@@ -36,6 +36,89 @@ Do not ask the user — just verify visually after every UI change.
 
 ---
 
+## Branch + PR Workflow (Non-Negotiable)
+
+**Every non-trivial set of changes lands via a feature branch + PR.** Direct pushes to `main` are blocked server-side by branch protection on all three source repos (`qb-engineer-server`, `qb-engineer-ui`, `qb-engineer-test`) — but more importantly, the user wants the PR moment as a deliberate review checkpoint.
+
+### When a branch is required
+
+Required for:
+- Multi-file changes
+- Anything that introduces a new pattern, convention, or shared component
+- Schema / DTO / wire-contract changes
+- New features
+- Refactors that span more than one component
+- Migrations
+- Workflow / CI / deploy config changes
+
+Skippable only for:
+- Single-line typo fixes
+- Comment-only changes
+- Fixes the user explicitly tags as "tiny" / "quick" / "just push it"
+
+When unclear, ask once at the start: *"Branch this or push direct?"* — and remember the answer for the rest of the conversation.
+
+### Naming
+
+`feat/<short-name>` · `fix/<short-name>` · `chore/<short-name>` · `refactor/<short-name>` · `docs/<short-name>`
+
+Names ≤5 words. Use kebab-case. The PR title carries the full context — the branch name just needs to be searchable.
+
+Examples: `feat/oem-on-vendorpart`, `fix/sourcing-step-mock-shape`, `chore/document-branch-pr-workflow`, `refactor/part-sourcing-resolver`.
+
+### Flow
+
+1. **Before starting:** `git checkout -b <type>/<name>` from the latest `main`. Create the branch first; don't accumulate uncommitted work on `main`.
+2. **Commit on the branch as you work.** Multiple commits are fine — they'll squash-merge.
+3. **Validate locally before push.** Always run the same gates the CI runs (`npm run test -- --watch=false` for UI/test repos, `dotnet build -warnaserror && dotnet test` for server). Spec tests live under a separate `tsconfig.spec.json` that prod-build doesn't compile, so `tsc --noEmit` and `ng build` alone are not enough — explicit test runs are mandatory.
+4. **Stop and summarize when the work is complete.** Show:
+   - Branch name
+   - Commits on the branch (one-liners)
+   - Files touched, grouped by area
+   - Local validation results (test counts, build status)
+   - Anything operationally relevant (new migration, env-var addition, etc.)
+5. **Ask for approval before opening the PR.** Wait for explicit confirmation. Don't infer approval from silence.
+6. **On approval:** `git push -u origin <branch>` then `gh pr create --title "..." --body "$(cat <<'EOF'...EOF)"` with the structured template below. Return the PR URL.
+7. **Never self-merge.** The user reviews and merges (or asks for changes). If changes are requested, commit them on the same branch and push — the PR auto-updates.
+
+### PR template
+
+```
+## Summary
+- 2-4 bullets: what changed at a high level
+
+## Why
+The problem this solves, the user request that triggered it, or the
+incident it prevents recurring. One short paragraph.
+
+## Scope
+Files / areas touched, anything notable a reviewer would want to know
+upfront (e.g. "introduces a new shared component", "renames a public
+endpoint", "migrates 14 files").
+
+## Test plan
+- [x] Local: <what was verified, with command output if useful>
+- [ ] Deploy: <what should be re-verified once the new image lands on
+      the server — only include if there's something the live env
+      reveals that local can't>
+
+## Migration / operational notes
+Only if applicable. New env var, new migration, version-bump action
+required, etc. If none, omit this section entirely.
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+```
+
+### Hard rules
+
+- **Don't open the PR without explicit user approval**, even after the work is fully done.
+- **Don't self-merge.** Even if the user is silent and the PR is sitting there green for hours.
+- **Don't force-push to a feature branch after the user has started reviewing.** Push fresh commits instead — they're easier to review incrementally.
+- **Don't delete the branch after merge** — let GitHub do that via the "delete branch on merge" repo setting (or let the user delete manually).
+- **Don't bypass branch protection** even when an error suggests it would help. If a hotfix really must skip the branch flow, surface that to the user and get explicit "yes, push direct" before doing it.
+
+---
+
 ## Space Efficiency (Application-Wide Rule)
 
 **Every UI screen must fit and be usable at 1080p (1920×1080) without scrolling off-screen or hiding primary content.** This is a hard constraint, not a nice-to-have.
