@@ -52,13 +52,16 @@ sudo QB_DEPLOY_USER=qbedeploy /opt/qb-engineer-deploy/scripts/install-qb-deploy.
 qb-deploy --status
 
 # What images are out there?
-qb-deploy --list                 # last 10 main-<sha> builds per image
-qb-deploy --list --releases      # X.Y.Z semver releases
+qb-deploy --list --releases      # X.Y.Z semver releases (preferred)
+qb-deploy --list                 # last 10 main-<sha> builds per image (legacy)
+
+# Deploy a specific semver to all services
+qb-deploy 1.2.3
 
 # Deploy interactively — picks last 5 main-<sha> per service
 qb-deploy
 
-# Deploy a specific tag to all services
+# Deploy a specific SHA tag to all services
 qb-deploy main-abc1234
 
 # Deploy that tag only to the api
@@ -82,12 +85,16 @@ qb-deploy --self-update
 
 `qb-deploy` only accepts:
 
-- `main-<7-hex>` (e.g. `main-abc1234`) — produced by every push to `main`
-- `<X.Y.Z>` (e.g. `1.2.3`) — produced by tag pushes to source repos
+- `<X.Y.Z>` (e.g. `1.2.3`) — auto-bumped by CI on every push to `main`
+  in the source image repos. **The preferred deploy surface.** See
+  [docs/cicd-design.md §Phase 8 addendum](./cicd-design.md) for the
+  auto-bump model.
+- `main-<7-hex>` (e.g. `main-abc1234`) — also produced on every main
+  push, kept for compatibility. Use when chasing a specific commit.
 
 It refuses `latest` outright. If you find yourself wanting to deploy
-`latest`, you really want `qb-deploy --list` and one of the SHAs that
-prints.
+`latest`, you really want `qb-deploy --list --releases` and one of the
+semver tags that prints.
 
 ## Healthcheck behavior
 
@@ -112,7 +119,7 @@ on the previous image.
 Sample log line:
 
 ```
-2026-04-28T22:14:33Z api main-9f8e7d6 -> main-abc1234 ok
+2026-05-02T22:14:33Z api 0.1.4 -> 0.1.5 ok
 ```
 
 ## Self-update
