@@ -17,10 +17,16 @@ deploy tag automatically pulls the right images.
 
 ## How to release
 
-1. Pick the sibling versions to bundle. They must already be tagged in
-   their own repos.
+1. Pick the sibling versions to bundle. They are already tagged
+   automatically — image repos (`qb-engineer-server`, `qb-engineer-ui`,
+   `qb-engineer-test`) auto-bump patch on every main push and publish
+   `<X.Y.Z>` tags to GHCR. See
+   [docs/cicd-design.md §Phase 8 addendum](./docs/cicd-design.md) and
+   [qb-engineer-deploy/CONTRIBUTING.md](https://github.com/danielhokanson/qb-engineer-deploy/blob/main/CONTRIBUTING.md)
+   for the auto-bump model.
 2. Update `qb-engineer-deploy/docker-compose.yml` to reference the
-   chosen image tags. Tag and release `qb-engineer-deploy`.
+   chosen image tags. Tag and release `qb-engineer-deploy` (manual,
+   no auto-bump — deploy repo publishes no image).
 3. Add a row to this manifest with the master tag + sibling versions.
 4. Tag this repo (`git tag -a vX.Y.Z -m "..."`) and push.
 5. Create a GitHub release on this repo summarizing what's in the bundle
@@ -30,6 +36,14 @@ deploy tag automatically pulls the right images.
 
 - **Independent semver per repo.** A bug fix in the UI doesn't bump the
   server's version.
+- **Image repo patch bumps are automatic.** `qb-engineer-server`,
+  `qb-engineer-ui`, and `qb-engineer-test` derive patch from
+  `BASE + (commits since VERSION was last touched)` in CI. Operators
+  bump minor/major by editing the `VERSION` file at the repo root and
+  pushing; the next CI build picks up the new base and resets distance
+  to 0.
+- **Deploy repo + this umbrella repo stay manual.** Neither publishes
+  a Docker image; their releases are git tags created on demand.
 - **Master version is set by the maintainer**, not auto-derived. Use it
   to signal "this is a recommended bundle" — typically minor or patch
   for refreshes, major when the platform behavior changes meaningfully.

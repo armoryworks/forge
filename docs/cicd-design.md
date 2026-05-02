@@ -304,3 +304,142 @@ less disruptive and keeps muscle memory on dev workstations.
   `refresh.*` for dev-side dev-loop, `qb-deploy` for prod CD. See
   `qb-engineer-deploy/CONTRIBUTING.md` for the operator-facing version
   of this distinction.
+
+## Phase 8 addendum (2026-05-02) — semver auto-bump, matrix split, Node 24
+
+Three operator-facing changes that the original design left open: the
+ambiguity of `main-<sha>` tags as a deploy surface, the build-time
+collapse of QEMU-emulated multi-arch on the server image, and the
+runner Node 20 deprecation deadline.
+
+### Auto-bumped semver replaces hash tags as the primary deploy surface
+
+The original design treated `main-<sha>` as the everyday deploy tag and
+`<X.Y.Z>` as a manual release tag. In practice this was opaque: the Pi
+operator looking at GHCR couldn't tell `main-23d6af4` from `main-9f8e7d6`
+without cross-referencing commit dates. The new model auto-derives a
+real semver on every main push.
+
+- **Per-repo `VERSION` file** holds `MAJOR.MINOR.BASE` (e.g. `0.0.0`,
+  `0.1.0`, `1.0.0`). Lives at the repo root in `qb-engineer-server`,
+  `qb-engineer-ui`, and `qb-engineer-test`. Edited manually for minor
+  and major bumps.
+- **Patch is computed in CI** as `BASE + (commits since VERSION was last
+  touched)`. The release workflow runs `git log -1 --format=%H -- VERSION`
+  to find the anchor, then `git rev-list --count <anchor>..HEAD`. This
+  resets to 0 when `VERSION` is edited and committed, so a `0.0.0` →
+  `0.1.0` bump produces `0.1.0` on the next CI build (not `0.1.5` or
+  whatever hash count happened to be in flight).
+- **Tag set on every main push:** `<X.Y.Z>` (immutable patch),
+  `<X.Y>` (floating minor), `latest` (floating, dev-only), and
+  `main-<sha>` (legacy, kept for compatibility with old qb-deploy
+  invocations). The `qb-deploy` CLI accepts both `<X.Y.Z>` and
+  `main-<sha>`, refuses `latest`.
+- **Tag set on `v*.*.*` git-tag push** (manual milestone): adds `<X>`
+  (floating major). Bypasses the VERSION-file computation entirely, so
+  the operator can cut `v2.0.0` without first editing VERSION.
+- **No git-tag pushing happens from inside CI.** The auto-bump is a
+  read of repo state, not a write. This avoids the recursive-build trap
+  (a tag-push would re-trigger the workflow).
+- **Operator workflow:** edit `VERSION` to bump minor/major, push to
+  main, CI publishes `0.1.0` (or whatever). Patch bumps are automatic
+  on every subsequent main commit. The operator never tags a release
+  manually unless they want a milestone semver (`vX.Y.Z`).
+
+### Matrix split: native amd64 + native arm64, no QEMU
+
+The original design used a single ARM64 runner with QEMU emulation for
+the amd64 leg. This hit the 30-minute timeout on the server image
+(chromium + ffmpeg + playwright add ~520MB of installs that QEMU runs
+5–10x slower than native). Rather than hide the symptom by extending the
+timeout, the release workflow now uses a build matrix:
+
+```yaml
+strategy:
+  matrix:
+    include:
+      - platform: linux/amd64
+        runner: ubuntu-latest
+        arch: amd64
+      - platform: linux/arm64
+        runner: ubuntu-24.04-arm
+        arch: arm64
+```
+
+Each matrix leg builds natively, pushes by-digest only, then a
+`merge-manifests` job downloads both digest artifacts and runs
+`docker buildx imagetools create` to publish the named tags as a single
+multi-arch manifest list. Per-arch GHA cache scopes (`scope=${matrix.arch}`)
+keep amd64 and arm64 caches isolated.
+
+The UI image stays single-job (it's small enough that QEMU on the
+amd64 leg doesn't time out). If it ever does, copy the matrix shape
+from the server workflow.
+
+### Why amd64 isn't dropped
+
+The Pi production target is arm64. Dropping amd64 was tempting but
+rejected: testers and contributors run on x86_64 server hardware, and
+some standalone customers may eventually deploy to amd64 VMs. The cost
+of a parallel amd64 leg (~10 min on its own native runner) is small.
+
+### Node 24 runtime forcing
+
+GitHub deprecated Node 20 on hosted runners (forced default June 2026,
+removed September 2026). Most action publishers haven't retagged their
+JS-based actions yet. Setting:
+
+```yaml
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+```
+
+at the top of every workflow forces actions/checkout, docker/login,
+docker/build-push, etc. to run on the runner's Node 24 binary at
+runtime — no per-action upgrade dance, no failures when individual
+actions retag.
+
+Applied to all 9 workflows across the three image-publishing repos
+(server, ui, test) as a top-level `env` block. Once all upstream
+actions retag for Node 24 native, this flag becomes a no-op and can
+be removed.
+
+### Concurrency to prevent stacking
+
+Each release workflow declares `concurrency: { group: release-${{ github.ref }} }`
+to prevent overlapping runs of the same ref. New pushes queue rather
+than stack; the previous run finishes (or is cancelled per
+`cancel-in-progress: false` on release, which we leave false to avoid
+half-published manifests).
+
+### Test gating across both workflows
+
+`ci.yml` runs on PR-to-develop/main and push-to-develop/main. `release.yml`
+on the image repos runs the same test suite as a `test` job that the
+`build-and-push` matrix `needs:`, so a failing test on a main push
+prevents image publication. The duplication is intentional — `ci.yml`
+provides the PR gate, the release `test` job provides the publish gate.
+
+### Branch protection
+
+Branch protection on `main` requires the `test` job from each repo's
+release workflow to pass before merge. Status check names are pinned to
+the canonical job names (`test`, `build-and-push (amd64)`,
+`build-and-push (arm64)`, `merge-manifests`).
+
+### What this means for `qb-deploy`
+
+The CLI is unchanged — it already accepted both `main-<sha>` and
+`<X.Y.Z>` tags, validated against regexes pinned in Phase 3+4. Operators
+should now reach for `qb-deploy --list --releases` (semver) by default
+and `qb-deploy --list` (sha) only when chasing a specific commit. The
+state file format is unchanged; `current` and `prior` accept either tag
+form transparently.
+
+### What this means for the deploy repo
+
+`qb-engineer-deploy` itself remains tag-on-demand (`v*.*.*` git tag, no
+auto-bump). It publishes no image — its release is just the compose
+files at that tag. The release-manifest.md model continues to work
+unchanged: each row pairs sibling versions, but those versions are now
+real semver instead of opaque hashes.
