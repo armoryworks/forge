@@ -38,7 +38,16 @@ Do not ask the user — just verify visually after every UI change.
 
 ## Branch + PR Workflow (Non-Negotiable)
 
-**Every non-trivial set of changes lands via a feature branch + PR.** Direct pushes to `main` are blocked server-side by branch protection on all three source repos (`qb-engineer-server`, `qb-engineer-ui`, `qb-engineer-test`) — but more importantly, the user wants the PR moment as a deliberate review checkpoint.
+**Every non-trivial set of changes lands via a feature branch + PR into `develop`.** Direct pushes to `main` or `develop` are blocked server-side by branch protection on all three source repos (`qb-engineer-server`, `qb-engineer-ui`, `qb-engineer-test`) — but more importantly, the user wants the PR moment as a deliberate review checkpoint.
+
+**Branch model (per umbrella `CONTRIBUTING.md` — newly enforced as of 2026-05-03 after main-target PRs were piling up faster than reviews):**
+
+- `main` = released code. Never targeted directly by feature branches. Only updated by a periodic consolidation PR from `develop`.
+- `develop` = integration branch. **All feature PRs target `develop`.** Multiple feature PRs accumulate here.
+- `feature/*` (`fix/*`, `chore/*`, `refactor/*`, `docs/*`) = your work-in-progress branches, branched FROM `develop`, merged TO `develop`.
+- When a consolidated batch is ready, ONE PR brings `develop → main` (the release moment). The user opens that PR; not Claude.
+
+Dependabot is configured to target `develop` already.
 
 ### When a branch is required
 
@@ -68,7 +77,7 @@ Examples: `feat/oem-on-vendorpart`, `fix/sourcing-step-mock-shape`, `chore/docum
 
 ### Flow
 
-1. **Before starting:** `git checkout -b <type>/<name>` from the latest `main`. Create the branch first; don't accumulate uncommitted work on `main`.
+1. **Before starting:** `git fetch origin && git checkout develop && git pull --ff-only origin develop && git checkout -b <type>/<name>`. Branch from the latest `develop`, NOT main. Don't accumulate uncommitted work on develop or main.
 2. **Commit on the branch as you work.** Multiple commits are fine — they'll squash-merge.
 3. **Validate locally before push.** Always run the same gates the CI runs (`npm run test -- --watch=false` for UI/test repos, `dotnet build -warnaserror && dotnet test` for server). Spec tests live under a separate `tsconfig.spec.json` that prod-build doesn't compile, so `tsc --noEmit` and `ng build` alone are not enough — explicit test runs are mandatory.
 4. **Stop and summarize when the work is complete.** Show:
@@ -78,8 +87,9 @@ Examples: `feat/oem-on-vendorpart`, `fix/sourcing-step-mock-shape`, `chore/docum
    - Local validation results (test counts, build status)
    - Anything operationally relevant (new migration, env-var addition, etc.)
 5. **Ask for approval before opening the PR.** Wait for explicit confirmation. Don't infer approval from silence.
-6. **On approval:** `git push -u origin <branch>` then `gh pr create --title "..." --body "$(cat <<'EOF'...EOF)"` with the structured template below. Return the PR URL.
+6. **On approval:** `git push -u origin <branch>` then `gh pr create --base develop --title "..." --body "$(cat <<'EOF'...EOF)"` with the structured template below. **`--base develop` is mandatory** — `gh pr create` defaults to the repo's default branch (`main`), which is the wrong target. Return the PR URL.
 7. **Never self-merge.** The user reviews and merges (or asks for changes). If changes are requested, commit them on the same branch and push — the PR auto-updates.
+8. **Don't open the consolidation `develop → main` PR.** That's the user's release moment, not yours. Stop after develop merge.
 
 ### PR template
 
