@@ -86,7 +86,11 @@ Examples: `feat/oem-on-vendorpart`, `fix/sourcing-step-mock-shape`, `chore/docum
 **Per-feature work inside an effort:**
 1. **Before starting:** `git fetch origin && git checkout effort/<current> && git pull --ff-only origin effort/<current> && git checkout -b <type>/<short-name>`. Types: `feat`, `fix`, `chore`, `refactor`, `docs`. Names ≤5 words, kebab-case.
 2. **Commit on the branch as you work.** Multiple commits are fine — auto-merge will squash.
-3. **Validate locally before push.** Same gates CI runs (`npm run test -- --watch=false` for UI/test repos, `dotnet build -warnaserror && dotnet test` for server). Spec tests live under a separate `tsconfig.spec.json` that prod-build doesn't compile, so `tsc --noEmit` and `ng build` alone are not enough — explicit test runs are mandatory.
+3. **Validate locally before push.** Same gates CI runs:
+    - **UI repo (`qb-engineer-ui`):** `npm run lint && npm run lint:i18n && npm run test -- --watch=false`. The `lint:i18n` script (added 2026-05-03) catches the recurring "{key.path} renders raw because en.json is missing it" bug class — `tsc --noEmit`, `ng build`, and `vitest` all silently allow missing keys (vitest specs use a mocked TranslateLoader). When you add a `'foo.bar' | translate` reference, run this before pushing.
+    - **Server repo (`qb-engineer-server`):** `dotnet build -warnaserror && dotnet test`.
+
+    Spec tests live under a separate `tsconfig.spec.json` that prod-build doesn't compile, so `tsc --noEmit` and `ng build` alone are not enough — explicit test runs are mandatory.
 4. **Push + open PR + enable auto-merge — no approval gate.**
    ```
    git push -u origin <branch>
