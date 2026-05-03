@@ -38,16 +38,18 @@ Do not ask the user — just verify visually after every UI change.
 
 ## Branch + PR Workflow (Non-Negotiable)
 
-**Every non-trivial set of changes lands via a feature branch + PR into `develop`.** Direct pushes to `main` or `develop` are blocked server-side by branch protection on all three source repos (`qb-engineer-server`, `qb-engineer-ui`, `qb-engineer-test`) — but more importantly, the user wants the PR moment as a deliberate review checkpoint.
+**Every non-trivial set of changes lands via a feature branch + PR into a per-effort integration branch.** Direct pushes to `main` are blocked server-side by branch protection on all source repos.
 
-**Branch model (per umbrella `CONTRIBUTING.md` — newly enforced as of 2026-05-03 after main-target PRs were piling up faster than reviews):**
+**Branch model (corrected 2026-05-03 after the first develop-as-integration pass — Dan wants per-effort branches with descriptive names, not one long-running develop):**
 
-- `main` = released code. Never targeted directly by feature branches. Only updated by a periodic consolidation PR from `develop`.
-- `develop` = integration branch. **All feature PRs target `develop`.** Multiple feature PRs accumulate here.
-- `feature/*` (`fix/*`, `chore/*`, `refactor/*`, `docs/*`) = your work-in-progress branches, branched FROM `develop`, merged TO `develop`.
-- When a consolidated batch is ready, ONE PR brings `develop → main` (the release moment). The user opens that PR; not Claude.
+- `main` = released code. Never targeted directly by feature branches. Only updated when an effort wraps and a consolidation PR brings the whole effort in.
+- **Effort branches** (e.g. `effort/inline-create`, `effort/quality-and-mrp-pass`) = where one cohesive batch of work accumulates. Created off `main` at the start of an effort. Lives until the effort wraps, then merged to main and deleted.
+- `feature/*` (`fix/*`, `chore/*`, `refactor/*`, `docs/*`) = work-in-progress branches, branched FROM the current effort branch, merged TO the current effort branch.
+- When the effort is done: Claude opens **ONE** PR (effort branch → main); the user reviews and approves. That's the only review checkpoint.
 
-Dependabot is configured to target `develop` already.
+**Per-feature PRs into the effort branch are auto-merged after CI green.** Claude opens the PR with `gh pr merge --auto --squash`, then GitHub merges automatically once required checks pass. **If CI fails, Claude is responsible for fixing it** — don't leave failing PRs sitting open.
+
+Dependabot is configured to target `develop` (legacy from the first pass — ignore for per-effort work; Dependabot PRs bypass the effort-branch model and target `develop` directly. Sync `develop` from `main` periodically as a parking branch for them).
 
 ### When a branch is required
 
@@ -77,19 +79,26 @@ Examples: `feat/oem-on-vendorpart`, `fix/sourcing-step-mock-shape`, `chore/docum
 
 ### Flow
 
-1. **Before starting:** `git fetch origin && git checkout develop && git pull --ff-only origin develop && git checkout -b <type>/<name>`. Branch from the latest `develop`, NOT main. Don't accumulate uncommitted work on develop or main.
-2. **Commit on the branch as you work.** Multiple commits are fine — they'll squash-merge.
-3. **Validate locally before push.** Always run the same gates the CI runs (`npm run test -- --watch=false` for UI/test repos, `dotnet build -warnaserror && dotnet test` for server). Spec tests live under a separate `tsconfig.spec.json` that prod-build doesn't compile, so `tsc --noEmit` and `ng build` alone are not enough — explicit test runs are mandatory.
-4. **Stop and summarize when the work is complete.** Show:
-   - Branch name
-   - Commits on the branch (one-liners)
-   - Files touched, grouped by area
-   - Local validation results (test counts, build status)
-   - Anything operationally relevant (new migration, env-var addition, etc.)
-5. **Ask for approval before opening the PR.** Wait for explicit confirmation. Don't infer approval from silence.
-6. **On approval:** `git push -u origin <branch>` then `gh pr create --base develop --title "..." --body "$(cat <<'EOF'...EOF)"` with the structured template below. **`--base develop` is mandatory** — `gh pr create` defaults to the repo's default branch (`main`), which is the wrong target. Return the PR URL.
-7. **Never self-merge.** The user reviews and merges (or asks for changes). If changes are requested, commit them on the same branch and push — the PR auto-updates.
-8. **Don't open the consolidation `develop → main` PR.** That's the user's release moment, not yours. Stop after develop merge.
+**Starting an effort:**
+- If no effort branch exists for the work the user just asked about, ask once: *"What should we name the effort branch? (e.g. `effort/quality-pass`, `effort/inline-create`)"* — kebab-case, ≤4 words. Then create it: `git fetch origin && git checkout main && git pull --ff-only origin main && git checkout -b effort/<name> && git push -u origin effort/<name>`.
+- If an effort branch already exists for ongoing related work, branch new features off it (don't open a parallel effort).
+
+**Per-feature work inside an effort:**
+1. **Before starting:** `git fetch origin && git checkout effort/<current> && git pull --ff-only origin effort/<current> && git checkout -b <type>/<short-name>`. Types: `feat`, `fix`, `chore`, `refactor`, `docs`. Names ≤5 words, kebab-case.
+2. **Commit on the branch as you work.** Multiple commits are fine — auto-merge will squash.
+3. **Validate locally before push.** Same gates CI runs (`npm run test -- --watch=false` for UI/test repos, `dotnet build -warnaserror && dotnet test` for server). Spec tests live under a separate `tsconfig.spec.json` that prod-build doesn't compile, so `tsc --noEmit` and `ng build` alone are not enough — explicit test runs are mandatory.
+4. **Push + open PR + enable auto-merge — no approval gate.**
+   ```
+   git push -u origin <branch>
+   gh pr create --base effort/<current> --title "..." --body "$(cat <<'EOF'...EOF)"
+   gh pr merge <pr-number> --auto --squash
+   ```
+   Brief one-line summary in chat with the PR URL. No approval needed; per-feature review is not how Dan works.
+5. **Watch CI.** If checks fail, fix the issue, push, and let auto-merge re-evaluate. Don't leave failing PRs sitting open. If you can't fix it (truly stuck), surface that to the user with the failure context.
+
+**Wrapping the effort:**
+6. **When the user signals the effort is done** (or you've finished everything they asked for in this effort), open the consolidation PR yourself: `gh pr create --base main --head effort/<current> --title "..." --body "$(cat <<'EOF'...EOF)"`. Use the PR template below; the body summarizes everything that landed in the effort branch (list each merged feature PR + its impact).
+7. **STOP and ask the user to review and approve** the effort → main PR. Don't auto-merge this one. This is the only review checkpoint — make the description thorough enough to support a real review.
 
 ### PR template
 
@@ -121,10 +130,11 @@ required, etc. If none, omit this section entirely.
 
 ### Hard rules
 
-- **Don't open the PR without explicit user approval**, even after the work is fully done.
-- **Don't self-merge.** Even if the user is silent and the PR is sitting there green for hours.
-- **Don't force-push to a feature branch after the user has started reviewing.** Push fresh commits instead — they're easier to review incrementally.
-- **Don't delete the branch after merge** — let GitHub do that via the "delete branch on merge" repo setting (or let the user delete manually).
+- **Per-feature PRs into an effort branch**: open + auto-merge without approval. The user's review point is the consolidated effort → main PR, not each piece.
+- **Effort → main PRs**: NEVER auto-merge. Open with the consolidated description, STOP, and wait for the user's explicit review and approval.
+- **Don't open a parallel effort branch** when the user's request is a continuation of work already on an open effort. Branch new features off the existing effort instead.
+- **Don't force-push to a feature branch after auto-merge has run.** Once squashed, the branch's history is in the effort branch; force-pushing the now-deleted feature branch does nothing useful.
+- **Don't delete the effort branch yourself after the consolidation PR merges** — let GitHub do that via "delete branch on merge", or the user will.
 - **Don't bypass branch protection** even when an error suggests it would help. If a hotfix really must skip the branch flow, surface that to the user and get explicit "yes, push direct" before doing it.
 
 ---
