@@ -101,6 +101,52 @@ Customer has no `Status` enum today. Adding one is its own migration. Sequencing
 
 **Recommendation:** Option B, but as a separate effort that lands BEFORE the customer workflow effort. Otherwise we ship a half-shape and have to retrofit later.
 
+## Sub-flows within Part — keep them off the create flow, surface from edit
+
+Part has multiple sub-areas that themselves benefit from a guided experience but DO NOT belong inside the new-part flow (cramming BOM + Routing + Pricing + sourcing + QC + compliance into one create wizard would be brutal). Instead, the new-part flow stays minimal (basics + cost) and the **part edit page** surfaces entry-point cards or links into focused sub-workflows.
+
+### Mechanism (no new abstractions)
+
+Each sub-flow is a **workflow definition bound to `entityType=Part`** with its own `definitionId`. The user clicks an entry point on the part edit page, which routes to `/parts/{id}?workflow={subflowDefinitionId}`. The same `WorkflowComponent` shell mounts; the steps and gates are scoped to the one concern. No new entity types in the workflow registry, no new server adapters — just new definitions + step components.
+
+### Initial sub-flow roster
+
+Lead with these six. Everything else waits until the pattern is proven on this set.
+
+#### Configuration sub-flows (set up data on the part)
+
+- **`part-bom-setup-v1`** — add components, set quantities + scrap factor, mark phantoms / alternates, validate against circular references. Gates on `hasBom`. Replaces the inline BOM cluster's add/edit dialogs as the *guided* path; cluster stays for power users who want a flat editor.
+- **`part-routing-setup-v1`** — sequence operations, assign work centers, set cycle + setup times, flag subcontract steps. Gates on `hasRouting`.
+- **`part-pricing-setup-v1`** — material cost, labor cost, overhead, target margin, tier breaks. Gates on `hasCost` (and a new `hasMargin` once defined).
+- **`part-sourcing-setup-v1`** — primary vendor, backup vendors (n), per-vendor pricing tiers, MOQ + lead time, mark preferred. Gates on `hasSourcing` and a future `hasVendorParts`.
+
+#### Lifecycle transition sub-flows (change the part's state)
+
+- **`part-obsolescence-v1`** — verify no open POs / SOs / WOs reference this part, suggest a replacement, set effective date, notify affected customers, transition status. **High-stakes** — orphaning open commitments is exactly what guided flows exist to prevent.
+- **`part-clone-v1`** — guided variant creation: pick source part → choose what to copy (BOM ✓, routing ✓, vendor list ✗, pricing reset, etc.) → tweak basics → save. Saves enormous re-entry for similar parts.
+
+### Deferred until the initial six are solid
+
+- **`part-quality-setup-v1`** — QC template, sampling plan, traceability config, FAI requirements. Gates on a future `hasQualityPolicy`.
+- **`part-inventory-policy-v1`** — thresholds, reorder rules, ABC refinement, bin defaults, UoM. Gates on `hasInventory` + new policy gates.
+- **`part-compliance-v1`** — HTS code, country of origin, hazmat, shelf life, certs. Required when `internationalShipping` or `regulatedIndustry` is on (per the customer-side game-out).
+- **`part-makebuy-reclassify-v1`** — when a part's `procurementSource` changes mid-life, walk through tearing down (Make→Buy) or building up (Buy→Make) BOM/routing. Rare but high-impact.
+
+### Documents — explicitly NOT a sub-flow
+
+File attachments / drawings / specs stay as a plain panel on the part edit page. There are no logical step breaks worth guiding through; it's just "here are the files."
+
+### Engineering Change Order (ECO) — meta-flow, separate design
+
+When `CAP-MD-ECO` is on, every change to BOM / routing / specs has to go through propose → review → approve → implement → verify. ECO **wraps** the configuration sub-flows above rather than replacing them. Whether the workflow shell hosts the ECO state machine or ECO is a layer above the shell is its own design conversation, deferred until the initial six are in production.
+
+### Sub-flow design principles
+
+- **One concern per flow.** A sub-flow that touches more than one of {BOM, routing, pricing, sourcing} should be a different sub-flow, not a longer one.
+- **Both modes available.** Express = the existing inline editor (BOM cluster, etc.) — no change required. Guided = the new sub-flow. The mode toggle in the shell flips between them when both are registered.
+- **Entry from edit page only.** New-part flow does NOT link into sub-flows. The entry-point cards live on `/parts/{id}` (edit). Reasoning: a brand-new part with no id can't have a BOM yet; trying to chain creates layers of state we don't want to manage.
+- **Resumable like everything else.** A user halfway through `part-bom-setup-v1` who closes the tab can come back to `/parts/42?workflow=part-bom-setup-v1` and pick up where they left off — same `WorkflowRun` machinery as the create flow.
+
 ## Workflow runs admin — the (b) extension
 
 Dan also wants the same guided UX applied to the existing Workflow runs admin pages. Today the Workflow admin is functional but not friendly — listing rows, opening details, manually completing or abandoning runs.
@@ -117,14 +163,16 @@ Scope of "(b)":
 
 Order of operations, before any new-entity effort starts:
 
-1. **Polish Part to "nearly flawless."** Ongoing. Driven by UX audits like the one that turned up the cost-required and validation-button bugs.
-2. **Add applicability checks to validators** (Part-side prework). Enables per-profile readiness for Customer; also retroactively enables capability-driven gates on Part itself.
-3. **Add a `[readonly]` input to `WorkflowComponent`.** Unblocks the workflow-runs admin (b) as well as future history-view surfaces.
-4. **Promote `WorkflowComponent` step-rail polish back to Part.** Whatever lessons we learn in Part-shell refinement need to be in the shared component before any new entity copies it.
-5. **Add `CustomerStatus` enum + migration + global filter retrofit.** Blocks the Customer workflow.
-6. **Author Customer workflow definitions, validators, step components.** This is the actual cloning work.
+1. **Polish Part to "nearly flawless."** Ongoing. Driven by UX audits like the one that turned up the cost-required and validation-button bugs. Currently in flight as Efforts A / B / C (rail polish, header & navigation, feedback & continuity).
+2. **Add the "what does this enable" collapsible pane to guided steps** (item 2 from the polish list). Per-step content explaining what filling in the section enables or blocks downstream — particularly valuable in guided sections where each step is a logical break point on a functional dependency. Deferred from the initial polish efforts because it requires content authoring per step, not just code.
+3. **Add applicability checks to validators** (Part-side prework). Enables per-profile readiness for Customer; also retroactively enables capability-driven gates on Part itself.
+4. **Add a `[readonly]` input to `WorkflowComponent`.** Unblocks the workflow-runs admin (b) as well as future history-view surfaces.
+5. **Promote `WorkflowComponent` step-rail polish back to Part.** Whatever lessons we learn in Part-shell refinement need to be in the shared component before any new entity copies it.
+6. **Build the initial six Part sub-flows** (`part-bom-setup-v1`, `part-routing-setup-v1`, `part-pricing-setup-v1`, `part-sourcing-setup-v1`, `part-obsolescence-v1`, `part-clone-v1`). Surface entry-point cards on the part edit page. Validates that the shell handles N-flows-per-entity cleanly before we adopt it elsewhere.
+7. **Add `CustomerStatus` enum + migration + global filter retrofit.** Blocks the Customer workflow.
+8. **Author Customer workflow definitions, validators, step components.** This is the actual cloning work.
 
-Step 1 is unbounded and intentional. Steps 2–4 are abstraction lifts — we should do them on Part anyway to keep the canonical reference current. Steps 5–6 are the real Customer effort.
+Step 1 is unbounded and intentional. Steps 2–5 are abstraction lifts — we should do them on Part anyway to keep the canonical reference current. Step 6 stress-tests the pattern at scale within one entity. Steps 7–8 are the real Customer effort.
 
 ## Open questions still TBD
 
