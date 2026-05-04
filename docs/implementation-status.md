@@ -775,7 +775,6 @@ Legend: Done | Partial | Not Started | N/A (deferred or out of scope)
 | QuickActionPanelComponent | Done | Ready for adoption |
 | MiniCalendarWidgetComponent | Done | Ready for adoption |
 | ToastComponent | Done | Global |
-| PlaceholderComponent | Done | Unused features |
 | ConnectionBannerComponent | Done | Global |
 
 ### Services & Utilities

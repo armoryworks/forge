@@ -766,7 +766,6 @@ All list views must show `<app-empty-state>` when data is empty — icon + messa
 | `StatusBadgeComponent` | `shared/components/status-badge/` | Colored status indicator |
 | `DashboardWidgetComponent` | `shared/components/dashboard-widget/` | Dashboard widget shell |
 | `ToastComponent` | `shared/components/toast/` | Stackable upper-right toasts |
-| `PlaceholderComponent` | `shared/components/placeholder/` | Placeholder for unbuilt features |
 | `EmptyStateComponent` | `shared/components/empty-state/` | Icon + message + optional CTA for empty lists |
 | `DataTableComponent` | `shared/components/data-table/` | Configurable data table (see below) |
 | `ColumnFilterPopoverComponent` | `shared/components/data-table/column-filter-popover/` | Per-column filter overlay (text/number/date/enum) |
