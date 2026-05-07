@@ -90,6 +90,13 @@ Examples: `feat/oem-on-vendorpart`, `fix/sourcing-step-mock-shape`, `chore/docum
     - **UI repo (`qb-engineer-ui`):** `npm run lint && npm run lint:i18n && npm run test -- --watch=false`. The `lint:i18n` script (added 2026-05-03) catches the recurring "{key.path} renders raw because en.json is missing it" bug class — `tsc --noEmit`, `ng build`, and `vitest` all silently allow missing keys (vitest specs use a mocked TranslateLoader). When you add a `'foo.bar' | translate` reference, run this before pushing.
 
       **i18n files live at `qb-engineer-ui/public/assets/i18n/{en,es}.json`. NEVER edit `src/assets/i18n/` — that path is intentionally non-existent.** Angular CLI's static-asset directory migrated from `src/assets/` to `public/` and the migrated project kept `public/assets/i18n/` as the only bundled source (per `angular.json`). For ~3 sessions before 2026-05-04, edits went to a phantom `src/assets/i18n/` that wasn't in any build — every new key showed up at runtime as a raw `foo.bar` token while `tsc`, `ng build`, `vitest`, AND the early `lint:i18n` all stayed green. The fix: deleted `src/assets/i18n/` and the lint script now hard-fails if it ever reappears. Don't recreate it. If you need to add a translation, the path is `public/assets/i18n/en.json` (and `es.json`). Server-supplied keys (workflow step labelKeys, validator displayNameKey/missingMessageKey) are scanned by `lint:i18n` from `qb-engineer-server/qb-engineer.api/Workflows/*.cs` automatically.
+
+      **100% language-parity rule (added 2026-05-05).** Every mapped language file MUST be in 1:1 sync with `en.json` (the canonical source). `lint:i18n` now hard-fails on:
+      - Keys present in `en.json` but missing from `es.json` (untranslated).
+      - Keys present in `es.json` but missing from `en.json` (orphans).
+      - Keys referenced in code but missing from `en.json` (existing rule).
+
+      No "warn-only" lag tolerated — when you add a key to `en.json`, add the matching `es.json` entry in the same commit. When you remove a key from `en.json`, remove the `es.json` entry too. Adding a new mapped language is the same contract: every key in `en.json` must exist in the new file before merge.
     - **Server repo (`qb-engineer-server`):** `dotnet build -warnaserror && dotnet test`.
 
     Spec tests live under a separate `tsconfig.spec.json` that prod-build doesn't compile, so `tsc --noEmit` and `ng build` alone are not enough — explicit test runs are mandatory.
@@ -196,6 +203,17 @@ qb-engineer-wrapper/
 ---
 
 ## Critical Rules
+
+### Lint discipline (Non-Negotiable)
+
+**No commit may add new lint warnings.** After any UI file edit, run `npm run lint` from `qb-engineer-ui` and ensure:
+
+- **Zero errors.** CI fails on errors via `ng lint`'s exit code; never push with a known error.
+- **Zero NEW non-spec warnings introduced by this commit.** Pre-existing warnings in unrelated files are acceptable to leave alone (separate cleanup PR), but the diff this commit ships must not add any. The standard `--fix` pass handles the easy ones (autofocus, lifecycle interfaces, stale eslint-disable directives).
+
+A PostToolUse hook in `.claude/settings.json` runs eslint on every UI .ts/.html edit so warnings surface immediately at authoring time rather than at commit. If the hook reports new warnings, fix them before continuing.
+
+For .NET: CI runs `dotnet build --configuration Release -warnaserror`. Compiler warnings break the build. There's no broader analyzer/StyleCop pack wired in today (CLAUDE.md previously claimed both — that was aspirational; only `Nullable enable` + `-warnaserror` are actually configured). Adding a real analyzer pack is a separate effort.
 
 ### ONE OBJECT PER FILE (Non-Negotiable)
 - **Angular:** One component, service, pipe, directive, guard, interceptor, or model per file. No barrel files (`index.ts`).
@@ -789,6 +807,7 @@ All list views must show `<app-empty-state>` when data is empty — icon + messa
 | `RowExpandDirective` | `shared/directives/row-expand.directive.ts` | Tags `ng-template` for expandable row content |
 | `ConfirmDialogComponent` | `shared/components/confirm-dialog/` | MatDialog-based confirmation for destructive actions |
 | `DetailSidePanelComponent` | `shared/components/detail-side-panel/` | Slide-out right panel (400px, Escape/backdrop close) |
+| `SlideoutComponent` | `shared/components/slideout/` | Generic transient slideout (left/right/top/bottom) anchored to a `position: relative` parent. Always-on close button, opt-in backdrop, opt-in outside-click close. Use for help sidecars, filter drawers, secondary-region panels — anywhere you'd otherwise hand-roll an absolute-positioned aside. |
 | `PageLayoutComponent` | `shared/components/page-layout/` | Standard page shell (toolbar + content + actions) |
 | `EntityPickerComponent` | `shared/components/entity-picker/` | Typeahead entity search via API (CVA) |
 | `EntityLinkComponent` | `shared/components/entity-link/` | Inline clickable cross-entity reference link |
@@ -1019,6 +1038,46 @@ Slide-out right panel (400px, full-width on mobile). Backdrop click + Escape clo
   </div>
 </app-detail-side-panel>
 ```
+
+### SlideoutComponent — Usage Guide
+
+Generic transient slideout that overlays a parent container (not the viewport). The parent MUST have `position: relative` (or any non-static position) so the slideout's absolute positioning resolves to that surface; otherwise it escapes to whichever ancestor *is* positioned. Designed for help sidecars, filter drawers, info pop-ins, and similar progressive-disclosure surfaces.
+
+```html
+<!-- Right-side help sidecar (default position) -->
+<div class="container" style="position: relative;">
+  <app-slideout
+    [open]="helpOpen()"
+    position="right"
+    size="320px"
+    icon="help_outline"
+    [title]="'Why this step' | translate"
+    (closed)="helpOpen.set(false)">
+    <p>Help content goes here…</p>
+  </app-slideout>
+</div>
+
+<!-- Left filter drawer with backdrop + outside-click close -->
+<app-slideout
+  [open]="filterDrawerOpen()"
+  position="left"
+  size="280px"
+  [title]="'Filters' | translate"
+  [backdrop]="true"
+  [closeOnOutsideClick]="true"
+  (closed)="filterDrawerOpen.set(false)">
+  <!-- filter form -->
+</app-slideout>
+
+<!-- Bottom notification tray -->
+<app-slideout [open]="trayOpen()" position="bottom" size="240px" (closed)="trayOpen.set(false)">
+  <!-- tray content -->
+</app-slideout>
+```
+
+**Inputs:** `open` (Signal\<boolean>, required), `position` ('left'|'right'|'top'|'bottom', default 'right'), `size` (CSS length, default '320px' — width for left/right, height for top/bottom), `title` (string), `icon` (Material icon name), `backdrop` (boolean, default false), `closeOnOutsideClick` (boolean, default false). Always renders a close button; Escape always closes.
+
+**When NOT to use:** viewport-fixed drawers (mobile nav, app shell) — use a dialog or a future viewport-fixed variant instead. Modal forms — use `<app-dialog>`. Right-side detail panels with the standard 400px width and `[panel-actions]` footer — use `<app-detail-side-panel>` so the established pattern stays consistent.
 
 ### DetailDialogService — Usage Guide
 

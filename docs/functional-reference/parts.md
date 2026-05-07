@@ -54,30 +54,34 @@ There is no side panel on the list page. Clicking a part opens a full `MatDialog
 
 ## 4. Filters
 
-All filters are standalone `FormControl` instances (not part of a `FormGroup`). Changes trigger a re-fetch from the API.
+The page-level filters bar holds a single control: free-text Search. Status, Procurement, and Class filtering moved into the DataTable column-menu (per the 2026-05-06 server-driven column-filters refactor). The DataTable emits `(filtersChanged)`, the parts page translates the filter map into server query params and refetches.
 
-| Filter | Control | Options | Behavior |
-|--------|---------|---------|----------|
-| Search | `FormControl<string>` (text input) | Free text | Filters by part number, description, external part number. Pressing Enter triggers load. Also populated by barcode scanner. |
-| Status | `FormControl<PartStatus \| ''>` (select) | All Statuses (default), Active, Draft, Prototype, Obsolete | Sends `?status=` query param to API |
-| Type | `FormControl<PartType \| ''>` (select) | All Types (default), Part, Assembly, RawMaterial, Consumable, Tooling, Fastener, Electronic, Packaging | Sends `?type=` query param to API |
+| Filter | Control | Behavior |
+|--------|---------|----------|
+| Search | `FormControl<string>` (text input, page-level) | Free text spanning multiple fields. Triggers a 300ms-debounced refetch via `?q=`. Also populated by barcode scanner. |
+| Status | column-menu enum filter on the Status column | Multi-select; single-select forwards to server as `?status=`. Defaults to `Active` on first visit (via DataTable's `initialFilters`). |
+| Procurement | column-menu enum filter on the Procurement column | Single-select forwards as `?procurementSource=`. See Section 17 (Pillar 1 axes). |
+| Class | column-menu enum filter on the Class column | Single-select forwards as `?inventoryClass=`. See Section 17. |
+
+When a column filter has multiple values selected, the server-side constraint is dropped and the DataTable's internal filter pass culls client-side — the API takes a single value per param.
 
 ---
 
 ## 5. Table Columns
 
-The table view uses `DataTableComponent` with `tableId="parts"` for column preference persistence.
+The table view uses `DataTableComponent` with `tableId="parts"` for column preference persistence. The `partType` and `material` columns retired with Pillar 1 / Pillar 2; the columns below replace them. `externalPartNumber` moved off Part entirely as part of Pillar 3 — it now lives as `VendorPart.VendorPartNumber` (per-vendor-source).
 
 | Field | Header | Type | Sortable | Filterable | Width | Align | Custom Cell |
 |-------|--------|------|----------|------------|-------|-------|-------------|
-| `partNumber` | Part # | text | Yes | No | 120px | left | Styled with `part-number` class |
-| `externalPartNumber` | Ext Part # | text | Yes | No | 120px | left | Plain text |
-| `description` | Description | text | Yes | No | auto | left | Styled with `part-desc` class |
+| `partNumber` | Part # | text | Yes | No | 120px | left | Styled with `part-number` class. Draft-row variant: `part-row__draft-tag` |
+| `name` | Name | text | Yes | No | auto | left | Includes `EntityCompletenessBadge` chip + draft-resume affordance |
 | `revision` | Rev | text | No | No | 60px | center | Plain text |
-| `partType` | Type | text | Yes | No | auto | left | Icon (`account_tree` for Assembly, `settings` for others) + type label |
-| `status` | Status | enum | Yes | Yes | auto | left | Status badge with color class (`--active`, `--draft`, `--prototype`, `--obsolete`) |
-| `material` | Material | text | No | No | auto | left | Shows `---` when null |
+| `procurementSource` | Procurement | enum | Yes | Yes (enum) | 110px | left | `type-chip`. Filter options: Make, Buy, Subcontract, Phantom |
+| `inventoryClass` | Class | enum | Yes | Yes (enum) | 110px | left | `type-chip`. Filter options: Raw, Component, Subassembly, FinishedGood, Consumable, Tool |
+| `status` | Status | enum | Yes | Yes (enum) | auto | left | Status badge: `--active`, `--draft`, `--prototype`, `--obsolete` |
+| `effectivePrice` | Price | currency | Yes | No | 110px | right | `CurrencyDisplay`; `---` when source is `Default` (no price set) |
 | `bomEntryCount` | BOM | number | No | No | 60px | center | Shows count or `---` when zero |
+| `completeness` | Completeness | derived | No | No | 160px | center | `EntityCompletenessChip` — hidden by default; opt in via column-manager |
 
 Rows are clickable. Clicking a row opens the part detail dialog.
 
@@ -112,28 +116,42 @@ The dialog title is the part number (e.g., "PRT-00042"). The auto-generated part
 
 ### Form Fields
 
+The single `Type` field was decomposed into three orthogonal axes per Pillar 1; see Section 17 for the conceptual model.
+
 | Field | Control | Type | Required | Validation | Default | Notes |
 |-------|---------|------|----------|------------|---------|-------|
-| Type | `app-select` | select | Yes | `Validators.required` | `Part` | Options: Part, Assembly, RawMaterial, Consumable, Tooling, Fastener, Electronic, Packaging |
-| Description | `app-input` | text | Yes | `Validators.required` | `''` | Primary description of the part |
+| Name | `app-input` | text | Yes | `Validators.required, Validators.maxLength(256)` | `''` | Primary name of the part |
+| Description | `app-textarea` | text | No | `Validators.maxLength(2000)` | `''` | Long-form description |
 | Revision | `app-input` | text | No | `maxlength="5"` | `'A'` | Current revision letter/number |
-| External Part Number | `app-input` | text | No | None | `''` | Customer or vendor part number |
-| Material | `app-input` | text | No | None | `''` | Material specification (e.g., "6061-T6 Aluminum") |
-| Mold/Tool Ref | `app-input` | text | No | None | `''` | Reference to associated tooling |
+| Procurement Source | `app-select` | select | Yes | `Validators.required` | `Buy` | Pillar 1 axis 1. Options: Make, Buy, Subcontract, Phantom |
+| Inventory Class | `app-select` | select | Yes | `Validators.required` | `Component` | Pillar 1 axis 2. Options: Raw, Component, Subassembly, FinishedGood, Consumable, Tool |
+| Item Kind | reference-data picker | select | No | None | `null` | Pillar 1 axis 3. Admin-configurable taxonomy under reference-data group `part.item_kind` (e.g., Fastener, Electronic, Packaging, Hardware, Material) |
+| Traceability | `app-select` | select | Yes | `Validators.required` | `None` | Tier-0 addition. Options: None, Lot, Serial. Replaces the legacy `IsSerialTracked` boolean |
+| ABC Class | `app-select` | select | No | None | `null` | Tier-0 addition. Options: A, B, C, or unclassified |
+| Manufacturer Name | (deferred to source) | — | — | — | — | Engineering OEM identity; lives on `VendorPart.ManufacturerName` per Pillar 3, NOT on Part. The legacy `Part.ManufacturerName` column was retired |
+| Manufacturer Part # | (deferred to source) | — | — | — | — | Same — moved to `VendorPart.ManufacturerPartNumber` (and `VendorPart.VendorMpn` for the distributor case) |
 | Tooling Asset | `app-entity-picker` | entity picker | No | None | `null` | Searches assets filtered by `assetType: 'Tooling'` |
 | Min Stock Threshold | `app-input` | number | No | `Validators.min(0)` | `null` | Inventory alert threshold |
 | Reorder Point | `app-input` | number | No | `Validators.min(0)` | `null` | When to trigger reorder |
 | Reorder Quantity | `app-input` | number | No | `Validators.min(0.01)` | `null` | How much to order |
-| Lead Time (Days) | `app-input` | number | No | `Validators.min(0)` | `null` | Procurement lead time |
 | Safety Stock (Days) | `app-input` | number | No | `Validators.min(0)` | `null` | Buffer stock in days |
+
+**Retired fields** (gone from the entity, do not reintroduce):
+- `Material` (free-text). Tier-2 work introduces `MaterialSpecId` FK + a measurement profile; deferred — not in v1 of the dialog.
+- `MoldToolRef` (free-text). Replaced by the `ToolingAssetId` FK.
+- `LeadTimeDays` on Part. Lead time now lives on `VendorPart.LeadTimeDays` (per-vendor-source); a snapshot of the preferred VendorPart's value remains on `Part` for back-compat reads.
+- `MinOrderQty`, `PackSize` on Part. Same — moved to `VendorPart`.
+- `IsSerialTracked` boolean. Replaced by `TraceabilityType` enum.
 
 The "Inventory Replenishment" fields are grouped under a section label.
 
 ### Validation
 
-Validation uses the hover popover pattern (`ValidationPopoverDirective`). The save button is disabled when the form is invalid. Violations are derived from `FormValidationService.getViolations()` with field labels:
+Validation uses the `<app-validation-button>` stereotype (kebab + warn icon + popover; the legacy hover popover via `ValidationPopoverDirective` is retired on new code per CLAUDE.md). The save button is disabled when the form is invalid. Violations are derived from `FormValidationService.getViolations()` with field labels:
+- Name: "Name"
 - Description: "Description"
-- Type: "Type"
+- Procurement Source: "Procurement Source"
+- Inventory Class: "Inventory Class"
 
 ### Behavior on Save
 
@@ -156,33 +174,51 @@ The detail view opens as a full `MatDialog` via `DetailDialogService`, which syn
 
 ### Tabs
 
-The detail panel has the following tabs:
+The detail panel's visible tabs are resolved by `PartDetailLayoutResolverService` based on the part's procurement source / inventory class (Pillar 1) — not every tab applies to every part. The table below lists the full tab catalog plus when each renders.
 
-| Tab | Key | Badge | Condition |
-|-----|-----|-------|-----------|
-| Info | `info` | None | Always visible |
-| BOM | `bom` | Entry count (when > 0) | Always visible |
-| Used In | `usage` | Usage count (when > 0) | Always visible |
-| Routing | `process` | None | Always visible |
-| Files | `files` | File count (when > 0) | Always visible |
-| Alternates | `alternates` | None | Always visible |
-| Serials | `serials` | None | Only when `part.isSerialTracked` is true |
+| Tab | Key | Badge | When visible |
+|-----|-----|-------|--------------|
+| Identity | `identity` | None | Always |
+| Sources | `sourcing` | Vendor count | All parts. The primary surface for Pillar 3 (`VendorPart` + `VendorPartPriceTier`); empty for `Procurement = Make`. See Section 22. |
+| Purchase History | `purchaseHistory` | None | All parts (un-gated as of 2026-05-05) |
+| Inventory | `inventory` | None | All parts that participate in inventory (skipped for `Phantom`) |
+| BOM | `bom` | Entry count (when > 0) | Parts that can have a BOM (`Make`, `Subassembly`, `FinishedGood`, `Phantom`) |
+| Material | `material` | None | Raw materials and components where material spec is meaningful |
+| Routing | `process` | None | `Make` parts |
+| Quality | `quality` | None | All parts that get inspected |
+| Cost | `cost` | None | All parts |
+| Pricing | `pricing` | None | All parts that get priced/sold |
+| Activity | `activity` | None | Always |
+| Files | `files` | File count (when > 0) | Always |
+| Alternates | `alternates` | None | Always |
+| Serials | `serials` | None | Only when `part.traceabilityType === 'Serial'` (replaces the retired `isSerialTracked` boolean) |
 | 3D Viewer | `viewer` | None | Only when an STL file is attached |
 
-### Info Tab
+The exact per-procurement/per-class tab-set is owned by `PartDetailLayoutResolverService` — when adding a new tab, register it there with the predicate that controls visibility.
 
-Displays a grid of part properties:
+### Identity Tab (formerly "Info")
+
+Renamed from "Info" to "Identity" with the Pillar 1 redesign — the tab now scopes specifically to identity/categorization fields, with operational fields (inventory, cost, etc.) split into their own tabs.
+
+Displays a grid of part identity properties:
 
 | Field | Display |
 |-------|---------|
+| Part Number | Auto-generated, read-only |
 | Revision | Current revision letter |
-| Type | Part type name |
+| Procurement Source | Pillar 1 axis 1 (Make/Buy/Subcontract/Phantom) |
+| Inventory Class | Pillar 1 axis 2 (Raw/Component/Subassembly/FinishedGood/Consumable/Tool) |
+| Item Kind | Pillar 1 axis 3 (admin-configurable taxonomy) |
 | Status | Colored status badge |
-| Material | Material spec or `---` |
-| External Part Number | Shown only when set |
-| Mold/Tool Ref | Shown only when set |
-| Preferred Vendor | Vendor name, shown only when set |
+| Traceability | None / Lot / Serial |
+| ABC Class | A / B / C / unclassified |
+| Preferred Vendor | Vendor name, shown only when set. Drives the Sources-tab "preferred" chip and the cost calculation |
 | Tooling Asset | Asset name, shown only when set |
+
+**Retired Info-tab fields** (moved with Pillar 3 to the Sources tab where they're per-vendor, not per-part):
+- External Part Number → `VendorPart.VendorPartNumber`
+- Manufacturer Name → `VendorPart.ManufacturerName`
+- Manufacturer Part # → `VendorPart.ManufacturerPartNumber`
 
 **Barcode section:** Renders `BarcodeInfoComponent` with `entityType="Part"`, using the part number as the natural identifier. Supports barcode/QR label generation and printing.
 
@@ -552,28 +588,73 @@ The viewer is dynamically loaded only when the user clicks the "3D Viewer" tab (
 
 ---
 
-## 17. Part Types
+## 17. Part categorization — the three orthogonal axes (Pillar 1)
 
-| Type | Meaning |
-|------|---------|
-| `Part` | Standard manufactured or purchased component |
-| `Assembly` | Multi-component assembly built from other parts (typically has BOM entries) |
-| `RawMaterial` | Raw stock material (e.g., bar stock, sheet metal, pellets) |
-| `Consumable` | Items consumed during manufacturing but not part of the finished product (e.g., coolant, sandpaper) |
-| `Tooling` | Tooling components (e.g., mold inserts, fixtures, dies) |
-| `Fastener` | Hardware fasteners (e.g., screws, bolts, nuts, rivets) |
-| `Electronic` | Electronic components (e.g., PCBs, sensors, connectors) |
-| `Packaging` | Packaging materials (e.g., boxes, foam, labels) |
+The legacy single `PartType` enum overloaded three concepts (procurement, inventory bucket, descriptive taxonomy) into one field. As of Pillar 1 it's decomposed into three orthogonal axes per `phase-4-output/part-type-field-relevance.md`. New code reads the three axes; the legacy `PartType` column stays on the row for two release cycles for rollback safety only.
 
-The type is set at creation and can be changed via the edit dialog. The type influences the icon displayed in the table and detail panel:
-- `Assembly` -- `account_tree` icon
-- All others -- `settings` icon
+### Axis 1 — `Part.ProcurementSource` (`ProcurementSource` enum)
+
+How the part is sourced.
+
+| Value | Meaning |
+|-------|---------|
+| `Make` | We manufacture this part in-house. Has a Routing tab; may have a BOM. |
+| `Buy` | We purchase this part from a vendor. Has a Sources tab. |
+| `Subcontract` | The entire part is outsourced to a vendor that builds it for us — we never touch it. (Distinct from "Make + Operation.IsSubcontract = true", which means we make most of it and send out for one step.) |
+| `Phantom` | A logical grouping that exists only on the BOM. Doesn't appear in inventory; doesn't get bought or made on its own. |
+
+### Axis 2 — `Part.InventoryClass` (`InventoryClass` enum)
+
+Which inventory bucket the part lives in.
+
+| Value | Meaning |
+|-------|---------|
+| `Raw` | Raw stock material (bar stock, sheet metal, resin pellets, etc.) |
+| `Component` | A single sourced or made component (default for most parts) |
+| `Subassembly` | A multi-component sub-build that becomes part of a larger assembly |
+| `FinishedGood` | A complete deliverable product |
+| `Consumable` | Consumed during manufacturing but not part of the finished product (coolant, sandpaper, gloves) |
+| `Tool` | Tooling components (mold inserts, fixtures, dies) — usually paired with a `ToolingAssetId` FK to the Asset record |
+
+### Axis 3 — `Part.ItemKindId` (FK to `reference_data` group `part.item_kind`)
+
+Descriptive taxonomy. Admin-configurable. Seeded with the legacy enum's values (Fastener, Electronic, Packaging, Hardware, Material, etc.) so the migration is non-destructive, but admins can extend, rename, or retire kinds.
+
+### The 11 viable combinations
+
+Not every (procurement × inventory_class) pair is meaningful. The full matrix is documented in `phase-4-output/part-type-field-relevance.md` — 11 combinations are real (e.g., `Buy × Raw`, `Make × Subassembly`, `Subcontract × FinishedGood`, `Phantom × Subassembly`). Per-combination workflow definitions are a Pillar 6 deliverable; today the existing 2 workflow definitions (assembly-guided + raw-material-express) drive but with axes populated.
+
+### Tier-0 additions on Part
+
+Three small additions shipped alongside the axes:
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `Part.TraceabilityType` | `TraceabilityType` enum (`None` / `Lot` / `Serial`) | Replaces the legacy `IsSerialTracked` boolean. Drives the Serials tab visibility (only renders when `Serial`) and the Lots interaction (only meaningful when `Lot` or `Serial`). |
+| `Part.AbcClass` | `AbcClass` enum (`A` / `B` / `C`) | Was an unused enum; now a column. Drives planning prioritization. |
+| `Part.PreferredVendorId` | FK to `Vendor` | Stays on Part — points at the canonical preferred vendor. Drives the Sources-tab "preferred" chip + cost calc default. |
+
+### Retired Part fields (moved to `VendorPart` per Pillar 3)
+
+Engineering OEM identity is per-vendor-source, not per-part:
+- `Part.ManufacturerName` → `VendorPart.ManufacturerName`
+- `Part.ManufacturerPartNumber` → `VendorPart.ManufacturerPartNumber` (and `VendorPart.VendorMpn` for the distributor case where the vendor distributes someone else's part)
+- `Part.ExternalPartNumber` → `VendorPart.VendorPartNumber`
+- `Part.LeadTimeDays`, `Part.MinOrderQty`, `Part.PackSize` → `VendorPart` (snapshot of the preferred VendorPart's values stays on Part for back-compat reads; new readers should consult VendorPart directly)
+
+### Icon mapping
+
+The detail panel + table chip choose icon based on the axes:
+- `procurementSource = Make` AND `inventoryClass ∈ {Subassembly, FinishedGood}` → `account_tree`
+- All others → `settings`
 
 ---
 
 ## 18. Serial Number Tracking
 
-The Serials tab (`SerialNumbersTabComponent`) appears only when `part.isSerialTracked` is true. It provides full serial number lifecycle management.
+The Serials tab (`SerialNumbersTabComponent`) appears only when `part.traceabilityType === 'Serial'`. (The legacy `isSerialTracked` boolean was retired with the Tier-0 axes work — see Section 17.) It provides full serial number lifecycle management.
+
+Lot-tracked parts (`traceabilityType === 'Lot'`) interact with the Lots subsystem instead of Serials. Parts with `traceabilityType === 'None'` get neither tab.
 
 ### Serial Numbers Table
 
@@ -665,7 +746,73 @@ The detail panel also includes `BarcodeInfoComponent` which generates barcode an
 
 ---
 
-## 21. API Endpoints
+## 21. Sources tab — Vendor sourcing intersection (Pillar 3)
+
+The Sources tab is the primary surface for the (Part × Vendor) intersection. Backed by `VendorPart` (the row) and `VendorPartPriceTier` (its 1:N child for tiered pricing). Built around `VendorSourcesPanelComponent`.
+
+### Data model
+
+`VendorPart` — vendor-scoped sourcing metadata for a part:
+- `VendorPartNumber`: the vendor's SKU for this part (replaces the retired `Part.ExternalPartNumber`)
+- `ManufacturerName`, `ManufacturerPartNumber`: engineering OEM identity, distinct from the vendor's own part number for the distributor case
+- `VendorMpn`: the vendor's manufacturer part number when distributing someone else's part
+- `LeadTimeDays`: per-vendor lead time
+- `MinOrderQty`, `PackSize`: per-vendor procurement constraints
+- `CountryOfOrigin`, `HtsCode`: customs/trade fields (drive future tariff calc)
+- `Currency`: vendor's quoting currency
+- `IsApproved`, `IsPreferred`: AVL approval + preferred-source flags
+- `Certifications`, `LastQuotedDate`, `Notes`
+
+`VendorPartPriceTier` — tiered pricing per VendorPart:
+- `MinQuantity`: tier threshold; tier with the largest `MinQuantity ≤ requested qty` wins
+- `UnitPrice`, `Currency`
+- `EffectiveFrom`, `EffectiveTo`: SCD Type 2; superseded tiers retain history
+
+### Preferred-uniqueness invariant
+
+At most one VendorPart per Part may have `IsPreferred = true`. Setting it true unsets it on every other VendorPart for the same Part within one `SaveChanges` (handled in `CreateVendorPart` + `UpdateVendorPart` handlers).
+
+`Part.PreferredVendorId` stays — points at the canonical preferred vendor. `Part.MinOrderQty` / `Part.PackSize` / `Part.LeadTimeDays` are kept on Part as a snapshot of the preferred VendorPart's values for back-compat with existing readers; Phase 2/4 work will migrate readers to the VendorPart row.
+
+### View modes
+
+The Sources tab has three view modes (toggled top-right):
+
+| Mode | Use |
+|------|-----|
+| Inspector (default) | Each vendor card renders side-by-side with its own detail pane (1:1 fields). Stacks vertically on screens < 1024px. |
+| Compare | Cards stacked with chevron-expand for per-card details. Used for side-by-side comparison. |
+| Pricing | Flat cross-vendor tier table — one row per tier across every vendor source, sorted by min qty asc then vendor name. Answers "where can I buy this part cheapest at qty N?" |
+
+### Edit pattern
+
+- Existing tiers always render as form controls (not click-to-edit). `[isReadonly]` toggles between input and text appearance per the identity-cluster pattern — same DOM, no jitter when toggling edit mode.
+- Empty trailing slot promotes to a pending tier on first input. A new empty slot appears below with a green-glow fade-out. Stable slot IDs preserve focus across the kind flip (per the slot-model implementation in PR #63).
+- Trash icon marks for delete; deletion batches with the page-level Save (no per-row commit).
+- Save flushes all pending mutations in one Phase-2 forkJoin: pending tier inserts + dirty existing-tier supersedes (via `addPriceTier` SCD path) + pending deletes (`deletePriceTier`).
+
+### Capability gate
+
+`CAP-MD-VENDORS`. Allowed roles: Admin, Manager, Engineer, OfficeManager.
+
+### API endpoints — VendorParts Controller (`/api/v1/vendor-parts`)
+
+| Method | Path | Description | Response |
+|--------|------|-------------|----------|
+| GET | `/?partId=...` | List for a part (alternative to `/parts/{id}/vendor-parts`) | `VendorPartResponseModel[]` |
+| POST | `/` | Create VendorPart | 201 |
+| PATCH | `/{id}` | Update VendorPart (1:1 fields) | 204 |
+| DELETE | `/{id}` | Soft-delete VendorPart | 204 |
+| POST | `/{id}/price-tiers` | Insert/supersede a price tier (SCD Type 2) | 201 |
+| DELETE | `/{id}/price-tiers/{tierId}` | Supersede a tier (sets EffectiveTo = now) | 204 |
+
+Helper endpoints:
+- `GET /api/v1/parts/{partId}/vendor-parts` — Sources tab data load
+- `GET /api/v1/vendors/{vendorId}/vendor-parts` — Vendor-detail Catalog tab data load
+
+---
+
+## 22. API Endpoints
 
 ### Parts Controller (`/api/v1/parts`)
 
