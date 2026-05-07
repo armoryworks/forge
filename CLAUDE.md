@@ -298,6 +298,19 @@ interface SelectOption { value: unknown; label: string; }
 { value: null, label: '-- None --' }
 ```
 
+### Save Action — Required on Every Editable Surface (Non-Negotiable)
+
+Every screen, panel, dialog, or cluster that has an edit mode MUST surface an explicit, visible Save action. Auto-save-on-blur is permitted as a safety net (catches the field that's still focused) but is NEVER the only path — the user must always have a clear button to commit work and exit edit mode.
+
+- **Visible at all times in edit mode**, not just on dirty state. A disabled Save button (with the `<app-validation-button>` stereotype surfacing why) still tells the user "this is where you save."
+- **Pair with Cancel.** Cancel reverts in-progress edits (reload from server is fine if change-tracking isn't local) and exits edit mode.
+- **Placement**: lower-right of the surface, equal-width, primary furthest right — matches `cluster__actions` in part-clusters and the `<app-dialog>` footer convention.
+- **The wrapping panel emits a `cancelled` event**; the parent (which owns the `editing()` signal) flips it back to false. Save typically also emits `cancelled` after committing — the user is "done editing" either way.
+- Auto-save-on-blur, when used, is documented in code comments as a backup behavior, not the primary one. The Save button is what the user looks for and what we test for.
+- This rule applies regardless of how the panel saves underneath (per-field PATCH, single PUT, batched mutations) — the user-facing affordance is uniform.
+
+Surfaces this applies to today: every `part-*-cluster` (identity, inventory, cost, quality, uom, material, mrp, pricing-add), `customer-identity-cluster`, `vendor-sources-panel`, every dialog with a form. New editable surfaces inherit the rule by default.
+
 ### Form Validation — No Inline Errors, Click-to-Reveal Stereotype
 Validation uses a dedicated warning-icon button paired with the disabled submit button — NOT `mat-error` beneath fields, NOT hover popover on the submit button. `mat-form-field` subscript wrapper is globally `display: none`.
 
@@ -2007,6 +2020,28 @@ Quote Requested → Quoted (Estimate) → Order Confirmed (Sales Order) → Mate
 - Batch field changes collapse into expandable entries
 - Inline comments with @mentions → notification
 - Filterable by action type and user. Immutable entries.
+
+#### Activity logging rules (Non-Negotiable)
+
+Every MediatR command handler that mutates a tracked entity MUST emit at least one `ActivityLog` row before its `SaveChangesAsync`. The Activity tab is the audit trail; missing rows = silent state changes.
+
+1. **Definitional vs transactional split** — this gates everything else below.
+   - **Definitional / master-data entities** describe what something *is* and are read by downstream transactions: `Part`, `Vendor`, `Customer`, `Contact`, `Asset`, `BOMEntry`, `VendorPart` (and its price tiers), `PriceList`, `RecurringOrder`, `QcTemplate`, `ComplianceFormTemplate`, `WorkflowDefinition`, `ReferenceData`, `SystemSetting`. Mutations here get the indexing-points treatment (rule 2).
+   - **Transactional / event-stream entities** *happen* — they're discrete records of operations: `Job`, `SalesOrder`, `Quote/Estimate`, `Invoice`, `Shipment`, `Payment`, `PurchaseOrder`, `BinMovement`, `TimeEntry`, `ClockEvent`, `ContactInteraction`, `Notification`, `ChatMessage`, plus the line-items of all of those. Mutations here log ONLY on the entity itself (and its parent header where applicable — e.g. a SalesOrderLine mutation logs on the SO, not on the upstream Part). Pushing transactional events onto the master-data Activity tab turns it into a transaction log and drowns the definitional changes that actually matter for audit.
+   - When in doubt, ask: "If I'm looking at this Part / Vendor / Customer next year, is this row about *what changed in the definition* (yes → log it here) or *something operational that happened to use this definition* (no → log on the transactional entity, not here)?"
+   - **Self-auditing-data exception.** Some definitional collections *are* their own audit trail — the current state, viewed in its native UI, fully describes what the entity is. `BOMEntry` is the canonical example: the BOM tab IS the history of "what this part is composed of"; an activity-feed row saying "added component X" duplicates information already trivially visible. For these, skip the activity log entirely on the collection mutations themselves — only log the *parent* entity's own definitional changes (rename, status change, etc.). Apply this exception conservatively: it's earned only when the collection is small, fully visible in one place, and a simple "added/removed/changed" verb adds nothing the screen doesn't already show. Fields with semantics (price, lead time, vendor preference) do NOT qualify — those go through the indexing-points rule.
+
+2. **Indexing-points rule (definitional entities only).** When the mutated entity sits at an indexing point between multiple definitional entities (e.g. `VendorPart` bridges Part ↔ Vendor; `BOMEntry` bridges parent-Part ↔ component-Part; `Contact` bridges to Customer), emit a row for **every** involved entity — not just the one the user is currently viewing. Use `db.LogActivityAt(action, description, ("Part", partId), ("Vendor", vendorId))` from `QBEngineer.Data.Extensions.ActivityLogExtensions`. Order doesn't matter; the helper writes one row per pair.
+
+3. **Rollup rule.** A multi-field update produces ONE activity row whose `Description` summarizes all changed fields (e.g. `"Updated 4 fields: leadTimeDays, minOrderQty, packSize, notes"`). Do NOT emit one row per field — per-field history is the History tab's stream (a different table / different concept). For UpdateXxxHandlers, build a `List<string> changedFields` while applying patches, then write one row referencing them all.
+
+4. **Action verb conventions.** Use kebab-case domain verbs: `created`, `updated`, `deleted`, `archived`, plus specific verbs like `vendor-source-added`, `vendor-source-removed`, `price-tier-added`, `price-tier-updated`, `price-tier-removed`, `preferred-vendor-changed`. Verbs are queryable — don't free-form them.
+
+5. **Description format.** First clause = what changed (in human terms), second clause (optional) = the defining identifiers ("qty ≥ 100 @ $1.50 USD effective 2026-05-04"). The History tab parses on FieldName/OldValue/NewValue; the Activity tab renders Description verbatim. Keep it under ~120 chars.
+
+6. **No cancellation token on the helper.** `LogActivityAt` doesn't take a CT — it just adds to the change-tracker; the surrounding `SaveChangesAsync(ct)` is what flushes.
+
+7. **Helper handles current user.** `LogActivityAt` reads `AppDbContext.CurrentUserId` (set by middleware) — handlers do NOT need to inject `IHttpContextAccessor` or pass user IDs. If `CurrentUserId` is null (system-initiated operation, e.g. Hangfire job), the row is logged with `UserId = null` and renders as "System" in the UI.
 
 ### Reference Data
 - Single `reference_data` table for all lookups (expense categories, lead sources, priorities, statuses, etc.)
