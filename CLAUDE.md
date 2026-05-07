@@ -36,119 +36,50 @@ Do not ask the user — just verify visually after every UI change.
 
 ---
 
-## Branch + PR Workflow (Non-Negotiable)
+## Branch + PR Workflow
 
-**Every non-trivial set of changes lands via a feature branch + PR into a per-effort integration branch.** Direct pushes to `main` are blocked server-side by branch protection on all source repos.
+**Pre-beta direct-push (current — flipped 2026-05-07):** Branch protection is off. Push commits directly to `main` on all source repos. The branch + PR ceremony was eating momentum during pre-beta when the only reviewer is Dan and there's no production user pain to protect against. Dropping the ceremony for now; we'll flip it back on once we're approaching beta.
 
-**Branch model (corrected 2026-05-03 after the first develop-as-integration pass — Dan wants per-effort branches with descriptive names, not one long-running develop):**
+**What this means in practice:**
+- Default flow is: edit → run local CI gates → `git commit -m "..."` → `git push origin main`. No branches, no PRs, no auto-merge.
+- Commit messages still need to be clear and descriptive — they ARE the change log now.
+- Local CI gates are still mandatory (lint, lint:i18n, tests, build for UI; build -warnaserror + tests for server). The whole point of the looser flow is speed, not "skip the gates" — broken main is more disruptive without the PR safety net, not less.
+- Group related changes into one commit before pushing. Don't push 5 commits where 1 well-scoped commit captures the change. Squash locally if needed.
+- Tag commits with the same prefix style PRs used (`feat:`, `fix:`, `chore:`, `refactor:`, `docs:`) so the log stays scannable.
+- For risky changes (schema migrations, breaking API changes, anything Dan flags as "let me look first"), still use a branch + PR. The default is direct, but the option remains for when the change benefits from a separate review.
 
-- `main` = released code. Never targeted directly by feature branches. Only updated when an effort wraps and a consolidation PR brings the whole effort in.
-- **Effort branches** (e.g. `effort/inline-create`, `effort/quality-and-mrp-pass`) = where one cohesive batch of work accumulates. Created off `main` at the start of an effort. Lives until the effort wraps, then merged to main and deleted.
-- `feature/*` (`fix/*`, `chore/*`, `refactor/*`, `docs/*`) = work-in-progress branches, branched FROM the current effort branch, merged TO the current effort branch.
-- When the effort is done: Claude opens **ONE** PR (effort branch → main); the user reviews and approves. That's the only review checkpoint.
+**When a PR is still useful (judgment call, not required):**
+- Schema migrations with non-trivial backfills.
+- API changes that break an external integration.
+- Anything Dan explicitly says "branch this and let me see it first."
+- Spikes / experiments where you might throw the work away.
 
-**Per-feature PRs into the effort branch are auto-merged after CI green.** Claude opens the PR with `gh pr merge --auto --squash`, then GitHub merges automatically once required checks pass. **If CI fails, Claude is responsible for fixing it** — don't leave failing PRs sitting open.
+For these, the model is: branch off main → push → open PR with `--base main` → Dan reviews and squashes when ready. No effort branches, no per-feature stacks.
 
-Dependabot is configured to target `develop` (legacy from the first pass — ignore for per-effort work; Dependabot PRs bypass the effort-branch model and target `develop` directly. Sync `develop` from `main` periodically as a parking branch for them).
+**Local CI gate commands** (run before every `git push origin main`):
 
-### When a branch is required
+- **UI repo (`qb-engineer-ui`):** `npm run lint && npm run lint:i18n && npm run test -- --watch=false`. The `lint:i18n` script (added 2026-05-03) catches the recurring "{key.path} renders raw because en.json is missing it" bug class — `tsc --noEmit`, `ng build`, and `vitest` all silently allow missing keys (vitest specs use a mocked TranslateLoader). When you add a `'foo.bar' | translate` reference, run this before pushing.
 
-Required for:
-- Multi-file changes
-- Anything that introduces a new pattern, convention, or shared component
-- Schema / DTO / wire-contract changes
-- New features
-- Refactors that span more than one component
-- Migrations
-- Workflow / CI / deploy config changes
+  **i18n files live at `qb-engineer-ui/public/assets/i18n/{en,es}.json`. NEVER edit `src/assets/i18n/` — that path is intentionally non-existent.** Angular CLI's static-asset directory migrated from `src/assets/` to `public/` and the migrated project kept `public/assets/i18n/` as the only bundled source (per `angular.json`). For ~3 sessions before 2026-05-04, edits went to a phantom `src/assets/i18n/` that wasn't in any build — every new key showed up at runtime as a raw `foo.bar` token while `tsc`, `ng build`, `vitest`, AND the early `lint:i18n` all stayed green. The fix: deleted `src/assets/i18n/` and the lint script now hard-fails if it ever reappears. Don't recreate it. If you need to add a translation, the path is `public/assets/i18n/en.json` (and `es.json`). Server-supplied keys (workflow step labelKeys, validator displayNameKey/missingMessageKey) are scanned by `lint:i18n` from `qb-engineer-server/qb-engineer.api/Workflows/*.cs` automatically.
 
-Skippable only for:
-- Single-line typo fixes
-- Comment-only changes
-- Fixes the user explicitly tags as "tiny" / "quick" / "just push it"
+  **100% language-parity rule (added 2026-05-05).** Every mapped language file MUST be in 1:1 sync with `en.json` (the canonical source). `lint:i18n` now hard-fails on:
+  - Keys present in `en.json` but missing from `es.json` (untranslated).
+  - Keys present in `es.json` but missing from `en.json` (orphans).
+  - Keys referenced in code but missing from `en.json` (existing rule).
 
-When unclear, ask once at the start: *"Branch this or push direct?"* — and remember the answer for the rest of the conversation.
+  No "warn-only" lag tolerated — when you add a key to `en.json`, add the matching `es.json` entry in the same commit. When you remove a key from `en.json`, remove the `es.json` entry too. Adding a new mapped language is the same contract: every key in `en.json` must exist in the new file before merge.
 
-### Naming
+- **Server repo (`qb-engineer-server`):** `dotnet build --configuration Release -warnaserror && dotnet test`.
 
-`feat/<short-name>` · `fix/<short-name>` · `chore/<short-name>` · `refactor/<short-name>` · `docs/<short-name>`
-
-Names ≤5 words. Use kebab-case. The PR title carries the full context — the branch name just needs to be searchable.
-
-Examples: `feat/oem-on-vendorpart`, `fix/sourcing-step-mock-shape`, `chore/document-branch-pr-workflow`, `refactor/part-sourcing-resolver`.
-
-### Flow
-
-**Starting an effort:**
-- If no effort branch exists for the work the user just asked about, ask once: *"What should we name the effort branch? (e.g. `effort/quality-pass`, `effort/inline-create`)"* — kebab-case, ≤4 words. Then create it: `git fetch origin && git checkout main && git pull --ff-only origin main && git checkout -b effort/<name> && git push -u origin effort/<name>`.
-- If an effort branch already exists for ongoing related work, branch new features off it (don't open a parallel effort).
-
-**Per-feature work inside an effort:**
-1. **Before starting:** `git fetch origin && git checkout effort/<current> && git pull --ff-only origin effort/<current> && git checkout -b <type>/<short-name>`. Types: `feat`, `fix`, `chore`, `refactor`, `docs`. Names ≤5 words, kebab-case.
-2. **Commit on the branch as you work.** Multiple commits are fine — auto-merge will squash.
-3. **Validate locally before push.** Same gates CI runs:
-    - **UI repo (`qb-engineer-ui`):** `npm run lint && npm run lint:i18n && npm run test -- --watch=false`. The `lint:i18n` script (added 2026-05-03) catches the recurring "{key.path} renders raw because en.json is missing it" bug class — `tsc --noEmit`, `ng build`, and `vitest` all silently allow missing keys (vitest specs use a mocked TranslateLoader). When you add a `'foo.bar' | translate` reference, run this before pushing.
-
-      **i18n files live at `qb-engineer-ui/public/assets/i18n/{en,es}.json`. NEVER edit `src/assets/i18n/` — that path is intentionally non-existent.** Angular CLI's static-asset directory migrated from `src/assets/` to `public/` and the migrated project kept `public/assets/i18n/` as the only bundled source (per `angular.json`). For ~3 sessions before 2026-05-04, edits went to a phantom `src/assets/i18n/` that wasn't in any build — every new key showed up at runtime as a raw `foo.bar` token while `tsc`, `ng build`, `vitest`, AND the early `lint:i18n` all stayed green. The fix: deleted `src/assets/i18n/` and the lint script now hard-fails if it ever reappears. Don't recreate it. If you need to add a translation, the path is `public/assets/i18n/en.json` (and `es.json`). Server-supplied keys (workflow step labelKeys, validator displayNameKey/missingMessageKey) are scanned by `lint:i18n` from `qb-engineer-server/qb-engineer.api/Workflows/*.cs` automatically.
-
-      **100% language-parity rule (added 2026-05-05).** Every mapped language file MUST be in 1:1 sync with `en.json` (the canonical source). `lint:i18n` now hard-fails on:
-      - Keys present in `en.json` but missing from `es.json` (untranslated).
-      - Keys present in `es.json` but missing from `en.json` (orphans).
-      - Keys referenced in code but missing from `en.json` (existing rule).
-
-      No "warn-only" lag tolerated — when you add a key to `en.json`, add the matching `es.json` entry in the same commit. When you remove a key from `en.json`, remove the `es.json` entry too. Adding a new mapped language is the same contract: every key in `en.json` must exist in the new file before merge.
-    - **Server repo (`qb-engineer-server`):** `dotnet build -warnaserror && dotnet test`.
-
-    Spec tests live under a separate `tsconfig.spec.json` that prod-build doesn't compile, so `tsc --noEmit` and `ng build` alone are not enough — explicit test runs are mandatory.
-4. **Push + open PR + enable auto-merge — no approval gate.**
-   ```
-   git push -u origin <branch>
-   gh pr create --base effort/<current> --title "..." --body "$(cat <<'EOF'...EOF)"
-   gh pr merge <pr-number> --auto --squash
-   ```
-   Brief one-line summary in chat with the PR URL. No approval needed; per-feature review is not how Dan works.
-5. **Watch CI.** If checks fail, fix the issue, push, and let auto-merge re-evaluate. Don't leave failing PRs sitting open. If you can't fix it (truly stuck), surface that to the user with the failure context.
-
-**Wrapping the effort:**
-6. **When the user signals the effort is done** (or you've finished everything they asked for in this effort), open the consolidation PR yourself: `gh pr create --base main --head effort/<current> --title "..." --body "$(cat <<'EOF'...EOF)"`. Use the PR template below; the body summarizes everything that landed in the effort branch (list each merged feature PR + its impact).
-7. **STOP and ask the user to review and approve** the effort → main PR. Don't auto-merge this one. This is the only review checkpoint — make the description thorough enough to support a real review.
-
-### PR template
-
-```
-## Summary
-- 2-4 bullets: what changed at a high level
-
-## Why
-The problem this solves, the user request that triggered it, or the
-incident it prevents recurring. One short paragraph.
-
-## Scope
-Files / areas touched, anything notable a reviewer would want to know
-upfront (e.g. "introduces a new shared component", "renames a public
-endpoint", "migrates 14 files").
-
-## Test plan
-- [x] Local: <what was verified, with command output if useful>
-- [ ] Deploy: <what should be re-verified once the new image lands on
-      the server — only include if there's something the live env
-      reveals that local can't>
-
-## Migration / operational notes
-Only if applicable. New env var, new migration, version-bump action
-required, etc. If none, omit this section entirely.
-
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
-```
+Spec tests live under a separate `tsconfig.spec.json` that prod-build doesn't compile, so `tsc --noEmit` and `ng build` alone are not enough — explicit test runs are mandatory.
 
 ### Hard rules
 
-- **Per-feature PRs into an effort branch**: open + auto-merge without approval. The user's review point is the consolidated effort → main PR, not each piece.
-- **Effort → main PRs**: NEVER auto-merge. Open with the consolidated description, STOP, and wait for the user's explicit review and approval.
-- **Don't open a parallel effort branch** when the user's request is a continuation of work already on an open effort. Branch new features off the existing effort instead.
-- **Don't force-push to a feature branch after auto-merge has run.** Once squashed, the branch's history is in the effort branch; force-pushing the now-deleted feature branch does nothing useful.
-- **Don't delete the effort branch yourself after the consolidation PR merges** — let GitHub do that via "delete branch on merge", or the user will.
-- **Don't bypass branch protection** even when an error suggests it would help. If a hotfix really must skip the branch flow, surface that to the user and get explicit "yes, push direct" before doing it.
+- **Don't push broken code to main.** Local CI gates are how we keep main green without the PR safety net. If a gate fails, fix it before pushing.
+- **Don't push secrets.** Same as before. Be especially careful when staging — `git add -A` can sweep up `.env` files that the gitignore doesn't catch.
+- **Don't force-push to main.** Without branch protection there's no server-side block, but force-push to main destroys other people's history and there's no good reason to do it pre-beta either. If you need to undo a bad commit, push a revert commit.
+- **Don't bundle 30 files of unrelated changes into one commit.** The commit message has to honestly summarize what changed; if you can't summarize it in 2 lines, the commit is too big — split it.
+- **Older effort/feature branches still in flight (2026-05-07): finish them as PRs.** Don't try to convert mid-flight work to direct pushes. New work starts direct.
 
 ---
 
