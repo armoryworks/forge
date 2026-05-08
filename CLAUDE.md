@@ -589,10 +589,10 @@ Six stereotypes. Choose by **intent**, never aesthetic. Each page MUST have at m
 ### Database (PostgreSQL + EF Core)
 - `AppDbContext` auto-applies:
   - Snake_case naming for all tables/columns/keys/indexes
-  - `SetTimestamps()` — auto-sets `CreatedAt`/`UpdatedAt` on `BaseEntity`
+  - `SetTimestamps()` — auto-sets `CreatedAt`/`UpdatedAt` on `BaseEntity`; auto-stamps `DeletedBy = CurrentUserId.ToString()` whenever a soft delete is committed (`DeletedAt` modified to non-null) and the handler hasn't already set `DeletedBy`. Soft-delete handlers only need to stamp `DeletedAt`; the audit principal follows automatically. Explicit `DeletedBy` values are never overwritten.
   - `NormalizeDateTimes()` — converts `DateTimeKind.Unspecified` to UTC before save
   - Global query filter: `DeletedAt == null` on all `BaseEntity` types
-- Soft deletes only — no hard deletes (`DeletedAt` timestamp + `DeletedBy` FK)
+- Soft deletes only — no hard deletes (`DeletedAt` timestamp + `DeletedBy` audit principal — auto-populated by `SetTimestamps()`)
 - Fluent API in separate `IEntityTypeConfiguration<T>` classes (no data annotations)
 - Foreign key indexes explicit on all FK columns
 - `reference_data` table: centralized lookup/dropdown values with `group_id` grouping and immutable `code` field
