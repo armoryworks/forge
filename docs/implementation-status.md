@@ -208,21 +208,27 @@ Legend: Done | Partial | Not Started | N/A (deferred or out of scope)
 
 | Item | Spec | Status | Notes |
 |------|------|--------|-------|
-| Lead CRUD | proposal.md §4.7 | Done | Create, update, soft-delete (not Converted) with ConfirmDialog |
-| Lead statuses (New → Lost) | proposal.md §4.7 | Done | LeadStatus enum |
-| Convert to Customer | proposal.md §4.7 | Done | Creates Customer + optional Contact from lead fields |
-| Convert and Create Job | proposal.md §4.7 | Done | Option in conversion flow, creates Job linked to new customer |
-| Lost lead reason capture | proposal.md §4.7 | Done | Lost dialog with reason textarea |
+| Lead CRUD | proposal.md §4.7 | Done | Create, update, soft-delete (not Converted) with ConfirmDialog. Activity log emits on create / update (rollup) / delete. CreateLead reads user from `AppDbContext.CurrentUserId` (not `IHttpContextAccessor`). DeleteLead uses `IClock`. |
+| Lead statuses (New → Lost) | proposal.md §4.7 | Done | LeadStatus enum. Status transitions surfaced by name in update activity rows ("status: Contacted"). |
+| Convert to Customer | proposal.md §4.7 | Done | 3-step convert-lead stepper (carry-over preview → customer details → confirm). Captures credit limit, tax-exempt + cert id, default currency, billing/shipping addresses atomically — resulting customer is fully populated rather than a shell record needing follow-up patches. Indexing-points activity log on both Lead and Customer. Defensive contact-name parsing handles "First Last", "First Middle Last", "Last, First", "Last, First MI", and single-word names. `Customer.SourceLead` inverse nav exposes the back-link. |
+| Convert and Create Job | proposal.md §4.7 | Done | "Also create a job after conversion" toggle inside the stepper (Step 2). Replaces the prior parallel button with a single guided flow. |
+| Lost lead reason capture | proposal.md §4.7 | Done | Lost dialog with required reason textarea. Submit wrapped in `<app-validation-button>` so empty submissions surface the violation rather than failing silently. Both copies (pipeline drag-to-Lost + detail-panel status menu) hardened. |
+| Lead list polish | parts-vs-customer-audit | Done | `?q=` + `?status=` URL-synced filter state; `ScannerService.setContext('leads')` integration drops scans into search; 300ms debounce on search. |
 | Custom fields | proposal.md §4.7 | Done | JSONB definitions on TrackType, values on Job, CRUD endpoints, Angular service |
 
 ### Customer & Contact Management
 
 | Item | Spec | Status | Notes |
 |------|------|--------|-------|
-| Customer CRUD | proposal.md §4.8 | Done | Full feature module: entity, API (8+ endpoints), DataTable UI, create/edit dialog, soft-delete with ConfirmDialog |
-| Customer Detail Screen | functional-decisions.md §Customer Detail | Done | Dedicated `/customers/:id/:tab` page. Sticky header: name, status chip, contact info. Stats bar: open estimates, quotes, orders, active jobs, outstanding, YTD revenue. 9 tabs: Overview, Contacts, Addresses, Estimates, Quotes, Orders, Jobs, Invoices, Activity. URL-driven active tab. |
-| Multiple contacts per customer | proposal.md §4.8 | Done | Contact CRUD endpoints, contacts tab in customer detail screen |
+| Customer CRUD | proposal.md §4.8 | Done | Full feature module: entity, API (8+ endpoints), DataTable UI, create/edit dialog, soft-delete with ConfirmDialog. Activity log emits on every create / update (rollup-rule summary) / delete. `IClock` used for soft-delete timestamps; `DeletedBy` auto-stamped by `AppDbContext.SetTimestamps`. |
+| Customer Detail Screen | functional-decisions.md §Customer Detail | Done | Dedicated `/customers/:id/:tab` page. Sticky header: name, status chip, contact info. Stats bar: open estimates, quotes, orders, active jobs, outstanding, YTD revenue. 11 tabs (resolver-driven): Overview, Contacts, Addresses, Estimates, Quotes, Orders, Jobs, Invoices, Interactions, Pricing, Activity. URL-driven active tab. Identity cluster shows immutability cue when editing the Name. Full i18n compliance — every label/aria-label/snackbar message routes through translate keys. |
+| Customer detail preview dialog | parts-vs-customer-audit | Done | `<app-customer-detail-dialog>` opens via `?detail=customer:{id}` from cross-entity links (invoice / SO / shipment). Lightweight 720px-wide preview wrapping the overview content + identity cluster. "Open customer page" footer button is the explicit-opt-in for the full multi-tab navigation. `EntityLinkComponent` no longer special-cases customers — same flow as every other linkable entity. |
+| Customer list polish | parts-vs-customer-audit | Done | `?q=` + `?active=` URL-synced filter state; `ScannerService.setContext('customers')` drops scans into search. |
+| Multiple contacts per customer | proposal.md §4.8 | Done | Contact CRUD endpoints, contacts tab in customer detail. Activity log on create / update (rollup) / delete with **indexing-points** rule (both Customer + Contact anchors). Gated behind `CAP-MD-CUSTOMER-CONTACTS` (default ON). |
 | Contact role tags | proposal.md §4.8 | Done | Role field on contact entity, editable in contact forms |
+| Multiple addresses per customer | parts-vs-customer-audit | Done | `CustomerAddress` CRUD via `CustomerAddressesController`. Activity log on create (`address-added`) / update (rollup) / delete (`address-removed`) anchored to Customer. Gated behind `CAP-MD-CUSTOMER-ADDRESSES` (default ON). Single-address shops: customer-create writes the primary address via `CreateCustomerCommand` directly, bypasses the controller. |
+| Contact interactions (CRM activity log) | parts-vs-customer-audit | Done | Call / Email / Meeting / Note logging per contact + per customer. CRUD via `Features/Customers/CreateContactInteraction.cs` (drops `IHttpContextAccessor` anti-pattern; reads from `AppDbContext.CurrentUserId`). Indexing-points activity log on both Customer + Contact. Soft-delete bug fix: `DeleteContactInteraction` was using `db.Remove`, now uses `DeletedAt = clock.UtcNow`. Gated behind `CAP-MD-CUSTOMER-INTERACTIONS` (default OFF). |
+| Credit management | parts-vs-customer-audit | Done | Credit limit + terms on Customer; place / release credit hold; credit-on-file (unapplied credits); AR aging exposure. Activity log on hold place / release. `IClock` everywhere; `IHttpContextAccessor` removed. Gated behind `CAP-O2C-CREDIT-LIMITS` (default OFF) — UI surfaces (Credit Status card + endpoints) hidden for COD/prepaid shops. |
 | Customer summary endpoint | — | Done | `GET /api/v1/customers/{id}/summary` returns header fields + aggregate stats (estimate count, quote count, order count, active jobs, open invoice total, YTD revenue) |
 | Jobs filtered by customer | — | Done | `GET /api/v1/jobs?customerId=` filter added to IJobRepository, JobRepository, GetJobsQuery, JobsController |
 | Accounting sync (read/write) | proposal.md §4.8 | Done | IAccountingProviderFactory resolves active provider at runtime. AccountingController: providers, employees, items, sync-status, test, disconnect endpoints. All sync jobs use factory. |
