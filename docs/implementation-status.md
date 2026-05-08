@@ -154,9 +154,11 @@ Legend: Done | Partial | Not Started | N/A (deferred or out of scope)
 
 | Item | Spec | Status | Notes |
 |------|------|--------|-------|
-| Part CRUD | proposal.md §4.3 | Done | Create, update, soft-delete with ConfirmDialog |
+| Part CRUD | proposal.md §4.3 | Done | Create, update, soft-delete with ConfirmDialog. Activity log emits on create/update/delete (rollup rule on update). |
 | BOM (recursive) | proposal.md §4.3 | Done | Entity + CRUD endpoints |
-| Part detail (specs, files, BOM) | proposal.md §4.3 | Done | Split-panel: list + 5-tab detail (info/BOM/usage/3D viewer/files). Inventory summary with low-stock warning. |
+| Part detail (specs, files, BOM) | proposal.md §4.3 | Done | Resolver-driven multi-tab cluster system (`PartDetailLayoutResolverService`) — Identity always first, Activity → Files always last; intermediate tabs (Inventory, MRP, Cost, Pricing, Quality, Routing, Alternates, Material, UoM, BOM, Sources, Purchase History, 3D Viewer) selected per (`procurementSource`, `inventoryClass`) combo. URL-synced tab via `?tab=`. |
+| Pillar 1: PartType decomposition | phase-4-output/part-type-field-relevance.md | Done | Legacy `PartType` enum decomposed into three orthogonal axes: `Part.ProcurementSource` (Make/Buy/Subcontract/Phantom), `Part.InventoryClass` (Raw/Component/Subassembly/FinishedGood/Consumable/Tool), `Part.ItemKindId` (FK to admin-configurable `reference_data` group `part.item_kind`). Tier 0 additions: `TraceabilityType` (None/Lot/Serial — replaces `IsSerialTracked`), `AbcClass`, `ManufacturerName`, `ManufacturerPartNumber`. Legacy `PartType` column retained for two release cycles for rollback safety. New-part fork dialog drives axis selection; workflow + clusters consume axes. Identity cluster + legacy edit dialog treat axes as immutable post-create. |
+| Pillar 3: VendorPart intersection | CLAUDE.md §Vendor-Part Intersection | Done | `VendorPart` entity captures (Vendor, Part) sourcing metadata: vendor part number, vendor MPN (distributor case), per-vendor lead time / MOQ / pack size, country of origin, HTS code, AVL approval, preferred flag, certifications, last-quoted date. `VendorPartPriceTier` 1:N child for tiered pricing. Preferred-uniqueness invariant enforced server-side. `Part.PreferredVendorId` mirrors canonical preferred VendorPart. APIs: `/api/v1/vendor-parts` CRUD, `/api/v1/parts/{id}/vendor-parts` (Sources tab), `/api/v1/vendors/{id}/vendor-parts` (Vendor catalog tab), `/{id}/price-tiers` POST/DELETE. UI: `VendorSourcesPanelComponent` on Part detail Sources tab. Activity log emits on every VendorPart mutation with both Part + Vendor anchors (indexing-points rule). |
 | Revision control | proposal.md §4.3 | Done | PartRevision entity, CRUD handlers, unique (PartId,Revision) index, IsCurrent flag |
 | Where Used (reverse BOM lookup) | proposal.md §4.3 | Done | Loaded via EF Include, displayed in Usage tab with navigation |
 | STL inline viewer | proposal.md §4.3 | Done | Three.js lazy-loaded StlViewerComponent, "3D View" tab in part detail when .stl file attached |
@@ -1230,11 +1232,14 @@ See `phase-4-output/PHASE-4-CLOSEOUT.md` for the closeout artifact.
 - High-priority visual styling (`job-chip--high-priority`)
 
 ### Part Detail Panel (Complete)
-- 5-tab detail: info, BOM, usage, 3D viewer, files
+- Resolver-driven multi-tab cluster system (`PartDetailLayoutResolverService`) — Identity always first, Activity → Files always last; intermediate tabs (Inventory, MRP, Cost, Pricing, Quality, Routing, Alternates, Material, UoM, BOM, Sources, Purchase History, 3D Viewer) selected per (`procurementSource`, `inventoryClass`) combo
+- URL-synced tab via `?tab=`
+- Per-cluster save / cancel with `<app-validation-button>` stereotype
 - `PartInventorySummary` model: totalQuantity + binLocations
 - `isLowStock` computed signal: warns when quantity < minStockThreshold
 - File upload zone + file list in files tab
 - STL auto-detection for viewer tab visibility
+- Identity axes (procurement, inventory class) are immutable post-create — both identity cluster and legacy edit dialog enforce this
 
 ### Vendor Linked Purchase Orders (Complete)
 - Split-panel layout: vendor list + detail panel

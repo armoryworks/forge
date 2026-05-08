@@ -251,7 +251,6 @@ when extracting clusters on other entities:
 | `PartUomClusterComponent`              | API-loaded select with fixed-list fallback  | `parts/components/part-clusters/part-uom-cluster/`                                  |
 | `PartMrpClusterComponent`              | Conditional reveal (`@if` driven by form value signals) | `parts/components/part-clusters/part-mrp-cluster/`                       |
 | `PartQualityClusterComponent`          | Toggle + multiple enums + numeric           | `parts/components/part-clusters/part-quality-cluster/`                              |
-| `PartBomClusterComponent`              | Thin wrapper around `<app-bom-tree>`        | `parts/components/part-clusters/part-bom-cluster/`                                  |
 | `PartRoutingClusterComponent`          | Thin wrapper around `<app-routing>`         | `parts/components/part-clusters/part-routing-cluster/`                              |
 | `PartAlternatesClusterComponent`       | Thin wrapper around `<app-part-alternates-tab>` | `parts/components/part-clusters/part-alternates-cluster/`                       |
 
