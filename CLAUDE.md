@@ -21,6 +21,20 @@ docker compose up -d --build qb-engineer-api
 
 Do not ask the user — just do it after verifying the build passes.
 
+## Auto-Rebuild UI
+
+**The `qb-engineer-ui` Docker container is nginx serving a baked production build, NOT a hot-reload Angular dev server.** UI source changes never land in the running container until you rebuild. After UI changes that should be testable / visible (template/component edits, i18n keys, route changes, anything beyond a pure spec/lint-only edit), automatically rebuild and restart:
+
+```bash
+docker compose up -d --build qb-engineer-ui
+```
+
+Same rule shape as the API: do not ask, just do it after `npm run lint` + `npm run lint:i18n` + `npm run test -- --watch=false` pass.
+
+**Batching is fine within a wave.** A multi-commit refactor doesn't need a rebuild between each commit — rebuild once at the end of the logical chunk before reporting the work as visible / verifiable. The wrong move is shipping a session's worth of UI commits and never rebuilding — the user opens the browser, sees stale UI, and assumes nothing landed (this happened 2026-05-08 — I committed 6 server + 8 UI changes across one session and didn't rebuild either container; symptom was "is something wrong with the UI container?").
+
+**Visual Verification depends on this.** The screenshot spec hits `http://localhost:4200` which is the Docker UI container. Without a rebuild, screenshots will show pre-edit state and falsely confirm a broken change.
+
 ## Visual Verification (Non-Negotiable)
 
 **After any UI fix or visual change, take a Playwright screenshot and examine it before considering the task complete.** This catches issues that code review alone misses (wrong spacing, overlapping elements, broken layouts, missing gaps).
