@@ -1991,7 +1991,7 @@ See `phase-4-output/PHASE-4-CLOSEOUT.md` for the closeout artifact.
 - **New entity:** `ContactInteraction` — ContactId FK, UserId, Type, Subject, Body, InteractionDate, DurationMinutes
 - **New handlers:** `CreateContactInteraction`, `GetContactInteractions` (by customerId, optional contactId filter), `UpdateContactInteraction`, `DeleteContactInteraction`
 - **New endpoints:** 4 endpoints at `api/v1/customers/{id}/interactions` (GET, POST, PATCH, DELETE)
-- **Frontend:** `CustomerInteractionsTabComponent` — chronological DataTable with contact/type filters, create/edit dialog, type icons (phone/email/groups/note), delete via ConfirmDialog
+- **Frontend:** `CustomerInteractionsClusterComponent` — chronological DataTable with contact/type filters, create/edit dialog, type icons (phone/email/groups/note), delete via ConfirmDialog
 - **Customer detail:** Added `'interactions'` tab after contacts
 
 ### Phase 4A: Events System (Backend + Admin UI)

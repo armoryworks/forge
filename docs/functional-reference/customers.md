@@ -223,7 +223,7 @@ The `CreditStatusCardComponent` is embedded in the overview tab. It loads credit
 
 ## Contacts Tab
 
-Component: `CustomerContactsTabComponent`
+Component: `CustomerContactsClusterComponent`
 
 ### Toolbar
 
@@ -266,7 +266,7 @@ Used for both create ("New Contact") and edit ("Edit Contact") operations.
 
 ## Interactions Tab
 
-Component: `CustomerInteractionsTabComponent`
+Component: `CustomerInteractionsClusterComponent`
 
 ### Toolbar
 
@@ -313,7 +313,7 @@ Title: "Log Interaction" (create) or "Edit Interaction" (edit). Width: 520px.
 
 ## Addresses Tab
 
-Component: `CustomerAddressesTabComponent`
+Component: `CustomerAddressesClusterComponent`
 
 ### Display
 
@@ -1283,7 +1283,7 @@ Converts the estimate to a formal quote. The estimate is marked as `ConvertedToQ
 
 ## Known Limitations
 
-1. **Addresses tab is read-only in the UI.** The `CustomerAddressesController` supports full CRUD (create, update, delete), but the `CustomerAddressesTabComponent` only fetches and displays addresses. There are no create, edit, or delete buttons in the tab. Address management must be done through the API directly or through other features that use addresses (e.g., sales orders, shipments).
+1. **Addresses tab is read-only in the UI.** The `CustomerAddressesController` supports full CRUD (create, update, delete), but the `CustomerAddressesClusterComponent` only fetches and displays addresses. There are no create, edit, or delete buttons in the tab. Address management must be done through the API directly or through other features that use addresses (e.g., sales orders, shipments).
 
 2. **Edit dialog does not expose isActive toggle.** The edit form group includes an `isActive` FormControl, but the dialog template does not render a toggle for it. There is no UI mechanism to deactivate a customer other than archiving (soft delete).
 
