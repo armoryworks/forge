@@ -1637,9 +1637,10 @@ _(No pending enhancements — all planned DataTable and UserPreferences work is 
 | Feature | Status | Notes |
 |---------|--------|-------|
 | AR Aging ⚡ | Done (as report) | Implemented as a report in the Reports module, not a standalone page |
-| Carrier APIs (UPS/FedEx/USPS/DHL) | Partial | Mock complete; direct carrier integrations not yet built |
-| Xero / FreshBooks / Sage accounting | Not Started | Interface + factory ready; only QB implemented |
+| Carrier APIs (UPS/FedEx/USPS/DHL) | Done | All four carriers implemented end-to-end (real OAuth + REST). MultiCarrierShippingService aggregator + IntegrationDescriptorCatalog wiring + IOptions hot-reload on admin save. Stamps.com is descriptor-only — SwsimV111 SOAP service not yet built |
+| Xero / FreshBooks / Sage / NetSuite / Wave / Zoho accounting | Done | All implemented; AccountingProviderFactory resolves the active provider from system settings |
 | QB Payroll API | Not Started | Controller + entities done; QB Payroll sync stubs return empty |
+| Customer Portal | Done (v1) | Magic-link auth + dashboard / orders / quotes / invoices / shipments + quote accept-decline. Capability CAP-EXT-CUSTOMER-PORTAL (default OFF). UI lives at /portal/* outside the employee shell |
 
 ---
 
