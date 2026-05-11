@@ -4,6 +4,8 @@ How the `PresetDefinition` record changes to carry JSON-bundled seed data, and h
 
 Read Artifact 5a (current preset format) first if you haven't.
 
+> **Addendum (Wave 7b, 2026-05-11):** The schema in §2 is correct, but the §3.3 example using a single "Engagement" TrackType is superseded. PRESET-08's actual TrackTypeBundle seeds five task-type tracks (`ps_epic`, `ps_project`, `ps_story`, `ps_bug`, `ps_spike`), each with its own status set. Terminology renames are Job→Task / Customer→Client / Work Center→Consultant (Job→Project was the original hypothesis; revised to Task per user direction). See [phase-2-foundations/wave-07b-retune-to-agile-tasks.md](../phase-2-foundations/wave-07b-retune-to-agile-tasks.md).
+
 ---
 
 ## 1. Design goals
