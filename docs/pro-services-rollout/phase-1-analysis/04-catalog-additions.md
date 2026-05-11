@@ -4,6 +4,8 @@ Concrete additions to the capability catalog, entity model, and database schema 
 
 This artifact is the foundation for Phase 2 (Foundations). After this lands, Phase 3 (Build everything achievable) implements features that use the new catalog entries.
 
+> **Addendum (Wave 7b, 2026-05-11):** The Pro Services vocabulary captured below as "Engagement track" is superseded by the agile/scrum task-type retune. PRESET-08 now seeds **five task types** (Epic, Project, Story, Bug, Spike) instead of a single Engagement track, and the entity rename is **Job → Task** (not Job → Project). See [phase-2-foundations/wave-07b-retune-to-agile-tasks.md](../phase-2-foundations/wave-07b-retune-to-agile-tasks.md). Capability names (`CAP-PS-ENGAGEMENT`, etc.) are unchanged.
+
 ---
 
 ## 1. New capabilities
