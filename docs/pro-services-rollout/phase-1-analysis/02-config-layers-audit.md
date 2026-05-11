@@ -108,7 +108,7 @@ For the Pro Services + Cloud Storage + Migration rollout, the catalog needs:
 6. **`CAP-ACCT-MIGRATION`** — accounting mode migration wizard. Auto-gated to `false` outside the eligibility window per Artifact 6.
 
 Possibly:
-7. **`CAP-PS-PROJECT`** — Pro Services project entity (if it lands as a distinct table rather than reusing Job).
+7. **`CAP-PS-ENGAGEMENT`** — Pro Services engagement axis fields + Engagement track surfaces on Job (per G-17 spike — Engagement = Job on Engagement track type; final naming differs from the original `CAP-PS-PROJECT` hypothesis recorded here).
 8. **`CAP-PS-TIME-BILLABLE`** — billable / non-billable split on time entries (independent of having time-tracking enabled).
 9. **`CAP-PS-RETAINER`** — retainer / prepaid-hours model.
 

@@ -447,7 +447,7 @@ For the `Prompt` conflict policy (and as a preview mode for all policies), an ad
 ┌─ Preview: Apply PRESET-08 to this install ─────────────────┐
 │                                                             │
 │ Capability changes (will be applied):                       │
-│   + CAP-PS-PROJECT      will turn ON                        │
+│   + CAP-PS-ENGAGEMENT   will turn ON                        │
 │   + CAP-PS-RETAINER     will turn ON                        │
 │   − CAP-MD-PARTS        will turn OFF                       │
 │   − CAP-INV-LOTS        will turn OFF                       │

@@ -30,24 +30,25 @@ Format: `CODE | Area | Name | Default | Depends on | Mutex with`. Sorted by phas
 
 | Code | Area | Name | Default | Depends | Mutex |
 |---|---|---|---|---|---|
-| `CAP-PS-PROJECT` | PS | Project / engagement entity | off | — | — |
-| `CAP-PS-RETAINER` | PS | Retainer / prepaid-hours billing | off | `CAP-O2C-RECURRING` | — |
+| `CAP-PS-ENGAGEMENT` | PS | Engagement (Job-as-engagement) axis fields + Engagement track surfaces | off | — | — |
+| `CAP-PS-RETAINER` | PS | Retainer / prepaid-hours billing | off | `CAP-O2C-RECURRING`, `CAP-PS-ENGAGEMENT` | — |
 | `CAP-PS-TIME-BILLABLE` | PS | Billable / non-billable time split | off | (TimeEntry billable column exists) | — |
 | `CAP-PS-RATE-CARDS` | PS | Per-resource / per-role bill rates | off | — | — |
-| `CAP-PS-PROJECT-COST` | PS | Project costing (T&M, fixed-bid) | off | `CAP-PS-PROJECT` | — |
-| `CAP-PS-UTILIZATION` | PS | Utilization dashboard widgets | off | `CAP-PS-PROJECT` + `CAP-PS-TIME-BILLABLE` | — |
+| `CAP-PS-PROJECT-COST` | PS | Engagement costing (T&M, fixed-bid) | off | `CAP-PS-ENGAGEMENT` | — |
+| `CAP-PS-UTILIZATION` | PS | Utilization dashboard widgets | off | `CAP-PS-ENGAGEMENT` + `CAP-PS-TIME-BILLABLE` | — |
 
 **Notes:**
 - New area `PS` (Professional Services). Mirrors `MFG` area for manufacturing.
-- `CAP-PS-PROJECT` adoption question: extend `Project` entity with axis fields (engagement type, project phase, etc.) or stand up a new `Engagement` entity? Recommend extending `Project` since it's lightly used today. Final call lands in Phase 2 spike.
-- `CAP-PS-TIME-BILLABLE` is independent of `CAP-PS-PROJECT` — a shop can split billable/non-billable without modeling full engagements.
+- **G-17 spike resolved 2026-05-10:** Engagement = Job on the Engagement track type. Capability renamed `CAP-PS-PROJECT` → `CAP-PS-ENGAGEMENT`. Pro Services axis fields land on `Job`, not on Project or a new entity. Full writeup: [phase-2-foundations/spike-01-engagement-entity.md](../phase-2-foundations/spike-01-engagement-entity.md).
+- `CAP-PS-TIME-BILLABLE` is independent of `CAP-PS-ENGAGEMENT` — a shop can split billable/non-billable without modeling full engagements.
+- Existing `CAP-EXT-PROJECT` (Project entity with WBS + earned value) stays as-is. Default-off for PRESET-08; PRESET-07 (Enterprise) keeps it on for heavyweight project accounting.
 
 ### Phase 3b+ (optional, candidate for descope)
 
 | Code | Area | Name | Default | Depends | Mutex |
 |---|---|---|---|---|---|
 | `CAP-PS-SOW` | PS | Statement of Work entity (distinct from Quote) | off | `CAP-O2C-QUOTE` | — |
-| `CAP-PS-MILESTONE-BILLING` | PS | Milestone-based invoicing on projects | off | `CAP-PS-PROJECT` | — |
+| `CAP-PS-MILESTONE-BILLING` | PS | Milestone-based invoicing on engagements | off | `CAP-PS-ENGAGEMENT` | — |
 | `CAP-PS-EXPENSE-PASSTHRU` | PS | Pass-through expense to invoice | off | `CAP-O2C-INVOICE` | — |
 | `CAP-PS-SUBCONTRACTOR-MGMT` | PS | Subcontractor (1099) management | off | `CAP-MD-VENDORS` | — |
 
@@ -65,11 +66,11 @@ DEPENDENCY EDGES (new):
   CAP-EXT-CLOUD-STORAGE-GDRIVE     depends_on  CAP-EXT-CLOUD-STORAGE
   CAP-EXT-CLOUD-STORAGE-ONEDRIVE   depends_on  CAP-EXT-CLOUD-STORAGE
   CAP-EXT-CLOUD-STORAGE-DROPBOX    depends_on  CAP-EXT-CLOUD-STORAGE
-  CAP-PS-RETAINER                  depends_on  CAP-O2C-RECURRING
-  CAP-PS-PROJECT-COST              depends_on  CAP-PS-PROJECT
-  CAP-PS-UTILIZATION               depends_on  CAP-PS-PROJECT, CAP-PS-TIME-BILLABLE
+  CAP-PS-RETAINER                  depends_on  CAP-O2C-RECURRING, CAP-PS-ENGAGEMENT
+  CAP-PS-PROJECT-COST              depends_on  CAP-PS-ENGAGEMENT
+  CAP-PS-UTILIZATION               depends_on  CAP-PS-ENGAGEMENT, CAP-PS-TIME-BILLABLE
   CAP-PS-SOW                       depends_on  CAP-O2C-QUOTE
-  CAP-PS-MILESTONE-BILLING         depends_on  CAP-PS-PROJECT
+  CAP-PS-MILESTONE-BILLING         depends_on  CAP-PS-ENGAGEMENT
   CAP-PS-EXPENSE-PASSTHRU          depends_on  CAP-O2C-INVOICE
   CAP-PS-SUBCONTRACTOR-MGMT        depends_on  CAP-MD-VENDORS
 
@@ -186,21 +187,22 @@ Per **D2** — `created_via` distinguishes preset-apply seeds (which use suggest
 
 Three tables: `accounting_migration_sessions`, `accounting_migration_rows`, `accounting_migration_audit`. Full schema in Artifact 6 §data-model.
 
-### 3.6 `engagement_axes` (placeholder)
+### 3.6 `engagement_axes` on `jobs` table
 
-If Phase 2 decides Project + axis fields (rather than new Engagement entity), this is the column-level additions on `projects` table. Not a new table.
+Per G-17 spike (2026-05-10), Pro Services engagements are Jobs on the Engagement track type. Axis fields land on `jobs`, NOT on `projects`. Project entity stays unchanged (heavyweight project accounting for Enterprise installs).
 
 ```sql
-ALTER TABLE projects ADD COLUMN engagement_type_id BIGINT REFERENCES reference_data(id);
-ALTER TABLE projects ADD COLUMN project_phase_id BIGINT REFERENCES reference_data(id);
-ALTER TABLE projects ADD COLUMN billing_model TEXT;  -- 't_and_m' | 'fixed_bid' | 'retainer'
-ALTER TABLE projects ADD COLUMN retainer_hours NUMERIC(10,2);
-ALTER TABLE projects ADD COLUMN retainer_balance_hours NUMERIC(10,2);
-ALTER TABLE projects ADD COLUMN budget_amount NUMERIC(14,2);
-ALTER TABLE projects ADD COLUMN budget_currency TEXT;
+ALTER TABLE jobs ADD COLUMN engagement_type_id BIGINT REFERENCES reference_data(id);
+ALTER TABLE jobs ADD COLUMN project_phase_id BIGINT REFERENCES reference_data(id);
+ALTER TABLE jobs ADD COLUMN billing_model TEXT;  -- 't_and_m' | 'fixed_bid' | 'retainer'
+ALTER TABLE jobs ADD COLUMN retainer_hours NUMERIC(10,2);
+ALTER TABLE jobs ADD COLUMN retainer_balance_hours NUMERIC(10,2);
+ALTER TABLE jobs ADD COLUMN sow_id BIGINT REFERENCES quotes(id);  -- nullable; SOW lives in Quote per spec
 ```
 
-Final shape decided in Phase 2 spike. The above is a starting hypothesis; adjust if Pro Services real-world data reveals additional axes.
+`budget_amount` / `budget_currency` are NOT added — Job already carries `QuotedPrice` + estimated cost fields (`EstimatedMaterialCost`, `EstimatedLaborCost`, `EstimatedBurdenCost`, `EstimatedSubcontractCost`) which serve the same purpose. Pro Services use of these fields differs by interpretation, not by schema.
+
+Full rationale: [phase-2-foundations/spike-01-engagement-entity.md](../phase-2-foundations/spike-01-engagement-entity.md).
 
 ### 3.7 `time_entries` extensions
 
@@ -211,10 +213,11 @@ ALTER TABLE time_entries ADD COLUMN is_billable BOOLEAN NOT NULL DEFAULT TRUE;
 ALTER TABLE time_entries ADD COLUMN bill_rate NUMERIC(10,2);
 ALTER TABLE time_entries ADD COLUMN bill_rate_currency TEXT;
 ALTER TABLE time_entries ADD COLUMN activity_type_id BIGINT REFERENCES reference_data(id);  -- discovery/design/build/etc.
-ALTER TABLE time_entries ADD COLUMN project_id BIGINT REFERENCES projects(id);  -- if CAP-PS-PROJECT
 ```
 
 Default `is_billable = true` to keep manufacturing semantics intact (existing time entries treated as billable, which they effectively are for cost-rollup purposes).
+
+**Note:** No `project_id` column. Per G-17 spike, Pro Services engagements are Jobs; `TimeEntry.JobId` already exists in the schema and serves as the engagement linkage.
 
 ---
 
@@ -271,25 +274,25 @@ Mirrors `entity_cloud_links` table. Polymorphic via `EntityType` + `EntityId` (n
 
 | Entity | Field added | Purpose |
 |---|---|---|
-| `TimeEntry` | `IsBillable`, `BillRate`, `BillRateCurrency`, `ActivityTypeId`, `ProjectId` | Pro Services billable split |
-| `Project` | `EngagementTypeId`, `ProjectPhaseId`, `BillingModel`, `RetainerHours`, `RetainerBalanceHours`, `BudgetAmount`, `BudgetCurrency` | Pro Services axis fields |
+| `TimeEntry` | `IsBillable`, `BillRate`, `BillRateCurrency`, `ActivityTypeId` | Pro Services billable split (Job linkage already exists) |
+| `Job` | `EngagementTypeId`, `ProjectPhaseId`, `BillingModel`, `RetainerHours`, `RetainerBalanceHours`, `SowId` | Pro Services engagement axes (per G-17 spike) |
 | `PresetDefinition` | `TerminologyBundle`, `ReferenceDataSeed`, `TrackTypeSeed`, `RoleSeed`, `ReportVisibilityFilter`, `FolderMapSuggestions` | See Artifact 5 |
 | `Invoice` | (none new — services billing reuses existing schema) | — |
 | `Quote` | (none new — SOW reuses Quote unless CAP-PS-SOW lands as its own entity) | — |
 
 ### 4.6 New `Deliverable` entity (gated by `CAP-O2C-DELIVERABLE`)
 
-Lightweight tracking for engagement artifacts.
+Lightweight tracking for engagement artifacts. Per G-17 spike, primary link is `JobId`; `ProjectId` retained as optional FK for Enterprise installs that roll engagements up into projects.
 
 ```csharp
 public class Deliverable : BaseEntity
 {
     public string Name { get; set; } = default!;
     public string? Description { get; set; }
-    public long? ProjectId { get; set; }
-    public long? JobId { get; set; }
+    public long? JobId { get; set; }              // primary linkage (Engagement-track Job)
+    public long? ProjectId { get; set; }          // optional Project rollup (Enterprise)
     public long? CustomerId { get; set; }
-    public long DeliverableTypeId { get; set; }  // ref_data
+    public long DeliverableTypeId { get; set; }   // ref_data
     public string Status { get; set; } = "Draft"; // Draft / In Review / Approved / Delivered
     public DateTime? DueDate { get; set; }
     public DateTime? DeliveredAt { get; set; }
@@ -298,12 +301,12 @@ public class Deliverable : BaseEntity
     public string? CloudLinkExternalId { get; set; }
 }
 
-CREATE INDEX idx_deliverable_project ON deliverables(project_id) WHERE deleted_at IS NULL;
 CREATE INDEX idx_deliverable_job ON deliverables(job_id) WHERE deleted_at IS NULL;
+CREATE INDEX idx_deliverable_project ON deliverables(project_id) WHERE deleted_at IS NULL;
 CREATE INDEX idx_deliverable_customer ON deliverables(customer_id) WHERE deleted_at IS NULL;
 ```
 
-If Phase 2 review finds this is over-engineered, fall back to "deliverables are just `FileAttachment` rows tagged with type=deliverable on a Project/Job."
+If Phase 2 review finds this is over-engineered, fall back to "deliverables are just `FileAttachment` rows tagged with type=deliverable on a Job."
 
 ---
 
@@ -313,7 +316,7 @@ If Phase 2 review finds this is over-engineered, fall back to "deliverables are 
 
 - **Target profile:** Headcount 5-50 (services-only). Consulting / agency / engineering services / professional services firms.
 - **Capability set:**
-  - On: `CAP-O2C-LEAD`, `CAP-O2C-QUOTE`, `CAP-O2C-INVOICE`, `CAP-O2C-CASH`, `CAP-O2C-RECURRING`, `CAP-O2C-DELIVERABLE`, `CAP-PS-PROJECT`, `CAP-PS-TIME-BILLABLE`, `CAP-PS-RATE-CARDS`, `CAP-PS-PROJECT-COST`, `CAP-PS-UTILIZATION`, `CAP-PS-RETAINER`, `CAP-ACCT-BUILTIN` (default), `CAP-QC-COMPLIANCE-FORMS` (per D7 — NDAs/MSAs).
+  - On: `CAP-O2C-LEAD`, `CAP-O2C-QUOTE`, `CAP-O2C-INVOICE`, `CAP-O2C-CASH`, `CAP-O2C-RECURRING`, `CAP-O2C-DELIVERABLE`, `CAP-PS-ENGAGEMENT`, `CAP-PS-TIME-BILLABLE`, `CAP-PS-RATE-CARDS`, `CAP-PS-PROJECT-COST`, `CAP-PS-UTILIZATION`, `CAP-PS-RETAINER`, `CAP-ACCT-BUILTIN` (default), `CAP-QC-COMPLIANCE-FORMS` (per D7 — NDAs/MSAs).
   - Off: `CAP-MD-PARTS`, `CAP-MD-BOM`, `CAP-MD-ROUTING`, all `CAP-INV-*`, all `CAP-MFG-*`, all `CAP-QC-*` except compliance forms, `CAP-PLAN-MRP`, `CAP-MFG-OEE`, `CAP-MFG-SHOPFLOOR`, `CAP-O2C-SHIP`, `CAP-O2C-PICKPACK`, `CAP-P2P-RECEIVE`.
 - **Terminology bundle:** ~40 renames (entity_job → Engagement, entity_part → Service Item, work_center → Resource, etc.). Full list in Artifact 5.
 - **Reference-data seed:** all 10 Pro Services groups (engagement_type, project_phase, resource_skill, time_billable_status, time_activity_type, deliverable_type, service_uom, engagement_status, retainer_status, client_segment).

@@ -133,10 +133,10 @@ This is distinct from Artifact 4 (catalog additions = new capabilities + tables 
   - Audit existing costing handlers; identify which assume Part vs which work on any costable entity.
   - For entities that need engagement-level costing (Project / Job-as-engagement / Deliverable), write a parallel costing handler family (`CalculateEngagementCost`, `CalculateProjectCost`, etc.) that uses existing CostCalculation entity shape.
   - Add billing-model field to Project (`t_and_m | fixed_bid | retainer`) — Artifact 4 §3.6.
-  - Hour-bucket cost rollup: sum TimeEntry where ProjectId = X and IsBillable = true, multiply by bill rate, add pass-through expenses.
+  - Hour-bucket cost rollup: sum TimeEntry where JobId = X and IsBillable = true, multiply by bill rate, add pass-through expenses.
 - **Risk:** Medium — costing is a corner of the codebase with implicit assumptions; may surface unexpected joins to Parts.
 - **Effort:** 3-4 engineering days.
-- **Dependencies:** G-02 (TimeEntry billable), Project axis fields, `CAP-PS-PROJECT-COST`.
+- **Dependencies:** G-02 (TimeEntry billable), Job engagement-axis fields (per G-17), `CAP-PS-PROJECT-COST`.
 
 ### G-10 — Folder-mapping suggestions in preset
 
@@ -180,7 +180,7 @@ This is distinct from Artifact 4 (catalog additions = new capabilities + tables 
   - Seed via PRESET-08's `WorkflowDefinitionBundle` (Artifact 5 §3.7).
 - **Risk:** Low — substrate is proven on Part.
 - **Effort:** 3 engineering days.
-- **Dependencies:** `CAP-PS-PROJECT`, Preset format extension.
+- **Dependencies:** `CAP-PS-ENGAGEMENT`, Preset format extension.
 
 ### G-13 — Pro Services dashboard widgets (`utilization_by_practitioner`, `billable_percent`, `project_margin`, `retainer_burn_down`)
 
@@ -238,6 +238,7 @@ This is distinct from Artifact 4 (catalog additions = new capabilities + tables 
 - **Risk:** Medium — wrong call here ramifies through Phase 3.
 - **Effort:** 1 day spike + 1-2 days implementation per outcome.
 - **Dependencies:** None for spike.
+- **Spike result (2026-05-10):** Neither A (extend Project) nor B (new Engagement). **Path C: Engagement = Job on Engagement track type.** Project is NOT lightly used — it's a full project-accounting entity with WBS + earned value, semantically wrong for service-shop engagements. Job is the right primitive; PRESET-08's TrackTypeBundle (Artifact 5 §3.3) already creates an Engagement track, and PRESET-08's TerminologyBundle renames Job → Engagement. Full writeup: [phase-2-foundations/spike-01-engagement-entity.md](../phase-2-foundations/spike-01-engagement-entity.md). Axis fields target `jobs` table; capability is renamed `CAP-PS-PROJECT` → `CAP-PS-ENGAGEMENT`.
 
 ### G-18 — Bootstrap exemption for cloud-storage admin endpoints
 
