@@ -1,0 +1,35 @@
+# Static-only demo deployment for demo.forge.com.
+#
+# Stands up a single nginx container serving the Angular demo bundle.
+# No API, no database, no SignalR, no storage — all data is synthesized
+# in-browser by demoApiInterceptor against /demo-data/*.json.
+#
+# Build / deploy:
+#   docker compose -p forge-demo -f docker-compose.demo.yml up -d --build
+#
+# Refresh demo data first (regenerates ./forge-ui/public/demo-data/*.json):
+#   ./export-demo-data.sh       (bash)
+#   .\export-demo-data.ps1      (PowerShell)
+#
+# Put a reverse proxy (Cloudflare, Caddy, or an outer nginx with Let's Encrypt)
+# in front of this container for TLS + the demo.forge.com hostname.
+# This compose file deliberately doesn't bake in a cert or a hostname.
+
+services:
+  forge-demo:
+    build:
+      context: ./forge-ui
+      dockerfile: Dockerfile.demo
+      args:
+        BUILD_VERSION: ${BUILD_VERSION:-demo}
+        BUILD_SHA: ${BUILD_SHA:-demo}
+    container_name: forge-demo
+    ports:
+      - "${DEMO_BIND:-127.0.0.1}:${DEMO_HOST_PORT:-4203}:80"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
