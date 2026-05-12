@@ -1,0 +1,16 @@
+# .editorconfig — https://editorconfig.org
+#
+# Project-level conventions for editors that respect EditorConfig
+# (VS Code, JetBrains IDEs, vim with plugin, etc.).
+#
+# The PowerShell rule below is load-bearing: Windows PowerShell 5
+# reads .ps1 scripts in the system code page (Windows-1252) unless
+# they start with a UTF-8 BOM, which silently mangles any non-ASCII
+# character (em-dashes, smart quotes, etc.) and breaks the parser.
+# Saving .ps1 files as utf-8-bom keeps them parseable on both
+# Windows PowerShell 5 and PowerShell 7+.
+root = true
+
+[*.ps1]
+charset = utf-8-bom
+end_of_line = crlf
