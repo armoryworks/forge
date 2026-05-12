@@ -229,13 +229,13 @@ async function main() {
         simpleTable(
           ["Container", "Purpose"],
           [
-            ["qb-engineer-ui", "Nginx serving Angular build, proxies API calls"],
-            ["qb-engineer-api", ".NET 9 Web API, accounting integration, business logic"],
-            ["qb-engineer-db", "PostgreSQL + pgvector with persistent volume"],
-            ["qb-engineer-storage", "MinIO with persistent volume"],
-            ["qb-engineer-backup", "Scheduled backup jobs (pg_dump + rclone)"],
-            ["qb-engineer-ai", "Ollama LLM runtime (optional — app works without it)"],
-            ["qb-engineer-backup-target", "MinIO replica on secondary machine (separate compose)"],
+            ["forge-ui", "Nginx serving Angular build, proxies API calls"],
+            ["forge-api", ".NET 9 Web API, accounting integration, business logic"],
+            ["forge-db", "PostgreSQL + pgvector with persistent volume"],
+            ["forge-storage", "MinIO with persistent volume"],
+            ["forge-backup", "Scheduled backup jobs (pg_dump + rclone)"],
+            ["forge-ai", "Ollama LLM runtime (optional — app works without it)"],
+            ["forge-backup-target", "MinIO replica on secondary machine (separate compose)"],
           ],
           [2800, 6560]
         ),

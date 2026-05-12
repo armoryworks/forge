@@ -1,8 +1,9 @@
 # --- Sibling repos (each has its own .git, must not be tracked here) ---
-/qb-engineer-deploy/
-/qb-engineer-server/
-/qb-engineer-ui/
-/qb-engineer-test/
+/forge-deploy/
+/forge-api/
+/forge-ui/
+/forge-test/
+/forge-voice/
 
 # --- Files hard-linked / junctioned in from sibling repos (owned by deploy) ---
 /docker-compose.yml
