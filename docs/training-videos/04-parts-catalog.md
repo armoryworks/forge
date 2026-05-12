@@ -10,7 +10,7 @@
 
 ## Purpose
 
-The parts catalog is the engineering backbone of QB Engineer. Engineers live here. This video covers the full lifecycle of a part from creation through BOM assembly, process planning, and connection to jobs, inventory, and purchasing. It is intentionally comprehensive — this is reference material that engineers will return to.
+The parts catalog is the engineering backbone of Forge. Engineers live here. This video covers the full lifecycle of a part from creation through BOM assembly, process planning, and connection to jobs, inventory, and purchasing. It is intentionally comprehensive — this is reference material that engineers will return to.
 
 ### Learning Objectives
 - Understand the parts catalog layout and status system
@@ -82,7 +82,7 @@ Click New Part to open the part creation dialog. Required fields: Part Number �
 **Chapter label:** "Make, Buy, Stock"
 
 **Narration Script:**
-The Type field on every part is one of three values, and choosing correctly matters. Make means your shop fabricates this part in-house. It will appear on production jobs and trigger process steps. Buy means you purchase this part from a vendor. When a job requires it, QB Engineer can generate a purchase order. Stock means it comes from your own inventory — already on the shelf. When a job calls for a stock item, QB Engineer checks your current inventory and alerts you if you are running low. The distinction drives purchasing suggestions, production scheduling, and inventory alerts. Getting this wrong causes missed deliveries and excess inventory.
+The Type field on every part is one of three values, and choosing correctly matters. Make means your shop fabricates this part in-house. It will appear on production jobs and trigger process steps. Buy means you purchase this part from a vendor. When a job requires it, Forge can generate a purchase order. Stock means it comes from your own inventory — already on the shelf. When a job calls for a stock item, Forge checks your current inventory and alerts you if you are running low. The distinction drives purchasing suggestions, production scheduling, and inventory alerts. Getting this wrong causes missed deliveries and excess inventory.
 
 **Alternative paths:** A part can change type over time — for example, you might outsource (Buy) a part that you previously made in-house (Make). This is a normal engineering decision. Change the type on the part record and the downstream behavior updates automatically.
 
@@ -98,7 +98,7 @@ The Type field on every part is one of three values, and choosing correctly matt
 **Narration Script:**
 Open any Make part and switch to the BOM tab. The Bill of Materials is the recipe for this part — it lists every component needed to build one unit. To add a component, click Add BOM Item. Search for the child part by number or description. If it does not exist yet, create it inline — the system lets you create a stub part directly from the BOM editor without losing your place. Set the quantity per parent unit. Set the type for this line item — Make, Buy, or Stock. Set a lead time in days if this component has a predictable procurement or fabrication time. The lead times roll up to give you a total lead time estimate for the parent part.
 
-**Alternative paths:** BOMs can have multiple levels — a BOM item can itself have a BOM, creating a tree structure. QB Engineer handles multi-level BOMs and can roll up total material cost and lead time across all levels.
+**Alternative paths:** BOMs can have multiple levels — a BOM item can itself have a BOM, creating a tree structure. Forge handles multi-level BOMs and can roll up total material cost and lead time across all levels.
 
 **Kinesthetic prompt:** Open a part that has a BOM and expand one of its sub-components to see if that component also has a BOM of its own.
 
@@ -110,7 +110,7 @@ Open any Make part and switch to the BOM tab. The Bill of Materials is the recip
 **Chapter label:** "Quantities and Lead Times"
 
 **Narration Script:**
-Let's look more closely at each BOM line item. Quantity per unit: how many of this component are needed to make one of the parent part. If the parent is a 10-piece kit, you might need 10 of a stock fastener — set quantity to 10. Lead time in days: for Buy components, this is the typical vendor lead time. For Make components, it is the typical fabrication time. For Stock components, it might be zero if you keep it on hand. These numbers feed into the planning tool — when a manager is scheduling a production run, QB Engineer uses the BOM lead times to suggest the latest possible order dates for purchased components. Keeping lead times current keeps your schedule accurate.
+Let's look more closely at each BOM line item. Quantity per unit: how many of this component are needed to make one of the parent part. If the parent is a 10-piece kit, you might need 10 of a stock fastener — set quantity to 10. Lead time in days: for Buy components, this is the typical vendor lead time. For Make components, it is the typical fabrication time. For Stock components, it might be zero if you keep it on hand. These numbers feed into the planning tool — when a manager is scheduling a production run, Forge uses the BOM lead times to suggest the latest possible order dates for purchased components. Keeping lead times current keeps your schedule accurate.
 
 **Kinesthetic prompt:** Find a BOM with at least three line items. Add up the longest-path lead times manually and compare to the system's total lead time estimate.
 
@@ -136,7 +136,7 @@ Switch to the Process Plan tab on a Make part. This is where you document the ma
 **Chapter label:** "Parts and Jobs"
 
 **Narration Script:**
-Parts and jobs are tightly connected in QB Engineer. When you create a new job, one of the fields is the associated part number — linking the job to a specific part tells the system what you are making, which process steps to display, and which BOM items to suggest for purchasing. You can also link a part to an existing job: from the kanban board, open the job detail panel and look for the Part field. Start typing and the typeahead shows matching parts. Once linked, the job cost-to-date is compared against the part's standard cost, and any BOM shortages are flagged for the purchasing team. The connection between parts and jobs is what transforms QB Engineer from a task manager into a true manufacturing operations system.
+Parts and jobs are tightly connected in Forge. When you create a new job, one of the fields is the associated part number — linking the job to a specific part tells the system what you are making, which process steps to display, and which BOM items to suggest for purchasing. You can also link a part to an existing job: from the kanban board, open the job detail panel and look for the Part field. Start typing and the typeahead shows matching parts. Once linked, the job cost-to-date is compared against the part's standard cost, and any BOM shortages are flagged for the purchasing team. The connection between parts and jobs is what transforms Forge from a task manager into a true manufacturing operations system.
 
 **Alternative paths:** A single job can reference multiple parts — for example, an assembly job that produces a multi-part kit. In this case, add each part as a separate line item on the sales order and link each line to the job.
 
@@ -222,7 +222,7 @@ Use search, status filter, and type filter to navigate large catalogs. Export to
       "element": "app-parts .action-btn--primary",
       "popover": {
         "title": "Make, Buy, Stock",
-        "description": "The Type field is one of three values and choosing correctly matters. Make means your shop fabricates this part — it appears on production jobs. Buy means you purchase it from a vendor — QB Engineer can generate a purchase order when a job needs it. Stock means it comes from your own inventory — the system checks quantity on hand and alerts when running low. The distinction drives purchasing, scheduling, and inventory alerts. Getting this wrong causes missed deliveries."
+        "description": "The Type field is one of three values and choosing correctly matters. Make means your shop fabricates this part — it appears on production jobs. Buy means you purchase it from a vendor — Forge can generate a purchase order when a job needs it. Stock means it comes from your own inventory — the system checks quantity on hand and alerts when running low. The distinction drives purchasing, scheduling, and inventory alerts. Getting this wrong causes missed deliveries."
       }
     },
     {
@@ -236,7 +236,7 @@ Use search, status filter, and type filter to navigate large catalogs. Export to
       "element": "app-parts app-data-table",
       "popover": {
         "title": "Quantities and Lead Times",
-        "description": "Each BOM line has a quantity and a lead time. Quantity per unit is how many of this component make one of the parent part. Lead time in days is the typical procurement time for Buy parts, fabrication time for Make parts, or zero for Stock items you keep on hand. These numbers feed directly into the planning tool — when scheduling a production run, QB Engineer uses BOM lead times to suggest the latest possible purchase order dates for procured components."
+        "description": "Each BOM line has a quantity and a lead time. Quantity per unit is how many of this component make one of the parent part. Lead time in days is the typical procurement time for Buy parts, fabrication time for Make parts, or zero for Stock items you keep on hand. These numbers feed directly into the planning tool — when scheduling a production run, Forge uses BOM lead times to suggest the latest possible purchase order dates for procured components."
       }
     },
     {

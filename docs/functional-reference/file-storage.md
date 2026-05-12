@@ -2,7 +2,7 @@
 
 ## Overview
 
-QB Engineer uses MinIO (S3-compatible object storage) for all file attachments. Files are associated with entities through a polymorphic `FileAttachment` table that stores the entity type and ID alongside the MinIO bucket name and object key. The frontend provides drag-and-drop upload (`FileUploadZoneComponent`), a fullscreen image viewer (`LightboxGalleryComponent`), and device camera capture (`CameraCaptureComponent`).
+Forge uses MinIO (S3-compatible object storage) for all file attachments. Files are associated with entities through a polymorphic `FileAttachment` table that stores the entity type and ID alongside the MinIO bucket name and object key. The frontend provides drag-and-drop upload (`FileUploadZoneComponent`), a fullscreen image viewer (`LightboxGalleryComponent`), and device camera capture (`CameraCaptureComponent`).
 
 Files are soft-deleted: the `FileAttachment` database record is marked with `DeletedAt` via the standard `BaseEntity` soft-delete mechanism. MinIO objects are retained indefinitely (not deleted from storage on soft-delete).
 
@@ -12,7 +12,7 @@ Files are soft-deleted: the `FileAttachment` database record is marked with `Del
 
 ### IStorageService
 
-**Location:** `qb-engineer-server/qb-engineer.core/Interfaces/IStorageService.cs`
+**Location:** `forge-api/forge.core/Interfaces/IStorageService.cs`
 
 The storage abstraction used by all file operations:
 
@@ -30,17 +30,17 @@ public interface IStorageService
 
 ### MinioStorageService
 
-**Location:** `qb-engineer-server/qb-engineer.integrations/MinioStorageService.cs`
+**Location:** `forge-api/forge.integrations/MinioStorageService.cs`
 
 Production implementation using the Minio .NET SDK (v7.0.0).
 
 **Dual-client architecture:**
 
 The service maintains two MinIO client instances:
-1. `_client` -- Points to the internal Docker hostname (e.g., `qb-engineer-storage:9000`). Used for upload, download, delete, and bucket management.
+1. `_client` -- Points to the internal Docker hostname (e.g., `forge-storage:9000`). Used for upload, download, delete, and bucket management.
 2. `_presignClient` -- Points to the public endpoint (e.g., `localhost:9000`). Used exclusively for presigned URL generation. This is necessary because presigned URLs embed the host in their HMAC signature, so the URL must match the host that the browser will actually request.
 
-**Configuration:** `MinioOptions` in `qb-engineer.core/Models/MinioOptions.cs`
+**Configuration:** `MinioOptions` in `forge.core/Models/MinioOptions.cs`
 
 | Setting | Purpose |
 |---------|---------|
@@ -63,7 +63,7 @@ The service maintains two MinIO client instances:
 
 ### MockStorageService
 
-**Location:** `qb-engineer-server/qb-engineer.integrations/MockStorageService.cs`
+**Location:** `forge-api/forge.integrations/MockStorageService.cs`
 
 In-memory `ConcurrentDictionary` implementation used when `MOCK_INTEGRATIONS=true`. All operations succeed immediately. Used for development and testing.
 
@@ -73,9 +73,9 @@ In-memory `ConcurrentDictionary` implementation used when `MOCK_INTEGRATIONS=tru
 
 | Bucket Name | Purpose |
 |-------------|---------|
-| `qb-engineer-job-files` | Job-related documents (work orders, drawings, specs) |
-| `qb-engineer-receipts` | Expense receipts and financial documents |
-| `qb-engineer-employee-docs` | Employee documents (tax forms, compliance, identity) |
+| `forge-job-files` | Job-related documents (work orders, drawings, specs) |
+| `forge-receipts` | Expense receipts and financial documents |
+| `forge-employee-docs` | Employee documents (tax forms, compliance, identity) |
 
 Buckets are auto-created on first use via `EnsureBucketExistsAsync`.
 
@@ -83,7 +83,7 @@ Buckets are auto-created on first use via `EnsureBucketExistsAsync`.
 
 ## FileAttachment Entity
 
-**Location:** `qb-engineer-server/qb-engineer.core/Entities/FileAttachment.cs`
+**Location:** `forge-api/forge.core/Entities/FileAttachment.cs`
 
 Extends `BaseAuditableEntity` (inherits `Id`, `CreatedAt`, `UpdatedAt`, `DeletedAt`, `DeletedBy`, `CreatedBy`).
 
@@ -110,7 +110,7 @@ The `EntityType`/`EntityId` pair creates a polymorphic association, allowing any
 
 ## API Endpoints
 
-**Controller:** `qb-engineer-server/qb-engineer.api/Controllers/FilesController.cs`
+**Controller:** `forge-api/forge.api/Controllers/FilesController.cs`
 
 All endpoints require `[Authorize]`.
 
@@ -153,7 +153,7 @@ When `isComplete` is true and `fileAttachment` is non-null, the upload is finish
 
 ## FileUploadZoneComponent
 
-**Location:** `qb-engineer-ui/src/app/shared/components/file-upload-zone/`
+**Location:** `forge-ui/src/app/shared/components/file-upload-zone/`
 
 Drag-and-drop file upload zone with per-file progress bars, file type validation, file size validation, and chunked upload support.
 
@@ -214,7 +214,7 @@ The `accept` input uses the same format as HTML `<input accept>`: file extension
 
 ## LightboxGalleryComponent
 
-**Location:** `qb-engineer-ui/src/app/shared/components/lightbox-gallery/`
+**Location:** `forge-ui/src/app/shared/components/lightbox-gallery/`
 
 Fullscreen image viewer with thumbnail strip, keyboard navigation, and touch/swipe support.
 
@@ -265,7 +265,7 @@ interface GalleryItem {
 
 ## CameraCaptureComponent
 
-**Location:** `qb-engineer-ui/src/app/shared/components/camera-capture/`
+**Location:** `forge-ui/src/app/shared/components/camera-capture/`
 
 Device camera capture overlay for taking photos of receipts, documents, or work-in-progress. Supports both camera capture and file picker fallback.
 
@@ -330,14 +330,14 @@ When a file is deleted via `DELETE /api/v1/files/{id}`:
 
 | File | Purpose |
 |------|---------|
-| `qb-engineer-server/qb-engineer.core/Interfaces/IStorageService.cs` | Storage abstraction interface |
-| `qb-engineer-server/qb-engineer.integrations/MinioStorageService.cs` | MinIO S3-compatible implementation |
-| `qb-engineer-server/qb-engineer.integrations/MockStorageService.cs` | In-memory mock for development |
-| `qb-engineer-server/qb-engineer.core/Entities/FileAttachment.cs` | Polymorphic file attachment entity |
-| `qb-engineer-server/qb-engineer.api/Controllers/FilesController.cs` | File CRUD + chunked upload endpoints |
-| `qb-engineer-server/qb-engineer.api/Features/Files/` | MediatR handlers (upload, download, delete, list) |
-| `qb-engineer-ui/src/app/shared/components/file-upload-zone/file-upload-zone.component.ts` | Drag-and-drop upload with progress |
-| `qb-engineer-ui/src/app/shared/components/lightbox-gallery/lightbox-gallery.component.ts` | Fullscreen image viewer |
-| `qb-engineer-ui/src/app/shared/components/camera-capture/camera-capture.component.ts` | Device camera capture overlay |
-| `qb-engineer-ui/src/app/shared/models/gallery-item.model.ts` | `GalleryItem` interface |
-| `qb-engineer-ui/src/app/shared/models/camera-capture-result.model.ts` | `CameraCaptureResult` interface |
+| `forge-api/forge.core/Interfaces/IStorageService.cs` | Storage abstraction interface |
+| `forge-api/forge.integrations/MinioStorageService.cs` | MinIO S3-compatible implementation |
+| `forge-api/forge.integrations/MockStorageService.cs` | In-memory mock for development |
+| `forge-api/forge.core/Entities/FileAttachment.cs` | Polymorphic file attachment entity |
+| `forge-api/forge.api/Controllers/FilesController.cs` | File CRUD + chunked upload endpoints |
+| `forge-api/forge.api/Features/Files/` | MediatR handlers (upload, download, delete, list) |
+| `forge-ui/src/app/shared/components/file-upload-zone/file-upload-zone.component.ts` | Drag-and-drop upload with progress |
+| `forge-ui/src/app/shared/components/lightbox-gallery/lightbox-gallery.component.ts` | Fullscreen image viewer |
+| `forge-ui/src/app/shared/components/camera-capture/camera-capture.component.ts` | Device camera capture overlay |
+| `forge-ui/src/app/shared/models/gallery-item.model.ts` | `GalleryItem` interface |
+| `forge-ui/src/app/shared/models/camera-capture-result.model.ts` | `CameraCaptureResult` interface |

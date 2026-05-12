@@ -1,6 +1,6 @@
-# QB Engineer -- Functional Reference
+# Forge -- Functional Reference
 
-> Complete functional documentation for every feature, form field, API endpoint, status lifecycle, validation rule, and user-facing behavior in QB Engineer. This is the single source of truth for understanding what the application does and how every piece works.
+> Complete functional documentation for every feature, form field, API endpoint, status lifecycle, validation rule, and user-facing behavior in Forge. This is the single source of truth for understanding what the application does and how every piece works.
 
 ## How to Use This Reference
 

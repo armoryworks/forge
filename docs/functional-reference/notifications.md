@@ -174,7 +174,7 @@ Defined in `shared/models/app-notification.model.ts`:
 
 ### Backend Entity (`Notification`)
 
-Defined in `qb-engineer.core/Entities/Notification.cs`. Extends `BaseAuditableEntity` (inherits `Id`, `CreatedAt`, `UpdatedAt`, `DeletedAt`, `DeletedBy`, `CreatedBy`).
+Defined in `forge.core/Entities/Notification.cs`. Extends `BaseAuditableEntity` (inherits `Id`, `CreatedAt`, `UpdatedAt`, `DeletedAt`, `DeletedBy`, `CreatedBy`).
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -297,7 +297,7 @@ Preferences are toggled inline with immediate persistence via `UserPreferencesSe
 
 ### NotificationHub
 
-The `NotificationHub` (`qb-engineer.api/Hubs/NotificationHub.cs`) is an authorized SignalR hub mapped at `/hubs/notifications`.
+The `NotificationHub` (`forge.api/Hubs/NotificationHub.cs`) is an authorized SignalR hub mapped at `/hubs/notifications`.
 
 **Connection lifecycle:**
 - `OnConnectedAsync` -- Adds the connection to a group named `user:{userId}` (derived from the JWT `NameIdentifier` claim).
@@ -488,17 +488,17 @@ The following events generate in-app notifications. Notifications created via `C
 
 | File | Purpose |
 |------|---------|
-| `qb-engineer.core/Entities/Notification.cs` | Database entity |
-| `qb-engineer.core/Models/NotificationResponseModel.cs` | API response record |
-| `qb-engineer.core/Models/CreateNotificationRequestModel.cs` | Internal creation request |
-| `qb-engineer.core/Models/UpdateNotificationRequestModel.cs` | PATCH request body |
-| `qb-engineer.core/Interfaces/INotificationRepository.cs` | Repository interface |
-| `qb-engineer.data/Repositories/NotificationRepository.cs` | Repository implementation |
-| `qb-engineer.api/Controllers/NotificationsController.cs` | REST API controller |
-| `qb-engineer.api/Features/Notifications/` | MediatR handlers (Create, Get, Update, MarkAllRead, DismissAll) |
-| `qb-engineer.api/Hubs/NotificationHub.cs` | SignalR hub |
-| `qb-engineer.api/Jobs/EventReminderJob.cs` | Hangfire: event reminders |
-| `qb-engineer.api/Jobs/UninvoicedJobNudgeJob.cs` | Hangfire: uninvoiced job nudges |
-| `qb-engineer.api/Jobs/OverdueMaintenanceJob.cs` | Hangfire: overdue maintenance alerts |
-| `qb-engineer.api/Jobs/CheckMismatchedClockEventsJob.cs` | Hangfire: unmatched clock-in alerts |
-| `qb-engineer.api/Jobs/DailyDigestJob.cs` | Hangfire: email daily digest |
+| `forge.core/Entities/Notification.cs` | Database entity |
+| `forge.core/Models/NotificationResponseModel.cs` | API response record |
+| `forge.core/Models/CreateNotificationRequestModel.cs` | Internal creation request |
+| `forge.core/Models/UpdateNotificationRequestModel.cs` | PATCH request body |
+| `forge.core/Interfaces/INotificationRepository.cs` | Repository interface |
+| `forge.data/Repositories/NotificationRepository.cs` | Repository implementation |
+| `forge.api/Controllers/NotificationsController.cs` | REST API controller |
+| `forge.api/Features/Notifications/` | MediatR handlers (Create, Get, Update, MarkAllRead, DismissAll) |
+| `forge.api/Hubs/NotificationHub.cs` | SignalR hub |
+| `forge.api/Jobs/EventReminderJob.cs` | Hangfire: event reminders |
+| `forge.api/Jobs/UninvoicedJobNudgeJob.cs` | Hangfire: uninvoiced job nudges |
+| `forge.api/Jobs/OverdueMaintenanceJob.cs` | Hangfire: overdue maintenance alerts |
+| `forge.api/Jobs/CheckMismatchedClockEventsJob.cs` | Hangfire: unmatched clock-in alerts |
+| `forge.api/Jobs/DailyDigestJob.cs` | Hangfire: email daily digest |

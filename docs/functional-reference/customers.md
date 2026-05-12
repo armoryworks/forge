@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Customers feature provides full customer relationship management within QB Engineer. It serves as the central hub for all customer-related data -- contact information, addresses, estimates, quotes, sales orders, jobs, invoices, credit status, and interaction history. Customers are a core entity that links to nearly every other domain in the system (order management, production, financials).
+The Customers feature provides full customer relationship management within Forge. It serves as the central hub for all customer-related data -- contact information, addresses, estimates, quotes, sales orders, jobs, invoices, credit status, and interaction history. Customers are a core entity that links to nearly every other domain in the system (order management, production, financials).
 
 The feature has two main views: a searchable/filterable customer list at `/customers`, and a dedicated multi-tab customer detail page at `/customers/:id/:tab` with 10 tabs covering all aspects of the customer relationship.
 

@@ -279,7 +279,7 @@ All statuses are terminal -- there is no resubmission or appeal workflow.
 
 ## Entity
 
-**Expense** (`qb-engineer.core/Entities/Expense.cs`): extends `BaseAuditableEntity`.
+**Expense** (`forge.core/Entities/Expense.cs`): extends `BaseAuditableEntity`.
 
 | Property | Type | Notes |
 |----------|------|-------|

@@ -18,15 +18,15 @@ The customer's accountant has the final say on what shape the handoff takes. The
 
 ### 2.1 Forward-only
 
-Existing invoices, payments, vendors, etc. remain in qb-engineer as historical, read-only records flagged `is_pre_migration_historical = true`. From the cutover moment, new financial documents route exclusively through the external provider.
+Existing invoices, payments, vendors, etc. remain in forge as historical, read-only records flagged `is_pre_migration_historical = true`. From the cutover moment, new financial documents route exclusively through the external provider.
 
 - **Implementation cost**: low.
-- **Customer experience**: the accountant now sees two sources of truth. qb-engineer for everything before the cutover; QuickBooks/Xero for everything after.
+- **Customer experience**: the accountant now sees two sources of truth. forge for everything before the cutover; QuickBooks/Xero for everything after.
 - **Use case**: clean break for shops that don't need historical data in the external system.
 
 ### 2.2 Cutoff date (default)
 
-Customer picks a date. Records before that date stay in qb-engineer with the historical flag. Records on/after that date get backfilled into the external provider and become the source of truth there going forward.
+Customer picks a date. Records before that date stay in forge with the historical flag. Records on/after that date get backfilled into the external provider and become the source of truth there going forward.
 
 - **Implementation cost**: medium.
 - **Customer experience**: most ergonomic for most customers. Accountant gets a defined "this is in QB starting Date X" boundary.
@@ -34,7 +34,7 @@ Customer picks a date. Records before that date stay in qb-engineer with the his
 
 ### 2.3 Full backfill
 
-Every invoice, payment, vendor, customer balance gets pushed into the external provider. After migration, qb-engineer's local accounting tables are marked `synced` with the external system's IDs and become read-only.
+Every invoice, payment, vendor, customer balance gets pushed into the external provider. After migration, forge's local accounting tables are marked `synced` with the external system's IDs and become read-only.
 
 - **Implementation cost**: high.
 - **Customer experience**: cleanest single-source-of-truth handoff. Accountant works exclusively in QuickBooks/Xero post-migration.
@@ -54,12 +54,12 @@ The wizard runs a read-only analysis pass:
 
 - Counts of touched entities: X invoices, Y payments, Z vendors, $W open AR.
 - **Conflict detection** with per-row resolution UI:
-  - Customer-name mismatches between qb-engineer and the external provider.
+  - Customer-name mismatches between forge and the external provider.
   - Missing chart-of-accounts mappings.
   - Tax-code mismatches.
   - Currency-code mismatches between systems.
   - Closed-period boundaries on the external side that block backfill into prior periods.
-  - Near-match duplicate detection (same amount + same date + same customer) for invoices/payments the customer may have manually entered in the external provider while running qb-engineer on built-in.
+  - Near-match duplicate detection (same amount + same date + same customer) for invoices/payments the customer may have manually entered in the external provider while running forge on built-in.
 - **Environmental check**: external provider API health, OAuth token expiry, exchange rates loaded for multi-currency installs, chart-of-accounts mapping covers every referenced account.
 
 Output: a green/yellow/red status with per-issue counts. Cannot proceed to Step 3 until every blocker (red) is resolved or explicitly skipped with confirmation.
@@ -84,13 +84,13 @@ Three gates before Step 5:
 2. **MFA challenge** where the install has MFA configured. Where MFA exists but isn't enabled by the user, surface a warning recommending enablement.
 3. **Cooling-off period**: 60-second timer with a Cancel button. Migrations don't fire instantly off a button click.
 
-For full-backfill mode specifically: customer types the exact company name (as configured in qb-engineer) to confirm. The literal string match is required.
+For full-backfill mode specifically: customer types the exact company name (as configured in forge) to confirm. The literal string match is required.
 
 ### Step 5 — Execution
 
 The engine runs:
 
-- Pre-execution: full `pg_dump` snapshot of qb-engineer's database, retained 90 days minimum (configurable up to 1 year for regulated installs).
+- Pre-execution: full `pg_dump` snapshot of forge's database, retained 90 days minimum (configurable up to 1 year for regulated installs).
 - Pre-execution (full-backfill mode only): snapshot of the external provider's state where supported (QuickBooks backup file via Intuit API; Xero full export).
 - Frozen window engaged: accounting-writing handlers reject new invoices, payments, recurring-order generation. SignalR pushes a `migration-active` banner to all connected sessions; in-flight forms go read-only.
 - Auto-push hooks (Drive / OneDrive / Dropbox) silenced via the integration outbox dispatcher gating on the active migration session.
@@ -102,7 +102,7 @@ The engine runs:
 - Per-row failure isolation: a failed invoice doesn't poison the rest of the batch. Failed rows accumulate in a "needs attention" queue.
 - Real-time progress streaming via SignalR.
 - Live reconciliation deltas surfaced as batches complete.
-- External-provider audit notes: every row pushed includes `qb-engineer migration session #N, row #M, [timestamp]` in the provider's metadata.
+- External-provider audit notes: every row pushed includes `forge migration session #N, row #M, [timestamp]` in the provider's metadata.
 - Abort button available throughout: stops new batches, lets in-flight ones complete cleanly, marks the session aborted, unfreezes the workspace. Does not roll back what's already migrated — that's the hold-period rollback flow (§6).
 
 ### Step 6 — Reconciliation and mode flip
@@ -149,7 +149,7 @@ Post-execution:
 | `id` | int PK | |
 | `session_id` | int FK → `accounting_migration_sessions` | |
 | `entity_type` | string | `Invoice` / `Payment` / `Vendor` / `Customer` / etc. |
-| `entity_id` | int | The local qb-engineer entity ID |
+| `entity_id` | int | The local forge entity ID |
 | `status` | enum | `Pending` / `DryRunOk` / `DryRunFailed` / `Executed` / `Failed` / `Skipped` |
 | `external_id_after_success` | string? | The ID returned by the external provider |
 | `idempotency_key` | string | `{session-id}:{entity-type}:{entity-id}` |
@@ -175,7 +175,7 @@ Post-execution:
 Every entity that participates in accounting (Invoice, Payment, Vendor, Customer, RecurringOrder) needs:
 
 - `external_provider_id` — string, nullable. Set after successful migration. Mostly already exists from existing QB/Xero connector work; Phase 2 foundations audits which still need adding.
-- `is_pre_migration_historical` — boolean, default `false`. Set true on rows that stay in qb-engineer post-migration but didn't get pushed to the external provider. Renders the row as read-only with a "Historical — not in [Provider]" badge.
+- `is_pre_migration_historical` — boolean, default `false`. Set true on rows that stay in forge post-migration but didn't get pushed to the external provider. Renders the row as read-only with a "Historical — not in [Provider]" badge.
 
 ## 5. Capability addition
 
@@ -307,7 +307,7 @@ Before exposing the wizard to ArmoryWorks (or any customer), build a synthetic i
 - A few duplicate-suspect rows in QB sandbox
 - Closed period on QB side (Jan-Mar prior year)
 
-Run the full BUILTIN→QuickBooks-sandbox migration as an automated Playwright E2E spec. Verify every safety gate fires. Lands in `qb-engineer-ui/e2e/tests/accounting-migration.spec.ts`. Runs in CI on every migration-tool change.
+Run the full BUILTIN→QuickBooks-sandbox migration as an automated Playwright E2E spec. Verify every safety gate fires. Lands in `forge-ui/e2e/tests/accounting-migration.spec.ts`. Runs in CI on every migration-tool change.
 
 Without this fixture, the first real migration is the test. With it, ArmoryWorks's migration is "the second time we've run this end-to-end."
 

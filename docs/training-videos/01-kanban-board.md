@@ -10,7 +10,7 @@
 
 ## Purpose
 
-This video is the primary spatial and conceptual orientation to QB Engineer's kanban board — the central hub where all active work lives. Viewers should finish understanding where things are, how work flows, and why the board is structured the way it is.
+This video is the primary spatial and conceptual orientation to Forge's kanban board — the central hub where all active work lives. Viewers should finish understanding where things are, how work flows, and why the board is structured the way it is.
 
 ### Learning Objectives
 - Understand the left-to-right flow of stages from quote to payment
@@ -45,7 +45,7 @@ Chapters are designed as self-contained clips. Someone searching "how do I move 
 **Chapter label:** "Board Overview"
 
 **Narration Script:**
-Welcome to the QB Engineer kanban board. Before we do anything, let's take ten seconds to orient ourselves spatially. You're looking at a grid of vertical columns. Each column is a production stage. Reading from left to right, these stages trace the life of a job — from the first customer conversation, through fabrication, to the moment payment arrives. This left-to-right flow is intentional. It mirrors how time moves. Jobs are born on the left and mature on the right. Every active job in your shop lives on this board. Nothing falls through the cracks. Try resisting the urge to click anything yet — just take in the layout.
+Welcome to the Forge kanban board. Before we do anything, let's take ten seconds to orient ourselves spatially. You're looking at a grid of vertical columns. Each column is a production stage. Reading from left to right, these stages trace the life of a job — from the first customer conversation, through fabrication, to the moment payment arrives. This left-to-right flow is intentional. It mirrors how time moves. Jobs are born on the left and mature on the right. Every active job in your shop lives on this board. Nothing falls through the cracks. Try resisting the urge to click anything yet — just take in the layout.
 
 **Alternative paths:** Users may land on a filtered board or a different track type. Mention that the view selector in the top-left controls which track type (Production, R&D, Maintenance, etc.) is displayed.
 
@@ -73,7 +73,7 @@ Look at the column headers. Each column has a name and a color. The colors serve
 **Chapter label:** "Reading Job Cards"
 
 **Narration Script:**
-Each rectangle on the board is a job card. Let's read one. The header stripe at the top matches the column color — this is the stage color. Inside the card you'll see the job number in the top left: a unique identifier your shop assigned or that QB Engineer auto-generated. Below that is the customer name. On the right edge is the priority indicator — a colored band or label: Urgent in red, High in orange, Normal in blue, Low in grey. Near the bottom is the due date. If the date has passed, it turns red to warn you. A pulsing timer icon means someone currently has a timer running against this job. A paperclip icon means files are attached.
+Each rectangle on the board is a job card. Let's read one. The header stripe at the top matches the column color — this is the stage color. Inside the card you'll see the job number in the top left: a unique identifier your shop assigned or that Forge auto-generated. Below that is the customer name. On the right edge is the priority indicator — a colored band or label: Urgent in red, High in orange, Normal in blue, Low in grey. Near the bottom is the due date. If the date has passed, it turns red to warn you. A pulsing timer icon means someone currently has a timer running against this job. A paperclip icon means files are attached.
 
 **Alternative paths:** Cards may show a custom badge if a QC inspection is pending or if the job is on hold (a pause indicator appears). If swimlane mode is active, cards are grouped by row rather than appearing freely in columns.
 
@@ -181,7 +181,7 @@ To create a new job, click the New Job button in the upper right corner of the t
 
 ## Full Transcript
 
-Welcome to the QB Engineer kanban board. Take a moment to orient yourself spatially — you're looking at a grid of vertical columns stretching from left to right. Each column is a production stage, and every active job in your shop lives here, moving from left to right as work progresses.
+Welcome to the Forge kanban board. Take a moment to orient yourself spatially — you're looking at a grid of vertical columns stretching from left to right. Each column is a production stage, and every active job in your shop lives here, moving from left to right as work progresses.
 
 Reading the column headers from left to right, you'll see the full lifecycle of a job: Quote Requested, Quoted, Order Confirmed, Materials Ordered, Materials Received, In Production, QC Review, Shipped, Invoiced, and Payment Received. The colors aren't decorative — each job card inherits the color of its current stage, making it easy to spot where work is concentrated at a glance.
 
@@ -209,7 +209,7 @@ Finally, creating a job takes seconds: click New Job, fill in customer and title
     {
       "popover": {
         "title": "Board Overview",
-        "description": "Welcome to the QB Engineer kanban board. Before clicking anything, take a moment to orient yourself spatially. You are looking at a grid of vertical columns. Each column is a production stage. Reading from left to right, these stages trace the life of a job — from the first customer conversation, through fabrication, all the way to the moment payment arrives. Work flows left to right. Every active job in your shop lives on this board."
+        "description": "Welcome to the Forge kanban board. Before clicking anything, take a moment to orient yourself spatially. You are looking at a grid of vertical columns. Each column is a production stage. Reading from left to right, these stages trace the life of a job — from the first customer conversation, through fabrication, all the way to the moment payment arrives. Work flows left to right. Every active job in your shop lives on this board."
       }
     },
     {

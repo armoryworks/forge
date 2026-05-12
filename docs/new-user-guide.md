@@ -1,4 +1,4 @@
-# New User Guide — Getting Started with QB Engineer
+# New User Guide — Getting Started with Forge
 
 ## Who This Guide Is For
 

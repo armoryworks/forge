@@ -2,7 +2,7 @@
 
 ## Overview
 
-QB Engineer implements a tiered authentication system designed for manufacturing environments where users range from office workers with full credentials to shop floor operators using RFID badges and PINs. The system supports four authentication tiers, single sign-on (SSO) via Google/Microsoft/OIDC, time-based one-time password (TOTP) multi-factor authentication, setup tokens for admin-provisioned accounts, and JWT-based session management.
+Forge implements a tiered authentication system designed for manufacturing environments where users range from office workers with full credentials to shop floor operators using RFID badges and PINs. The system supports four authentication tiers, single sign-on (SSO) via Google/Microsoft/OIDC, time-based one-time password (TOTP) multi-factor authentication, setup tokens for admin-provisioned accounts, and JWT-based session management.
 
 ---
 

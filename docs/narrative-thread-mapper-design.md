@@ -52,7 +52,7 @@ The threads below are a starting point, not a fixed taxonomy. They were derived 
 - **You track training + certifications** — drives `CAP-EXT-TRAINING-LMS`.
 
 #### Cash-side threads
-- **You invoice + collect payment in QB Engineer** — drives `CAP-ACCT-BUILTIN` family (Invoices, Payments, AR Aging, Statements).
+- **You invoice + collect payment in Forge** — drives `CAP-ACCT-BUILTIN` family (Invoices, Payments, AR Aging, Statements).
 - **You hand invoicing off to QuickBooks / Xero / etc.** — drives `CAP-ACCT-EXTERNAL`. Mutex with the above.
 - **You charge by the hour (project accounting)** — drives `CAP-EXT-PROJECT-ACCT`.
 - **You sell internationally** — drives `CAP-EXT-MULTI-CURRENCY`, `CAP-EXT-FX-REVAL`.
@@ -140,7 +140,7 @@ A user can also enter via thread mode and exit by saying "this is closest to Pro
 ### Data model
 
 ```csharp
-namespace QBEngineer.Core.Discovery;
+namespace Forge.Core.Discovery;
 
 public sealed record ThreadDescriptor(
     string Key,

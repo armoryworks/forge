@@ -1,12 +1,12 @@
 # Integrations Reference
 
-> Complete reference for all pluggable external integrations in QB Engineer. Each integration follows the interface/real/mock pattern and is toggled via configuration.
+> Complete reference for all pluggable external integrations in Forge. Each integration follows the interface/real/mock pattern and is toggled via configuration.
 
 ---
 
 ## Architecture Overview
 
-QB Engineer uses a **pluggable integration architecture** where every external dependency is abstracted behind an interface in `qb-engineer.core/Interfaces/`. Each interface has:
+Forge uses a **pluggable integration architecture** where every external dependency is abstracted behind an interface in `forge.core/Interfaces/`. Each interface has:
 
 - **Real implementation** -- connects to the actual external service
 - **Mock implementation** -- returns canned data, logs operations via `ILogger`
@@ -36,7 +36,7 @@ Default is `false` in production. Set to `true` in development or when external 
 
 ### Interface
 
-**`IAccountingService`** (`qb-engineer.core/Interfaces/IAccountingService.cs`)
+**`IAccountingService`** (`forge.core/Interfaces/IAccountingService.cs`)
 
 ```csharp
 public interface IAccountingService
@@ -106,7 +106,7 @@ Available providers:
 
 ### QuickBooks Online (Primary Provider)
 
-**Implementation:** `QuickBooksAccountingService` (`qb-engineer.integrations/`)
+**Implementation:** `QuickBooksAccountingService` (`forge.integrations/`)
 
 **OAuth 2.0 Flow:**
 1. Admin initiates connect from Admin > Integrations
@@ -189,7 +189,7 @@ The app works fully without any accounting provider -- financial features degrad
 
 ### Interface
 
-**`IShippingService`** (`qb-engineer.core/Interfaces/IShippingService.cs`)
+**`IShippingService`** (`forge.core/Interfaces/IShippingService.cs`)
 
 ```csharp
 public interface IShippingService
@@ -262,7 +262,7 @@ When no carrier APIs are configured, shipments still function in manual mode. Us
 
 ### Interface
 
-**`IAddressValidationService`** (`qb-engineer.core/Interfaces/IAddressValidationService.cs`)
+**`IAddressValidationService`** (`forge.core/Interfaces/IAddressValidationService.cs`)
 
 ```csharp
 public interface IAddressValidationService
@@ -319,7 +319,7 @@ Register for free at https://www.usps.com/business/web-tools-apis/.
 
 ### Interface
 
-**`IAiService`** (`qb-engineer.core/Interfaces/IAiService.cs`)
+**`IAiService`** (`forge.core/Interfaces/IAiService.cs`)
 
 ```csharp
 public interface IAiService
@@ -366,7 +366,7 @@ public interface IAiService
 ```yaml
 # AiOptions (appsettings.json)
 Ai:
-  BaseUrl: "http://qb-engineer-ai:11434"
+  BaseUrl: "http://forge-ai:11434"
   Model: "gemma3:4b"
   EmbeddingModel: "all-minilm:l6-v2"
   VisionModel: "llava:7b"
@@ -375,7 +375,7 @@ Ai:
   DocsPath: "/app/docs"
 
 # docker-compose.yml
-- Ai__BaseUrl=${AI_BASE_URL:-http://qb-engineer-ai:11434}
+- Ai__BaseUrl=${AI_BASE_URL:-http://forge-ai:11434}
 - Ai__Model=${AI_MODEL:-gemma3:4b}
 - Ai__EmbeddingModel=${AI_EMBEDDING_MODEL:-all-minilm:l6-v2}
 ```
@@ -383,9 +383,9 @@ Ai:
 ### Docker Service
 
 ```yaml
-qb-engineer-ai:
+forge-ai:
   image: ollama/ollama
-  container_name: qb-engineer-ai
+  container_name: forge-ai
   ports:
     - "${AI_PORT:-11434}:11434"
   volumes:
@@ -397,7 +397,7 @@ qb-engineer-ai:
       limits:
         memory: 6G
 
-qb-engineer-ai-init:  # One-shot model pull on first start
+forge-ai-init:  # One-shot model pull on first start
   image: ollama/ollama
   entrypoint: ["/bin/sh", "-c"]
   command: >
@@ -423,7 +423,7 @@ qb-engineer-ai-init:  # One-shot model pull on first start
 
 ### Interface
 
-**`IStorageService`** (`qb-engineer.core/Interfaces/IStorageService.cs`)
+**`IStorageService`** (`forge.core/Interfaces/IStorageService.cs`)
 
 ```csharp
 public interface IStorageService
@@ -450,10 +450,10 @@ public interface IStorageService
 
 | Bucket | Purpose |
 |---|---|
-| `qb-engineer-job-files` | Job attachments (drawings, specs, photos) |
-| `qb-engineer-receipts` | Expense receipt images |
-| `qb-engineer-employee-docs` | Employee documents (resumes, certifications) |
-| `qb-engineer-pii-docs` | PII documents (tax forms, identity documents) |
+| `forge-job-files` | Job attachments (drawings, specs, photos) |
+| `forge-receipts` | Expense receipt images |
+| `forge-employee-docs` | Employee documents (resumes, certifications) |
+| `forge-pii-docs` | PII documents (tax forms, identity documents) |
 
 Buckets are auto-created on startup when `MockIntegrations=false`.
 
@@ -462,15 +462,15 @@ Buckets are auto-created on startup when `MockIntegrations=false`.
 ```yaml
 # MinioOptions (appsettings.json)
 Minio:
-  Endpoint: "qb-engineer-storage:9000"
+  Endpoint: "forge-storage:9000"
   PublicEndpoint: "localhost:9000"
   AccessKey: "minioadmin"
   SecretKey: "minioadmin"
   UseSsl: false
-  JobFilesBucket: "qb-engineer-job-files"
-  ReceiptsBucket: "qb-engineer-receipts"
-  EmployeeDocsBucket: "qb-engineer-employee-docs"
-  PiiDocsBucket: "qb-engineer-pii-docs"
+  JobFilesBucket: "forge-job-files"
+  ReceiptsBucket: "forge-receipts"
+  EmployeeDocsBucket: "forge-employee-docs"
+  PiiDocsBucket: "forge-pii-docs"
 
 # LocalStorageOptions (alternative)
 LocalStorage:
@@ -482,9 +482,9 @@ LocalStorage:
 ### Docker Service
 
 ```yaml
-qb-engineer-storage:
+forge-storage:
   image: minio/minio
-  container_name: qb-engineer-storage
+  container_name: forge-storage
   ports:
     - "${MINIO_API_PORT:-9000}:9000"       # S3 API
     - "${MINIO_CONSOLE_PORT:-9001}:9001"   # Web console
@@ -533,7 +533,7 @@ public interface IPdfJsExtractorService
 **`PdfJsExtractorService`** -- uses PuppeteerSharp (headless Chromium) with a bundled pdf.js extraction page:
 
 - **Singleton browser instance** -- lazily initialized, reused across extractions via `SemaphoreSlim` lock
-- **Extraction page:** `qb-engineer.api/wwwroot/pdf-extract.html` -- bundled pdf.js called via `EvaluateFunctionAsync`
+- **Extraction page:** `forge.api/wwwroot/pdf-extract.html` -- bundled pdf.js called via `EvaluateFunctionAsync`
 - **Page rendering:** Renders PDF pages as PNG images for visual verification against AI-generated form definitions
 
 **`FormDefinitionParser`** -- smart parser that infers `ComplianceFormDefinition` layout from structural cues:
@@ -564,7 +564,7 @@ The API container uses a **Debian base** (not Alpine) with Chromium installed. E
 
 ### Interface
 
-**`IDocumentSigningService`** (`qb-engineer.core/Interfaces/IDocumentSigningService.cs`)
+**`IDocumentSigningService`** (`forge.core/Interfaces/IDocumentSigningService.cs`)
 
 ```csharp
 public interface IDocumentSigningService
@@ -586,7 +586,7 @@ public interface IDocumentSigningService
 **`DocuSealSigningService`** -- self-hosted DocuSeal instance for document signing:
 
 - **Authentication:** `X-Auth-Token` header with API key
-- **URL rewriting:** Embed URLs are rewritten from internal Docker hostname (`qb-engineer-signing:3000`) to browser-accessible proxy URL via `PublicBaseUrl` (e.g., `http://localhost:4200/docuseal/s/abc`)
+- **URL rewriting:** Embed URLs are rewritten from internal Docker hostname (`forge-signing:3000`) to browser-accessible proxy URL via `PublicBaseUrl` (e.g., `http://localhost:4200/docuseal/s/abc`)
 - **Multi-submitter support:** `CreateSubmissionFromPdfAsync` supports ordered sequential signing (employee signs first, then employer/verifier)
 - **Zero-byte PDF handling:** Falls back to blank HTML template when PDF bytes are empty
 
@@ -597,14 +597,14 @@ public interface IDocumentSigningService
 ```yaml
 # DocuSealOptions (appsettings.json)
 DocuSeal:
-  BaseUrl: "http://qb-engineer-signing:3000"
+  BaseUrl: "http://forge-signing:3000"
   PublicBaseUrl: "http://localhost:4200/docuseal"
   ApiKey: ""
   TimeoutSeconds: 30
   WebhookSecret: ""
 
 # docker-compose.yml
-- DocuSeal__BaseUrl=${DOCUSEAL_BASE_URL:-http://qb-engineer-signing:3000}
+- DocuSeal__BaseUrl=${DOCUSEAL_BASE_URL:-http://forge-signing:3000}
 - DocuSeal__PublicBaseUrl=${DOCUSEAL_PUBLIC_BASE_URL:-...}
 - DocuSeal__ApiKey=${DOCUSEAL_API_KEY:-}
 - DocuSeal__WebhookSecret=${DOCUSEAL_WEBHOOK_SECRET:-}
@@ -613,9 +613,9 @@ DocuSeal:
 ### Docker Service
 
 ```yaml
-qb-engineer-signing:
+forge-signing:
   image: docuseal/docuseal:latest
-  container_name: qb-engineer-signing
+  container_name: forge-signing
   ports:
     - "${DOCUSEAL_PORT:-3000}:3000"
   volumes:
@@ -638,7 +638,7 @@ nginx proxies `/docuseal/` to the DocuSeal container for browser-accessible embe
 
 ### Interface
 
-**`IEmailService`** (`qb-engineer.core/Interfaces/IEmailService.cs`)
+**`IEmailService`** (`forge.core/Interfaces/IEmailService.cs`)
 
 ```csharp
 public interface IEmailService
@@ -674,8 +674,8 @@ Smtp:
   Username: ""
   Password: ""
   UseSsl: true
-  FromAddress: "noreply@qbengineer.local"
-  FromName: "QB Engineer"
+  FromAddress: "noreply@forge.local"
+  FromName: "Forge"
 ```
 
 ### Mock Implementation
@@ -695,7 +695,7 @@ Smtp:
 
 ### Interface
 
-**`ICalendarIntegrationService`** (`qb-engineer.core/Interfaces/ICalendarIntegrationService.cs`)
+**`ICalendarIntegrationService`** (`forge.core/Interfaces/ICalendarIntegrationService.cs`)
 
 ```csharp
 public interface ICalendarIntegrationService
@@ -727,7 +727,7 @@ Per-user integration -- each user connects their own calendar account via Admin 
 
 ### Interface
 
-**`IMessagingIntegrationService`** (`qb-engineer.core/Interfaces/IMessagingIntegrationService.cs`)
+**`IMessagingIntegrationService`** (`forge.core/Interfaces/IMessagingIntegrationService.cs`)
 
 ```csharp
 public interface IMessagingIntegrationService
@@ -756,7 +756,7 @@ Per-user integration -- users configure webhook URLs in their account settings.
 
 ### Interface
 
-**`IEdiService`** (`qb-engineer.core/Interfaces/IEdiService.cs`)
+**`IEdiService`** (`forge.core/Interfaces/IEdiService.cs`)
 
 ```csharp
 public interface IEdiService
@@ -798,7 +798,7 @@ public interface IEdiService
 
 ### Interface
 
-**`IMfaService`** (`qb-engineer.core/Interfaces/IMfaService.cs`)
+**`IMfaService`** (`forge.core/Interfaces/IMfaService.cs`)
 
 ```csharp
 public interface IMfaService

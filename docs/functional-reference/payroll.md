@@ -11,7 +11,7 @@ Payroll records can originate from two sources:
 - **Manual** -- uploaded directly by an admin/manager via the API.
 - **Accounting** -- synced from a connected accounting provider (e.g., QuickBooks Payroll).
 
-QB Engineer does not perform payroll calculations, tax withholding, or paycheck generation. It is a document distribution and self-service portal, not a payroll processing system.
+Forge does not perform payroll calculations, tax withholding, or paycheck generation. It is a document distribution and self-service portal, not a payroll processing system.
 
 ## Routes
 
@@ -61,7 +61,7 @@ Displays the authenticated user's pay stubs in a DataTable.
 
 ### Pay Stub Entity
 
-**PayStub** (`qb-engineer.core/Entities/PayStub.cs`): extends `BaseAuditableEntity`.
+**PayStub** (`forge.core/Entities/PayStub.cs`): extends `BaseAuditableEntity`.
 
 | Property | Type | Notes |
 |----------|------|-------|
@@ -81,7 +81,7 @@ Displays the authenticated user's pay stubs in a DataTable.
 
 Each pay stub can have multiple deductions:
 
-**PayStubDeduction** (`qb-engineer.core/Entities/PayStubDeduction.cs`): extends `BaseEntity`.
+**PayStubDeduction** (`forge.core/Entities/PayStubDeduction.cs`): extends `BaseEntity`.
 
 | Property | Type | Notes |
 |----------|------|-------|
@@ -144,7 +144,7 @@ Displays the authenticated user's tax documents (W-2, 1099, etc.) in a DataTable
 
 ### Tax Document Entity
 
-**TaxDocument** (`qb-engineer.core/Entities/TaxDocument.cs`): extends `BaseAuditableEntity`.
+**TaxDocument** (`forge.core/Entities/TaxDocument.cs`): extends `BaseAuditableEntity`.
 
 | Property | Type | Notes |
 |----------|------|-------|
@@ -326,7 +326,7 @@ Both sources are displayed identically in the employee view. The source badge he
 
 ## Known Limitations
 
-1. **No payroll processing.** QB Engineer does not calculate wages, taxes, or deductions. It is a document portal only.
+1. **No payroll processing.** Forge does not calculate wages, taxes, or deductions. It is a document portal only.
 2. **No deduction detail in UI.** The employee pay stubs view shows `totalDeductions` as a single sum. Individual deduction line items exist in the data model but are not displayed in the current UI.
 3. **No admin upload UI.** While admin upload endpoints exist, there is no dedicated admin UI for uploading pay stubs or tax documents. Admin operations are performed via direct API calls or integrated into the employee detail section of the admin module.
 4. **No payroll sync implementation.** The `POST /api/v1/payroll/sync` endpoint exists but the QB Payroll sync integration returns stub data. Real QB Payroll API integration is not yet implemented.

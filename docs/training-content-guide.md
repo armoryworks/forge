@@ -1,6 +1,6 @@
 # Training Content Guide
 
-> Reference for writing, seeding, and maintaining training modules in the QB Engineer LMS.
+> Reference for writing, seeding, and maintaining training modules in the Forge LMS.
 > See `implementation-status.md` for current module/path counts.
 
 ---
@@ -248,7 +248,7 @@ The following slugs are defined in seed data. Never rename a slug after initial 
 
 | Slug | Type | Path(s) |
 |------|------|---------|
-| `welcome-to-qb-engineer` | Article | 1 |
+| `welcome-to-forge` | Article | 1 |
 | `navigating-the-interface` | Walkthrough | 1 |
 | `kanban-board-basics` | Walkthrough | 1, 2, 4 |
 | `logging-your-time` | Article | 1, 3 |
@@ -329,5 +329,5 @@ Walkthrough-type rows in the Content tab show an `auto_awesome` "Regenerate Step
 3. Write the `ContentJson` following the schema above
 4. Add to `SeedData.cs` via `GetOrCreateModule()` helper
 5. If adding a new path, add a title-guard and associate modules via `bySlug`
-6. Run `docker compose up -d --build qb-engineer-api` to apply seed changes to dev DB
+6. Run `docker compose up -d --build forge-api` to apply seed changes to dev DB
 7. Verify the module appears in `/training/all-modules` and the path appears in `/training/paths`

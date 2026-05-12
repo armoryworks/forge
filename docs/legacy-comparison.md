@@ -1,6 +1,6 @@
 # Legacy Application Comparison — Armory Plastics Access DB
 
-> Contrasting analysis of the legacy Microsoft Access application (`ArmoryBusines.accdb`) against QB Engineer. This document maps legacy functionality, identifies inefficiencies, and flags areas where naive migration could introduce usability problems.
+> Contrasting analysis of the legacy Microsoft Access application (`ArmoryBusines.accdb`) against Forge. This document maps legacy functionality, identifies inefficiencies, and flags areas where naive migration could introduce usability problems.
 
 Updated: 2026-03-12
 
@@ -24,10 +24,10 @@ The legacy app is a monolithic Access database handling orders, products, suppli
 
 **Legacy:** Two separate tables for bill-to (41 rows) and ship-to (41 rows) addresses. Identical column structure (company, contact, address, city, state, zip, phone, web, email, notes, tax exemption cert). Linked by company name (text), not by ID. A single customer has entries in both tables with matching `Company` text.
 
-**QB Engineer:** Single `Customer` entity with one address set. Contacts are a separate `Contact` entity linked by FK.
+**Forge:** Single `Customer` entity with one address set. Contacts are a separate `Contact` entity linked by FK.
 
 **Key Differences:**
-| Aspect | Legacy | QB Engineer |
+| Aspect | Legacy | Forge |
 |--------|--------|-------------|
 | Bill-to / Ship-to split | Two separate tables | Single entity (needs ship-to address support) |
 | Primary key | Company name (text) | Integer auto-increment |
@@ -36,8 +36,8 @@ The legacy app is a monolithic Access database handling orders, products, suppli
 | Linking | Text match on company name | Foreign key integer |
 
 **Migration Caution:**
-- The bill-to/ship-to split is unnecessary complexity. QB Engineer correctly uses a single customer entity. If multi-address support is needed, add an `addresses` collection — do NOT replicate two parallel tables.
-- Company name as primary key caused data integrity issues in the legacy app (typos like "Fee to Custmer" vs "Fee to Customer" appear in product data). QB Engineer's integer FK approach is correct.
+- The bill-to/ship-to split is unnecessary complexity. Forge correctly uses a single customer entity. If multi-address support is needed, add an `addresses` collection — do NOT replicate two parallel tables.
+- Company name as primary key caused data integrity issues in the legacy app (typos like "Fee to Custmer" vs "Fee to Customer" appear in product data). Forge's integer FK approach is correct.
 - Tax exemption certificate storage can be handled via `FileAttachment` (already built).
 
 ---
@@ -46,10 +46,10 @@ The legacy app is a monolithic Access database handling orders, products, suppli
 
 **Legacy (300 rows):** Products with name, SKU, category (Injection/Thermoform/Re-sale/Sample), customer assignment (ship-to + bill-to by name), stock tracking (in-stock qty, goal stock, kept-in-stock flag), picture (attachment), location, directions, notes, products-per-box.
 
-**QB Engineer:** `Part` entity with part number, description, revision, status, type, material, BOM entries.
+**Forge:** `Part` entity with part number, description, revision, status, type, material, BOM entries.
 
 **Key Differences:**
-| Aspect | Legacy | QB Engineer |
+| Aspect | Legacy | Forge |
 |--------|--------|-------------|
 | Naming | "Product" | "Part" |
 | Customer binding | Product locked to one customer | Parts are customer-agnostic |
@@ -60,8 +60,8 @@ The legacy app is a monolithic Access database handling orders, products, suppli
 | Categories | 6 text values | PartType enum + reference data |
 
 **Migration Caution:**
-- Legacy products are customer-specific (each product "belongs to" one customer). QB Engineer parts are customer-agnostic and linked to jobs. This is intentional — a part can be used across multiple customers/jobs. Do NOT add customer FK to Part.
-- Legacy embeds stock tracking into the product table. QB Engineer correctly separates this into the Inventory module. Do NOT collapse inventory fields into Part.
+- Legacy products are customer-specific (each product "belongs to" one customer). Forge parts are customer-agnostic and linked to jobs. This is intentional — a part can be used across multiple customers/jobs. Do NOT add customer FK to Part.
+- Legacy embeds stock tracking into the product table. Forge correctly separates this into the Inventory module. Do NOT collapse inventory fields into Part.
 - The `ProductDirections` field (manufacturing instructions) maps well to Part's description or a future work instructions field.
 - `ProductsPerBox` is packaging metadata — consider adding to Part if needed, but not high priority.
 
@@ -71,16 +71,16 @@ The legacy app is a monolithic Access database handling orders, products, suppli
 
 **Legacy (601 rows):** Links products to supplies (raw materials) with quantity used, wrap cut size, length cut size, and bead weight. This is effectively a Bill of Materials.
 
-**QB Engineer:** `BOMEntry` entity linking parent Part to child Part with quantity.
+**Forge:** `BOMEntry` entity linking parent Part to child Part with quantity.
 
 **Key Differences:**
-- Legacy BOM links Products to Supplies (different entity types). QB Engineer BOM links Parts to Parts (unified model).
+- Legacy BOM links Products to Supplies (different entity types). Forge BOM links Parts to Parts (unified model).
 - Legacy has manufacturing-specific fields (WrapCut, LengthCut, BeadWeightOZ) that are domain-specific to thermoforming. These are better modeled as custom fields or part metadata rather than fixed BOM columns.
 - Legacy uses text names as keys ("Supplies" = supply name, "ProductName" = product name). Extremely fragile.
 
 **Migration Caution:**
 - Do NOT add domain-specific BOM fields (cut sizes, bead weight) to the core BOMEntry model. Use Part custom fields (JSONB `CustomFieldValues`) for these.
-- The legacy approach of separate Products and Supplies tables with a junction table creates unnecessary complexity. QB Engineer's unified Part model where supplies are simply parts of type "Raw Material" is cleaner.
+- The legacy approach of separate Products and Supplies tables with a junction table creates unnecessary complexity. Forge's unified Part model where supplies are simply parts of type "Raw Material" is cleaner.
 
 ---
 
@@ -88,7 +88,7 @@ The legacy app is a monolithic Access database handling orders, products, suppli
 
 **Legacy (333 rows):** Tracks product price and manufacturing cost per year. Fields: manufacturer's cost, product price, discontinued flag, product name, year value.
 
-**QB Engineer:** No pricing module yet.
+**Forge:** No pricing module yet.
 
 **Analysis:** Year-over-year cost tracking is valuable for margin analysis. This maps to a future pricing/quoting feature. The approach of storing annual snapshots is reasonable but should be implemented as a `PriceHistory` entity rather than duplicating the legacy pattern of a separate lookup table keyed by product name + year text.
 
@@ -101,10 +101,10 @@ The legacy app is a monolithic Access database handling orders, products, suppli
 - `OrderDetailT` (847 rows): Line items — product name, quantity ordered, target delivery date, resolved flag, PO number, notes.
 - `OrderDeliveryT` (919 rows): Partial delivery tracking — quantity delivered, delivery date, invoice number, invoice sent flag.
 
-**QB Engineer:** Jobs on a kanban board represent orders flowing through production stages. No explicit order/line-item model — jobs ARE the work orders.
+**Forge:** Jobs on a kanban board represent orders flowing through production stages. No explicit order/line-item model — jobs ARE the work orders.
 
 **Key Differences:**
-| Aspect | Legacy | QB Engineer |
+| Aspect | Legacy | Forge |
 |--------|--------|-------------|
 | Order model | PO header + line items + deliveries | Job = single work item on board |
 | Partial delivery | OrderDeliveryT tracks partial shipments | Not yet implemented |
@@ -113,9 +113,9 @@ The legacy app is a monolithic Access database handling orders, products, suppli
 | Invoice tracking | Embedded in delivery records | Planned via accounting integration |
 
 **Migration Caution:**
-- The legacy model's strength is partial delivery tracking — a customer orders 500 units, receives 200 now and 300 later, each delivery generates a separate invoice. QB Engineer needs this for manufacturing but should implement it as a shipping/fulfillment feature, not by replicating the three-table Access pattern.
-- Legacy PO numbers are customer-provided text strings (e.g., "0093536 Blue Ridge", "263-Survive"). These are external references, NOT system-generated identifiers. QB Engineer correctly auto-generates `JobNumber` and stores customer references in `ExternalRef`.
-- The `Resolved` flag on OrderDetailT is a simple boolean — QB Engineer's multi-stage kanban is far superior for tracking completion status.
+- The legacy model's strength is partial delivery tracking — a customer orders 500 units, receives 200 now and 300 later, each delivery generates a separate invoice. Forge needs this for manufacturing but should implement it as a shipping/fulfillment feature, not by replicating the three-table Access pattern.
+- Legacy PO numbers are customer-provided text strings (e.g., "0093536 Blue Ridge", "263-Survive"). These are external references, NOT system-generated identifiers. Forge correctly auto-generates `JobNumber` and stores customer references in `ExternalRef`.
+- The `Resolved` flag on OrderDetailT is a simple boolean — Forge's multi-stage kanban is far superior for tracking completion status.
 
 ---
 
@@ -126,10 +126,10 @@ The legacy app is a monolithic Access database handling orders, products, suppli
 - `ProjectManagementStepsT` (43 rows): Step templates per project type — defines the standard steps for Injection, Thermoform, or both.
 - `ProjectManagementDetailsT` (470 rows): Actual step completion records — step name, order, completion date, lead, notes, linked to project by name.
 
-**QB Engineer:** This is the closest match to the kanban board + track types + stages system.
+**Forge:** This is the closest match to the kanban board + track types + stages system.
 
 **Mapping:**
-| Legacy Concept | QB Engineer Equivalent |
+| Legacy Concept | Forge Equivalent |
 |---------------|----------------------|
 | ProjectType (Injection, Thermoform) | TrackType |
 | ProjectManagementSteps (templates) | JobStage (stages within a track type) |
@@ -146,12 +146,12 @@ The steps represent a product development lifecycle, NOT a production workflow:
 5. Project approval → Project Workflow scheduling → Project in production → First Order Delivered
 6. Re-evaluate estimate after order is complete
 
-This is a **new product development** pipeline, distinct from a **production order** pipeline. QB Engineer's track types handle this well — "R&D/Tooling" track type with these stages.
+This is a **new product development** pipeline, distinct from a **production order** pipeline. Forge's track types handle this well — "R&D/Tooling" track type with these stages.
 
 **Migration Caution:**
-- Legacy project steps are about bringing a NEW product to market. Production orders (OrderT) are a separate workflow. QB Engineer should maintain this separation via different track types (Production vs R&D/Tooling).
-- The legacy step model allows steps to be completed out of order (just checked off). QB Engineer's linear stage progression is more structured — consider allowing backward moves for this track type.
-- Legacy notes field on ProjectManagementT contains chronological entries with dates embedded in free text (e.g., "7/24\nWaiting the customer...\n01/06/2025:\nMulticam .093..."). QB Engineer's `JobActivityLog` is far superior for this.
+- Legacy project steps are about bringing a NEW product to market. Production orders (OrderT) are a separate workflow. Forge should maintain this separation via different track types (Production vs R&D/Tooling).
+- The legacy step model allows steps to be completed out of order (just checked off). Forge's linear stage progression is more structured — consider allowing backward moves for this track type.
+- Legacy notes field on ProjectManagementT contains chronological entries with dates embedded in free text (e.g., "7/24\nWaiting the customer...\n01/06/2025:\nMulticam .093..."). Forge's `JobActivityLog` is far superior for this.
 
 ---
 
@@ -159,10 +159,10 @@ This is a **new product development** pipeline, distinct from a **production ord
 
 **Legacy (45 rows):** Supplier company name (PK), contact name, position, address, phone, web, email, **username, password** (plaintext credentials stored!), notes.
 
-**QB Engineer:** `Vendor` entity (built).
+**Forge:** `Vendor` entity (built).
 
 **Migration Caution:**
-- Legacy stores **plaintext supplier portal credentials** (username/password columns). This is a serious security issue. QB Engineer must NEVER store third-party credentials in entity tables. If portal access is needed, use encrypted storage via ASP.NET Data Protection API.
+- Legacy stores **plaintext supplier portal credentials** (username/password columns). This is a serious security issue. Forge must NEVER store third-party credentials in entity tables. If portal access is needed, use encrypted storage via ASP.NET Data Protection API.
 
 ---
 
@@ -170,10 +170,10 @@ This is a **new product development** pipeline, distinct from a **production ord
 
 **Legacy (160 rows):** Raw materials/consumables with name, supplier, SKU, description, category (Hardware/KYDEX/Machine parts/Office/Plastic/Shipping/Tools), quantity, reorder level, current cost, DNI (do not inventory) flag, location, notes.
 
-**QB Engineer:** Maps to Parts with `PartType = RawMaterial` + Inventory module for stock tracking.
+**Forge:** Maps to Parts with `PartType = RawMaterial` + Inventory module for stock tracking.
 
 **Key Differences:**
-- Legacy has a separate Supplies entity from Products. QB Engineer unifies them under Part with different PartType values.
+- Legacy has a separate Supplies entity from Products. Forge unifies them under Part with different PartType values.
 - Legacy `SuppliesReorderLevel` maps to inventory reorder alerts (not yet implemented).
 - Legacy `SuppliesDNI` (do not inventory) flag — some items are tracked without counting. Could map to a Part flag or PartStatus.
 
@@ -189,14 +189,14 @@ This is a **new product development** pipeline, distinct from a **production ord
 - `DescriptionT` (496 rows): Vendor/payee lookup — names of everyone/everything paid, with discontinued flag.
 - `Checks` (1 row): Physical check writing.
 
-**QB Engineer:** Expenses module (basic), planned QuickBooks integration for full accounting.
+**Forge:** Expenses module (basic), planned QuickBooks integration for full accounting.
 
 **Migration Caution — CRITICAL:**
 - The daily ledger is the most dangerous legacy feature to replicate. It is essentially a **manual general ledger** with 9,000+ hand-entered transactions spanning 8+ years. This is the entire bookkeeping system.
-- QB Engineer should NOT replicate this. QuickBooks handles general ledger, P&L, balance sheet. The QB integration is the correct approach.
-- The Expenses module in QB Engineer handles expense capture/approval. Income tracking flows through invoicing → QB sync.
+- Forge should NOT replicate this. QuickBooks handles general ledger, P&L, balance sheet. The QB integration is the correct approach.
+- The Expenses module in Forge handles expense capture/approval. Income tracking flows through invoicing → QB sync.
 - Payroll tax breakdown fields (FWT, SWT, Social Security, Medicare) belong in a payroll system (Gusto, ADP), NOT in the application.
-- The `DescriptionT` table (496 vendor names) is a manual autocomplete list. QB Engineer's `ReferenceData` table handles this more elegantly.
+- The `DescriptionT` table (496 vendor names) is a manual autocomplete list. Forge's `ReferenceData` table handles this more elegantly.
 - The `Balanced` flag and `DateBalanced` fields suggest manual bank reconciliation — again, this belongs in QuickBooks.
 
 ---
@@ -205,9 +205,9 @@ This is a **new product development** pipeline, distinct from a **production ord
 
 **Legacy:** Invoice tracking is spread across two tables. `InvoiceSentT` tracks which invoices have been sent (currently 0 rows — unused). Invoice numbers are embedded in `OrderDeliveryT` delivery records.
 
-**QB Engineer:** Invoice workflow planned via QB Online integration (Estimate → Sales Order → Invoice → Payment stage flow).
+**Forge:** Invoice workflow planned via QB Online integration (Estimate → Sales Order → Invoice → Payment stage flow).
 
-**Analysis:** Legacy invoicing is minimal — just an invoice number stamped on delivery records. No invoice line items, totals, or payment tracking beyond the daily ledger. QB Engineer's planned QB integration is far more capable.
+**Analysis:** Legacy invoicing is minimal — just an invoice number stamped on delivery records. No invoice line items, totals, or payment tracking beyond the daily ledger. Forge's planned QB integration is far more capable.
 
 ---
 
@@ -215,9 +215,9 @@ This is a **new product development** pipeline, distinct from a **production ord
 
 **Legacy (56 POs, 99 line items):** Internal purchase orders to suppliers — date, supplier, ordered by, shipping instructions, comments, payment terms. Detail lines: supply name, SKU, description, quantity, unit cost, unit type.
 
-**QB Engineer:** `PurchaseOrder` + `PurchaseOrderLine` entities (built).
+**Forge:** `PurchaseOrder` + `PurchaseOrderLine` entities (built).
 
-**Good alignment.** The legacy PO model maps directly. QB Engineer's implementation is already more complete with FK relationships, status tracking, and receiving records.
+**Good alignment.** The legacy PO model maps directly. Forge's implementation is already more complete with FK relationships, status tracking, and receiving records.
 
 ---
 
@@ -225,9 +225,9 @@ This is a **new product development** pipeline, distinct from a **production ord
 
 **Legacy (5 rows):** Basic user table — name, user type (Office/null), username, plaintext password stored as bytes.
 
-**QB Engineer:** ASP.NET Identity with 6 roles, bcrypt-hashed passwords, JWT auth, refresh tokens.
+**Forge:** ASP.NET Identity with 6 roles, bcrypt-hashed passwords, JWT auth, refresh tokens.
 
-**No comparison needed** — QB Engineer's auth system is categorically superior.
+**No comparison needed** — Forge's auth system is categorically superior.
 
 ---
 
@@ -270,7 +270,7 @@ Products, orders, finances, project management, inventory, suppliers — all in 
 
 ## Feature Parity Summary
 
-| Legacy Feature | Legacy Complexity | QB Engineer Status | Notes |
+| Legacy Feature | Legacy Complexity | Forge Status | Notes |
 |---------------|------------------|-------------------|-------|
 | Customer management | 6 forms, 2 tables | **Done** | Superior: FK-based, contacts, activity log |
 | Bill-to / Ship-to split | Parallel tables | **Gap** | Consider adding ship-to address to Job or Customer |
@@ -332,7 +332,7 @@ The Access application contains 43 forms comprising the entire user interface. F
 The legacy UI follows a typical Access pattern: a main menu form (`MainMenuF`) with navigation buttons launching modal data-entry forms. There is no sidebar, no tabbed navigation, no URL routing — every screen is a popup window opened by VBA code behind button click events.
 
 **Navigation:**
-| Form | Purpose | QB Engineer Equivalent |
+| Form | Purpose | Forge Equivalent |
 |------|---------|----------------------|
 | `MainMenuF` | Central launch pad — buttons to every area | Sidebar + Dashboard |
 | `OrdersMenuF` | Sub-menu for order management | Kanban board |
@@ -347,18 +347,18 @@ The legacy UI follows a typical Access pattern: a main menu form (`MainMenuF`) w
 | `CustomerLookupF` | Search/select customer | Dropdown/typeahead replacement |
 | `CustomerBillTosubF` | Bill-to address subform | Embedded in customer form |
 | `CustomerShipTosubF` | Ship-to address subform | Embedded in customer form |
-| `CustomerBillTosubLookupF` / `CustomerShipTosubLookupF` / `CustomerNewLookupF` / `CustomerShipTosubLookupF` | Various lookup popups | Redundant — QB Engineer EntityPicker handles all |
+| `CustomerBillTosubLookupF` / `CustomerShipTosubLookupF` / `CustomerNewLookupF` / `CustomerShipTosubLookupF` | Various lookup popups | Redundant — Forge EntityPicker handles all |
 
-**Inefficiency:** 6+ forms for one entity. QB Engineer handles this with a single page + dialog + EntityPicker. The legacy pattern of separate "New" and "Edit" forms is an Access-era anti-pattern — modern UIs use one form for both.
+**Inefficiency:** 6+ forms for one entity. Forge handles this with a single page + dialog + EntityPicker. The legacy pattern of separate "New" and "Edit" forms is an Access-era anti-pattern — modern UIs use one form for both.
 
 **Product Management (6 forms):**
 | Form | Purpose | Notes |
 |------|---------|-------|
-| `ProductF` | Product detail entry | Part detail in QB Engineer |
+| `ProductF` | Product detail entry | Part detail in Forge |
 | `ProductLookupsubF` | Product search subform | Part search in toolbar |
-| `ProductNewsubF` | New product creation | Same form as edit in QB Engineer |
-| `ProductPriceAnnualsubF` | Annual price entry subform | Not yet in QB Engineer |
-| `ProductPriceAnnualLookupsubF` | Price history lookup | Not yet in QB Engineer |
+| `ProductNewsubF` | New product creation | Same form as edit in Forge |
+| `ProductPriceAnnualsubF` | Annual price entry subform | Not yet in Forge |
+| `ProductPriceAnnualLookupsubF` | Price history lookup | Not yet in Forge |
 | `ProductSuppliesJunctionF` | BOM editing (product-to-supply links) | BOM tab on Part detail |
 
 **Order Management (3 forms):**
@@ -381,16 +381,16 @@ The legacy UI follows a typical Access pattern: a main menu form (`MainMenuF`) w
 | `ArmoryFinancialF` | Main financials dashboard | QuickBooks |
 | `DailyLedgerF` | Transaction entry — income & expenses | QuickBooks |
 | `DailyLedgerNotBalancedF` | Unbalanced transaction viewer | QuickBooks reconciliation |
-| `DailyExpenceAnnualChartF` | Annual expense chart | QB Engineer Reports module |
-| `FinancialsLoginF` | Separate login for financial access | Role-based access in QB Engineer |
+| `DailyExpenceAnnualChartF` | Annual expense chart | Forge Reports module |
+| `FinancialsLoginF` | Separate login for financial access | Role-based access in Forge |
 | `ChecksF` | Physical check printing | Not needed |
 
-**Caution:** The `FinancialsLoginF` form implies a second layer of authentication specifically for financial data. QB Engineer handles this more elegantly with role-based access (Admin/Manager roles see financial data; others don't).
+**Caution:** The `FinancialsLoginF` form implies a second layer of authentication specifically for financial data. Forge handles this more elegantly with role-based access (Admin/Manager roles see financial data; others don't).
 
 **Supplier / Supply / PO Forms (6 forms):**
 | Form | Purpose | Notes |
 |------|---------|-------|
-| `SuppliersF` | Supplier detail | Vendor page in QB Engineer |
+| `SuppliersF` | Supplier detail | Vendor page in Forge |
 | `SupplierssubF` / `SupplierssubLookupF` | Supplier subform and lookup | EntityPicker |
 | `SuppliessubF` / `SuppliessubLookupF` | Supply item entry and lookup | Part (RawMaterial type) |
 | `PurchaseOrderF` / `PurchaseOrderDetailF` | PO entry with line items | Purchase Order page |
@@ -400,23 +400,23 @@ The legacy UI follows a typical Access pattern: a main menu form (`MainMenuF`) w
 |------|---------|-------|
 | `AddNewUserF` / `AddNewAdminLoginF` | User account creation | Admin user management |
 | `DescriptionF` | Manage description lookup table | ReferenceData admin |
-| `InvoiceNumberNextF` / `InvoiceNumberNextPlusOneF` | Manual invoice number sequencing | Auto-generated in QB Engineer |
+| `InvoiceNumberNextF` / `InvoiceNumberNextPlusOneF` | Manual invoice number sequencing | Auto-generated in Forge |
 | `InvoiceSentF` | Invoice sending tracker | QuickBooks integration |
 | `UpdateInventoryF` | Manual stock count update | Inventory module |
 
 ### Form UX Anti-Patterns
 
-1. **Separate New/Edit forms** — `CustomerF` vs `CustomerNewF`, `ProductF` vs `ProductNewsubF`. Access developers often create separate forms because Access lacks dynamic form behavior. QB Engineer correctly uses one dialog for both create and edit.
+1. **Separate New/Edit forms** — `CustomerF` vs `CustomerNewF`, `ProductF` vs `ProductNewsubF`. Access developers often create separate forms because Access lacks dynamic form behavior. Forge correctly uses one dialog for both create and edit.
 
-2. **Lookup subform proliferation** — 8+ lookup forms (`*LookupF`, `*LookupsubF`). Each entity needing a dropdown gets its own lookup popup. QB Engineer's `EntityPickerComponent` and `AutocompleteComponent` eliminate all of these.
+2. **Lookup subform proliferation** — 8+ lookup forms (`*LookupF`, `*LookupsubF`). Each entity needing a dropdown gets its own lookup popup. Forge's `EntityPickerComponent` and `AutocompleteComponent` eliminate all of these.
 
-3. **Modal popup chains** — Opening a form that opens another form that opens another. No breadcrumbs, no back button, no URL state. Users lose context easily. QB Engineer's router + sidebar + detail panels avoid this entirely.
+3. **Modal popup chains** — Opening a form that opens another form that opens another. No breadcrumbs, no back button, no URL state. Users lose context easily. Forge's router + sidebar + detail panels avoid this entirely.
 
-4. **No list views** — Access forms typically show one record at a time. Browsing records requires navigation buttons (next/previous). QB Engineer's data tables and kanban boards show many records simultaneously with filtering and sorting.
+4. **No list views** — Access forms typically show one record at a time. Browsing records requires navigation buttons (next/previous). Forge's data tables and kanban boards show many records simultaneously with filtering and sorting.
 
 5. **Financial gatekeeping via separate login** — Instead of role-based access, the legacy app has a second login form for financial data. This creates a poor UX where users must re-authenticate to access restricted areas.
 
-6. **Manual sequence management** — `InvoiceNumberNextF` / `InvoiceNumberNextPlusOneF` forms exist solely to manage the next invoice number. This is handled automatically by database sequences in QB Engineer.
+6. **Manual sequence management** — `InvoiceNumberNextF` / `InvoiceNumberNextPlusOneF` forms exist solely to manage the next invoice number. This is handled automatically by database sequences in Forge.
 
 ---
 
@@ -438,11 +438,11 @@ The legacy app has 34 reports — mostly financial ledger views, with some opera
 | `SalesTaxReportR` | Sales tax liability |
 | `CheckR` | Check printing template |
 
-**All of these are QuickBooks territory.** QB Engineer should not replicate any financial report generation. The Reports module should focus on operational metrics (jobs, production throughput, time tracking, parts usage) — never bookkeeping.
+**All of these are QuickBooks territory.** Forge should not replicate any financial report generation. The Reports module should focus on operational metrics (jobs, production throughput, time tracking, parts usage) — never bookkeeping.
 
-### Operational Reports (16) — Relevant to QB Engineer
+### Operational Reports (16) — Relevant to Forge
 
-| Report | Purpose | QB Engineer Mapping |
+| Report | Purpose | Forge Mapping |
 |--------|---------|-------------------|
 | `OrderTicketR` | Work order / shop ticket | **Planned**: `GET /api/v1/jobs/{id}/pdf?type=work-order` |
 | `PackingSlipR` | Packing slip for shipment | **Planned**: shipping integration |
@@ -459,9 +459,9 @@ The legacy app has 34 reports — mostly financial ledger views, with some opera
 
 ### Report Patterns to Adopt
 
-- **Work order / shop ticket** (`OrderTicketR`): A printable job card with all details, materials needed, and routing steps. Critical for shop floor. QB Engineer has planned QuestPDF generation for this.
+- **Work order / shop ticket** (`OrderTicketR`): A printable job card with all details, materials needed, and routing steps. Critical for shop floor. Forge has planned QuestPDF generation for this.
 - **Packing slip** (`PackingSlipR`): Needed when shipping. Include customer address, line items, quantities.
-- **Inventory reports** (`ProductInventoryR`, `WeeklyInventoryR`): Regular stock snapshots. QB Engineer's Reports module should include these.
+- **Inventory reports** (`ProductInventoryR`, `WeeklyInventoryR`): Regular stock snapshots. Forge's Reports module should include these.
 - **Undelivered orders** (`UndeliveredR`): A filtered view of in-progress work — already handled by kanban board filtering.
 
 ---
@@ -472,7 +472,7 @@ The 53 queries fall into clear categories revealing the business logic patterns:
 
 ### Query Categories
 
-**Financial Queries (25)** — All related to the daily ledger. Filtering by date range, balanced/unbalanced status, income vs expense, account type. Complex aggregation for income statements and chart data. Every one of these belongs in QuickBooks, not QB Engineer.
+**Financial Queries (25)** — All related to the daily ledger. Filtering by date range, balanced/unbalanced status, income vs expense, account type. Complex aggregation for income statements and chart data. Every one of these belongs in QuickBooks, not Forge.
 
 **Order/Delivery Queries (8):**
 - `OrderQ`, `OrderDetailQ`, `OrderdeliveryQ` — Basic CRUD data sources
@@ -508,11 +508,11 @@ The 53 queries fall into clear categories revealing the business logic patterns:
 
 1. **GUID-suffixed duplicates** — `ProjectManagementQ_928B9B9CE299407A8BF177DD0D4B1FB8` suggests Access created a copy when a query name collision occurred. This is a sign of fragile tooling.
 
-2. **Report-query coupling** — Every report has a dedicated query rather than using parameterized queries or views. In QB Engineer, MediatR handlers return shaped data directly; no intermediate query layer needed.
+2. **Report-query coupling** — Every report has a dedicated query rather than using parameterized queries or views. In Forge, MediatR handlers return shaped data directly; no intermediate query layer needed.
 
-3. **Separate "Active" queries** — `ProductActiveQ`, `InventoryActiveQ`, `SuppliesActiveQ` duplicate the base query with a WHERE filter. QB Engineer handles this with global query filters (`DeletedAt == null`) and optional status filters in the UI.
+3. **Separate "Active" queries** — `ProductActiveQ`, `InventoryActiveQ`, `SuppliesActiveQ` duplicate the base query with a WHERE filter. Forge handles this with global query filters (`DeletedAt == null`) and optional status filters in the UI.
 
-4. **Invoice number sequencing** — Two queries (`InvoiceNumberNextQ`, `InvoiceNumberNextPlusOneQ`) exist solely to calculate `MAX(InvoiceNumber) + 1`. This is handled by database sequences or auto-increment in QB Engineer.
+4. **Invoice number sequencing** — Two queries (`InvoiceNumberNextQ`, `InvoiceNumberNextPlusOneQ`) exist solely to calculate `MAX(InvoiceNumber) + 1`. This is handled by database sequences or auto-increment in Forge.
 
 ---
 
@@ -530,15 +530,15 @@ Based on the form-to-table relationships and data patterns:
 
 1. **Navigation logic**: `MainMenuF` buttons execute `DoCmd.OpenForm "FormName"` — each button opens a different form. No parameterized navigation.
 
-2. **Lookup cascading**: Customer lookup forms filter products, orders, and projects by company name text match. QB Engineer uses typed ID-based relationships.
+2. **Lookup cascading**: Customer lookup forms filter products, orders, and projects by company name text match. Forge uses typed ID-based relationships.
 
-3. **Invoice number generation**: VBA behind `InvoiceNumberNextF` runs `DMax("InvoiceNumber", "OrderDeliveryT") + 1` — fragile under concurrent access. QB Engineer uses database sequences.
+3. **Invoice number generation**: VBA behind `InvoiceNumberNextF` runs `DMax("InvoiceNumber", "OrderDeliveryT") + 1` — fragile under concurrent access. Forge uses database sequences.
 
-4. **Financial access control**: `FinancialsLoginF` likely checks credentials against `UserT` before opening `ArmoryFinancialF`. A single-purpose auth gate vs QB Engineer's role-based middleware.
+4. **Financial access control**: `FinancialsLoginF` likely checks credentials against `UserT` before opening `ArmoryFinancialF`. A single-purpose auth gate vs Forge's role-based middleware.
 
-5. **Inventory updates**: `UpdateInventoryF` likely reads current stock from `ProductT.InStock` and updates it — direct table mutation with no audit trail. QB Engineer uses `BinMovement` records for full traceability.
+5. **Inventory updates**: `UpdateInventoryF` likely reads current stock from `ProductT.InStock` and updates it — direct table mutation with no audit trail. Forge uses `BinMovement` records for full traceability.
 
-6. **Form validation**: Field-level validation via VBA `BeforeUpdate` events (e.g., required fields, numeric ranges). QB Engineer uses `FluentValidation` server-side and reactive form validators client-side.
+6. **Form validation**: Field-level validation via VBA `BeforeUpdate` events (e.g., required fields, numeric ranges). Forge uses `FluentValidation` server-side and reactive form validators client-side.
 
 ---
 
@@ -567,7 +567,7 @@ Based on the form-to-table relationships and data patterns:
 
 The legacy database uses an inconsistent naming scheme that should NOT be carried forward:
 
-| Legacy Pattern | Problem | QB Engineer Standard |
+| Legacy Pattern | Problem | Forge Standard |
 |---------------|---------|---------------------|
 | `CustomerBillToT` | Suffix `T` for "Table" — verbose, unnecessary | `customer` (snake_case, no suffix) |
 | `ProductPriceAnnualT` | CamelCase table names | `product_price_annual` (snake_case) |
@@ -578,7 +578,7 @@ The legacy database uses an inconsistent naming scheme that should NOT be carrie
 | `FWT`, `SWT`, `SS` | Cryptic abbreviations | Full names or standard abbreviations |
 | `DNI` | Unexplained abbreviation (Do Not Inventory) | `is_tracked` (boolean, clear meaning) |
 
-**Rule:** QB Engineer uses snake_case for database (auto-converted by EF Core), PascalCase for C# entities, camelCase for JSON/TypeScript. All names should be self-documenting without table prefixes or type suffixes.
+**Rule:** Forge uses snake_case for database (auto-converted by EF Core), PascalCase for C# entities, camelCase for JSON/TypeScript. All names should be self-documenting without table prefixes or type suffixes.
 
 ### Data Quality Issues Observed
 
@@ -595,7 +595,7 @@ From the actual data in the legacy tables:
 
 ## Data Migration Notes
 
-If migrating legacy data into QB Engineer:
+If migrating legacy data into Forge:
 
 1. **Customer dedup**: BillTo and ShipTo are parallel tables joined by company name. Merge into single Customer entity, store ship-to as secondary address.
 2. **Products → Parts**: Map ProductT to Part. `ProductCategory` → `PartType`. `ProductName` → Part description. `ProductSKU` → `PartNumber`.

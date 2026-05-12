@@ -1,4 +1,4 @@
-# Contributing to qb-engineer
+# Contributing to forge
 
 Thanks for your interest. This is the project-wide contributor guide.
 For per-repo specifics (build instructions, test commands), see the
@@ -8,11 +8,11 @@ For per-repo specifics (build instructions, test commands), see the
 
 | Repo | What it owns |
 |---|---|
-| [qb-engineer](https://github.com/danielhokanson/qb-engineer) | Project docs, architecture, governance, release manifest |
-| [qb-engineer-ui](https://github.com/danielhokanson/qb-engineer-ui) | Angular frontend |
-| [qb-engineer-server](https://github.com/danielhokanson/qb-engineer-server) | .NET backend + EF migrations |
-| [qb-engineer-deploy](https://github.com/danielhokanson/qb-engineer-deploy) | docker-compose, ops scripts |
-| [qb-engineer-test](https://github.com/danielhokanson/qb-engineer-test) | Manual test plans |
+| [forge](https://github.com/danielhokanson/forge) | Project docs, architecture, governance, release manifest |
+| [forge-ui](https://github.com/danielhokanson/forge-ui) | Angular frontend |
+| [forge-api](https://github.com/danielhokanson/forge-api) | .NET backend + EF migrations |
+| [forge-deploy](https://github.com/danielhokanson/forge-deploy) | docker-compose, ops scripts |
+| [forge-test](https://github.com/danielhokanson/forge-test) | Manual test plans |
 
 Open issues, PRs, and discussions in the repo that owns the affected
 code. Cross-cutting design discussions go in this umbrella repo.
@@ -20,13 +20,13 @@ code. Cross-cutting design discussions go in this umbrella repo.
 ## Getting set up
 
 ```bash
-git clone https://github.com/danielhokanson/qb-engineer.git
-cd qb-engineer
-./bootstrap.sh        # clones all four sibling repos as ../qb-engineer-*
+git clone https://github.com/danielhokanson/forge.git
+cd forge
+./bootstrap.sh        # clones all four sibling repos as ../forge-*
 ```
 
 For dev environment setup (running the app locally), follow the README
-in [qb-engineer-deploy](https://github.com/danielhokanson/qb-engineer-deploy).
+in [forge-deploy](https://github.com/danielhokanson/forge-deploy).
 
 ## Branch model
 
@@ -69,7 +69,7 @@ canonical version. Highlights:
 
 - **Unit tests** for new logic in services, handlers, pipes.
 - **Integration tests** for new API endpoints.
-- **Manual test plans** in `qb-engineer-test/` for new user-facing
+- **Manual test plans** in `forge-test/` for new user-facing
   features that benefit from human verification.
 - E2E (Playwright/Cypress) is not required on every PR — runs nightly
   and on `release/*` branches.

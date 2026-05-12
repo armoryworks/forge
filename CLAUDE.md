@@ -1,4 +1,4 @@
-# QB Engineer — Project Rules
+# Forge — Project Rules
 
 > Loaded into every Claude Code session. These rules override defaults. Follow exactly.
 > Full specs in `docs/`. When in doubt, check `docs/coding-standards.md` first.
@@ -16,17 +16,17 @@ Also update `docs/coding-standards.md` or the relevant doc file if the change is
 **When any .NET backend change is made that requires a restart (controller changes, entity changes, Program.cs, appsettings, etc.), automatically rebuild and restart the API container:**
 
 ```bash
-docker compose up -d --build qb-engineer-api
+docker compose up -d --build forge-api
 ```
 
 Do not ask the user — just do it after verifying the build passes.
 
 ## Auto-Rebuild UI
 
-**The `qb-engineer-ui` Docker container is nginx serving a baked production build, NOT a hot-reload Angular dev server.** UI source changes never land in the running container until you rebuild. After UI changes that should be testable / visible (template/component edits, i18n keys, route changes, anything beyond a pure spec/lint-only edit), automatically rebuild and restart:
+**The `forge-ui` Docker container is nginx serving a baked production build, NOT a hot-reload Angular dev server.** UI source changes never land in the running container until you rebuild. After UI changes that should be testable / visible (template/component edits, i18n keys, route changes, anything beyond a pure spec/lint-only edit), automatically rebuild and restart:
 
 ```bash
-docker compose up -d --build qb-engineer-ui
+docker compose up -d --build forge-ui
 ```
 
 Same rule shape as the API: do not ask, just do it after `npm run lint` + `npm run lint:i18n` + `npm run test -- --watch=false` pass.
@@ -40,11 +40,11 @@ Same rule shape as the API: do not ask, just do it after `npm run lint` + `npm r
 **After any UI fix or visual change, take a Playwright screenshot and examine it before considering the task complete.** This catches issues that code review alone misses (wrong spacing, overlapping elements, broken layouts, missing gaps).
 
 **How to verify:**
-1. Run `npx playwright test screenshot-verify` from `qb-engineer-ui/`
+1. Run `npx playwright test screenshot-verify` from `forge-ui/`
 2. Examine the screenshot at `e2e/screenshots/{page}.png`
 3. If the screenshot shows the fix didn't work (hot-reload missed, wrong CSS, etc.), iterate
 
-**Reusable screenshot script:** `qb-engineer-ui/e2e/tests/screenshot-verify.spec.ts` — set `TARGET_PATH` env var or edit the route inline. Default: `/dashboard`.
+**Reusable screenshot script:** `forge-ui/e2e/tests/screenshot-verify.spec.ts` — set `TARGET_PATH` env var or edit the route inline. Default: `/dashboard`.
 
 Do not ask the user — just verify visually after every UI change.
 
@@ -72,9 +72,9 @@ For these, the model is: branch off main → push → open PR with `--base main`
 
 **Local CI gate commands** (run before every `git push origin main`):
 
-- **UI repo (`qb-engineer-ui`):** `npm run lint && npm run lint:i18n && npm run test -- --watch=false`. The `lint:i18n` script (added 2026-05-03) catches the recurring "{key.path} renders raw because en.json is missing it" bug class — `tsc --noEmit`, `ng build`, and `vitest` all silently allow missing keys (vitest specs use a mocked TranslateLoader). When you add a `'foo.bar' | translate` reference, run this before pushing.
+- **UI repo (`forge-ui`):** `npm run lint && npm run lint:i18n && npm run test -- --watch=false`. The `lint:i18n` script (added 2026-05-03) catches the recurring "{key.path} renders raw because en.json is missing it" bug class — `tsc --noEmit`, `ng build`, and `vitest` all silently allow missing keys (vitest specs use a mocked TranslateLoader). When you add a `'foo.bar' | translate` reference, run this before pushing.
 
-  **i18n files live at `qb-engineer-ui/public/assets/i18n/{en,es}.json`. NEVER edit `src/assets/i18n/` — that path is intentionally non-existent.** Angular CLI's static-asset directory migrated from `src/assets/` to `public/` and the migrated project kept `public/assets/i18n/` as the only bundled source (per `angular.json`). For ~3 sessions before 2026-05-04, edits went to a phantom `src/assets/i18n/` that wasn't in any build — every new key showed up at runtime as a raw `foo.bar` token while `tsc`, `ng build`, `vitest`, AND the early `lint:i18n` all stayed green. The fix: deleted `src/assets/i18n/` and the lint script now hard-fails if it ever reappears. Don't recreate it. If you need to add a translation, the path is `public/assets/i18n/en.json` (and `es.json`). Server-supplied keys (workflow step labelKeys, validator displayNameKey/missingMessageKey) are scanned by `lint:i18n` from `qb-engineer-server/qb-engineer.api/Workflows/*.cs` automatically.
+  **i18n files live at `forge-ui/public/assets/i18n/{en,es}.json`. NEVER edit `src/assets/i18n/` — that path is intentionally non-existent.** Angular CLI's static-asset directory migrated from `src/assets/` to `public/` and the migrated project kept `public/assets/i18n/` as the only bundled source (per `angular.json`). For ~3 sessions before 2026-05-04, edits went to a phantom `src/assets/i18n/` that wasn't in any build — every new key showed up at runtime as a raw `foo.bar` token while `tsc`, `ng build`, `vitest`, AND the early `lint:i18n` all stayed green. The fix: deleted `src/assets/i18n/` and the lint script now hard-fails if it ever reappears. Don't recreate it. If you need to add a translation, the path is `public/assets/i18n/en.json` (and `es.json`). Server-supplied keys (workflow step labelKeys, validator displayNameKey/missingMessageKey) are scanned by `lint:i18n` from `forge-api/forge.api/Workflows/*.cs` automatically.
 
   **100% language-parity rule (added 2026-05-05).** Every mapped language file MUST be in 1:1 sync with `en.json` (the canonical source). `lint:i18n` now hard-fails on:
   - Keys present in `en.json` but missing from `es.json` (untranslated).
@@ -83,7 +83,7 @@ For these, the model is: branch off main → push → open PR with `--base main`
 
   No "warn-only" lag tolerated — when you add a key to `en.json`, add the matching `es.json` entry in the same commit. When you remove a key from `en.json`, remove the `es.json` entry too. Adding a new mapped language is the same contract: every key in `en.json` must exist in the new file before merge.
 
-- **Server repo (`qb-engineer-server`):** `dotnet build --configuration Release -warnaserror && dotnet test`.
+- **Server repo (`forge-api`):** `dotnet build --configuration Release -warnaserror && dotnet test`.
 
 Spec tests live under a separate `tsconfig.spec.json` that prod-build doesn't compile, so `tsc --noEmit` and `ng build` alone are not enough — explicit test runs are mandatory.
 
@@ -127,8 +127,8 @@ Spec tests live under a separate `tsconfig.spec.json` that prod-build doesn't co
 ## Project Structure
 
 ```
-qb-engineer-wrapper/
-├── qb-engineer-ui/          # Angular 21 + Material 21
+forge-wrapper/
+├── forge-ui/          # Angular 21 + Material 21
 │   └── src/
 │       ├── styles/           # _variables, _mixins, _shared, _reset
 │       ├── styles.scss       # Material theme + overrides
@@ -136,11 +136,11 @@ qb-engineer-wrapper/
 │           ├── shared/       # Reusable components, services, directives, pipes, utils
 │           ├── features/     # Feature modules (kanban, backlog, admin, etc.)
 │           └── core/         # Singleton services (layout, nav, toolbar, sidebar)
-├── qb-engineer-server/       # .NET 9 solution
-│   ├── qb-engineer.api/      # Controllers, Features/ (MediatR handlers), Middleware
-│   ├── qb-engineer.core/     # Entities, Interfaces, Models, Enums
-│   ├── qb-engineer.data/     # DbContext, Repositories, Migrations, Configuration
-│   └── qb-engineer.integrations/
+├── forge-api/       # .NET 9 solution
+│   ├── forge.api/      # Controllers, Features/ (MediatR handlers), Middleware
+│   ├── forge.core/     # Entities, Interfaces, Models, Enums
+│   ├── forge.data/     # DbContext, Repositories, Migrations, Configuration
+│   └── forge.integrations/
 ├── docs/                     # Specs: coding-standards, architecture, functional-decisions, ui-components, roles-auth, libraries
 └── docker-compose.yml        # 5 core + 3 optional profiles (ai, tts, signing)
 ```
@@ -151,7 +151,7 @@ qb-engineer-wrapper/
 
 ### Lint discipline (Non-Negotiable)
 
-**No commit may add new lint warnings.** After any UI file edit, run `npm run lint` from `qb-engineer-ui` and ensure:
+**No commit may add new lint warnings.** After any UI file edit, run `npm run lint` from `forge-ui` and ensure:
 
 - **Zero errors.** CI fails on errors via `ng lint`'s exit code; never push with a known error.
 - **Zero NEW non-spec warnings introduced by this commit.** Pre-existing warnings in unrelated files are acceptable to leave alone (separate cleanup PR), but the diff this commit ships must not add any. The standard `--fix` pass handles the easy ones (autofocus, lifecycle interfaces, stale eslint-disable directives).
@@ -192,7 +192,7 @@ For .NET: CI runs `dotnet build --configuration Release -warnaserror`. Compiler 
 | Parameters/locals | camelCase | `jobId`, `isActive` |
 | Interfaces | `I` prefix | `IJobService` |
 | Constants | PascalCase | `MaxRetryCount` |
-| Namespaces | `QbEngineer.{Project}.{Folder}` | `QbEngineer.Api.Controllers` |
+| Namespaces | `Forge.{Project}.{Folder}` | `Forge.Api.Controllers` |
 | Models | `*ResponseModel` / `*RequestModel` | **Never "DTO"** |
 
 **Person Names:** When displaying a person's full name, always use `Last, First MI` format (e.g., "Hartman, Daniel J"). This applies everywhere: headers, dropdowns, tables, avatars, reports, PDFs.
@@ -200,13 +200,13 @@ For .NET: CI runs `dotnet build --configuration Release -warnaserror`. Compiler 
 **Date Display:** Dates shown to users use `MM/dd/yyyy` (e.g., "03/11/2026"). When time is included, use `MM/dd/yyyy hh:mm` (e.g., "03/11/2026 02:30"). This applies to tables, detail panels, reports, PDFs — all user-facing date rendering.
 
 **Database:** snake_case for tables/columns (auto-converted by EF Core)
-**Docker:** services named `qb-engineer-*`
+**Docker:** services named `forge-*`
 
 ### Import Ordering
 
 **TypeScript:** (1) Angular core → (2) Angular Material → (3) Third-party (rxjs, three, etc.) → (4) App shared → (5) Feature-relative. Blank line between groups.
 
-**C#:** (1) System → (2) Microsoft → (3) Third-party (FluentValidation, MediatR, etc.) → (4) QbEngineer
+**C#:** (1) System → (2) Microsoft → (3) Third-party (FluentValidation, MediatR, etc.) → (4) Forge
 
 ### Tech Stack
 - **Frontend:** Angular 21, Angular Material 21, SCSS, standalone components, zoneless (signals)
@@ -830,7 +830,7 @@ All list views must show `<app-empty-state>` when data is empty — icon + messa
 | `DraftRecoveryPromptComponent` | `shared/components/draft-recovery-prompt/` | Post-login / TTL expiry dialog listing all drafts |
 | `LogoutDraftsDialogComponent` | `shared/components/logout-drafts-dialog/` | Logout confirmation with draft list |
 | `DraftService` | `shared/services/` | Draft orchestrator: register/unregister, auto-save, TTL, cross-tab sync |
-| `DraftStorageService` | `shared/services/` | IndexedDB CRUD for drafts (`qb-engineer-drafts` DB) |
+| `DraftStorageService` | `shared/services/` | IndexedDB CRUD for drafts (`forge-drafts` DB) |
 | `DraftBroadcastService` | `shared/services/` | Cross-tab BroadcastChannel for draft sync |
 | `DraftRecoveryService` | `shared/services/` | Post-login recovery, TTL cleanup, logout warning |
 | `unsavedChangesGuard` | `shared/guards/` | `CanDeactivateFn` — warns on navigation away from dirty forms |
@@ -1491,9 +1491,9 @@ await boardHub.Clients.Group($"board:{trackTypeId}")
 Auto-saves dirty form state to IndexedDB. Recovers drafts on login. Warns before navigation/logout. Cross-tab sync via BroadcastChannel.
 
 **Core services:**
-- `DraftStorageService` — IndexedDB wrapper (`qb-engineer-drafts` DB, separate from cache)
+- `DraftStorageService` — IndexedDB wrapper (`forge-drafts` DB, separate from cache)
 - `DraftService` — orchestrator: `register(form)` / `unregister()`, debounced auto-save (2.5s), TTL management
-- `DraftBroadcastService` — cross-tab sync via `qb-engineer-draft-sync` BroadcastChannel
+- `DraftBroadcastService` — cross-tab sync via `forge-draft-sync` BroadcastChannel
 - `DraftRecoveryService` — post-login draft check, TTL cleanup with 5-min grace period, logout warning
 
 **UI components:**
@@ -1646,7 +1646,7 @@ _(No pending enhancements — all planned DataTable and UserPreferences work is 
 
 ## .NET Entity Structure
 
-### Core Entities (in `qb-engineer.core/Entities/`)
+### Core Entities (in `forge.core/Entities/`)
 ```
 BaseEntity (Id, CreatedAt, UpdatedAt, DeletedAt, DeletedBy)
 ├── Job (+ Disposition, DispositionNotes, DisposedAt, ParentJobId, PartId), TrackType, JobStage, JobSubtask, JobActivityLog, JobLink
@@ -1684,7 +1684,7 @@ BaseEntity (Id, CreatedAt, UpdatedAt, DeletedAt, DeletedBy)
 ├── UserMfaDevice, MfaRecoveryCode
 ```
 
-### Enums (in `qb-engineer.core/Enums/`)
+### Enums (in `forge.core/Enums/`)
 `JobPriority`, `JobLinkType`, `JobDisposition`, `ActivityAction`, `PartType` (legacy — being decomposed into `ProcurementSource` × `InventoryClass` × `ItemKindId`), `ProcurementSource` (Make, Buy, Subcontract, Phantom), `InventoryClass` (Raw, Component, Subassembly, FinishedGood, Consumable, Tool), `TraceabilityType` (None, Lot, Serial — replaces legacy `IsSerialTracked` boolean), `AbcClass` (A, B, C), `PartStatus` (Draft, Prototype, Active, Obsolete), `BOMSourceType` (Make, Buy, Stock), `LocationType`, `BinContentStatus`, `BinMovementReason`, `LeadStatus`, `ExpenseStatus`, `AssetType`, `AssetStatus`, `ClockEventType`, `SyncStatus`, `AccountingDocumentType`, `PlanningCycleStatus`, `PurchaseOrderStatus`, `SalesOrderStatus`, `QuoteType` (Estimate, Quote), `QuoteStatus` (Draft, Sent, Accepted, Declined, Expired, ConvertedToQuote, ConvertedToOrder), `ShipmentStatus`, `InvoiceStatus`, `PaymentMethod`, `CreditTerms`, `AddressType`, `EventType` (Meeting, Training, Safety, Other), `AttendeeStatus` (Invited, Accepted, Declined, Attended), `InteractionType` (Call, Email, Meeting, Note), `EdiFormat`, `EdiTransportMethod`, `EdiDirection`, `EdiTransactionStatus`, `MfaDeviceType`
 
 ---
@@ -1776,7 +1776,7 @@ BaseEntity (Id, CreatedAt, UpdatedAt, DeletedAt, DeletedBy)
 - Integration tests for API endpoints via `WebApplicationFactory`
 - Bogus for test data generation
 - Mock external services (QB, MinIO, SMTP) — never hit real services
-- Test project mirrors source: `QbEngineer.Tests/Handlers/Jobs/CreateJobHandlerTests.cs`
+- Test project mirrors source: `Forge.Tests/Handlers/Jobs/CreateJobHandlerTests.cs`
 
 ### E2E (Cypress)
 - Critical user journeys: login, kanban CRUD, job detail, planning, dashboard, notifications, expense, lead, parts, time tracking, search, admin
@@ -1789,14 +1789,14 @@ BaseEntity (Id, CreatedAt, UpdatedAt, DeletedAt, DeletedBy)
 ### E2E (Playwright — SignalR Diagnostics & Simulation)
 - Playwright for multi-browser context tests (required for SignalR real-time sync verification)
 - Also powers the week simulation framework (see §E2E Simulation Framework above)
-- Tests in `qb-engineer-ui/e2e/tests/`, helpers in `e2e/helpers/`
+- Tests in `forge-ui/e2e/tests/`, helpers in `e2e/helpers/`
 - Run headless: `npm run e2e` | headed: `npm run e2e:headed`
 - Config: `e2e/playwright.config.ts` — Chromium only, no webServer (assumes Docker stack running)
 - Auth via API helper (`e2e/helpers/auth.helper.ts`) — sets localStorage directly, no UI login
-- Seeded test users: `admin@qbengineer.local`, `akim@qbengineer.local` — password set via `SEED_USER_PASSWORD` env var
+- Seeded test users: `admin@forge.local`, `akim@forge.local` — password set via `SEED_USER_PASSWORD` env var
 - `ui-actions.helper.ts`: reusable helpers (navigateTo, fillInput, fillMatSelect, fillDatepicker, clickButton)
 - **SignalR diagnostic:** `signalr-board-sync.spec.ts` — verifies real-time board sync between two browser contexts
-- **Troubleshooting SignalR:** Run `npm run e2e` from `qb-engineer-ui/` as a quick diagnostic. Creates two browser contexts, logs in both, moves a job via API, asserts the second browser updates within 5s via SignalR.
+- **Troubleshooting SignalR:** Run `npm run e2e` from `forge-ui/` as a quick diagnostic. Creates two browser contexts, logs in both, moves a job via API, asserts the second browser updates within 5s via SignalR.
 
 ### Static Analysis
 - ESLint + `@angular-eslint` + `@typescript-eslint`: unused vars, no `any`, import ordering, no `console.log`
@@ -1840,12 +1840,12 @@ PRs require passing CI. Test results reported as PR comments. Failed E2E include
 
 ```bash
 docker compose up -d                          # Full stack
-docker compose up -d --build qb-engineer-api  # Rebuild API
-docker compose logs -f qb-engineer-api        # API logs
-docker compose exec qb-engineer-db psql -U postgres -d qb_engineer  # DB access
+docker compose up -d --build forge-api  # Rebuild API
+docker compose logs -f forge-api        # API logs
+docker compose exec forge psql -U postgres -d forge  # DB access
 ```
 
-5 core services: `qb-engineer-ui`, `qb-engineer-api`, `qb-engineer-db`, `qb-engineer-storage`, `qb-engineer-backup`. Optional profiles: `ai` (Ollama + model init), `tts` (Coqui TTS), `signing` (DocuSeal).
+5 core services: `forge-ui`, `forge-api`, `forge`, `forge-storage`, `forge-backup`. Optional profiles: `ai` (Ollama + model init), `tts` (Coqui TTS), `signing` (DocuSeal).
 
 ### Setup & Refresh Scripts
 
@@ -1875,7 +1875,7 @@ When `docker compose up` fails with "port is already allocated" or "bind: addres
 1. Find the PID holding the port: `sudo ss -tlnp 'sport = :<port>'` or `sudo lsof -iTCP:<port> -sTCP:LISTEN`
 2. If the process is `docker-proxy`, read its argv: `cat /proc/<pid>/cmdline | tr '\0' ' '; echo` — look for `-host-port <port>` and `-container-id <hash>`
 3. Match the container-id to a running container: `docker ps --format '{{.ID}}\t{{.Names}}\t{{.Ports}}'`
-4. **If the container belongs to this project** (`qb-engineer-*`) → `docker compose down` or `docker rm -f <container>`, then retry `up`
+4. **If the container belongs to this project** (`forge-*`) → `docker compose down` or `docker rm -f <container>`, then retry `up`
 5. **If the container belongs to another project** → the port is legitimately in use; pick a different port or stop the other stack intentionally
 
 Scripts (`setup.sh`, `refresh.sh`) must follow this ownership check before taking any remediation action. Never blanket-kill all `docker-proxy` processes.
@@ -1902,7 +1902,7 @@ Registered in `Program.cs`. Used by `AppDbContext.SetTimestamps()` and time-depe
 
 Playwright-based week simulation spanning 431 weeks (2018–2026) for realistic data generation:
 
-- `qb-engineer-ui/e2e/tests/` — simulation specs
+- `forge-ui/e2e/tests/` — simulation specs
 - `e2e/helpers/ui-actions.helper.ts` — reusable Playwright helpers (navigateTo, fillInput, fillMatSelect, fillDatepicker, clickButton)
 - `e2e/helpers/auth.helper.ts` — `seedAuth()` for pre-authenticated browser contexts
 - Resume support: queries API for latest data to skip already-processed weeks
@@ -1924,45 +1924,45 @@ All form fields and interactive elements in dialog/form templates must have `dat
 - All mock services log operations via `ILogger` for dev visibility
 
 ### Accounting (`IAccountingService`)
-- Interface: `qb-engineer.core/Interfaces/IAccountingService.cs`
-- Models: `qb-engineer.core/Models/AccountingModels.cs` (AccountingCustomer, AccountingDocument, AccountingLineItem, AccountingPayment, AccountingTimeActivity, AccountingSyncStatus)
-- Mock: `qb-engineer.integrations/MockAccountingService.cs` — returns canned data matching seeded customers
-- QuickBooks Online is default + primary provider — **implemented** (`qb-engineer.integrations/QuickBooksAccountingService.cs`): OAuth 2.0, sync queue, customer/item/invoice/payment/time-activity sync, token encryption via Data Protection API
+- Interface: `forge.core/Interfaces/IAccountingService.cs`
+- Models: `forge.core/Models/AccountingModels.cs` (AccountingCustomer, AccountingDocument, AccountingLineItem, AccountingPayment, AccountingTimeActivity, AccountingSyncStatus)
+- Mock: `forge.integrations/MockAccountingService.cs` — returns canned data matching seeded customers
+- QuickBooks Online is default + primary provider — **implemented** (`forge.integrations/QuickBooksAccountingService.cs`): OAuth 2.0, sync queue, customer/item/invoice/payment/time-activity sync, token encryption via Data Protection API
 - Additional providers (Xero, FreshBooks, Sage) implement same interface — **not yet implemented** (interface + factory ready)
 - App works fully in standalone mode (no provider) — financial features degrade gracefully
 - Sync queue, caching, orphan detection are provider-agnostic
 
 ### Shipping (`IShippingService`)
-- Interface: `qb-engineer.core/Interfaces/IShippingService.cs`
-- Models: `qb-engineer.core/Models/ShippingModels.cs` (ShipmentRequest, ShippingAddress, ShippingPackage, ShippingRate, ShippingLabel, ShipmentTracking, TrackingEvent)
-- Mock: `qb-engineer.integrations/MockShippingService.cs` — returns 3 mock carrier rates
+- Interface: `forge.core/Interfaces/IShippingService.cs`
+- Models: `forge.core/Models/ShippingModels.cs` (ShipmentRequest, ShippingAddress, ShippingPackage, ShippingRate, ShippingLabel, ShipmentTracking, TrackingEvent)
+- Mock: `forge.integrations/MockShippingService.cs` — returns 3 mock carrier rates
 - Direct carrier integrations: UPS, FedEx, USPS, DHL (not yet implemented — each implements `IShippingService` directly, no middleman)
 - Manual mode always available (no API, user enters tracking number)
 - **Address validation is NOT part of IShippingService** — see `IAddressValidationService` below
 
 ### Address Validation (`IAddressValidationService`)
-- Interface: `qb-engineer.core/Interfaces/IAddressValidationService.cs`
+- Interface: `forge.core/Interfaces/IAddressValidationService.cs`
 - Decoupled from shipping — address validation uses USPS Web Tools directly (free)
-- Mock: `qb-engineer.integrations/MockAddressValidationService.cs` — format-only validation (state codes, ZIP regex, required fields)
-- Real: `qb-engineer.integrations/UspsAddressValidationService.cs` — USPS Address Information API v3 (XML REST, free with USPS Web Tools User ID)
+- Mock: `forge.integrations/MockAddressValidationService.cs` — format-only validation (state codes, ZIP regex, required fields)
+- Real: `forge.integrations/UspsAddressValidationService.cs` — USPS Address Information API v3 (XML REST, free with USPS Web Tools User ID)
 - Config: `UspsOptions` (`Usps:UserId` in appsettings.json) — register at https://www.usps.com/business/web-tools-apis/
 - Program.cs: USPS when User ID configured, mock otherwise (same pattern as other integrations)
 - Frontend: `AddressFormComponent` → `AddressService.validate()` → `POST /api/v1/addresses/validate` → `IAddressValidationService.ValidateAsync()`
 - USPS returns DPV (Delivery Point Validation) confirmation + standardized address
 
 ### AI (`IAiService` — Optional)
-- Interface: `qb-engineer.core/Interfaces/IAiService.cs`
-- Models: `qb-engineer.core/Models/AiModels.cs` (AiSearchResult)
-- Mock: `qb-engineer.integrations/MockAiService.cs` — returns canned text responses
+- Interface: `forge.core/Interfaces/IAiService.cs`
+- Models: `forge.core/Models/AiModels.cs` (AiSearchResult)
+- Mock: `forge.integrations/MockAiService.cs` — returns canned text responses
 - Self-hosted Ollama + pgvector RAG — **implemented** (`OllamaAiService.cs`): gemma3:4b, `DocumentEmbedding` entity (pgvector vector(384)), RAG pipeline (IndexDocument / RagSearch / BulkIndexDocuments handlers), `DocumentIndexJob` (Hangfire 30 min), `AiController` (generate/summarize/status/search/index)
 - Use cases: smart search, job description drafting, QC anomaly detection, document Q&A, header AI search column with RAG results
 - Graceful degradation when AI container is down
 
 ### Storage (`IStorageService`)
-- Interface: `qb-engineer.core/Interfaces/IStorageService.cs`
-- Real: `qb-engineer.integrations/MinioStorageService.cs` (MinIO S3-compatible)
-- Mock: `qb-engineer.integrations/MockStorageService.cs` — in-memory ConcurrentDictionary
-- Config: `MinioOptions` in `qb-engineer.core/Models/MinioOptions.cs`
+- Interface: `forge.core/Interfaces/IStorageService.cs`
+- Real: `forge.integrations/MinioStorageService.cs` (MinIO S3-compatible)
+- Mock: `forge.integrations/MockStorageService.cs` — in-memory ConcurrentDictionary
+- Config: `MinioOptions` in `forge.core/Models/MinioOptions.cs`
 
 ### PDF Form Extraction (pdf.js + PuppeteerSharp)
 - **Architecture:** pdf.js (via PuppeteerSharp headless Chromium) extracts text + form fields from PDFs. Smart parser infers ComplianceFormDefinition layout. AI verifies and refines.
@@ -1973,7 +1973,7 @@ All form fields and interactive elements in dialog/form templates must have `dat
   - `IFormDefinitionVerifier` — structural checks + AI refinement loop (max 3 iterations)
 - **Real:** `PdfJsExtractorService.cs` (PuppeteerSharp singleton browser), `FormDefinitionParser.cs`, `FormDefinitionVerifier.cs`
 - **Mock:** `MockPdfJsExtractorService.cs` — returns canned extraction data
-- **JS extraction page:** `qb-engineer.api/wwwroot/pdf-extract.html` — bundled pdf.js, called via PuppeteerSharp `EvaluateFunctionAsync`
+- **JS extraction page:** `forge.api/wwwroot/pdf-extract.html` — bundled pdf.js, called via PuppeteerSharp `EvaluateFunctionAsync`
 - **Docker:** API container uses Debian base (not Alpine) with Chromium installed. `PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium`
 - **Pattern detection:** Step sections, amount lines, filing status, signature blocks, form headers — all inferred from structural cues, no per-form hardcoding
 
@@ -2036,7 +2036,7 @@ Every MediatR command handler that mutates a tracked entity MUST emit at least o
    - When in doubt, ask: "If I'm looking at this Part / Vendor / Customer next year, is this row about *what changed in the definition* (yes → log it here) or *something operational that happened to use this definition* (no → log on the transactional entity, not here)?"
    - **Self-auditing-data exception.** Some definitional collections *are* their own audit trail — the current state, viewed in its native UI, fully describes what the entity is. `BOMEntry` is the canonical example: the BOM tab IS the history of "what this part is composed of"; an activity-feed row saying "added component X" duplicates information already trivially visible. For these, skip the activity log entirely on the collection mutations themselves — only log the *parent* entity's own definitional changes (rename, status change, etc.). Apply this exception conservatively: it's earned only when the collection is small, fully visible in one place, and a simple "added/removed/changed" verb adds nothing the screen doesn't already show. Fields with semantics (price, lead time, vendor preference) do NOT qualify — those go through the indexing-points rule.
 
-2. **Indexing-points rule (definitional entities only).** When the mutated entity sits at an indexing point between multiple definitional entities (e.g. `VendorPart` bridges Part ↔ Vendor; `BOMEntry` bridges parent-Part ↔ component-Part; `Contact` bridges to Customer), emit a row for **every** involved entity — not just the one the user is currently viewing. Use `db.LogActivityAt(action, description, ("Part", partId), ("Vendor", vendorId))` from `QBEngineer.Data.Extensions.ActivityLogExtensions`. Order doesn't matter; the helper writes one row per pair.
+2. **Indexing-points rule (definitional entities only).** When the mutated entity sits at an indexing point between multiple definitional entities (e.g. `VendorPart` bridges Part ↔ Vendor; `BOMEntry` bridges parent-Part ↔ component-Part; `Contact` bridges to Customer), emit a row for **every** involved entity — not just the one the user is currently viewing. Use `db.LogActivityAt(action, description, ("Part", partId), ("Vendor", vendorId))` from `Forge.Data.Extensions.ActivityLogExtensions`. Order doesn't matter; the helper writes one row per pair.
 
 3. **Rollup rule.** A multi-field update produces ONE activity row whose `Description` summarizes all changed fields (e.g. `"Updated 4 fields: leadTimeDays, minOrderQty, packSize, notes"`). Do NOT emit one row per field — per-field history is the History tab's stream (a different table / different concept). For UpdateXxxHandlers, build a `List<string> changedFields` while applying patches, then write one row referencing them all.
 
@@ -2206,7 +2206,7 @@ readonly isStandalone = this.accountingService.isStandalone;
 The system runs on a **per-install capability gate**: 129 named capabilities (e.g., `CAP-MD-CUSTOMERS`, `CAP-INV-LOTS`, `CAP-EXT-AI-ASSISTANT`) are registered in a static catalog. Each install's capability state is stored in the `capabilities` table; controllers and Hangfire-fired commands carry `[RequiresCapability("CAP-...")]` attributes; the `CapabilityGateMiddleware` (controller side) and `CapabilityGateBehavior` (MediatR side) short-circuit with 403 + envelope when a capability is disabled. Bootstrap-exempt endpoints (auth, descriptor, capability admin) carry `[CapabilityBootstrap]` instead so admins are never locked out.
 
 **Where things live:**
-- **Catalog (source of truth)**: `qb-engineer-server/qb-engineer.api/Capabilities/CapabilityCatalog.cs` — 129 capabilities with code, name, area, default-state, dependencies/mutexes
+- **Catalog (source of truth)**: `forge-api/forge.api/Capabilities/CapabilityCatalog.cs` — 129 capabilities with code, name, area, default-state, dependencies/mutexes
 - **Relations**: `CapabilityCatalogRelations.cs` — dependency edges + mutex pairs (only one declared mutex today: `CAP-ACCT-EXTERNAL ⊥ CAP-ACCT-BUILTIN`)
 - **Snapshot + middleware**: `CapabilitySnapshot.cs`, `ICapabilitySnapshotProvider`, `CapabilityGateMiddleware.cs`, `CapabilityGateBehavior.cs`
 - **Mutation API**: `CapabilitiesController` exposes `PUT /api/v1/capabilities/{code}/enabled`, bulk-toggle, validate, audit-log; preset & discovery endpoints layered on top
@@ -2263,7 +2263,7 @@ Legacy `PartType` column kept on the row for two release cycles for rollback saf
 
 ## Order Management Entities
 
-### New Core Entities (in `qb-engineer.core/Entities/`)
+### New Core Entities (in `forge.core/Entities/`)
 ```
 SalesOrder, SalesOrderLine
 Quote, QuoteLine

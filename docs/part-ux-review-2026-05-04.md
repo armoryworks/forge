@@ -1,7 +1,7 @@
 # Part workflow UX review — 2026-05-04
 
 > **Status:** for Dan's review.
-> **Code state:** changes are in the working tree of `qb-engineer-ui` only — **nothing committed, nothing pushed, no PR open**. To reset everything: `git checkout -- src/ public/` from the UI repo. To accept and ship: see "How to commit this" at the bottom.
+> **Code state:** changes are in the working tree of `forge-ui` only — **nothing committed, nothing pushed, no PR open**. To reset everything: `git checkout -- src/ public/` from the UI repo. To accept and ship: see "How to commit this" at the bottom.
 > **Time spent:** ~5 hours of focused research + audit + implementation + writeup.
 
 ---
@@ -130,7 +130,7 @@ This is what the research synthesized into. **It applies directly to the part wo
 
 ## 3. What I changed (this session)
 
-All changes are uncommitted. They live in the working tree of `qb-engineer-ui`.
+All changes are uncommitted. They live in the working tree of `forge-ui`.
 
 ### 3.1 Workflow shell — full restructure (`shared/components/workflow/`)
 
@@ -203,7 +203,7 @@ The body text for each `parts.workflow.{stepId}.rationale` was authored in the p
 
 ## 5. Before / after screenshots
 
-All screenshots in `qb-engineer-ui/e2e/screenshots/part-ux-audit/`.
+All screenshots in `forge-ui/e2e/screenshots/part-ux-audit/`.
 
 ### Guided shell — desktop (1920×1080)
 
@@ -271,7 +271,7 @@ These are non-wizard surfaces that should still pin close + actions consistently
 ### 6.4 Cross-cutting tightening
 
 - **`<app-dialog>` audit**: every dialog should declare its width category (small / medium / large) instead of pixel widths. Add a `[size]` input that maps to standard widths consistently.
-- **Mobile breakpoints**: `qb-engineer-ui` uses `@include mobile` (≤768px) but the workflow shell needed extra breakpoints at 1200 / 1024 / 480. Worth promoting these to shared mixins (`@include narrow-laptop`, `@include tablet`, `@include phone-narrow`) so other surfaces use the same numbers.
+- **Mobile breakpoints**: `forge-ui` uses `@include mobile` (≤768px) but the workflow shell needed extra breakpoints at 1200 / 1024 / 480. Worth promoting these to shared mixins (`@include narrow-laptop`, `@include tablet`, `@include phone-narrow`) so other surfaces use the same numbers.
 - **Surface color tokens**: add explicit named tokens for "primary work surface" (`--surface`) vs. "secondary / demoted surface" (`--bg`) so future authors know which to reach for. Documented in CLAUDE.md.
 - **Persistent header chrome**: a shared `<app-dialog-chrome>` component that bundles "title / breadcrumb / right-aligned action cluster / close" — would let the fork dialog, detail dialogs, and the workflow shell all share the same header skeleton.
 
@@ -301,7 +301,7 @@ The philosophy applies to mobile with the following collapses (already implement
 The change is one logical effort. Recommended PR shape:
 
 ```bash
-cd qb-engineer-ui
+cd forge-ui
 git checkout -b effort/part-ux-philosophy
 git add public/assets/i18n/ \
         src/app/shared/components/workflow/ \
@@ -317,7 +317,7 @@ gh pr create --base main --head effort/part-ux-philosophy ...
 
 The umbrella doc (this file at `docs/part-ux-review-2026-05-04.md`) lives in the umbrella repo and should commit there separately.
 
-To **discard** instead: `cd qb-engineer-ui && git checkout -- public/ src/ && git clean -fd e2e/tests/part-ux-audit.spec.ts e2e/screenshots/part-ux-audit/`.
+To **discard** instead: `cd forge-ui && git checkout -- public/ src/ && git clean -fd e2e/tests/part-ux-audit.spec.ts e2e/screenshots/part-ux-audit/`.
 
 ---
 

@@ -26,8 +26,8 @@ Covenant.
 ## Scope
 
 This code of conduct applies in all project-managed spaces (this repo
-and all sibling repos: `qb-engineer`, `qb-engineer-ui`,
-`qb-engineer-server`, `qb-engineer-deploy`, `qb-engineer-test`) and
+and all sibling repos: `forge`, `forge-ui`,
+`forge-api`, `forge-deploy`, `forge-test`) and
 when an individual is officially representing the project in public
 spaces.
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-QB Engineer supports barcode scanning, QR code display, NFC/RFID tag reading, and label printing across the application. The scanning infrastructure has two main modes:
+Forge supports barcode scanning, QR code display, NFC/RFID tag reading, and label printing across the application. The scanning infrastructure has two main modes:
 
 1. **Global keyboard-wedge detection** -- The `ScannerService` listens for rapid keystroke patterns on `document` that indicate a USB barcode scanner or keyboard-wedge device, as opposed to normal human typing. This works application-wide without requiring focus on a specific input field.
 2. **Focused scan input** -- The `BarcodeScanInputComponent` provides a dedicated input field for kiosk scenarios (e.g., shop floor clock-in) where the scanner input should be captured in a specific field.
@@ -13,7 +13,7 @@ Additionally, the system supports NFC/RFID readers through the `WebHidRfidServic
 
 ## ScannerService
 
-**Location:** `qb-engineer-ui/src/app/shared/services/scanner.service.ts`
+**Location:** `forge-ui/src/app/shared/services/scanner.service.ts`
 
 Global singleton (`providedIn: 'root'`) that detects USB barcode scanner and NFC reader input using keyboard-wedge detection. Started in `AppComponent.ngOnInit()` after authentication and stopped on logout.
 
@@ -133,7 +133,7 @@ Uses `BarcodeScanInputComponent` directly (focused input mode) rather than the g
 
 ## BarcodeScanInputComponent
 
-**Location:** `qb-engineer-ui/src/app/shared/components/barcode-scan-input/`
+**Location:** `forge-ui/src/app/shared/components/barcode-scan-input/`
 
 A dedicated scan input field designed for kiosk use where scans should target a specific input rather than being detected globally.
 
@@ -167,7 +167,7 @@ A dedicated scan input field designed for kiosk use where scans should target a 
 
 ## WebHidRfidService
 
-**Location:** `qb-engineer-ui/src/app/shared/services/web-hid-rfid.service.ts`
+**Location:** `forge-ui/src/app/shared/services/web-hid-rfid.service.ts`
 
 Handles NFC/RFID reader communication through two transport mechanisms:
 
@@ -233,7 +233,7 @@ Raw HID input reports are processed to extract the NFC tag UID:
 
 ## QrCodeComponent
 
-**Location:** `qb-engineer-ui/src/app/shared/components/qr-code/`
+**Location:** `forge-ui/src/app/shared/components/qr-code/`
 
 A thin wrapper around `angularx-qrcode` for displaying QR codes.
 
@@ -255,7 +255,7 @@ A thin wrapper around `angularx-qrcode` for displaying QR codes.
 
 ## LabelPrintService
 
-**Location:** `qb-engineer-ui/src/app/shared/services/label-print.service.ts`
+**Location:** `forge-ui/src/app/shared/services/label-print.service.ts`
 
 Generates barcode and QR code images using `bwip-js` (lazy-loaded) and opens a print window with formatted labels.
 
@@ -318,9 +318,9 @@ The `printLabels` method generates a self-contained HTML document that:
 
 | File | Purpose |
 |------|---------|
-| `qb-engineer-ui/src/app/shared/services/scanner.service.ts` | Global keyboard-wedge scan detection |
-| `qb-engineer-ui/src/app/shared/services/web-hid-rfid.service.ts` | NFC/RFID via WebSocket relay or WebHID |
-| `qb-engineer-ui/src/app/shared/services/label-print.service.ts` | Barcode/QR generation and label printing |
-| `qb-engineer-ui/src/app/shared/components/barcode-scan-input/barcode-scan-input.component.ts` | Focused scan input field (kiosk use) |
-| `qb-engineer-ui/src/app/shared/components/qr-code/qr-code.component.ts` | QR code display wrapper |
-| `qb-engineer-ui/src/app/shared/models/scan-event.model.ts` | `ScanEvent`, `ScanContext` types |
+| `forge-ui/src/app/shared/services/scanner.service.ts` | Global keyboard-wedge scan detection |
+| `forge-ui/src/app/shared/services/web-hid-rfid.service.ts` | NFC/RFID via WebSocket relay or WebHID |
+| `forge-ui/src/app/shared/services/label-print.service.ts` | Barcode/QR generation and label printing |
+| `forge-ui/src/app/shared/components/barcode-scan-input/barcode-scan-input.component.ts` | Focused scan input field (kiosk use) |
+| `forge-ui/src/app/shared/components/qr-code/qr-code.component.ts` | QR code display wrapper |
+| `forge-ui/src/app/shared/models/scan-event.model.ts` | `ScanEvent`, `ScanContext` types |

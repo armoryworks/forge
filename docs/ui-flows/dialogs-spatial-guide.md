@@ -1,6 +1,6 @@
 # Dialog Controls — Spatial Guide
 
-All dialogs in QB Engineer share the same layout structure.
+All dialogs in Forge share the same layout structure.
 
 ## Universal Dialog Layout
 

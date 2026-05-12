@@ -7,7 +7,7 @@
 ## Purpose
 
 The admin panel provides system configuration, user management, and compliance
-template management. It is the control center for the entire QB Engineer instance.
+template management. It is the control center for the entire Forge instance.
 
 ## Admin Tabs
 

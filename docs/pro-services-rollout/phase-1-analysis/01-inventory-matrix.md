@@ -24,7 +24,7 @@ Every UI feature folder, backend entity, and notable surface tagged with how it 
 
 ## Table 1 — UI Feature folders
 
-Source: `qb-engineer-ui/src/app/features/`.
+Source: `forge-ui/src/app/features/`.
 
 | Folder | Tag | Pro | Hybrid | Mfg | Notes |
 |---|---|---|---|---|---|
@@ -81,7 +81,7 @@ Source: `qb-engineer-ui/src/app/features/`.
 
 ## Table 2 — Backend entities
 
-Source: `qb-engineer.core/Entities/`. Tagged by whether the entity itself is meaningful in a services world, not by its UI surface.
+Source: `forge.core/Entities/`. Tagged by whether the entity itself is meaningful in a services world, not by its UI surface.
 
 ### Master Data
 

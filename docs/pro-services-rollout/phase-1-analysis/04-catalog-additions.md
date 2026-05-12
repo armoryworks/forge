@@ -115,7 +115,7 @@ CREATE TABLE cloud_storage_providers (
     provider_code       TEXT NOT NULL,  -- 'gdrive' | 'onedrive' | 'dropbox'
     mode                TEXT NOT NULL,  -- 'per_user' | 'service_account' (D3)
     is_active           BOOLEAN NOT NULL DEFAULT TRUE,
-    root_folder_id      TEXT,           -- provider-side root (where qb-engineer files live)
+    root_folder_id      TEXT,           -- provider-side root (where forge files live)
     service_account_id  TEXT,           -- when mode='service_account'
     oauth_token_encrypted BYTEA,        -- encrypted via ITokenEncryptionService
     refresh_token_encrypted BYTEA,
@@ -227,7 +227,7 @@ Default `is_billable = true` to keep manufacturing semantics intact (existing ti
 
 ### 4.1 `TerminologyOverride` (new)
 
-Mirrors `terminology_overrides` table. EF Core entity in `qb-engineer.core/Entities/`.
+Mirrors `terminology_overrides` table. EF Core entity in `forge.core/Entities/`.
 
 ```csharp
 public class TerminologyOverride : BaseEntity

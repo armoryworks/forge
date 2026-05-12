@@ -328,7 +328,7 @@ Payment application automatically transitions invoice status (see Payments docum
 
 ## Entity
 
-**Invoice** (`qb-engineer.core/Entities/Invoice.cs`): extends `BaseAuditableEntity`.
+**Invoice** (`forge.core/Entities/Invoice.cs`): extends `BaseAuditableEntity`.
 
 | Property | Type | Notes |
 |----------|------|-------|
@@ -352,7 +352,7 @@ Payment application automatically transitions invoice status (see Payments docum
 | AmountPaid | decimal | Computed: sum of payment applications |
 | BalanceDue | decimal | Computed: total - amountPaid |
 
-**InvoiceLine** (`qb-engineer.core/Entities/InvoiceLine.cs`): extends `BaseEntity`.
+**InvoiceLine** (`forge.core/Entities/InvoiceLine.cs`): extends `BaseEntity`.
 
 | Property | Type | Notes |
 |----------|------|-------|

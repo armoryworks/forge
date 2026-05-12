@@ -139,7 +139,7 @@ A bundled HTML page with pdf.js that exposes an `extractFormStructure(pdfBytesBa
 - `page.getTextContent()` — returns `TextContent.items[]` with `str`, `transform` (position matrix), `fontName`, `width`, `height`
 - `page.getAnnotations()` — returns `AnnotationData[]` with `id`, `fieldType`, `rect`, `fieldName`, `alternativeText`, `fieldValue`, `options`, `fieldFlags`, `radioButton`, etc.
 
-### 2. IPdfJsExtractorService (`qb-engineer.core/Interfaces/`)
+### 2. IPdfJsExtractorService (`forge.core/Interfaces/`)
 
 ```csharp
 public interface IPdfJsExtractorService
@@ -148,7 +148,7 @@ public interface IPdfJsExtractorService
 }
 ```
 
-**Implementation** (`qb-engineer.integrations/PdfJsExtractorService.cs`):
+**Implementation** (`forge.integrations/PdfJsExtractorService.cs`):
 
 - Manages a PuppeteerSharp browser instance (lazy-initialized, reused)
 - Opens `pdf-extract.html` in a new page
@@ -156,11 +156,11 @@ public interface IPdfJsExtractorService
 - Deserializes the JS return value into `PdfExtractionResult`
 - Disposes the page after extraction (browser stays warm)
 
-**Mock** (`qb-engineer.integrations/MockPdfJsExtractorService.cs`):
+**Mock** (`forge.integrations/MockPdfJsExtractorService.cs`):
 
 - Returns canned extraction data for development/testing when `MockIntegrations=true`
 
-### 3. IFormDefinitionParser (`qb-engineer.core/Interfaces/`)
+### 3. IFormDefinitionParser (`forge.core/Interfaces/`)
 
 ```csharp
 public interface IFormDefinitionParser
@@ -169,7 +169,7 @@ public interface IFormDefinitionParser
 }
 ```
 
-**Implementation** (`qb-engineer.integrations/FormDefinitionParser.cs`):
+**Implementation** (`forge.integrations/FormDefinitionParser.cs`):
 
 Stateless parser that converts raw pdf.js output to `ComplianceFormDefinition` JSON. Pattern detection rules:
 
@@ -186,7 +186,7 @@ Stateless parser that converts raw pdf.js output to `ComplianceFormDefinition` J
 | Shaded section | Background fill detection (if available) or even-step pattern | `shaded: true` |
 | Instructions | Non-bold text blocks between sections | Section `instructions` or field `displayText` |
 
-### 4. IFormDefinitionVerifier (`qb-engineer.core/Interfaces/`)
+### 4. IFormDefinitionVerifier (`forge.core/Interfaces/`)
 
 ```csharp
 public interface IFormDefinitionVerifier
@@ -234,7 +234,7 @@ if (!result.Passed && iteration < 3):
 For visual diff verification, the API calls the running UI container:
 
 ```
-POST http://qb-engineer-ui/api/verify-form-render
+POST http://forge-ui/api/verify-form-render
 Body: { formDefinitionJson, sourceUrl }
 
 UI container:
@@ -311,16 +311,16 @@ GetMyStateFormDefinitionHandler
 ## File Structure
 
 ```
-qb-engineer.core/Interfaces/
+forge.core/Interfaces/
   IPdfJsExtractorService.cs              (NEW)
   IFormDefinitionParser.cs               (NEW)
   IFormDefinitionVerifier.cs             (NEW)
 
-qb-engineer.core/Models/
+forge.core/Models/
   PdfExtractionResult.cs                 (NEW — raw pdf.js output model)
   FormVerificationResult.cs              (NEW)
 
-qb-engineer.integrations/
+forge.integrations/
   PdfJsExtractorService.cs              (NEW — PuppeteerSharp + pdf.js)
   MockPdfJsExtractorService.cs          (NEW — mock for dev/test)
   FormDefinitionParser.cs               (NEW — smart pattern parser)
@@ -328,10 +328,10 @@ qb-engineer.integrations/
   PdfFormExtractorService.cs            (DELETED)
   MockPdfFormExtractorService.cs        (DELETED)
 
-qb-engineer.api/wwwroot/
+forge.api/wwwroot/
   pdf-extract.html                       (NEW — bundled pdf.js extraction page)
 
-qb-engineer.api/Dockerfile              (MODIFIED — add Chromium)
+forge.api/Dockerfile              (MODIFIED — add Chromium)
 ```
 
 ---
@@ -341,7 +341,7 @@ qb-engineer.api/Dockerfile              (MODIFIED — add Chromium)
 1. New services created alongside existing `IPdfFormExtractorService`
 2. Handlers updated to use new `IPdfJsExtractorService` + `IFormDefinitionParser` + `IFormDefinitionVerifier`
 3. Old `IPdfFormExtractorService`, `PdfFormExtractorService`, `MockPdfFormExtractorService` deleted
-4. PdfPig NuGet package removed from `qb-engineer.integrations.csproj`
+4. PdfPig NuGet package removed from `forge.integrations.csproj`
 5. Existing `FormDefinitionVersion` records in database remain valid — the JSON schema is unchanged
 
 ---
@@ -575,7 +575,7 @@ interface FormFieldDefinition {
 
 ## Frontend Rendering (`ComplianceFormRendererComponent`)
 
-The renderer in `qb-engineer-ui/src/app/features/account/components/compliance-form-renderer/` consumes the JSON and produces a pixel-accurate HTML/CSS reproduction.
+The renderer in `forge-ui/src/app/features/account/components/compliance-form-renderer/` consumes the JSON and produces a pixel-accurate HTML/CSS reproduction.
 
 ### Rendering Strategy
 
@@ -637,7 +637,7 @@ ExtractFormDefinitionHandler
        │
        ├─ Render source PDF pages as PNG (PuppeteerSharp + pdf.js)
        ├─ Render form definition as PNG (PuppeteerSharp + headless Angular)
-       │     └─ Navigates to http://qb-engineer-ui/__render-form
+       │     └─ Navigates to http://forge-ui/__render-form
        │        Injects formDefinitionJson, captures page screenshots
        │
        ├─ Compare each page pair (SkiaImageComparisonService)

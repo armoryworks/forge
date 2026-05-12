@@ -1,6 +1,6 @@
 # Testing Strategy
 
-> Practical testing plan for QB Engineer. Solo developer, limited resources — maximize coverage per hour invested.
+> Practical testing plan for Forge. Solo developer, limited resources — maximize coverage per hour invested.
 
 ---
 
@@ -32,10 +32,10 @@
 
 Auto-generated from controller files. Hits every parameterless GET endpoint as an authenticated admin user. Catches broken routes, missing DI registrations, serialization failures, and startup crashes.
 
-- **Source**: Scans `qb-engineer.api/Controllers/` for `[HttpGet]` attributes without required route parameters
-- **Auth**: Logs in as `admin@qbengineer.local`, uses JWT for all requests
+- **Source**: Scans `forge.api/Controllers/` for `[HttpGet]` attributes without required route parameters
+- **Auth**: Logs in as `admin@forge.local`, uses JWT for all requests
 - **Pass criteria**: Response is not 500. 401/403/404 are acceptable (means the route exists and the handler ran)
-- **Run**: `npm run test:api-smoke` from `qb-engineer-ui/`
+- **Run**: `npm run test:api-smoke` from `forge-ui/`
 
 This single test catches the majority of backend regressions: missing service registrations, broken entity configurations, null reference exceptions in handlers, and serialization cycles.
 
@@ -45,7 +45,7 @@ Cross-references Angular service HTTP URLs with backend controller routes. Catch
 
 - **Source**: Parses `*.service.ts` files for `this.http.get/post/put/patch/delete()` URL patterns, parses `*Controller.cs` files for `[Route]` + `[Http*]` attributes
 - **Output**: List of frontend URLs with no matching backend route
-- **Run**: `npm run test:contract-drift` from `qb-engineer-ui/`
+- **Run**: `npm run test:contract-drift` from `forge-ui/`
 
 No test framework needed — this is a Node script that reads files and compares strings. Fast, zero flakiness.
 
@@ -61,7 +61,7 @@ These are the paths that break a user's day if they fail:
 
 Each test runs against the full Docker Compose stack. Auth via API helper (no UI login except test #1).
 
-- **Run**: `npm run test:critical-flows` from `qb-engineer-ui/`
+- **Run**: `npm run test:critical-flows` from `forge-ui/`
 - **Config**: `e2e/playwright.config.ts`
 
 ### Pre-Commit Hook
@@ -74,7 +74,7 @@ git config core.hooksPath .githooks
 
 # What it runs:
 # 1. npx vitest run --reporter=dot (Angular unit tests)
-# 2. dotnet build qb-engineer-server/qb-engineer.sln --no-restore (compile check)
+# 2. dotnet build forge-api/forge.sln --no-restore (compile check)
 # Blocks commit on failure.
 ```
 
@@ -165,7 +165,7 @@ When you add a new feature, ask these questions in order. Stop at the first "yes
 | Does it have a new Angular service URL? | Auto-covered by contract drift detection | None needed |
 | Is it a new entity with seed data? | Auto-covered by seed startup | None needed |
 | Does it have complex state management (multi-step wizard, optimistic UI)? | Component test the state transitions | `.spec.ts` co-located |
-| Is it a MediatR handler with business logic (not just CRUD)? | Integration test against real DB | `QbEngineer.Tests/` |
+| Is it a MediatR handler with business logic (not just CRUD)? | Integration test against real DB | `Forge.Tests/` |
 
 If none of the above apply, the feature is likely simple enough that existing infrastructure tests cover it.
 
@@ -174,7 +174,7 @@ If none of the above apply, the feature is likely simple enough that existing in
 ## 6. Test File Conventions
 
 ```
-qb-engineer-ui/
+forge-ui/
 ├── src/app/
 │   ├── shared/services/auth.service.spec.ts        # Co-located unit test
 │   ├── shared/pipes/terminology.pipe.spec.ts       # Co-located unit test
@@ -197,8 +197,8 @@ qb-engineer-ui/
 │   │   └── ui-actions.helper.ts                    # navigateTo, fillInput, fillMatSelect, etc.
 │   └── playwright.config.ts
 
-qb-engineer-server/
-└── qb-engineer.tests/
+forge-api/
+└── forge.tests/
     ├── Handlers/
     │   ├── Jobs/CreateJobHandlerTests.cs            # Integration test
     │   └── Jobs/MoveJobStageHandlerTests.cs         # Integration test (business logic)

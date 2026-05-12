@@ -17,14 +17,14 @@ A repeatable, auditable pipeline from `git push` on a sibling repo to a running 
 ## Architecture overview
 
 ```
-qb-engineer-server  ─┐
+forge-api  ─┐
                      │   GH Actions (ubuntu-24.04-arm)
-qb-engineer-ui      ─┼─▶ test → buildx → push to GHCR
+forge-ui      ─┼─▶ test → buildx → push to GHCR
                      │   tags: sha-<short>, latest
-qb-engineer-deploy  ─┘
+forge-deploy  ─┘
                             │
                             ▼
-              ghcr.io/danielhokanson/qb-engineer-{server,ui}
+              ghcr.io/danielhokanson/forge-{server,ui}
                             │
                             ▼
          ┌──────────────────────────────────────┐
@@ -43,7 +43,7 @@ Two clean halves:
 
 ## Image registry: GHCR
 
-`ghcr.io/danielhokanson/qb-engineer-server` and `ghcr.io/danielhokanson/qb-engineer-ui`. Image name matches repo name -- the convention `${{ github.repository }}` already encodes in the existing `release.yml` workflows.
+`ghcr.io/danielhokanson/forge-api` and `ghcr.io/danielhokanson/forge-ui`. Image name matches repo name -- the convention `${{ github.repository }}` already encodes in the existing `release.yml` workflows.
 
 Why GHCR:
 - Free, unlimited bandwidth for public images
@@ -51,7 +51,7 @@ Why GHCR:
 - Native multi-arch manifest support (same tag transparently serves AMD64 to dev laptops and ARM64 to the Pi)
 - Pi pulls with no auth (public images); CI pushes with `${{ secrets.GITHUB_TOKEN }}`
 
-`qb-engineer-deploy` does **not** publish a Docker image. It ships compose files, scripts, and the `qb-deploy` CLI -- consumed by `git clone` at a tag, not `docker pull`.
+`forge-deploy` does **not** publish a Docker image. It ships compose files, scripts, and the `qb-deploy` CLI -- consumed by `git clone` at a tag, not `docker pull`.
 
 ## Image tagging strategy
 
@@ -72,13 +72,13 @@ Multiple tags from one push, each with a different purpose. The existing `releas
 This project has two parallel release models that should not be conflated:
 
 - **Head-of-main deploys** -- what `qb-deploy` handles. Operator deploys the latest CI-built image (`main-<sha>`) when ready. No formal release; just "what's currently shipping on the Pi." This is the everyday flow for the solo operator.
-- **Customer releases** -- governed by [release-manifest.md](../release-manifest.md). Each row pairs tested versions across `qb-engineer-server`, `qb-engineer-ui`, `qb-engineer-deploy`, and `qb-engineer-test`. Cohosted customers pin to a master tag and get a vetted bundle. `qb-deploy` can also deploy these when given a `<X.Y.Z>` tag instead of a `main-<sha>`, but the act of *creating* the release is manual (tagging each sibling, updating the manifest).
+- **Customer releases** -- governed by [release-manifest.md](../release-manifest.md). Each row pairs tested versions across `forge-api`, `forge-ui`, `forge-deploy`, and `forge-test`. Cohosted customers pin to a master tag and get a vetted bundle. `qb-deploy` can also deploy these when given a `<X.Y.Z>` tag instead of a `main-<sha>`, but the act of *creating* the release is manual (tagging each sibling, updating the manifest).
 
-The `qb-engineer-deploy` repo's `release.yml` reflects this split: it triggers only on `v*.*.*` tag pushes and creates a GitHub release with auto-generated notes. It does **not** build an image.
+The `forge-deploy` repo's `release.yml` reflects this split: it triggers only on `v*.*.*` tag pushes and creates a GitHub release with auto-generated notes. It does **not** build an image.
 
 ## CI: GitHub Actions per source repo
 
-Both `qb-engineer-server` and `qb-engineer-ui` already ship `release.yml` workflows that handle GHCR publishing. The Phase 2 work *adapts* those, doesn't replace them. Two real gaps to close:
+Both `forge-api` and `forge-ui` already ship `release.yml` workflows that handle GHCR publishing. The Phase 2 work *adapts* those, doesn't replace them. Two real gaps to close:
 
 1. **Multi-arch builds.** Existing workflows build `linux/amd64` only (default for `ubuntu-latest`). The Pi needs `linux/arm64`.
 2. **Test gating.** Existing workflows push images regardless of test status -- the `ci.yml` workflow runs in parallel and a failure there doesn't stop the image push.
@@ -91,11 +91,11 @@ Adapted shape:
 - **Triggers:** unchanged (`push` to main + `v*.*.*` tags).
 - **Tags:** unchanged (handled by `docker/metadata-action` -- see the strategy table above).
 
-`qb-engineer-deploy` keeps its existing release-on-tag workflow and gains no Docker image build (it has none).
+`forge-deploy` keeps its existing release-on-tag workflow and gains no Docker image build (it has none).
 
 ## CD: the `qb-deploy` CLI on the Pi
 
-A single bash script (~150 lines), versioned in `qb-engineer-deploy/scripts/qb-deploy`, installed on the Pi at `/usr/local/bin/qb-deploy`.
+A single bash script (~150 lines), versioned in `forge-deploy/scripts/qb-deploy`, installed on the Pi at `/usr/local/bin/qb-deploy`.
 
 ### Commands
 
@@ -107,27 +107,27 @@ qb-deploy --list                # list last N tags available in GHCR
 qb-deploy --status              # current deployed SHA per service + container health
 qb-deploy --rollback            # re-pin to the previously deployed SHA
 qb-deploy --logs                # tail the deploy history log
-qb-deploy --self-update         # git pull qb-engineer-deploy and re-install
+qb-deploy --self-update         # git pull forge-deploy and re-install
 ```
 
 ### Tag discovery
 
-Source of truth: GHCR API. `qb-deploy --list` queries the GHCR REST endpoint for available tags on `qb-engineer-server` and `qb-engineer-ui`, filters to `main-*` tags by default (and shows `<X.Y.Z>` tags when invoked with `--releases`), sorts by image push timestamp.
+Source of truth: GHCR API. `qb-deploy --list` queries the GHCR REST endpoint for available tags on `forge-api` and `forge-ui`, filters to `main-*` tags by default (and shows `<X.Y.Z>` tags when invoked with `--releases`), sorts by image push timestamp.
 
 This is more accurate than querying GitHub for recent commits, because a build can fail tests and never produce an image -- listing commits would surface SHAs that have no deployable artifact. It also means `qb-deploy` works even if the source repos are temporarily unreachable.
 
 ### State management
 
-`/etc/qb-engineer/deploy-state.json` -- created on first run with `0600` permissions, owned by the deploy user.
+`/etc/forge/deploy-state.json` -- created on first run with `0600` permissions, owned by the deploy user.
 
 ```json
 {
-  "qb-engineer-server": {
+  "forge-api": {
     "current": "main-abc1234",
     "prior":   "main-9f8e7d6",
     "deployedAt": "2026-04-26T22:14:33Z"
   },
-  "qb-engineer-ui": { ... }
+  "forge-ui": { ... }
 }
 ```
 
@@ -144,41 +144,41 @@ Used by `--rollback` (re-pin to `prior`), `--status` (current snapshot), and the
 7. **On healthy:** update state file (`prior` <- old `current`, `current` <- new tag), append to log, exit 0.
 8. **On unhealthy:** revert `.env` to prior tag, `docker compose up -d <service>`, append failure to log, exit 1.
 
-Logs append to `/var/log/qb-engineer-deploy.log`. Format: `<iso8601> <service> <from-tag> -> <to-tag> <outcome>`.
+Logs append to `/var/log/forge-deploy.log`. Format: `<iso8601> <service> <from-tag> -> <to-tag> <outcome>`.
 
 ### Self-update
 
 `qb-deploy --self-update`:
-1. `git -C /opt/qb-engineer-deploy pull --ff-only`
+1. `git -C /opt/forge-deploy pull --ff-only`
 2. Re-run `scripts/install-qb-deploy.sh` to copy the latest script to `/usr/local/bin/`.
 3. Refuses to run if the deploy repo has uncommitted changes (would be ignoring local work).
 
 ### Installation
 
-`qb-engineer-deploy/scripts/install-qb-deploy.sh`:
+`forge-deploy/scripts/install-qb-deploy.sh`:
 1. Install `qb-deploy` to `/usr/local/bin/qb-deploy` (mode `0755`).
-2. Create `/etc/qb-engineer/` (mode `0750`, owned by deploy user).
-3. Create `/etc/qb-engineer/deploy-state.json` if missing.
-4. Touch `/var/log/qb-engineer-deploy.log` (mode `0644`).
+2. Create `/etc/forge/` (mode `0750`, owned by deploy user).
+3. Create `/etc/forge/deploy-state.json` if missing.
+4. Touch `/var/log/forge-deploy.log` (mode `0644`).
 5. Verify `docker`, `docker compose`, `curl`, `jq` are available on the Pi.
 
 ## Compose split for prod
 
 Local dev keeps the existing `build:` directives. Prod adds an overlay that swaps `build:` for `image:`.
 
-`docker-compose.prod.yml` (lives in `qb-engineer-deploy`):
+`docker-compose.prod.yml` (lives in `forge-deploy`):
 
 ```yaml
 services:
-  qb-engineer-api:
-    image: ghcr.io/danielhokanson/qb-engineer-server:${SERVER_IMAGE_TAG:-latest}
+  forge-api:
+    image: ghcr.io/danielhokanson/forge-api:${SERVER_IMAGE_TAG:-latest}
     build: !reset null
-  qb-engineer-ui:
-    image: ghcr.io/danielhokanson/qb-engineer-ui:${UI_IMAGE_TAG:-latest}
+  forge-ui:
+    image: ghcr.io/danielhokanson/forge-ui:${UI_IMAGE_TAG:-latest}
     build: !reset null
 ```
 
-The compose service is still `qb-engineer-api` (matches the existing service name and container_name); only the underlying image source changes.
+The compose service is still `forge-api` (matches the existing service name and container_name); only the underlying image source changes.
 
 Pi invocation: `docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d`.
 
@@ -190,12 +190,12 @@ Local dev invocation (unchanged): `docker compose up -d --build`.
 - **No GH Actions runner on the Pi.** Eliminates the public-OSS-repo workflow-code threat surface.
 - **GHCR images are public**, pulled anonymously. No registry credentials stored on the Pi.
 - **CI pushes use `${{ secrets.GITHUB_TOKEN }}`**, scoped to the source repo and the matching package.
-- **Deploy user on the Pi is unprivileged**, with a tightly-scoped `sudoers` rule for `docker compose` against the qb-engineer compose project only.
+- **Deploy user on the Pi is unprivileged**, with a tightly-scoped `sudoers` rule for `docker compose` against the forge compose project only.
 - **Deploy state and log files are owned by the deploy user**, mode `0640` for state, `0644` for log.
 
 ## Rollback
 
-`qb-deploy --rollback` reads `prior` from `/etc/qb-engineer/deploy-state.json` and runs the deploy flow against that SHA. The `prior` field is updated only on successful deploys, so two consecutive bad deploys cannot lose the last-known-good SHA.
+`qb-deploy --rollback` reads `prior` from `/etc/forge/deploy-state.json` and runs the deploy flow against that SHA. The `prior` field is updated only on successful deploys, so two consecutive bad deploys cannot lose the last-known-good SHA.
 
 If `prior` is null (first deploy), `--rollback` errors out with a clear message.
 
@@ -213,19 +213,19 @@ These are deferred deliberately. Each is easy to add later when there's a real m
 
 | Phase | Deliverable | Repo |
 |---|---|---|
-| 1 | This design doc | `qb-engineer` (meta) |
-| 2 | Adapt existing `release.yml` -- ARM64 runner + multi-arch + test gate | `qb-engineer-server` |
-| 3 | `qb-deploy` CLI + install script | `qb-engineer-deploy` |
-| 4 | `docker-compose.prod.yml` overlay | `qb-engineer-deploy` |
+| 1 | This design doc | `forge` (meta) |
+| 2 | Adapt existing `release.yml` -- ARM64 runner + multi-arch + test gate | `forge-api` |
+| 3 | `qb-deploy` CLI + install script | `forge-deploy` |
+| 4 | `docker-compose.prod.yml` overlay | `forge-deploy` |
 | 5 | Pi bring-up: install `qb-deploy`, do a real deploy | (operational) |
-| 6 | Same `release.yml` adaptation for ui | `qb-engineer-ui` |
-| 7 | Add Pi-side guard to `refresh.ps1`/`refresh.sh`; document setup vs. refresh vs. qb-deploy roles | `qb-engineer-deploy` |
+| 6 | Same `release.yml` adaptation for ui | `forge-ui` |
+| 7 | Add Pi-side guard to `refresh.ps1`/`refresh.sh`; document setup vs. refresh vs. qb-deploy roles | `forge-deploy` |
 
 Phase 7 specifically: `setup.ps1`/`setup.sh` keep their first-time-bootstrap role on the dev side. `refresh.ps1`/`refresh.sh` -- the proxy CICD scripts -- get retired entirely on the Pi (replaced by `qb-deploy`) but keep their dev-loop role on workstations. Naming may need to drift to make the distinction clearer (e.g., `dev-refresh.ps1`).
 
 ## Open questions
 
-- **Versioning the meta repo and the deploy repo.** Right now they're on `main` only. If we ever cohost a customer who pins to a specific qb-engineer release, both repos likely want semver tags too. Out of scope until that customer exists.
+- **Versioning the meta repo and the deploy repo.** Right now they're on `main` only. If we ever cohost a customer who pins to a specific forge release, both repos likely want semver tags too. Out of scope until that customer exists.
 - **Pi disk pressure.** Each deploy leaves a previous image on disk. `docker image prune --filter "until=720h"` (30 days) on a weekly cron handles this without manual intervention. Worth adding to the install script.
 - **Migrating off the Pi.** If the production host ever moves from a Pi to a VM/cloud host, only the build runner choice changes (drop the explicit ARM64 target if no longer needed). The CD half is host-agnostic.
 
@@ -235,12 +235,12 @@ Decisions made while implementing the CLI and prod overlay that the
 original design didn't pin down. None of these change the architecture;
 they're just the small calls that needed making.
 
-- **Test image (`qb-engineer-test`) is wired in the CLI from day one.** The
+- **Test image (`forge-test`) is wired in the CLI from day one.** The
   design doc predates the test-site decision and only mentions
   `server` and `ui`. The CLI lists/deploys/rolls-back the third image
   identically; the prod compose overlay carries it as a commented-out
   block (uncommented when Phase 6's test-site `release.yml` lands and the
-  base compose grows a `qb-engineer-test` service). This avoids a churn
+  base compose grows a `forge-test` service). This avoids a churn
   pass through the CLI later.
 - **Healthcheck mapping per service:**
   - `api` -- HTTP probe to `http://127.0.0.1:${API_PORT}/api/v1/health`
@@ -248,7 +248,7 @@ they're just the small calls that needed making.
     documented health endpoint and is reachable from the Pi without any
     container shell hop.
   - `ui` -- container's own `HEALTHCHECK` (nginx wget `:80/`). Already
-    defined in `qb-engineer-ui/Dockerfile`; `qb-deploy` reads the
+    defined in `forge-ui/Dockerfile`; `qb-deploy` reads the
     container's `State.Health.Status` via `docker inspect`.
   - `test` -- same approach as ui (container `HEALTHCHECK`). The
     test-site Dockerfile owns the specific probe; the CLI is agnostic.
@@ -263,7 +263,7 @@ they're just the small calls that needed making.
   then `Authorization: Bearer ...` against `/v2/.../tags/list` and
   `HEAD /v2/.../manifests/<tag>`. Public-image-friendly; no Pi-side
   credentials.
-- **State file lives at `/etc/qb-engineer/deploy-state.json`** (0640,
+- **State file lives at `/etc/forge/deploy-state.json`** (0640,
   owned by deploy user). Three image entries (server, ui, test) are
   pre-created so jq updates don't have to handle a missing key.
 - **Dev defaults for image tags are `latest`.** `qb-deploy` refuses to
@@ -281,7 +281,7 @@ role on the Pi. The original design tentatively suggested a rename
 less disruptive and keeps muscle memory on dev workstations.
 
 - **Runtime guard, not a rename.** `refresh.sh` and `refresh.ps1` now
-  test for `/etc/qb-engineer/deploy-state.json` near the top. If it
+  test for `/etc/forge/deploy-state.json` near the top. If it
   exists, the script aborts with a clear pointer at `qb-deploy`. The
   state file is created by `scripts/install-qb-deploy.sh`, so it's
   present exactly when (and only when) `qb-deploy` is the canonical
@@ -302,7 +302,7 @@ less disruptive and keeps muscle memory on dev workstations.
   cross-cutting; the other two are role-specific.
 - **Three roles, three scripts:** `setup.*` for first-time bootstrap,
   `refresh.*` for dev-side dev-loop, `qb-deploy` for prod CD. See
-  `qb-engineer-deploy/CONTRIBUTING.md` for the operator-facing version
+  `forge-deploy/CONTRIBUTING.md` for the operator-facing version
   of this distinction.
 
 ## Phase 8 addendum (2026-05-02) — semver auto-bump, matrix split, Node 24
@@ -321,8 +321,8 @@ without cross-referencing commit dates. The new model auto-derives a
 real semver on every main push.
 
 - **Per-repo `VERSION` file** holds `MAJOR.MINOR.BASE` (e.g. `0.0.0`,
-  `0.1.0`, `1.0.0`). Lives at the repo root in `qb-engineer-server`,
-  `qb-engineer-ui`, and `qb-engineer-test`. Edited manually for minor
+  `0.1.0`, `1.0.0`). Lives at the repo root in `forge-api`,
+  `forge-ui`, and `forge-test`. Edited manually for minor
   and major bumps.
 - **Patch is computed in CI** as `BASE + (commits since VERSION was last
   touched)`. The release workflow runs `git log -1 --format=%H -- VERSION`
@@ -438,7 +438,7 @@ form transparently.
 
 ### What this means for the deploy repo
 
-`qb-engineer-deploy` itself remains tag-on-demand (`v*.*.*` git tag, no
+`forge-deploy` itself remains tag-on-demand (`v*.*.*` git tag, no
 auto-bump). It publishes no image — its release is just the compose
 files at that tag. The release-manifest.md model continues to work
 unchanged: each row pairs sibling versions, but those versions are now

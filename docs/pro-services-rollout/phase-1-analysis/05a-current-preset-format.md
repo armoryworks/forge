@@ -1,10 +1,10 @@
 # Artifact 5a — Current Preset Format (Reference)
 
-Pre-extension state of qb-engineer's preset definition format. This brief is the factual baseline that the extension spec (Artifact 5) builds on. **No proposed changes here** — only what exists today.
+Pre-extension state of forge's preset definition format. This brief is the factual baseline that the extension spec (Artifact 5) builds on. **No proposed changes here** — only what exists today.
 
 ## 1. Preset record shape
 
-The preset catalog lives at `qb-engineer-server/qb-engineer.api/Capabilities/Discovery/PresetCatalog.cs` as a static list of immutable C# records. The record definition itself is in `PresetDefinition.cs`.
+The preset catalog lives at `forge-api/forge.api/Capabilities/Discovery/PresetCatalog.cs` as a static list of immutable C# records. The record definition itself is in `PresetDefinition.cs`.
 
 ### 1.1 Current `PresetDefinition` fields
 

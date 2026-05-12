@@ -2,7 +2,7 @@
 
 ## Overview
 
-QB Engineer uses ASP.NET Core SignalR for real-time bidirectional communication between the server and connected browser clients. Four domain-specific hubs handle distinct concerns: kanban board synchronization, notification delivery, time tracking events, and chat messaging. All hubs require JWT authentication and use WebSocket transport through an nginx reverse proxy.
+Forge uses ASP.NET Core SignalR for real-time bidirectional communication between the server and connected browser clients. Four domain-specific hubs handle distinct concerns: kanban board synchronization, notification delivery, time tracking events, and chat messaging. All hubs require JWT authentication and use WebSocket transport through an nginx reverse proxy.
 
 The frontend manages connections through a layered service architecture: a singleton `SignalrService` handles low-level connection lifecycle (creation, retry, teardown), while domain-specific hub services (`BoardHubService`, `NotificationHubService`, `TimerHubService`, `ChatHubService`) wrap it with event registration and group management.
 
@@ -10,7 +10,7 @@ The frontend manages connections through a layered service architecture: a singl
 
 ## Server-Side Hubs
 
-All four hubs live in `qb-engineer-server/qb-engineer.api/Hubs/` and are mapped in `Program.cs`:
+All four hubs live in `forge-api/forge.api/Hubs/` and are mapped in `Program.cs`:
 
 ```csharp
 app.MapHub<BoardHub>("/hubs/board");
@@ -138,7 +138,7 @@ The nginx reverse proxy upgrades HTTP connections to WebSocket for hub paths:
 
 ```nginx
 location /hubs/ {
-    proxy_pass http://qb-engineer-api:8080/hubs/;
+    proxy_pass http://forge-api:8080/hubs/;
     proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection "upgrade";
@@ -152,7 +152,7 @@ location /hubs/ {
 
 ### SignalrService
 
-**Location:** `qb-engineer-ui/src/app/shared/services/signalr.service.ts`
+**Location:** `forge-ui/src/app/shared/services/signalr.service.ts`
 
 Singleton connection manager (`providedIn: 'root'`). All hub-specific services delegate to this service for connection lifecycle.
 
@@ -180,7 +180,7 @@ The system has two layers of reconnection:
 
 ### BoardHubService
 
-**Location:** `qb-engineer-ui/src/app/shared/services/board-hub.service.ts`
+**Location:** `forge-ui/src/app/shared/services/board-hub.service.ts`
 
 Wraps SignalrService for the `/hubs/board` endpoint. Tracks current board and job group memberships.
 
@@ -203,7 +203,7 @@ boardHub.onSubtaskChangedEvent((event) => this.reloadSubtasks());
 
 ### NotificationHubService
 
-**Location:** `qb-engineer-ui/src/app/shared/services/notification-hub.service.ts`
+**Location:** `forge-ui/src/app/shared/services/notification-hub.service.ts`
 
 Connects once during app initialization (in `AppComponent.ngOnInit()` after authentication). Automatically pushes received notifications into `NotificationService`.
 
@@ -217,7 +217,7 @@ Has a `connected` guard flag to prevent duplicate connections.
 
 ### TimerHubService
 
-**Location:** `qb-engineer-ui/src/app/shared/services/timer-hub.service.ts`
+**Location:** `forge-ui/src/app/shared/services/timer-hub.service.ts`
 
 Used by the time tracking feature. Supports explicit user group management.
 
@@ -234,7 +234,7 @@ Auto-rejoins user groups after reconnection via `onreconnected` handler.
 
 ### ChatHubService
 
-**Location:** `qb-engineer-ui/src/app/shared/services/chat-hub.service.ts`
+**Location:** `forge-ui/src/app/shared/services/chat-hub.service.ts`
 
 Connects when the chat feature is opened. Registers a single `messageReceived` event handler.
 
@@ -246,7 +246,7 @@ chatHub.onMessageReceived((event) => this.handleNewMessage(event));
 
 ## ConnectionBannerComponent
 
-**Location:** `qb-engineer-ui/src/app/shared/components/connection-banner/`
+**Location:** `forge-ui/src/app/shared/components/connection-banner/`
 
 Displays a warning banner when SignalR connections are degraded. Added to `app.component.html` with no configuration needed:
 
@@ -315,15 +315,15 @@ This pattern is used by: `CreateJobHandler`, `UpdateJobHandler`, `MoveJobStageHa
 
 | File | Purpose |
 |------|---------|
-| `qb-engineer-server/qb-engineer.api/Hubs/BoardHub.cs` | Board hub: JoinBoard, LeaveBoard, JoinJob, LeaveJob |
-| `qb-engineer-server/qb-engineer.api/Hubs/NotificationHub.cs` | Notification hub: auto user group join/leave |
-| `qb-engineer-server/qb-engineer.api/Hubs/TimerHub.cs` | Timer hub: auto user group join/leave |
-| `qb-engineer-server/qb-engineer.api/Hubs/ChatHub.cs` | Chat hub: auto user group + JoinRoom/LeaveRoom |
-| `qb-engineer-ui/src/app/shared/services/signalr.service.ts` | Singleton connection manager |
-| `qb-engineer-ui/src/app/shared/services/board-hub.service.ts` | Board event registration and group management |
-| `qb-engineer-ui/src/app/shared/services/notification-hub.service.ts` | Notification push integration |
-| `qb-engineer-ui/src/app/shared/services/timer-hub.service.ts` | Timer event registration |
-| `qb-engineer-ui/src/app/shared/services/chat-hub.service.ts` | Chat message event registration |
-| `qb-engineer-ui/src/app/shared/components/connection-banner/connection-banner.component.ts` | Reconnecting/disconnected warning UI |
-| `qb-engineer-ui/src/app/shared/models/signalr.model.ts` | `ConnectionState` type |
-| `qb-engineer-ui/src/app/shared/models/timer-event.model.ts` | `TimerEvent` interface |
+| `forge-api/forge.api/Hubs/BoardHub.cs` | Board hub: JoinBoard, LeaveBoard, JoinJob, LeaveJob |
+| `forge-api/forge.api/Hubs/NotificationHub.cs` | Notification hub: auto user group join/leave |
+| `forge-api/forge.api/Hubs/TimerHub.cs` | Timer hub: auto user group join/leave |
+| `forge-api/forge.api/Hubs/ChatHub.cs` | Chat hub: auto user group + JoinRoom/LeaveRoom |
+| `forge-ui/src/app/shared/services/signalr.service.ts` | Singleton connection manager |
+| `forge-ui/src/app/shared/services/board-hub.service.ts` | Board event registration and group management |
+| `forge-ui/src/app/shared/services/notification-hub.service.ts` | Notification push integration |
+| `forge-ui/src/app/shared/services/timer-hub.service.ts` | Timer event registration |
+| `forge-ui/src/app/shared/services/chat-hub.service.ts` | Chat message event registration |
+| `forge-ui/src/app/shared/components/connection-banner/connection-banner.component.ts` | Reconnecting/disconnected warning UI |
+| `forge-ui/src/app/shared/models/signalr.model.ts` | `ConnectionState` type |
+| `forge-ui/src/app/shared/models/timer-event.model.ts` | `TimerEvent` interface |

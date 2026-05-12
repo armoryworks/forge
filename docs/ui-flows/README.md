@@ -1,4 +1,4 @@
-# QB Engineer — UI Flow Documentation
+# Forge — UI Flow Documentation
 
 **Generated:** 2026-03-22
 **Purpose:** Training documentation for the AI help system and human onboarding.

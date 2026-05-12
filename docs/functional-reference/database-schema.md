@@ -1,7 +1,7 @@
 # Database Schema Reference
 
-> Comprehensive schema reference for the QB Engineer PostgreSQL database.
-> Auto-generated from entity definitions in `qb-engineer.core/Entities/` and `qb-engineer.data/Context/`.
+> Comprehensive schema reference for the Forge PostgreSQL database.
+> Auto-generated from entity definitions in `forge.core/Entities/` and `forge.data/Context/`.
 
 ---
 

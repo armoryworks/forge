@@ -1,31 +1,31 @@
 # Release Manifest
 
 Each row is a tested combination of sibling repo versions that ship
-together as a release of the qb-engineer platform.
+together as a release of the forge platform.
 
 When installing, pull the sibling versions named in the row matching the
-master tag you're targeting. The `qb-engineer-deploy` repo's
-`docker-compose.yml` references the `qb-engineer-ui` and
-`qb-engineer-server` image tags by version, so checking out the right
+master tag you're targeting. The `forge-deploy` repo's
+`docker-compose.yml` references the `forge-ui` and
+`forge-api` image tags by version, so checking out the right
 deploy tag automatically pulls the right images.
 
 ## Releases
 
 | Master tag | UI | Server | Deploy | Test | Notes |
 |---|---|---|---|---|---|
-| `v0.0.1` | `v0.0.1` | `v0.0.1` | `v0.0.1` | `v0.0.1` | Initial extraction from monorepo. Same code as `qb-engineer-wrapper@7820bdd` (the last commit before the split). |
+| `v0.0.1` | `v0.0.1` | `v0.0.1` | `v0.0.1` | `v0.0.1` | Initial extraction from monorepo. Same code as `forge-wrapper@7820bdd` (the last commit before the split). |
 
 ## How to release
 
 1. Pick the sibling versions to bundle. They are already tagged
-   automatically — image repos (`qb-engineer-server`, `qb-engineer-ui`,
-   `qb-engineer-test`) auto-bump patch on every main push and publish
+   automatically — image repos (`forge-api`, `forge-ui`,
+   `forge-test`) auto-bump patch on every main push and publish
    `<X.Y.Z>` tags to GHCR. See
    [docs/cicd-design.md §Phase 8 addendum](./docs/cicd-design.md) and
-   [qb-engineer-deploy/CONTRIBUTING.md](https://github.com/danielhokanson/qb-engineer-deploy/blob/main/CONTRIBUTING.md)
+   [forge-deploy/CONTRIBUTING.md](https://github.com/danielhokanson/forge-deploy/blob/main/CONTRIBUTING.md)
    for the auto-bump model.
-2. Update `qb-engineer-deploy/docker-compose.yml` to reference the
-   chosen image tags. Tag and release `qb-engineer-deploy` (manual,
+2. Update `forge-deploy/docker-compose.yml` to reference the
+   chosen image tags. Tag and release `forge-deploy` (manual,
    no auto-bump — deploy repo publishes no image).
 3. Add a row to this manifest with the master tag + sibling versions.
 4. Tag this repo (`git tag -a vX.Y.Z -m "..."`) and push.
@@ -36,8 +36,8 @@ deploy tag automatically pulls the right images.
 
 - **Independent semver per repo.** A bug fix in the UI doesn't bump the
   server's version.
-- **Image repo patch bumps are automatic.** `qb-engineer-server`,
-  `qb-engineer-ui`, and `qb-engineer-test` derive patch from
+- **Image repo patch bumps are automatic.** `forge-api`,
+  `forge-ui`, and `forge-test` derive patch from
   `BASE + (commits since VERSION was last touched)` in CI. Operators
   bump minor/major by editing the `VERSION` file at the repo root and
   pushing; the next CI build picks up the new base and resets distance
