@@ -5,12 +5,16 @@
 /forge-test/
 /forge-voice/
 
-# --- Files hard-linked / junctioned in from sibling repos (owned by deploy) ---
+# --- Wrapper-local copy (relative paths differ from forge-deploy's) ---
 /docker-compose.yml
+
+# --- Hard-linked from forge-deploy/ (identical content; edit either side) ---
 /docker-compose.dev.yml
 /docker-compose.demo.yml
 /docker-compose.cohost.yml
 /docker-compose.export.yml
+
+# --- Junctioned to forge-deploy/tools (Windows directory link) ---
 /tools/
 
 # --- Local-only runtime artifacts ---
