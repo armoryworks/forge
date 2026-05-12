@@ -1,0 +1,72 @@
+# Ephemeral export stack — stands up a throwaway Postgres + API, seeds it,
+# dumps every business entity to JSON under ./forge-ui/public/demo-data,
+# then exits. Does NOT touch the dev database or dev stack.
+#
+# Usage (prefer the wrapper scripts):
+#   ./export-demo-data.sh    (bash / WSL / Linux / macOS)
+#   .\export-demo-data.ps1   (Windows PowerShell)
+#
+# Manual invocation — the `-p forge-export` project flag is REQUIRED
+# so this stack doesn't collide with the dev stack in `docker compose ps`:
+#   docker compose -p forge-export -f docker-compose.export.yml up --abort-on-container-exit --build
+#   docker compose -p forge-export -f docker-compose.export.yml down -v
+#
+# Container names are `*-export` to avoid any collision with a running dev stack.
+# No host ports are published. Postgres data is tmpfs (ephemeral).
+
+services:
+  forge-export:
+    image: pgvector/pgvector:pg17
+    container_name: forge-export
+    environment:
+      - POSTGRES_DB=forge_export
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=export-only-not-persisted
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d forge_export"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    networks:
+      - export-net
+
+  forge-api-export:
+    build:
+      context: ./forge-api
+      dockerfile: forge.api/Dockerfile
+    container_name: forge-api-export
+    # Run as root so the container can write JSON into the host bind-mount.
+    # The normal image user is `appuser`; that's fine for prod but awkward
+    # for a one-shot export whose whole job is writing files to the host.
+    user: "0:0"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - RECREATE_DB=false
+      - SEED_DEMO_DATA=true
+      - SEED_USER_PASSWORD=ExportPass123!
+      - EXPORT_DEMO_DATA=/out
+      - MockIntegrations=true
+      - ConnectionStrings__DefaultConnection=Host=forge-export;Port=5432;Database=forge_export;Username=postgres;Password=export-only-not-persisted
+      - Jwt__Key=export-only-dummy-key-min-32-chars-padding
+      - Jwt__Issuer=forge-export
+      - Jwt__Audience=forge-export
+      - Storage__Provider=local
+      - LocalStorage__RootPath=/tmp/export-storage
+      - LocalStorage__PublicBaseUrl=http://localhost
+      - FrontendBaseUrl=http://localhost
+      - FormRendererBaseUrl=http://localhost
+    volumes:
+      - ./forge-ui/public/demo-data:/out
+      - ./docs:/app/docs:ro
+    depends_on:
+      forge-export:
+        condition: service_healthy
+    restart: "no"
+    networks:
+      - export-net
+
+networks:
+  export-net:
+    driver: bridge

@@ -8,14 +8,17 @@
 # --- Wrapper-local copy (relative paths differ from forge-deploy's) ---
 /docker-compose.yml
 
-# --- Hard-linked from forge-deploy/ (identical content; edit either side) ---
-/docker-compose.dev.yml
-/docker-compose.demo.yml
-/docker-compose.cohost.yml
-/docker-compose.export.yml
-
 # --- Junctioned to forge-deploy/tools (Windows directory link) ---
 /tools/
+
+# Note: the four overlay compose files (docker-compose.{dev,demo,cohost,
+# export}.yml) USED to be gitignored here under a "hard-linked, owned by
+# forge-deploy" model. That model meant CI couldn't verify parity (the
+# wrapper checkout had no copies to check). Now the four files are
+# tracked in BOTH the wrapper and forge-deploy, hard-links keep them in
+# sync locally, and .github/workflows/wrapper-invariants.yml verifies
+# the wrapper's committed content matches forge-deploy's committed
+# content on every PR + push.
 
 # --- Local-only runtime artifacts ---
 /.env

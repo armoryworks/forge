@@ -76,11 +76,17 @@ forge/                 ← this repo (docs, governance)
 
 The bootstrap script also hard-links the four overlay compose files
 (`docker-compose.{dev,demo,cohost,export}.yml`) from `forge-deploy/`
-and junctions `tools/` to `forge-deploy/tools/`, so the wrapper sees
-the same canonical copies forge-deploy ships. The base
-`docker-compose.yml` stays an independent wrapper-local file because
-its relative build-context paths (`./forge-ui`) differ from
-forge-deploy's (`../forge-ui`).
+and junctions `tools/` to `forge-deploy/tools/`, so editing either
+side propagates to the other locally. The four overlays are tracked
+in **both** repos; CI verifies they stay byte-identical on every PR
+and push. When you edit one, commit it in both repos. If a `git
+checkout` ever breaks the underlying inode share, run
+`bash scripts/relink.sh` to re-establish it (verify with
+`bash scripts/check-overlay-parity.sh`).
+
+The base `docker-compose.yml` stays an independent wrapper-local
+file because its relative build-context paths (`./forge-ui`) differ
+from forge-deploy's (`../forge-ui`).
 
 Read [`CONTRIBUTING.md`](./CONTRIBUTING.md) before opening a PR.
 
