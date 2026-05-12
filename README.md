@@ -5,10 +5,11 @@ engineering and production management for small-to-mid shops.
 
 > **This is the umbrella repo.** The actual code lives in sibling repos:
 >
-> - **[forge-ui](https://github.com/danielhokanson/forge-ui)** — Angular 21 frontend
-> - **[forge-api](https://github.com/danielhokanson/forge-api)** — .NET 9 API + EF migrations
-> - **[forge-deploy](https://github.com/danielhokanson/forge-deploy)** — docker-compose + ops scripts (start here to install)
-> - **[forge-test](https://github.com/danielhokanson/forge-test)** — manual test plans for human testers
+> - **[forge-ui](https://github.com/armoryworks/forge-ui)** — Angular 21 frontend
+> - **[forge-api](https://github.com/armoryworks/forge-api)** — .NET 9 API + EF migrations
+> - **[forge-deploy](https://github.com/armoryworks/forge-deploy)** — docker-compose + ops scripts (start here to install)
+> - **[forge-test](https://github.com/armoryworks/forge-test)** — manual test plans for human testers
+> - **[forge-voice](https://github.com/armoryworks/forge-voice)** — Asterisk-based voice / telephony integration
 
 This repo holds project-level documentation, governance, and the
 release manifest pinning which sibling versions ship together.
@@ -32,7 +33,7 @@ designed to scale to small-team use without a Kubernetes commitment.
 
 ```bash
 # Clone the deploy repo
-git clone https://github.com/danielhokanson/forge-deploy.git
+git clone https://github.com/armoryworks/forge-deploy.git
 cd forge-deploy
 
 # Run the setup wizard (Linux/macOS)
@@ -44,7 +45,7 @@ cd forge-deploy
 
 The setup script handles prerequisite checks, env file generation, JWT
 key creation, and starts the stack via `docker compose up -d`. See
-[forge-deploy](https://github.com/danielhokanson/forge-deploy) for
+[forge-deploy](https://github.com/armoryworks/forge-deploy) for
 full installation docs.
 
 ---
@@ -52,11 +53,11 @@ full installation docs.
 ## Get started (for contributors)
 
 Clone this umbrella repo and run the bootstrap script — it clones all
-five sibling repos into sibling directories so you have the full project
-laid out for cross-cutting work:
+five sibling repos as children of the wrapper so you have the full
+project laid out for cross-cutting work:
 
 ```bash
-git clone https://github.com/danielhokanson/forge.git
+git clone https://github.com/armoryworks/forge.git
 cd forge
 ./bootstrap.sh        # Linux/macOS
 .\bootstrap.ps1       # Windows
@@ -65,13 +66,21 @@ cd forge
 After bootstrap, your directory layout looks like:
 
 ```
-.../wherever/
-├── forge/          ← this repo (docs, governance)
-├── forge-ui/       ← Angular code
-├── forge-api/   ← .NET code
-├── forge-deploy/   ← docker-compose + scripts
-└── forge-test/     ← manual test plans
+forge/                 ← this repo (docs, governance)
+├── forge-ui/          ← Angular code
+├── forge-api/         ← .NET code
+├── forge-deploy/      ← docker-compose + scripts
+├── forge-test/        ← manual test plans
+└── forge-voice/       ← Asterisk voice / telephony integration
 ```
+
+The bootstrap script also hard-links the four overlay compose files
+(`docker-compose.{dev,demo,cohost,export}.yml`) from `forge-deploy/`
+and junctions `tools/` to `forge-deploy/tools/`, so the wrapper sees
+the same canonical copies forge-deploy ships. The base
+`docker-compose.yml` stays an independent wrapper-local file because
+its relative build-context paths (`./forge-ui`) differ from
+forge-deploy's (`../forge-ui`).
 
 Read [`CONTRIBUTING.md`](./CONTRIBUTING.md) before opening a PR.
 
