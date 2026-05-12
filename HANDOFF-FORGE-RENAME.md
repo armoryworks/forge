@@ -444,4 +444,40 @@ This HANDOFF doc covers ONLY the rename + restructure pass. Future work tracked 
 - **Forms API**: future MCP work, separate release.
 - **Slides API**: future MCP work, separate release.
 
+## Post-rename operational cleanup (for the user, after Phase G)
+
+These are concrete on-disk and infrastructure cleanups that the user (not the agent in-editor) should perform after the rename is committed and pushed. The VS Code agent cannot do these because they require closing the editor on the workspace first (Windows file locks) or touching infrastructure outside the repo.
+
+### 1. Outer workspace directory rename on disk
+
+When you are ready to close VS Code on this workspace and reopen at `E:/dev/forge/`:
+
+```powershell
+cd E:/dev
+mv qb-engineer forge
+cd forge
+mv qb-engineer-server forge-api
+mv qb-engineer-ui forge-ui
+mv qb-engineer-test forge-test
+mv qb-engineer-deploy forge-deploy
+mv qb-engineer-voice forge-voice
+```
+
+Then update `docker-compose.yml` in the now-`forge` directory: drop the temporary `./qb-engineer-*` `build.context:` paths back to `./forge-*` (one commit on the wrapper repo). This is the last lingering reference to the old name in the active workspace.
+
+### 2. Old Docker volume cleanup
+
+After verifying the new stack boots cleanly with the renamed compose configuration and data has been backed up or migrated, reclaim disk:
+
+```powershell
+docker volume rm qb-engineer_pgdata qb-engineer_miniodata
+```
+
+The new stack's volumes are differently named (e.g., `forge_pgdata`, `forge_miniodata`) so this is pure garbage collection. Verify the new volumes exist and contain expected data BEFORE removing the old ones.
+
+### 3. armoryworks user → org conversion
+
+A GitHub support ticket is open to convert the `armoryworks` user account into an organization. While that ticket is pending, repositories work fine under the user-flavored namespace — clone, push, fork, and PRs all behave the same. After conversion completes, team-level features become available (multi-seat management, team-scoped permissions, organization audit log API). No repo URLs change. The GitHub Team Plan subscription (D-021) charges already, but its org-only benefits (team management, role permissions) only fully activate once the namespace is converted.
+
 End of handoff.
+                                                                                                                                                                                            
