@@ -332,7 +332,7 @@ For existing users without a password:
 
 ## ApplicationUser Entity
 
-The `ApplicationUser` extends `IdentityUser<int>` and is located in `qb-engineer.data/Context/ApplicationUser.cs`.
+The `ApplicationUser` extends `IdentityUser<int>` and is located in `forge.data/Context/ApplicationUser.cs`.
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -364,7 +364,7 @@ The `ApplicationUser` extends `IdentityUser<int>` and is located in `qb-engineer
 
 ## EmployeeProfile Entity
 
-The `EmployeeProfile` entity stores employee-specific profile data separate from the authentication identity. Located in `qb-engineer.core/Entities/EmployeeProfile.cs`.
+The `EmployeeProfile` entity stores employee-specific profile data separate from the authentication identity. Located in `forge.core/Entities/EmployeeProfile.cs`.
 
 | Field | Type | Description |
 |-------|------|-------------|

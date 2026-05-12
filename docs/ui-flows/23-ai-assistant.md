@@ -67,7 +67,7 @@ Positions are described relative to a standard 1920×1080 desktop layout.
 
 ### 📋 Top of Content Area (first rows, column headers)
 
-- **General AssistantGeneral-purpose help for navigating and using QB Engineer.** — look for the `smart_toy` icon (left side of toolbar)
+- **General AssistantGeneral-purpose help for navigating and using Forge.** — look for the `smart_toy` icon (left side of toolbar)
 - **HR AssistantEmployee onboarding, compliance, training, and policy guidance.** — look for the `badge` icon (left side of toolbar)
 
 ### 📄 Middle of Page (main content)

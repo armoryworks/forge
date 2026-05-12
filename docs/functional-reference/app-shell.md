@@ -2,7 +2,7 @@
 
 ## Overview
 
-The application shell is the persistent layout wrapper that surrounds every authenticated page in QB Engineer. It provides navigation, global search, notifications, theme switching, real-time connection status, offline resilience indicators, and a loading overlay. The shell is conditionally rendered: it appears only when the user is authenticated and the current route is not a display route (shop floor kiosk, form render) or auth route (login, setup, SSO callback).
+The application shell is the persistent layout wrapper that surrounds every authenticated page in Forge. It provides navigation, global search, notifications, theme switching, real-time connection status, offline resilience indicators, and a loading overlay. The shell is conditionally rendered: it appears only when the user is authenticated and the current route is not a display route (shop floor kiosk, form render) or auth route (login, setup, SSO callback).
 
 The shell is implemented across these primary components:
 
@@ -365,7 +365,7 @@ The dropdown is 260px wide, positioned below the trigger with an 8px gap, at z-i
 
 ### About Dialog
 
-Opens as an `<app-dialog>` with title "About QB Engineer" at 420px width. Contains:
+Opens as an `<app-dialog>` with title "About Forge" at 420px width. Contains:
 
 - Application logo text "QB:Eng" in heading size with primary color
 - Tagline: "Manufacturing Operations Platform" (uppercase, muted)

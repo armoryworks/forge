@@ -1,6 +1,6 @@
 # OEE (Overall Equipment Effectiveness)
 
-> Functional reference for the OEE feature of QB Engineer.
+> Functional reference for the OEE feature of Forge.
 
 ## Overview
 

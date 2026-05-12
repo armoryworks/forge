@@ -85,7 +85,7 @@ All authenticated users can access their own compliance forms:
 
 ### ComplianceFormTemplate
 
-Defines a compliance form type and its configuration. Located in `qb-engineer.core/Entities/ComplianceFormTemplate.cs`.
+Defines a compliance form type and its configuration. Located in `forge.core/Entities/ComplianceFormTemplate.cs`.
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -115,7 +115,7 @@ Defines a compliance form type and its configuration. Located in `qb-engineer.co
 
 ### ComplianceFormSubmission
 
-Tracks an employee's interaction with a compliance form. Located in `qb-engineer.core/Entities/ComplianceFormSubmission.cs`.
+Tracks an employee's interaction with a compliance form. Located in `forge.core/Entities/ComplianceFormSubmission.cs`.
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -140,7 +140,7 @@ Tracks an employee's interaction with a compliance form. Located in `qb-engineer
 
 ### FormDefinitionVersion
 
-Versioned, effective-dated form definitions. Located in `qb-engineer.core/Entities/FormDefinitionVersion.cs`.
+Versioned, effective-dated form definitions. Located in `forge.core/Entities/FormDefinitionVersion.cs`.
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -162,7 +162,7 @@ Versioned, effective-dated form definitions. Located in `qb-engineer.core/Entiti
 
 ### IdentityDocument
 
-Identity documents uploaded by employees for I-9 verification. Located in `qb-engineer.core/Entities/IdentityDocument.cs`.
+Identity documents uploaded by employees for I-9 verification. Located in `forge.core/Entities/IdentityDocument.cs`.
 
 | Field | Type | Description |
 |-------|------|-------------|

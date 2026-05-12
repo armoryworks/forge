@@ -1,6 +1,6 @@
-# QB Engineer API Reference
+# Forge API Reference
 
-Comprehensive reference for all REST API endpoints exposed by the QB Engineer backend.
+Comprehensive reference for all REST API endpoints exposed by the Forge backend.
 
 ---
 
@@ -112,7 +112,7 @@ Comprehensive reference for all REST API endpoints exposed by the QB Engineer ba
 
 ## Overview
 
-The QB Engineer API is a RESTful JSON API built on ASP.NET Core 9. All endpoints are prefixed with `/api/v1/`. The API uses MediatR (CQRS pattern) internally -- controllers are thin dispatchers to command/query handlers.
+The Forge API is a RESTful JSON API built on ASP.NET Core 9. All endpoints are prefixed with `/api/v1/`. The API uses MediatR (CQRS pattern) internally -- controllers are thin dispatchers to command/query handlers.
 
 ---
 

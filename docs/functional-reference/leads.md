@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Leads feature is QB Engineer's sales pipeline management tool. It tracks prospective customers from initial contact through conversion to a full customer record, providing visibility into the sales funnel for PM, Manager, and Admin roles.
+The Leads feature is Forge's sales pipeline management tool. It tracks prospective customers from initial contact through conversion to a full customer record, providing visibility into the sales funnel for PM, Manager, and Admin roles.
 
 Leads represent companies or individuals who have expressed interest but are not yet customers in the system. The feature supports two views -- a sortable/filterable data table and a visual drag-and-drop pipeline board -- and provides a conversion workflow that creates a Customer (and optionally a Job) from a qualified lead.
 

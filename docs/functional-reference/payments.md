@@ -252,7 +252,7 @@ The `PaymentMethod` enum defines accepted payment types:
 
 ## Entity
 
-**Payment** (`qb-engineer.core/Entities/Payment.cs`): extends `BaseAuditableEntity`.
+**Payment** (`forge.core/Entities/Payment.cs`): extends `BaseAuditableEntity`.
 
 | Property | Type | Notes |
 |----------|------|-------|
@@ -270,7 +270,7 @@ The `PaymentMethod` enum defines accepted payment types:
 | AppliedAmount | decimal | Computed: sum of application amounts |
 | UnappliedAmount | decimal | Computed: amount - appliedAmount |
 
-**PaymentApplication** (`qb-engineer.core/Entities/PaymentApplication.cs`): extends `BaseEntity`.
+**PaymentApplication** (`forge.core/Entities/PaymentApplication.cs`): extends `BaseEntity`.
 
 | Property | Type | Notes |
 |----------|------|-------|

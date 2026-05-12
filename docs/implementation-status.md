@@ -38,7 +38,7 @@ Legend: Done | Partial | Not Started | N/A (deferred or out of scope)
 | Three.js (STL viewer) | architecture.md §Stack | Done | Lazy-loaded StlViewerComponent, wired into part detail "3D View" tab |
 | SignalR | architecture.md §Stack | Done | 4 hubs (Board, Notification, Timer, Chat) — all functional with typed events, group management, reconnect handling |
 | Hangfire | architecture.md §Stack | Done | 14 recurring jobs, PostgreSQL storage, dashboard |
-| Mapperly | architecture.md §Stack | Done | 6 mappers (Job, Part, Customer, Expense, Asset, Lead) in qb-engineer.api/Mappers/ |
+| Mapperly | architecture.md §Stack | Done | 6 mappers (Job, Part, Customer, Expense, Asset, Lead) in forge.api/Mappers/ |
 | OpenAPI + Scalar | architecture.md §Stack | Done | API docs available |
 | Docker Compose | architecture.md §Docker | Done | 6 containers running (AI optional via profile), Alpine images, non-root user, health checks, resource limits |
 | CI/CD Pipeline | architecture.md §CI/CD | Done | GitHub Actions: parallel build+test (Angular + .NET), Docker image build on main push |
@@ -452,7 +452,7 @@ Legend: Done | Partial | Not Started | N/A (deferred or out of scope)
 | Track type management | proposal.md §4.23 | Done | Full CRUD with stage management dialog |
 | Reference data management | proposal.md §4.23 | Done | Admin tab |
 | Accounting setup wizard | proposal.md §4.23 | Done | IntegrationsPanelComponent: provider list, active provider selection, QB OAuth connect/disconnect, sync status, coming-soon badges for Xero/FreshBooks/Sage |
-| Branding (logo, colors) | proposal.md §4.23 | Done | Brand colors + logo upload (MinIO qb-engineer-branding bucket), admin UI with upload/remove, header displays logo |
+| Branding (logo, colors) | proposal.md §4.23 | Done | Brand colors + logo upload (MinIO forge-branding bucket), admin UI with upload/remove, header displays logo |
 | System settings UI | proposal.md §4.23 | Done | Admin Settings tab with 10 configurable settings, upsert API |
 | Company profile | Plan: Company Profile | Done | System settings key-value (company.name/phone/email/ein/website), GET/PATCH admin endpoints, profile form in admin settings tab |
 | Company locations | Plan: Company Locations | Done | CompanyLocation entity + CRUD controller (6 endpoints), admin locations DataTable with create/edit/delete/set-default, CompanyLocationDialogComponent with AddressFormComponent |
@@ -622,9 +622,9 @@ Legend: Done | Partial | Not Started | N/A (deferred or out of scope)
 | **Admin compliance tab** | Plan §Phase 4 | Done | ComplianceTemplatesPanelComponent (DataTable CRUD), ComplianceTemplateDialogComponent, UserCompliancePanelComponent |
 | **Admin service methods** | Plan §Phase 4 | Done | Template CRUD, sync, getUserComplianceDetail, sendReminder, verifyIdentityDocument |
 | **Docker DocuSeal container** | Plan §Phase 5 | Done | 8th container, profiles: [signing], docusealdata volume |
-| **nginx DocuSeal proxy** | Plan §Phase 5 | Done | /docuseal/ → qb-engineer-signing:3000 |
+| **nginx DocuSeal proxy** | Plan §Phase 5 | Done | /docuseal/ → forge-signing:3000 |
 | **appsettings DocuSeal** | Plan §Phase 5 | Done | DocuSeal section in appsettings.json + docker-compose env vars |
-| **PII MinIO bucket** | Plan §Phase 1 | Done | qb-engineer-pii-docs bucket in MinioOptions |
+| **PII MinIO bucket** | Plan §Phase 1 | Done | forge-pii-docs bucket in MinioOptions |
 | **Per-employee state withholding** | Plan §Phase 9 | Done | 3-tier state resolution: WorkLocation.State → default CompanyLocation → company_state setting. No-tax states auto-complete. StateWithholdingInfoModel on responses. |
 | **State withholding admin banner** | Plan §Phase 9 | Done | UserCompliancePanelComponent shows state name, category, resolution source |
 | **Electronic form definitions** | Plan §Phase 10 | Done | FormDefinitionJson (jsonb) + FormDefinitionRevision on ComplianceFormTemplate. Dynamic form rendering from JSON definition. |
@@ -642,7 +642,7 @@ Legend: Done | Partial | Not Started | N/A (deferred or out of scope)
 
 | Item | Status | Notes |
 |------|--------|-------|
-| **`OnboardingSubmitRequestModel` / result / status models** | Done | `qb-engineer.core/Models/OnboardingModels.cs` — all fields for 7 wizard steps, signing URL list, per-category completion status |
+| **`OnboardingSubmitRequestModel` / result / status models** | Done | `forge.core/Models/OnboardingModels.cs` — all fields for 7 wizard steps, signing URL list, per-category completion status |
 | **`SubmitOnboarding` handler** | Done | Loads W-4/I-9/StateWithholding templates → `BuildFormDataDictionary()` (40+ canonical keys) → `FillAndSubmitFormForSigningCommand` per template → upserts EmployeeProfile (address, phone, DOB, direct deposit) → marks acknowledgments |
 | **`GetOnboardingStatus` handler** | Done | Reads EmployeeProfile timestamps → returns `OnboardingStatusModel` with per-category booleans + `AllComplete`/`CanBeAssigned` flags |
 | **`OnboardingController`** | Done | `POST /api/v1/onboarding/submit`, `GET /api/v1/onboarding/status` |
@@ -801,8 +801,8 @@ Legend: Done | Partial | Not Started | N/A (deferred or out of scope)
 | NotificationHubService | Done | Hub + panel + header bell wired |
 | TimerHubService | Done | Full SignalR integration: connect/disconnect, onTimerStartedEvent/onTimerStoppedEvent, wired in time-tracking component |
 | DraftService | Done | Draft orchestrator: register/unregister forms, debounced auto-save (2.5s), TTL management, cross-tab event handling |
-| DraftStorageService | Done | IndexedDB wrapper (`qb-engineer-drafts` DB), userId index |
-| DraftBroadcastService | Done | Cross-tab BroadcastChannel `qb-engineer-draft-sync` |
+| DraftStorageService | Done | IndexedDB wrapper (`forge-drafts` DB), userId index |
+| DraftBroadcastService | Done | Cross-tab BroadcastChannel `forge-draft-sync` |
 | DraftRecoveryService | Done | Post-login recovery, 5-min TTL grace period, logout warning dialog |
 | DirtyFormIndicatorComponent | Done | Orange dot + "Unsaved changes" chip for dirty forms |
 | DraftRecoveryBannerComponent | Done | Per-form "Recovered from [timestamp]. [Discard]" banner |
@@ -1080,7 +1080,7 @@ See `phase-4-output/PHASE-4-CLOSEOUT.md` for the closeout artifact.
 
 ### Coding Standards Remediation
 - **One Object Per File (Angular):** Split 16 model files into 115 individual files. TrackType + Stage promoted to `shared/models/` (used by 3+ features). 35 consumer files had imports updated.
-- **One Object Per File (.NET):** Split 18 model files into 103 individual files in `qb-engineer.core/Models/`. Namespace unchanged, no import updates needed.
+- **One Object Per File (.NET):** Split 18 model files into 103 individual files in `forge.core/Models/`. Namespace unchanged, no import updates needed.
 - **Inline Template Extraction:** 8 shared components extracted from `template:` → `templateUrl:` + `.component.html` files (page-header, dialog, select, datepicker, toggle, textarea, input, toast).
 - **Inline Style Extraction:** Same 8 components extracted from `styles:` → `styleUrl:` + `.component.scss` files.
 - **SCSS Variable Remediation:** 22 component SCSS files remediated — 80+ hardcoded values replaced with design system variables. New variables added to `_variables.scss`: `$sp-xxs`, `$sp-2xl`–`$sp-4xl`, `$icon-size-xs`–`$icon-size-hero`, `$font-size-md`/`lg`/`xl`/`heading`, `$avatar-size-*`, `$dot-size-*`, `$badge-size-*`, `$progress-bar-height`, `$sidebar-nav-height`, `$sidebar-icon-size`, `$btn-icon-size`, `$input-height`, `$chip-padding-sm`, `$chart-height`, `$detail-panel-width`, `$notification-panel-width`, `$shadow-panel`, `$shadow-dropdown`, `$backdrop-color`.
@@ -1109,7 +1109,7 @@ See `phase-4-output/PHASE-4-CLOSEOUT.md` for the closeout artifact.
 ### QuestPDF PDF Generation (2 documents)
 - Invoice PDF: Full layout with header, line items table, totals, payment info, notes. GET /api/v1/invoices/{id}/pdf
 - Packing Slip PDF: Ship-to address, line items from SO, signature line. GET /api/v1/shipments/{id}/packing-slip
-- Company name from SystemSetting (fallback: "QB Engineer")
+- Company name from SystemSetting (fallback: "Forge")
 
 ### SMTP Email (MailKit)
 - IEmailService interface + SmtpEmailService (real) + MockEmailService
@@ -1171,7 +1171,7 @@ See `phase-4-output/PHASE-4-CLOSEOUT.md` for the closeout artifact.
 
 ### Mapperly Source-Generated Mapping
 - Installed `Riok.Mapperly` 4.3.1 NuGet package
-- 6 mapper files in `qb-engineer.api/Mappers/`: JobMapper, PartMapper, CustomerMapper, ExpenseMapper, AssetMapper, LeadMapper
+- 6 mapper files in `forge.api/Mappers/`: JobMapper, PartMapper, CustomerMapper, ExpenseMapper, AssetMapper, LeadMapper
 - Source-generated `ToListModel()` / `ToDetailModel()` / `ToResponseModel()` extension methods
 - Manual helpers for complex mappings with navigation properties (Job, Part, Expense)
 
@@ -1276,7 +1276,7 @@ See `phase-4-output/PHASE-4-CLOSEOUT.md` for the closeout artifact.
 - Tests cover login/logout, token management, theme toggle/persistence, form validation extraction, loading state management
 
 ### .NET Unit Tests (xUnit + Bogus + Moq)
-- 6 test classes in qb-engineer.tests project: CreateJobHandler, UpdateJobHandler, MoveJobStageHandler, CreatePartHandler, StartTimerHandler, StopTimerHandler
+- 6 test classes in forge.tests project: CreateJobHandler, UpdateJobHandler, MoveJobStageHandler, CreatePartHandler, StartTimerHandler, StopTimerHandler
 - Repository/context mocking with Moq, test data via Bogus
 
 ### Accessibility (WCAG)
@@ -1287,8 +1287,8 @@ See `phase-4-output/PHASE-4-CLOSEOUT.md` for the closeout artifact.
 
 ### Offline Resilience & PWA Infrastructure
 - `ngsw-config.json`: Service Worker config with app-shell prefetch, lazy assets, freshness strategies for API
-- `CacheService`: IndexedDB wrapper (`qb-engineer-cache` database) with `get<T>()`, `set()`, `clear()`, `clearAll()` and `lastSynced` timestamps
-- `BroadcastService`: BroadcastChannel `qb-engineer-sync` for multi-tab logout propagation and theme sync
+- `CacheService`: IndexedDB wrapper (`forge-cache` database) with `get<T>()`, `set()`, `clear()`, `clearAll()` and `lastSynced` timestamps
+- `BroadcastService`: BroadcastChannel `forge-sync` for multi-tab logout propagation and theme sync
 - AuthService + ThemeService integrated with BroadcastService
 - `provideServiceWorker()` registered in app.config.ts (production only)
 
@@ -1412,7 +1412,7 @@ See `phase-4-output/PHASE-4-CLOSEOUT.md` for the closeout artifact.
 - Installed `Microsoft.AspNetCore.DataProtection.EntityFrameworkCore`
 - `AppDbContext` implements `IDataProtectionKeyContext` — keys persisted to PostgreSQL
 - `ITokenEncryptionService` interface + `TokenEncryptionService` implementation using `IDataProtector`
-- Purpose string `QbEngineer.OAuthTokens` for OAuth token encryption
+- Purpose string `Forge.OAuthTokens` for OAuth token encryption
 - Configured in Program.cs with `PersistKeysToDbContext` + `SetApplicationName`
 
 ### EFCore.BulkExtensions
@@ -1518,7 +1518,7 @@ See `phase-4-output/PHASE-4-CLOSEOUT.md` for the closeout artifact.
 - `BinStockResponseModel` extended with ReservedQuantity + AvailableQuantity
 
 ### Chunked File Upload
-- `UploadFileChunk` handler: writes chunks to temp dir (`/tmp/qb-engineer-uploads/{uploadId}/`), concatenates on final chunk, uploads to MinIO, cleans up
+- `UploadFileChunk` handler: writes chunks to temp dir (`/tmp/forge-uploads/{uploadId}/`), concatenates on final chunk, uploads to MinIO, cleans up
 - `ChunkedUploadResponseModel`: UploadId, ChunkIndex, IsComplete, FileAttachment?
 - FilesController: `POST {entityType}/{entityId}/files/chunked` endpoint
 - FileUploadZoneComponent: auto-detects large files (> chunkSizeMb input, default 5MB), slices with File.slice(), sequential chunk upload, progress as completedChunks/totalChunks
@@ -1604,7 +1604,7 @@ See `phase-4-output/PHASE-4-CLOSEOUT.md` for the closeout artifact.
 - Seed data: 4 built-in assistants (General, HR, Procurement, Sales & Marketing) with domain-specific system prompts, entity type filters, and starter questions
 - 6 MediatR handlers: GetAiAssistants (active), GetAllAiAssistants (admin), GetAiAssistant, CreateAiAssistant (FluentValidation), UpdateAiAssistant (protects IsBuiltIn), DeleteAiAssistant (409 on built-in)
 - `AiAssistantsController`: GET/POST/PUT/DELETE with role-based auth (admin for mutations)
-- Response/request models in `qb-engineer.core/Models/`
+- Response/request models in `forge.core/Models/`
 
 ### AssistantChat Handler
 - Extended `IAiService` with `GenerateTextAsync(prompt, systemPrompt, temperature, ct)` overload
@@ -1643,7 +1643,7 @@ See `phase-4-output/PHASE-4-CLOSEOUT.md` for the closeout artifact.
 - Test now passes cleanly in ~47s; final screenshot shows all 6 forms completed (green checkmarks)
 
 ### Bug Fix: `ValidateRequiredFields` throws on `"required": null` in JSON
-- **File:** `qb-engineer.api/Features/ComplianceForms/SubmitFormData.cs`
+- **File:** `forge.api/Features/ComplianceForms/SubmitFormData.cs`
 - **Root cause:** `I9FormDefinitionBuilder` serializes `["required"] = required` where `required` is `bool?`. Unset fields serialize as `"required": null`. `req.GetBoolean()` throws `InvalidOperationException` (not `JsonException`) on `null` values — bypassing the `catch (JsonException)` guard.
 - **Fix:** Replaced `req.GetBoolean()` with `req.ValueKind != JsonValueKind.True` — only considers a field required if the JSON value is explicitly `true`.
 - Applied same fix pattern to handle any other nullable boolean fields in form definitions safely.
@@ -1663,9 +1663,9 @@ See `phase-4-output/PHASE-4-CLOSEOUT.md` for the closeout artifact.
 - i18n: `account.downloadFormCopy` added (en + es)
 
 ### Dead `src/assets/i18n/` Removed
-- `qb-engineer-ui/src/assets/` was never served (angular.json assets root = `public/`)
+- `forge-ui/src/assets/` was never served (angular.json assets root = `public/`)
 - Deleted the duplicate `src/assets/i18n/en.json` and `src/assets/i18n/es.json`
-- Canonical i18n path: `qb-engineer-ui/public/assets/i18n/`
+- Canonical i18n path: `forge-ui/public/assets/i18n/`
 
 ### CLAUDE.md Documentation Accuracy Pass
 - Fixed: QB Online and Ollama RAG marked "not yet implemented" → corrected to implemented with file references
@@ -1798,7 +1798,7 @@ See `phase-4-output/PHASE-4-CLOSEOUT.md` for the closeout artifact.
 - `VideoGenerationStatus` enum: None=0, Pending=1, Processing=2, Done=3, Failed=4
 - `VideoMinioKey` + `VideoGenerationStatus` + `VideoGenerationError` fields on `TrainingModule` entity
 - `GET /api/v1/training/modules/{id}/video-status` endpoint — returns presigned MinIO URL (60 min expiry)
-- MinIO bucket: `qb-engineer-training-videos`
+- MinIO bucket: `forge-training-videos`
 
 ### Backend: Hangfire Queue Serialization
 - Added dedicated `video-worker` Hangfire server in `Program.cs` with `WorkerCount = 1`
@@ -1818,7 +1818,7 @@ See `phase-4-output/PHASE-4-CLOSEOUT.md` for the closeout artifact.
 - Playwright browsers baked into build stage: `pwsh playwright.ps1 install chromium ffmpeg`
 - Browser cache copied to runtime image; `chmod 755` applied
 - `PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium` env var set
-- `MinioOptions__PublicEndpoint` env var active in `docker-compose.yml` for presigned URL rewriting (internal `qb-engineer-storage:9000` → `localhost:9000`)
+- `MinioOptions__PublicEndpoint` env var active in `docker-compose.yml` for presigned URL rewriting (internal `forge-storage:9000` → `localhost:9000`)
 
 ### Docs: Training Video Manuscripts (Source Control)
 - `docs/training-videos/01-kanban-board.md` — 10 chapters, full narration scripts, Playwright selectors, chapter timestamps, Playwright generation spec JSON
@@ -1838,7 +1838,7 @@ See `phase-4-output/PHASE-4-CLOSEOUT.md` for the closeout artifact.
 ## Batch — Simulation Infrastructure & IClock (2026-04-03)
 
 ### IClock Abstraction
-- `IClock` interface in `qb-engineer.core/Interfaces/` — injectable clock for testable time-dependent code
+- `IClock` interface in `forge.core/Interfaces/` — injectable clock for testable time-dependent code
 - `SystemClock` implementation (production): wraps `DateTime.UtcNow`
 - `SimulationClock` implementation (E2E): controllable time for deterministic tests
 - Registered via DI in `Program.cs`; `AppDbContext.SetTimestamps()` uses IClock
@@ -1918,10 +1918,10 @@ See `phase-4-output/PHASE-4-CLOSEOUT.md` for the closeout artifact.
 ## Batch — Form Draft System (2026-04-06)
 
 ### Draft Auto-Save System (Client-Side Only)
-- **IndexedDB storage**: `qb-engineer-drafts` database, separate from cache DB
+- **IndexedDB storage**: `forge-drafts` database, separate from cache DB
 - **DraftService**: orchestrator with register/unregister, debounced auto-save (2.5s), TTL management
 - **DraftStorageService**: IndexedDB wrapper with userId index
-- **DraftBroadcastService**: cross-tab sync via `qb-engineer-draft-sync` BroadcastChannel
+- **DraftBroadcastService**: cross-tab sync via `forge-draft-sync` BroadcastChannel
 - **DraftRecoveryService**: post-login recovery prompt, 5-min TTL grace period, logout warning
 
 ### Centralized DialogComponent Integration

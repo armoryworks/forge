@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Kanban Board is the primary job management interface in QB Engineer. It presents jobs as cards organized into columns representing workflow stages, with each board scoped to a specific track type (Production, R&D/Tooling, Maintenance, etc.). The board supports drag-and-drop movement between stages, real-time multi-user sync via SignalR, multi-select bulk operations, and two view modes: a standard column-based board view and a team-based swimlane view.
+The Kanban Board is the primary job management interface in Forge. It presents jobs as cards organized into columns representing workflow stages, with each board scoped to a specific track type (Production, R&D/Tooling, Maintenance, etc.). The board supports drag-and-drop movement between stages, real-time multi-user sync via SignalR, multi-select bulk operations, and two view modes: a standard column-based board view and a team-based swimlane view.
 
 The board is the visual representation of work flowing through the manufacturing pipeline. Jobs progress left-to-right through stages that mirror the physical workflow -- from quoting through production to invoicing. Each track type defines its own set of stages, colors, WIP limits, and irreversibility rules.
 
@@ -1028,7 +1028,7 @@ Used to link stages to accounting documents for irreversibility:
 
 ## Job Entity (Backend)
 
-The `Job` entity (`qb-engineer.core/Entities/Job.cs`) extends `BaseAuditableEntity` and includes:
+The `Job` entity (`forge.core/Entities/Job.cs`) extends `BaseAuditableEntity` and includes:
 
 ### Core Fields
 

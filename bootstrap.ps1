@@ -1,16 +1,16 @@
-# bootstrap.ps1 — clone all qb-engineer sibling repos as siblings of this one.
+# bootstrap.ps1 — clone all forge sibling repos as siblings of this one.
 #
-# Run from inside the qb-engineer\ directory after a fresh clone.
+# Run from inside the forge\ directory after a fresh clone.
 # Idempotent: skips repos that already exist; runs `git pull` instead.
 
 $ErrorActionPreference = "Stop"
 
 $OWNER = "danielhokanson"
-$SIBLINGS = @("qb-engineer-ui", "qb-engineer-server", "qb-engineer-deploy", "qb-engineer-test")
+$SIBLINGS = @("forge-ui", "forge-api", "forge-deploy", "forge-test")
 
 $PARENT_DIR = (Resolve-Path ..).Path
 
-Write-Host "Bootstrapping qb-engineer siblings into: $PARENT_DIR"
+Write-Host "Bootstrapping forge siblings into: $PARENT_DIR"
 Write-Host ""
 
 foreach ($repo in $SIBLINGS) {
@@ -28,6 +28,6 @@ foreach ($repo in $SIBLINGS) {
 
 Write-Host ""
 Write-Host "Done. Sibling layout:"
-Get-ChildItem -Directory -Path $PARENT_DIR -Filter "qb-engineer*" | Select-Object -ExpandProperty FullName
+Get-ChildItem -Directory -Path $PARENT_DIR -Filter "forge*" | Select-Object -ExpandProperty FullName
 Write-Host ""
-Write-Host "Next: cd ..\qb-engineer-deploy ; .\setup.ps1"
+Write-Host "Next: cd ..\forge-deploy ; .\setup.ps1"

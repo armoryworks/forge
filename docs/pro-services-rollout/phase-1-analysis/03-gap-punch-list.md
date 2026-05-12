@@ -21,7 +21,7 @@ This is distinct from Artifact 4 (catalog additions = new capabilities + tables 
 ### G-01 — Adopt `| terminology` on entity nouns and status verbs
 
 - **Tier:** P1
-- **Where:** ~150-300 sites across `qb-engineer-ui/src/app/features/` and `core/layout/`. Today: 0 uses of `| terminology`, 4,297 uses of `| translate`.
+- **Where:** ~150-300 sites across `forge-ui/src/app/features/` and `core/layout/`. Today: 0 uses of `| terminology`, 4,297 uses of `| translate`.
 - **Problem:** TerminologyService loads bundles, the substrate works end-to-end, but no template pipes to it. So a preset's terminology bundle has nowhere to land at render time.
 - **Treatment:** Sweep entity-noun + status-verb i18n keys (those tagged 🏷️ in Artifact 1) and switch their templates from `| translate` to `| terminology`. Sweep is mechanical:
   - Identify keys: `entity_*`, `status_*`, `action_start_production`, etc. — the keys named at noun/verb granularity. Skip `form_*`, `error_*`, `button_*` keys (these are UI copy, stay on translate).
@@ -34,7 +34,7 @@ This is distinct from Artifact 4 (catalog additions = new capabilities + tables 
 ### G-02 — Split `TimeEntry` into billable / non-billable
 
 - **Tier:** P1
-- **Where:** `qb-engineer.core/Entities/TimeEntry.cs`, `qb-engineer.api/Features/TimeTracking/*`, `qb-engineer-ui/src/app/features/time-tracking/`.
+- **Where:** `forge.core/Entities/TimeEntry.cs`, `forge.api/Features/TimeTracking/*`, `forge-ui/src/app/features/time-tracking/`.
 - **Problem:** TimeEntry today has no billable flag. Pro Services invoicing depends on knowing which hours are billable; reports (utilization, billable %) depend on the split. Today everything's treated as cost-bearing time, which is wrong for non-billable internal work.
 - **Treatment:**
   - Add columns `IsBillable` (bool, default true), `BillRate` (numeric, nullable), `BillRateCurrency` (text, nullable), `ActivityTypeId` (FK to reference_data) on `time_entries` table (see Artifact 4 §3.7).
@@ -100,7 +100,7 @@ This is distinct from Artifact 4 (catalog additions = new capabilities + tables 
 ### G-07 — Report library gets per-preset visibility filter
 
 - **Tier:** P2
-- **Where:** `qb-engineer.api/Features/Reports/`, `qb-engineer-ui/src/app/features/reports/`. ~30 reports registered statically today.
+- **Where:** `forge.api/Features/Reports/`, `forge-ui/src/app/features/reports/`. ~30 reports registered statically today.
 - **Problem:** Every install sees all 30 reports regardless of preset. A Pro Services install sees "Scrap Rate," "Inventory Levels," "OEE by Work Center" — irrelevant clutter.
 - **Treatment:**
   - Add `ReportVisibilityBundle` to preset format (Artifact 5 §3.5).
@@ -114,7 +114,7 @@ This is distinct from Artifact 4 (catalog additions = new capabilities + tables 
 ### G-08 — Dashboard widget set becomes per-preset
 
 - **Tier:** P2
-- **Where:** `qb-engineer-ui/src/app/features/dashboard/`. Default widget set is utilization / scrap rate / OEE / WIP — manufacturing-flavored.
+- **Where:** `forge-ui/src/app/features/dashboard/`. Default widget set is utilization / scrap rate / OEE / WIP — manufacturing-flavored.
 - **Problem:** Pro Services install gets a dashboard that doesn't describe what an engagement manager cares about. The widgets are still useful for Hybrid but irrelevant for pure services.
 - **Treatment:**
   - Add `DashboardBundle` to preset format (Artifact 5 §3.8).
@@ -127,7 +127,7 @@ This is distinct from Artifact 4 (catalog additions = new capabilities + tables 
 ### G-09 — `CostCalculation` accommodates Pro Services costing model
 
 - **Tier:** P2
-- **Where:** `qb-engineer.core/Entities/CostCalculation.cs`, `CostingProfile.cs`, `CostCalculationInputs.cs`.
+- **Where:** `forge.core/Entities/CostCalculation.cs`, `CostingProfile.cs`, `CostCalculationInputs.cs`.
 - **Problem:** Costing today is part-cost-flavored: rolls up BOM material cost + operation labor + overhead per unit. Pro Services costing is different: per-engagement T&M (time × rate) + pass-through expenses + fixed-bid amortization. The existing entity shape doesn't make this hard, but the existing handlers assume part-cost semantics.
 - **Treatment:**
   - Audit existing costing handlers; identify which assume Part vs which work on any costable entity.
@@ -156,7 +156,7 @@ This is distinct from Artifact 4 (catalog additions = new capabilities + tables 
 ### G-11 — Discovery wizard top question + Pro Services sub-tree
 
 - **Tier:** P2
-- **Where:** `qb-engineer.api/Capabilities/Discovery/DiscoveryQuestionCatalog.cs`, `DiscoveryRecommendationEngine.cs`.
+- **Where:** `forge.api/Capabilities/Discovery/DiscoveryQuestionCatalog.cs`, `DiscoveryRecommendationEngine.cs`.
 - **Problem:** Per D4 — the 22-question wizard assumes manufacturing from question 1. Pro Services prospects either don't see themselves in the questions or get steered to a mfg preset.
 - **Treatment:**
   - Add one new top-of-funnel question: "Do you make products, sell time, or both?"
@@ -171,7 +171,7 @@ This is distinct from Artifact 4 (catalog additions = new capabilities + tables 
 ### G-12 — Pro Services workflow definition for Project / Engagement
 
 - **Tier:** P2
-- **Where:** `qb-engineer.api/Workflows/WorkflowSeedData.cs`.
+- **Where:** `forge.api/Workflows/WorkflowSeedData.cs`.
 - **Problem:** Part is the only entity with a workflow definition today. Engagement intake (client → scope → budget → SOW → kickoff) benefits from the same multi-step gathering pattern.
 - **Treatment:**
   - Author Engagement workflow definition JSON.
@@ -185,7 +185,7 @@ This is distinct from Artifact 4 (catalog additions = new capabilities + tables 
 ### G-13 — Pro Services dashboard widgets (`utilization_by_practitioner`, `billable_percent`, `project_margin`, `retainer_burn_down`)
 
 - **Tier:** P2
-- **Where:** `qb-engineer-ui/src/app/features/dashboard/widgets/`.
+- **Where:** `forge-ui/src/app/features/dashboard/widgets/`.
 - **Problem:** No widget describes a service-shop's key metrics.
 - **Treatment:** Build the 4 widgets (or more, per Artifact 4 §5). Each uses existing dashboard-widget plumbing.
 - **Risk:** Low.
@@ -207,7 +207,7 @@ This is distinct from Artifact 4 (catalog additions = new capabilities + tables 
 ### G-15 — Apply-preset pipeline grows seven layer-apply methods
 
 - **Tier:** P1
-- **Where:** `qb-engineer.api/Capabilities/Discovery/ApplyPreset.cs`.
+- **Where:** `forge.api/Capabilities/Discovery/ApplyPreset.cs`.
 - **Problem:** Pipeline today only writes capability state. To carry stereotypes, it needs to seed terminology, ref data, track types, roles, reports, folder maps, workflow defs, dashboards.
 - **Treatment:** Add 7-8 layer-apply methods, each transactional with capability state. See Artifact 5 §4.
 - **Risk:** Medium — re-apply semantics need care; conflict policies have to be respected.
@@ -229,7 +229,7 @@ This is distinct from Artifact 4 (catalog additions = new capabilities + tables 
 ### G-17 — Verify Project entity is the right home for Engagement (vs new Engagement entity)
 
 - **Tier:** P1 spike, then implementation per spike outcome.
-- **Where:** `qb-engineer.core/Entities/Project.cs` — exists but lightly used today.
+- **Where:** `forge.core/Entities/Project.cs` — exists but lightly used today.
 - **Problem:** Pro Services needs a first-class "engagement" entity. Question: extend `Project` with axis fields, or stand up new `Engagement` entity?
 - **Treatment:**
   - Phase 2 spike: read current Project usage; identify what touches it; estimate cost of extension vs new entity.
@@ -243,7 +243,7 @@ This is distinct from Artifact 4 (catalog additions = new capabilities + tables 
 ### G-18 — Bootstrap exemption for cloud-storage admin endpoints
 
 - **Tier:** P1
-- **Where:** `qb-engineer.api/Capabilities/RequiresCapabilityAttribute.cs` / `CapabilityBootstrap` list.
+- **Where:** `forge.api/Capabilities/RequiresCapabilityAttribute.cs` / `CapabilityBootstrap` list.
 - **Problem:** Admin connects first cloud-storage provider → endpoint must be reachable even though `CAP-EXT-CLOUD-STORAGE` is off. Same for accounting migration.
 - **Treatment:** Mark `POST /api/v1/cloud-storage/providers`, `GET /api/v1/cloud-storage/providers`, migration endpoints (per Artifact 4 §6) as `[CapabilityBootstrap]`.
 - **Risk:** Low.

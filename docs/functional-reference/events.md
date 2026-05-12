@@ -65,7 +65,7 @@ The events tab in the admin panel is visible to Admin and Manager roles (`MANAGE
 
 ### Event
 
-Represents a scheduled event. Extends `BaseAuditableEntity`. Located in `qb-engineer.core/Entities/Event.cs`.
+Represents a scheduled event. Extends `BaseAuditableEntity`. Located in `forge.core/Entities/Event.cs`.
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -87,7 +87,7 @@ Represents a scheduled event. Extends `BaseAuditableEntity`. Located in `qb-engi
 
 ### EventAttendee
 
-Tracks an attendee's RSVP status for an event. Extends `BaseEntity`. Located in `qb-engineer.core/Entities/EventAttendee.cs`.
+Tracks an attendee's RSVP status for an event. Extends `BaseEntity`. Located in `forge.core/Entities/EventAttendee.cs`.
 
 | Field | Type | Description |
 |-------|------|-------------|

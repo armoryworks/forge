@@ -19,7 +19,7 @@ This doc is the developer reference. Design history (the "why we picked these 12
 The authoritative list of capabilities lives at:
 
 ```
-qb-engineer-server/qb-engineer.api/Capabilities/CapabilityCatalog.cs
+forge-api/forge.api/Capabilities/CapabilityCatalog.cs
 ```
 
 It is a single static `IReadOnlyList<CapabilityDefinition>` with 129 rows. Every row carries:
@@ -58,7 +58,7 @@ Per the comment block at the top of `CapabilityCatalog.cs`, the 4A design markdo
 
 ### Storage entity
 
-`Capability` (`qb-engineer.core/Entities/Capability.cs`) is the DB row:
+`Capability` (`forge.core/Entities/Capability.cs`) is the DB row:
 
 ```csharp
 public class Capability : BaseAuditableEntity, IConcurrencyVersioned
@@ -76,7 +76,7 @@ public class Capability : BaseAuditableEntity, IConcurrencyVersioned
 }
 ```
 
-`CapabilityConfig` (`qb-engineer.core/Entities/CapabilityConfig.cs`) is a 1:0..1 sidecar holding an opaque JSON payload (`ConfigJson`) for capabilities that have tunables. It carries its own independent `Version` so toggle edits and config edits each have their own ETag space.
+`CapabilityConfig` (`forge.core/Entities/CapabilityConfig.cs`) is a 1:0..1 sidecar holding an opaque JSON payload (`ConfigJson`) for capabilities that have tunables. It carries its own independent `Version` so toggle edits and config edits each have their own ETag space.
 
 ### Seeding
 
@@ -113,7 +113,7 @@ Unknown codes always return false — important for the bootstrap-exempt flow an
 Capabilities form a graph. Edges are encoded as static tuples in:
 
 ```
-qb-engineer-server/qb-engineer.api/Capabilities/CapabilityCatalogRelations.cs
+forge-api/forge.api/Capabilities/CapabilityCatalogRelations.cs
 ```
 
 There are two edge kinds:
@@ -250,7 +250,7 @@ The attribute composes — class-level acts as the default; method-level overrid
 
 ### MediatR pipeline behavior
 
-`CapabilityGateBehavior<TRequest, TResponse>` (`qb-engineer.api/Behaviors/CapabilityGateBehavior.cs`) is the parallel gate for MediatR commands dispatched **outside an HTTP context**: Hangfire jobs, SignalR hub callbacks, or anything that calls `IMediator.Send` directly without going through a controller.
+`CapabilityGateBehavior<TRequest, TResponse>` (`forge.api/Behaviors/CapabilityGateBehavior.cs`) is the parallel gate for MediatR commands dispatched **outside an HTTP context**: Hangfire jobs, SignalR hub callbacks, or anything that calls `IMediator.Send` directly without going through a controller.
 
 Registered in `Program.cs`:
 
@@ -291,7 +291,7 @@ The client mirrors server gating in three layers (descriptor service, structural
 
 ### Descriptor service
 
-`CapabilityService` (`qb-engineer-ui/src/app/shared/services/capability.service.ts`) is the singleton that loads and exposes the descriptor.
+`CapabilityService` (`forge-ui/src/app/shared/services/capability.service.ts`) is the singleton that loads and exposes the descriptor.
 
 ```typescript
 @Injectable({ providedIn: 'root' })
@@ -332,7 +332,7 @@ Cleared on logout via `clear()`.
 
 ### Structural directives
 
-`*appCap` and `*appCapNot` (`qb-engineer-ui/src/app/shared/directives/cap.directive.ts`, `cap-not.directive.ts`) are the standard template gates:
+`*appCap` and `*appCapNot` (`forge-ui/src/app/shared/directives/cap.directive.ts`, `cap-not.directive.ts`) are the standard template gates:
 
 ```html
 <div *appCap="'CAP-MD-PART-COMPLIANCE'">
@@ -350,9 +350,9 @@ Two distinct selectors (rather than a compound expression like `*appCap="!CAP-X"
 
 ### Layer-3 request interceptor
 
-`capabilityGateInterceptor` (`qb-engineer-ui/src/app/shared/interceptors/capability-gate.interceptor.ts`) pre-flights every outbound HTTP request against a static URL → capability registry. If the request hits a gated endpoint AND the capability is known to be disabled, the request is short-circuited with `CapabilityDisabledError` — the network request never fires.
+`capabilityGateInterceptor` (`forge-ui/src/app/shared/interceptors/capability-gate.interceptor.ts`) pre-flights every outbound HTTP request against a static URL → capability registry. If the request hits a gated endpoint AND the capability is known to be disabled, the request is short-circuited with `CapabilityDisabledError` — the network request never fires.
 
-The registry (`qb-engineer-ui/src/app/shared/capability/capability-endpoint-registry.ts`) mirrors controller-level `[RequiresCapability]` attributes from the .NET API:
+The registry (`forge-ui/src/app/shared/capability/capability-endpoint-registry.ts`) mirrors controller-level `[RequiresCapability]` attributes from the .NET API:
 
 ```typescript
 export const CAPABILITY_ENDPOINT_REGISTRY: readonly CapabilityEndpointEntry[] = [
@@ -385,11 +385,11 @@ Behavior:
 
 The interceptor MUST be registered before `httpErrorInterceptor` in the `withInterceptors([...])` chain.
 
-`CapabilityDisabledError` (`qb-engineer-ui/src/app/shared/errors/capability-disabled.error.ts`) is intentionally NOT a snackbar / toast trigger — a disabled capability is a configuration state, not a security violation.
+`CapabilityDisabledError` (`forge-ui/src/app/shared/errors/capability-disabled.error.ts`) is intentionally NOT a snackbar / toast trigger — a disabled capability is a configuration state, not a security violation.
 
 ### SignalR push
 
-`NotificationHubService` (`qb-engineer-ui/src/app/shared/services/notification-hub.service.ts`) registers a handler for the `capabilityChanged` event on the notification hub:
+`NotificationHubService` (`forge-ui/src/app/shared/services/notification-hub.service.ts`) registers a handler for the `capabilityChanged` event on the notification hub:
 
 ```typescript
 connection.off('capabilityChanged');
@@ -541,7 +541,7 @@ The engine does NOT parse free-text answers (per 4C decision #1). It surfaces th
 
 ### DiscoveryRun audit row
 
-`DiscoveryRun` (`qb-engineer.core/Entities/DiscoveryRun.cs`) is the immutable evidence row written on apply:
+`DiscoveryRun` (`forge.core/Entities/DiscoveryRun.cs`) is the immutable evidence row written on apply:
 
 ```csharp
 public class DiscoveryRun : BaseAuditableEntity
@@ -562,7 +562,7 @@ Re-running discovery overwrites capability state but never replaces prior `Disco
 
 ### UI
 
-`/admin/discovery` (`qb-engineer-ui/src/app/features/admin/discovery/discovery.component.ts`) is a multi-step wizard that follows the URL-as-source-of-truth pattern: current step is `?step=N`, browser back/forward moves through steps. Answers live in `DiscoveryService` (signals, lost on page refresh).
+`/admin/discovery` (`forge-ui/src/app/features/admin/discovery/discovery.component.ts`) is a multi-step wizard that follows the URL-as-source-of-truth pattern: current step is `?step=N`, browser back/forward moves through steps. Answers live in `DiscoveryService` (signals, lost on page refresh).
 
 ---
 
@@ -622,7 +622,7 @@ Re-running discovery overwrites capability state but never replaces prior `Disco
 | `/admin/presets/custom` | `PresetCustomComponent` — Custom builder |
 | `/admin/presets/:id` | `PresetDetailComponent` — single-preset detail with deltas + apply CTA |
 
-`PresetService` (`qb-engineer-ui/src/app/shared/services/preset.service.ts`) is the API client. Apply UX flow is **browse → detail → preview-apply (delta + violations modal) → apply**.
+`PresetService` (`forge-ui/src/app/shared/services/preset.service.ts`) is the API client. Apply UX flow is **browse → detail → preview-apply (delta + violations modal) → apply**.
 
 ---
 
@@ -699,7 +699,7 @@ public record RecomputeVendorScorecardsCommand(...) : IRequest<...>;
 
 ### 4. Gate the UI
 
-Add the URL → capability mapping to the client registry so the layer-3 interceptor short-circuits requests. `qb-engineer-ui/src/app/shared/capability/capability-endpoint-registry.ts`:
+Add the URL → capability mapping to the client registry so the layer-3 interceptor short-circuits requests. `forge-ui/src/app/shared/capability/capability-endpoint-registry.ts`:
 
 ```typescript
 { prefix: 'vendor-scorecards', capability: 'CAP-MD-VENDORSCORECARDS' },
@@ -731,7 +731,7 @@ If the capability should be on/off in any of the 8 standard profiles, edit `Pres
 Capability copy itself is not localized (see Gotchas). Add UI labels / menu entries / error messages to `public/assets/i18n/{en,es}.json` per the standard 100% language-parity rule in `CLAUDE.md`.
 
 Add tests:
-- Controller 403s when the capability is disabled — see `qb-engineer.tests/Capabilities/CapabilityToggleTests.cs` for the test factory pattern.
+- Controller 403s when the capability is disabled — see `forge.tests/Capabilities/CapabilityToggleTests.cs` for the test factory pattern.
 - Dependency edge is enforced — see `CapabilityMutationTests.cs`.
 
 ---

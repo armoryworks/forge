@@ -13,7 +13,7 @@ The frontend provides three components: `StatusTimelineComponent` (displays acti
 
 ## StatusEntry Entity
 
-**Location:** `qb-engineer-server/qb-engineer.core/Entities/StatusEntry.cs`
+**Location:** `forge-api/forge.core/Entities/StatusEntry.cs`
 
 Extends `BaseAuditableEntity` (inherits `Id`, `CreatedAt`, `UpdatedAt`, `DeletedAt`, `DeletedBy`, `CreatedBy`).
 
@@ -38,7 +38,7 @@ Extends `BaseAuditableEntity` (inherits `Id`, `CreatedAt`, `UpdatedAt`, `Deleted
 
 ## API Endpoints
 
-**Controller:** `qb-engineer-server/qb-engineer.api/Controllers/StatusTrackingController.cs`
+**Controller:** `forge-api/forge.api/Controllers/StatusTrackingController.cs`
 
 Route prefix: `/api/v1/status-tracking`. All endpoints require `[Authorize]`.
 
@@ -63,7 +63,7 @@ interface ActiveStatus {
 
 ## MediatR Handlers
 
-All handlers live in `qb-engineer-server/qb-engineer.api/Features/StatusTracking/`.
+All handlers live in `forge-api/forge.api/Features/StatusTracking/`.
 
 ### SetWorkflowStatus
 
@@ -187,7 +187,7 @@ When a status is set, the handler resolves the `StatusLabel` from the reference 
 
 ### StatusTrackingService
 
-**Location:** `qb-engineer-ui/src/app/shared/services/status-tracking.service.ts`
+**Location:** `forge-ui/src/app/shared/services/status-tracking.service.ts`
 
 HTTP service (`providedIn: 'root'`) that wraps all status tracking API calls.
 
@@ -205,7 +205,7 @@ HTTP service (`providedIn: 'root'`) that wraps all status tracking API calls.
 
 ### StatusTimelineComponent
 
-**Location:** `qb-engineer-ui/src/app/shared/components/status-timeline/`
+**Location:** `forge-ui/src/app/shared/components/status-timeline/`
 
 Displays the active workflow status, active holds, and full status history for any entity. Provides buttons to set a new status, add a hold, or release an existing hold.
 
@@ -238,7 +238,7 @@ After any action succeeds, the component reloads the full status data and shows 
 
 ### SetStatusDialogComponent
 
-**Location:** `qb-engineer-ui/src/app/shared/components/set-status-dialog/`
+**Location:** `forge-ui/src/app/shared/components/set-status-dialog/`
 
 A `MatDialog`-based form for selecting a new workflow status.
 
@@ -263,7 +263,7 @@ interface SetStatusDialogData {
 
 ### AddHoldDialogComponent
 
-**Location:** `qb-engineer-ui/src/app/shared/components/add-hold-dialog/`
+**Location:** `forge-ui/src/app/shared/components/add-hold-dialog/`
 
 A `MatDialog`-based form for adding a hold to an entity.
 
@@ -333,19 +333,19 @@ The component is self-contained: it loads its own data, manages its own loading 
 
 | File | Purpose |
 |------|---------|
-| `qb-engineer-server/qb-engineer.core/Entities/StatusEntry.cs` | Polymorphic status entry entity |
-| `qb-engineer-server/qb-engineer.api/Controllers/StatusTrackingController.cs` | REST API for status tracking |
-| `qb-engineer-server/qb-engineer.api/Features/StatusTracking/SetWorkflowStatus.cs` | Set workflow status handler |
-| `qb-engineer-server/qb-engineer.api/Features/StatusTracking/AddHold.cs` | Add hold handler |
-| `qb-engineer-server/qb-engineer.api/Features/StatusTracking/ReleaseHold.cs` | Release hold handler |
-| `qb-engineer-server/qb-engineer.api/Features/StatusTracking/GetStatusHistory.cs` | Get full history handler |
-| `qb-engineer-server/qb-engineer.api/Features/StatusTracking/GetActiveStatus.cs` | Get active status + holds handler |
-| `qb-engineer-ui/src/app/shared/services/status-tracking.service.ts` | Frontend HTTP service |
-| `qb-engineer-ui/src/app/shared/components/status-timeline/status-timeline.component.ts` | Timeline display + action triggers |
-| `qb-engineer-ui/src/app/shared/components/set-status-dialog/set-status-dialog.component.ts` | Workflow status change dialog |
-| `qb-engineer-ui/src/app/shared/components/add-hold-dialog/add-hold-dialog.component.ts` | Hold creation dialog |
-| `qb-engineer-ui/src/app/shared/models/status-entry.model.ts` | Frontend `StatusEntry` interface |
-| `qb-engineer-ui/src/app/shared/models/active-status.model.ts` | Frontend `ActiveStatus` interface |
-| `qb-engineer-ui/src/app/shared/models/set-status-request.model.ts` | `SetStatusRequest` interface |
-| `qb-engineer-ui/src/app/shared/models/add-hold-request.model.ts` | `AddHoldRequest` interface |
-| `qb-engineer-ui/src/app/shared/models/release-hold-request.model.ts` | `ReleaseHoldRequest` interface |
+| `forge-api/forge.core/Entities/StatusEntry.cs` | Polymorphic status entry entity |
+| `forge-api/forge.api/Controllers/StatusTrackingController.cs` | REST API for status tracking |
+| `forge-api/forge.api/Features/StatusTracking/SetWorkflowStatus.cs` | Set workflow status handler |
+| `forge-api/forge.api/Features/StatusTracking/AddHold.cs` | Add hold handler |
+| `forge-api/forge.api/Features/StatusTracking/ReleaseHold.cs` | Release hold handler |
+| `forge-api/forge.api/Features/StatusTracking/GetStatusHistory.cs` | Get full history handler |
+| `forge-api/forge.api/Features/StatusTracking/GetActiveStatus.cs` | Get active status + holds handler |
+| `forge-ui/src/app/shared/services/status-tracking.service.ts` | Frontend HTTP service |
+| `forge-ui/src/app/shared/components/status-timeline/status-timeline.component.ts` | Timeline display + action triggers |
+| `forge-ui/src/app/shared/components/set-status-dialog/set-status-dialog.component.ts` | Workflow status change dialog |
+| `forge-ui/src/app/shared/components/add-hold-dialog/add-hold-dialog.component.ts` | Hold creation dialog |
+| `forge-ui/src/app/shared/models/status-entry.model.ts` | Frontend `StatusEntry` interface |
+| `forge-ui/src/app/shared/models/active-status.model.ts` | Frontend `ActiveStatus` interface |
+| `forge-ui/src/app/shared/models/set-status-request.model.ts` | `SetStatusRequest` interface |
+| `forge-ui/src/app/shared/models/add-hold-request.model.ts` | `AddHoldRequest` interface |
+| `forge-ui/src/app/shared/models/release-hold-request.model.ts` | `ReleaseHoldRequest` interface |

@@ -1,14 +1,14 @@
-# qb-engineer
+# forge
 
 Open-source manufacturing operations platform. QuickBooks-integrated
 engineering and production management for small-to-mid shops.
 
 > **This is the umbrella repo.** The actual code lives in sibling repos:
 >
-> - **[qb-engineer-ui](https://github.com/danielhokanson/qb-engineer-ui)** — Angular 21 frontend
-> - **[qb-engineer-server](https://github.com/danielhokanson/qb-engineer-server)** — .NET 9 API + EF migrations
-> - **[qb-engineer-deploy](https://github.com/danielhokanson/qb-engineer-deploy)** — docker-compose + ops scripts (start here to install)
-> - **[qb-engineer-test](https://github.com/danielhokanson/qb-engineer-test)** — manual test plans for human testers
+> - **[forge-ui](https://github.com/danielhokanson/forge-ui)** — Angular 21 frontend
+> - **[forge-api](https://github.com/danielhokanson/forge-api)** — .NET 9 API + EF migrations
+> - **[forge-deploy](https://github.com/danielhokanson/forge-deploy)** — docker-compose + ops scripts (start here to install)
+> - **[forge-test](https://github.com/danielhokanson/forge-test)** — manual test plans for human testers
 
 This repo holds project-level documentation, governance, and the
 release manifest pinning which sibling versions ship together.
@@ -32,8 +32,8 @@ designed to scale to small-team use without a Kubernetes commitment.
 
 ```bash
 # Clone the deploy repo
-git clone https://github.com/danielhokanson/qb-engineer-deploy.git
-cd qb-engineer-deploy
+git clone https://github.com/danielhokanson/forge-deploy.git
+cd forge-deploy
 
 # Run the setup wizard (Linux/macOS)
 ./setup.sh
@@ -44,7 +44,7 @@ cd qb-engineer-deploy
 
 The setup script handles prerequisite checks, env file generation, JWT
 key creation, and starts the stack via `docker compose up -d`. See
-[qb-engineer-deploy](https://github.com/danielhokanson/qb-engineer-deploy) for
+[forge-deploy](https://github.com/danielhokanson/forge-deploy) for
 full installation docs.
 
 ---
@@ -56,8 +56,8 @@ five sibling repos into sibling directories so you have the full project
 laid out for cross-cutting work:
 
 ```bash
-git clone https://github.com/danielhokanson/qb-engineer.git
-cd qb-engineer
+git clone https://github.com/danielhokanson/forge.git
+cd forge
 ./bootstrap.sh        # Linux/macOS
 .\bootstrap.ps1       # Windows
 ```
@@ -66,11 +66,11 @@ After bootstrap, your directory layout looks like:
 
 ```
 .../wherever/
-├── qb-engineer/          ← this repo (docs, governance)
-├── qb-engineer-ui/       ← Angular code
-├── qb-engineer-server/   ← .NET code
-├── qb-engineer-deploy/   ← docker-compose + scripts
-└── qb-engineer-test/     ← manual test plans
+├── forge/          ← this repo (docs, governance)
+├── forge-ui/       ← Angular code
+├── forge-api/   ← .NET code
+├── forge-deploy/   ← docker-compose + scripts
+└── forge-test/     ← manual test plans
 ```
 
 Read [`CONTRIBUTING.md`](./CONTRIBUTING.md) before opening a PR.

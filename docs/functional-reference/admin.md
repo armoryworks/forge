@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Admin Panel is the centralized configuration hub for QB Engineer. It provides system-wide management of users, production track types, reference data, terminology, company settings, integrations, training, AI assistants, compliance, sales tax, audit logging, time corrections, events, EDI, and MFA policy enforcement.
+The Admin Panel is the centralized configuration hub for Forge. It provides system-wide management of users, production track types, reference data, terminology, company settings, integrations, training, AI assistants, compliance, sales tax, audit logging, time corrections, events, EDI, and MFA policy enforcement.
 
 Access is role-gated. Admin users see all 16 tabs. Managers see a subset (Training, Time Corrections, Events, Compliance). Non-admin/non-manager users see only the Compliance tab for their own employee compliance status.
 

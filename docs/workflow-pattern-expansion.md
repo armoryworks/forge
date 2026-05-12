@@ -85,7 +85,7 @@ This is a **new mechanic** the Part implementation doesn't have. Part validators
 
 #### Q3 — Coexistence with quick-create dialog
 
-[customers.component.html:56](../qb-engineer-ui/src/app/features/customers/customers.component.html#L56) has an `<app-dialog>` create form today. Two paths after Customer adopts the workflow:
+[customers.component.html:56](../forge-ui/src/app/features/customers/customers.component.html#L56) has an `<app-dialog>` create form today. Two paths after Customer adopts the workflow:
 
 - **"+ New customer"** opens the workflow page (`/customers/new?workflow=customer-v1&mode=express`). The express form is the same five fields the dialog has today; nothing slower.
 - **Existing dialog gets retired** — the workflow's express mode IS the quick-add, just behind a route + scrim instead of a MatDialog.

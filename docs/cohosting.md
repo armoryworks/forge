@@ -1,10 +1,10 @@
-# Co-hosting QB Engineer behind an existing reverse proxy
+# Co-hosting Forge behind an existing reverse proxy
 
-QB Engineer can run in two hosting modes:
+Forge can run in two hosting modes:
 
 | Mode | Who terminates TLS? | Public port | Use when |
 |------|--------------------|-------------|----------|
-| **standalone** (default) | The `qb-engineer-ui` container (nginx in the image) | `:443` (or `:80` plain) on `0.0.0.0` | The host has no other web services, or you're running locally. |
+| **standalone** (default) | The `forge-ui` container (nginx in the image) | `:443` (or `:80` plain) on `0.0.0.0` | The host has no other web services, or you're running locally. |
 | **cohost** | An existing host-level reverse proxy (nginx, Caddy, cloudflared, …) | Owned by that proxy | The host already serves another site, or you want Cloudflare Tunnel to front the app. |
 
 For a one-command standalone-with-HTTPS install on a fresh host, see `./setup.sh --public` — it implies `--standalone --ssl` and runs a system-side preflight (detects port 80/443 conflicts, offers to stop system nginx/apache, configures UFW, picks the cert hostname). Documented in the deploy repo's `CONTRIBUTING.md` § Public deploy. The rest of *this* doc covers cohost mode end-to-end.
@@ -63,7 +63,7 @@ Three ways to flip the switch; they stack in this order of precedence:
    QBE_HOSTING_MODE=cohost
    ```
 3. **Auto-detection**. Any of the following flips to cohost:
-   - `/etc/nginx/sites-enabled/qb-engineer*.conf` exists (or the `conf.d` variant)
+   - `/etc/nginx/sites-enabled/forge*.conf` exists (or the `conf.d` variant)
    - `cloudflared` is running as a systemd service
    - `/etc/cloudflared/config.yml` (or `.yaml`) exists
 
@@ -76,13 +76,13 @@ Once resolved, the mode is persisted to `.env` as `QBE_HOSTING_MODE=cohost|stand
 `setup.sh` in cohost mode does **not** guess your public hostname. You need to edit `.env` and set:
 
 ```bash
-# Example for qb-engineer.com fronted by host nginx + Let's Encrypt:
-FRONTEND_BASE_URL=https://qb-engineer.com
-CORS_ORIGINS=https://qb-engineer.com
-MINIO_PUBLIC_ENDPOINT=qb-engineer.com
+# Example for forge.com fronted by host nginx + Let's Encrypt:
+FRONTEND_BASE_URL=https://forge.com
+CORS_ORIGINS=https://forge.com
+MINIO_PUBLIC_ENDPOINT=forge.com
 ```
 
-Then `docker compose up -d --force-recreate qb-engineer-api` to pick up the env change.
+Then `docker compose up -d --force-recreate forge-api` to pick up the env change.
 
 If MinIO needs to be reachable externally (download links, etc.) add a second vhost or path-route on the proxy pointing at `127.0.0.1:9000`.
 
@@ -90,24 +90,24 @@ If MinIO needs to be reachable externally (download links, etc.) add a second vh
 
 ## Host-level nginx (TLS via Let's Encrypt)
 
-Typical vhost for `qb-engineer.com`, terminating TLS and proxying to the UI container on the loopback:
+Typical vhost for `forge.com`, terminating TLS and proxying to the UI container on the loopback:
 
 ```nginx
-# /etc/nginx/sites-available/qb-engineer.com.conf
+# /etc/nginx/sites-available/forge.com.conf
 server {
     listen 80;
     listen [::]:80;
-    server_name qb-engineer.com www.qb-engineer.com;
+    server_name forge.com www.forge.com;
     return 301 https://$host$request_uri;
 }
 
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name qb-engineer.com www.qb-engineer.com;
+    server_name forge.com www.forge.com;
 
-    ssl_certificate     /etc/letsencrypt/live/qb-engineer.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/qb-engineer.com/privkey.pem;
+    ssl_certificate     /etc/letsencrypt/live/forge.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/forge.com/privkey.pem;
     include /etc/letsencrypt/options-ssl-nginx.conf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
@@ -133,22 +133,22 @@ server {
 Enable and reload:
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/qb-engineer.com.conf \
-           /etc/nginx/sites-enabled/qb-engineer.com.conf
+sudo ln -s /etc/nginx/sites-available/forge.com.conf \
+           /etc/nginx/sites-enabled/forge.com.conf
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
 Certs via certbot:
 
 ```bash
-sudo certbot --nginx -d qb-engineer.com -d www.qb-engineer.com
+sudo certbot --nginx -d forge.com -d www.forge.com
 ```
 
 ---
 
 ## Cloudflare Tunnel (cloudflared)
 
-Secondary hostnames (e.g. `demo.qb-engineer.com`) can route through a Cloudflare Tunnel instead of direct DNS + Let's Encrypt. The tunnel daemon is a separate systemd service and **its config lives outside this repo**: edit by hand and reload.
+Secondary hostnames (e.g. `demo.forge.com`) can route through a Cloudflare Tunnel instead of direct DNS + Let's Encrypt. The tunnel daemon is a separate systemd service and **its config lives outside this repo**: edit by hand and reload.
 
 ```yaml
 # /etc/cloudflared/config.yml
@@ -156,9 +156,9 @@ tunnel: <your-tunnel-uuid>
 credentials-file: /etc/cloudflared/<your-tunnel-uuid>.json
 
 ingress:
-  - hostname: demo.qb-engineer.com
+  - hostname: demo.forge.com
     service: http://127.0.0.1:4203   # the demo container
-  - hostname: qb-engineer.com
+  - hostname: forge.com
     service: http://127.0.0.1:4200   # (optional — usually handled by host nginx)
   - service: http_status:404
 ```
@@ -169,7 +169,7 @@ Apply:
 sudo systemctl restart cloudflared
 ```
 
-Cloudflare DNS: add a `CNAME` from `demo.qb-engineer.com` → `<tunnel-uuid>.cfargotunnel.com`.
+Cloudflare DNS: add a `CNAME` from `demo.forge.com` → `<tunnel-uuid>.cfargotunnel.com`.
 
 Setup auto-detects an active `cloudflared` service and selects cohost mode on first run.
 
@@ -212,7 +212,7 @@ Proxy is reaching the UI, but `/api/*` isn't routing. In cohost mode the UI cont
 Missing WebSocket upgrade headers on the host proxy. See the nginx config above — `Upgrade` and `Connection "upgrade"` are mandatory.
 
 **`setup.sh` didn't detect my host nginx.**
-The detection globs on `qb-engineer*.conf` under `sites-enabled` and `conf.d`. If your vhost file is named differently, pass `--cohost` explicitly (once is enough; it's persisted to `.env`).
+The detection globs on `forge*.conf` under `sites-enabled` and `conf.d`. If your vhost file is named differently, pass `--cohost` explicitly (once is enough; it's persisted to `.env`).
 
 **I want both modes on the same box (dev + cohost test).**
 Use separate clones in separate directories with separate `.env` files.

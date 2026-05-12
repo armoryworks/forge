@@ -17,20 +17,20 @@
 See `docs/libraries.md` for the complete library reference.
 
 ## IClock Abstraction
-- `IClock` interface (`qb-engineer.core/Interfaces/IClock.cs`) — injectable clock for testable time-dependent code
+- `IClock` interface (`forge.core/Interfaces/IClock.cs`) — injectable clock for testable time-dependent code
 - `SystemClock` (production): wraps `DateTime.UtcNow`
 - `SimulationClock` (E2E): controllable time for deterministic week simulation tests
 - Injected into `AppDbContext.SetTimestamps()` and time-dependent handlers
 - Registered via DI in `Program.cs`
 
 ## Docker Compose -- 7 Containers (AI optional)
-1. qb-engineer-ui -- Nginx + Angular build
-2. qb-engineer-api -- .NET 9 Web API
-3. qb-engineer-db -- PostgreSQL + pgvector with persistent volume
-4. qb-engineer-storage -- MinIO with persistent volume
-5. qb-engineer-backup -- Scheduled backup jobs (Hangfire)
-6. qb-engineer-ai -- Ollama LLM runtime (optional)
-7. qb-engineer-backup-target -- MinIO replica on secondary machine (separate compose)
+1. forge-ui -- Nginx + Angular build
+2. forge-api -- .NET 9 Web API
+3. forge -- PostgreSQL + pgvector with persistent volume
+4. forge-storage -- MinIO with persistent volume
+5. forge-backup -- Scheduled backup jobs (Hangfire)
+6. forge-ai -- Ollama LLM runtime (optional)
+7. forge-backup-target -- MinIO replica on secondary machine (separate compose)
 
 ## Auth
 - ASP.NET Identity with custom ApplicationUser

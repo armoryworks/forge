@@ -1,6 +1,6 @@
-# QB Engineer vs. Industry Manufacturing ERP/MES — Detailed Comparison
+# Forge vs. Industry Manufacturing ERP/MES — Detailed Comparison
 
-> Generated 2026-04-11. Compares QB Engineer's implemented features against the combined feature sets of: **Epicor Kinetic**, **SAP S/4HANA (Manufacturing)**, **Oracle Cloud Manufacturing**, **Infor SyteLine (CloudSuite Industrial)**, **Plex (Rockwell)**, **IQMS/DELMIAworks**, **JobBOSS²**, **ProShop ERP**, **Fishbowl Manufacturing**, and **MIE Trak Pro**.
+> Generated 2026-04-11. Compares Forge's implemented features against the combined feature sets of: **Epicor Kinetic**, **SAP S/4HANA (Manufacturing)**, **Oracle Cloud Manufacturing**, **Infor SyteLine (CloudSuite Industrial)**, **Plex (Rockwell)**, **IQMS/DELMIAworks**, **JobBOSS²**, **ProShop ERP**, **Fishbowl Manufacturing**, and **MIE Trak Pro**.
 >
 > Scope: field-level, component-level, and data-structure-level comparison. Not just feature presence/absence, but depth of implementation.
 
@@ -56,7 +56,7 @@
 
 ## Executive Summary
 
-QB Engineer covers an unusually broad surface area for a single-codebase manufacturing platform: 104 entities, 62 controllers, 391 MediatR handlers, 35 Angular feature modules. It spans job-shop manufacturing, CRM, order management, inventory, quality, time tracking, training, chat, AI assistance, and shop-floor kiosks — territory that typically requires 3-5 separate products.
+Forge covers an unusually broad surface area for a single-codebase manufacturing platform: 104 entities, 62 controllers, 391 MediatR handlers, 35 Angular feature modules. It spans job-shop manufacturing, CRM, order management, inventory, quality, time tracking, training, chat, AI assistance, and shop-floor kiosks — territory that typically requires 3-5 separate products.
 
 **Strengths vs. industry:**
 - Quote-to-cash lifecycle with full Estimate → Quote → Sales Order → Job → Shipment → Invoice → Payment chain
@@ -86,7 +86,7 @@ QB Engineer covers an unusually broad surface area for a single-codebase manufac
 ### Industry Standard (Epicor, JobBOSS, ProShop)
 A work order / job typically includes: job number, part, quantity, revision, routing (sequence of operations), BOM, due date, priority, status, customer PO reference, material costs, labor costs, burden costs, subcontract costs, quoted price, actual vs. estimated variance, operation-level scheduling, split/merge capabilities, rework tracking, ECO (engineering change order) linkage.
 
-### QB Engineer Implementation — **STRONG**
+### Forge Implementation — **STRONG**
 
 **Job Entity (42 fields):**
 - `JobNumber`, `Title`, `Description`, `TrackTypeId`, `CurrentStageId`, `AssigneeId`, `Priority` (enum: Low/Medium/High/Critical), `CustomerId`, `DueDate`, `StartDate`, `CompletedDate`, `IsArchived`, `BoardPosition`, `PartId`, `ParentJobId`, `SalesOrderLineId`, `ExternalId/ExternalRef/Provider` (accounting sync), `IterationCount`, `IterationNotes`, `IsInternal`, `InternalProjectTypeId`, `Disposition` (enum: ShipToCustomer/AddToInventory/CapitalizeAsAsset/Scrap/HoldForReview), `DispositionNotes`, `DispositionAt`, `CustomFieldValues` (JSONB), `CoverPhotoFileId`
@@ -129,7 +129,7 @@ A work order / job typically includes: job number, part, quantity, revision, rou
 ### Industry Standard (Epicor, SAP, SyteLine)
 Multi-level BOM with revision control, effectivity dates, ECO management, phantom assemblies, BOM costing, where-used analysis, alternate parts, engineering vs. manufacturing BOMs, unit-of-measure conversion.
 
-### QB Engineer Implementation — **STRONG**
+### Forge Implementation — **STRONG**
 
 **Part Entity (30+ fields):**
 - `PartNumber`, `Description`, `Revision`, `Status` (Draft/Prototype/Active/Obsolete), `PartType` (Manufactured/Purchased/Raw/Assembly/Phantom/Tool/Consumable), `Material`, `MoldToolRef`, `ExternalPartNumber`, `ExternalId/ExternalRef/Provider`, `PreferredVendorId`, `MinStockThreshold`, `ReorderPoint`, `ReorderQuantity`, `LeadTimeDays`, `SafetyStockDays`, `CustomFieldValues` (JSONB), `ToolingAssetId`
@@ -175,7 +175,7 @@ Multi-level BOM with revision control, effectivity dates, ECO management, phanto
 ### Industry Standard (Epicor, ProShop, Plex)
 Operation sequence with work centers, setup/run times, tooling requirements, labor/machine rates, overlap/concurrent operations, subcontracting, operation-level scheduling, SPC integration, scrap factors.
 
-### QB Engineer Implementation — **PARTIAL**
+### Forge Implementation — **PARTIAL**
 
 **Operation Entity (12 fields):**
 - `PartId`, `StepNumber`, `Title`, `Instructions`, `WorkCenterId` (FK to Asset), `EstimatedMinutes`, `IsQcCheckpoint`, `QcCriteria`, `ReferencedOperationId`
@@ -209,7 +209,7 @@ Operation sequence with work centers, setup/run times, tooling requirements, lab
 ### Industry Standard (Plex, IQMS/DELMIAworks, Epicor Advanced MES)
 Real-time shop floor data collection, machine integration (OPC-UA), automatic cycle counting, real-time dashboards, operator instructions at workstation, downtime tracking, OEE calculation, pack-out stations, serialization, label printing.
 
-### QB Engineer Implementation — **PARTIAL**
+### Forge Implementation — **PARTIAL**
 
 **ProductionRun Entity (14 fields):**
 - `JobId`, `PartId`, `OperatorId`, `RunNumber`, `TargetQuantity`, `CompletedQuantity`, `ScrapQuantity`, `Status` (enum), `StartedAt`, `CompletedAt`, `Notes`, `SetupTimeMinutes`, `RunTimeMinutes`
@@ -258,7 +258,7 @@ Real-time shop floor data collection, machine integration (OPC-UA), automatic cy
 ### Industry Standard (Plex, IQMS, ProShop)
 Inspection plans, SPC (X-bar/R charts, Cpk/Ppk), CAPA (Corrective and Preventive Action), NCR (Non-Conformance Reports), receiving inspection, in-process inspection, final inspection, gage management, supplier quality, document control, 8D reports, PPAP, FMEA integration.
 
-### QB Engineer Implementation — **PARTIAL**
+### Forge Implementation — **PARTIAL**
 
 **QcChecklistTemplate Entity:**
 - `Name`, `Description`, `PartId`, `IsActive`
@@ -303,7 +303,7 @@ Inspection plans, SPC (X-bar/R charts, Cpk/Ppk), CAPA (Corrective and Preventive
 ### Industry Standard (Epicor, SAP, Fishbowl)
 Multi-warehouse, zone/aisle/rack/bin hierarchy, lot/serial tracking, FIFO/LIFO/FEFO, cycle counting, physical inventory, ABC classification, consignment inventory, inter-warehouse transfers, reservation/allocation, pick/pack/ship, wave planning, put-away rules.
 
-### QB Engineer Implementation — **STRONG**
+### Forge Implementation — **STRONG**
 
 **StorageLocation Entity (10 fields):**
 - `Name`, `LocationType` (Warehouse/Zone/Aisle/Rack/Shelf/Bin), `ParentId` (self-referencing hierarchy), `Barcode`, `Description`, `SortOrder`, `IsActive`
@@ -358,7 +358,7 @@ Multi-warehouse, zone/aisle/rack/bin hierarchy, lot/serial tracking, FIFO/LIFO/F
 ### Industry Standard (Epicor, SAP, SyteLine, Plex)
 Net requirements calculation (gross requirements - on-hand - on-order), time-phased demand, planned order generation, MPS (Master Production Schedule), demand forecasting, what-if simulation, pegging (demand-to-supply traceability), exception messages (expedite/defer/cancel).
 
-### QB Engineer Implementation — **BASIC**
+### Forge Implementation — **BASIC**
 
 **What exists:**
 - `ReorderSuggestion` entity with burn rate analysis and projected stockout
@@ -385,7 +385,7 @@ Net requirements calculation (gross requirements - on-hand - on-order), time-pha
 | Capacity requirements planning | SAP: CRP from MRP output | Not implemented |
 | Multi-level BOM explosion for MRP | Epicor: recursive netting through BOM levels | BOM explosion creates child jobs but doesn't net requirements |
 
-> **This is the single largest gap vs. industry standard.** MRP is the cornerstone of manufacturing ERP. Without it, QB Engineer operates as a job-shop tracker with reorder-point inventory, not a planning system. Adding even a basic net-requirements MRP would be transformative.
+> **This is the single largest gap vs. industry standard.** MRP is the cornerstone of manufacturing ERP. Without it, Forge operates as a job-shop tracker with reorder-point inventory, not a planning system. Adding even a basic net-requirements MRP would be transformative.
 
 ---
 
@@ -394,7 +394,7 @@ Net requirements calculation (gross requirements - on-hand - on-order), time-pha
 ### Industry Standard (Epicor, SAP)
 RFQ (Request for Quote), vendor comparison, blanket POs, PO approval workflow, receiving with inspection, three-way match (PO vs. receipt vs. invoice), vendor scorecards, contract management.
 
-### QB Engineer Implementation — **STRONG**
+### Forge Implementation — **STRONG**
 
 **PurchaseOrder Entity (16 fields):**
 - `PONumber`, `VendorId`, `JobId`, `Status` (Draft/Submitted/Acknowledged/PartiallyReceived/Received/Cancelled/Closed), `SubmittedDate`, `AcknowledgedDate`, `ExpectedDeliveryDate`, `ReceivedDate`, `Notes`, `ExternalId/ExternalRef/Provider`
@@ -433,7 +433,7 @@ RFQ (Request for Quote), vendor comparison, blanket POs, PO approval workflow, r
 ### Industry Standard (Epicor, SAP CRM, Salesforce integration)
 Opportunity management, contact management, quote management, win/loss analysis, territory management, marketing campaigns, customer portal, credit management, customer communication history.
 
-### QB Engineer Implementation — **STRONG**
+### Forge Implementation — **STRONG**
 
 **Lead Entity (14 fields):**
 - `CompanyName`, `ContactName`, `Email`, `Phone`, `Source`, `Status` (New/Contacted/Quoting/Converted/Lost), `Notes`, `FollowUpDate`, `LostReason`, `ConvertedCustomerId`, `CustomFieldValues`, `CreatedBy`
@@ -478,7 +478,7 @@ Overview, Contacts, Addresses, Estimates, Quotes, Orders, Jobs, Invoices, Activi
 ### Industry Standard (Epicor, SAP)
 CPQ (Configure, Price, Quote), multi-currency pricing, quantity breaks, trade agreements, blanket orders, drop-shipping, back-to-back orders, ATP (Available-to-Promise), credit holds.
 
-### QB Engineer Implementation — **FULL**
+### Forge Implementation — **FULL**
 
 **Full quote-to-cash chain implemented:**
 
@@ -522,7 +522,7 @@ CPQ (Configure, Price, Quote), multi-currency pricing, quantity breaks, trade ag
 ### Industry Standard (SAP, Epicor, ShipStation)
 Multi-carrier rate shopping, label generation, tracking, packing slip, bill of lading, freight class, customs/export documentation, drop-ship, consolidation, route optimization.
 
-### QB Engineer Implementation — **STRONG**
+### Forge Implementation — **STRONG**
 
 **Shipment Entity (15 fields):**
 - `ShipmentNumber`, `SalesOrderId`, `ShippingAddressId`, `Status` (Pending/Shipped/Delivered), `Carrier`, `TrackingNumber`, `ShippedDate`, `DeliveredDate`, `ShippingCost`, `Weight`, `Notes`
@@ -568,10 +568,10 @@ Multi-carrier rate shopping, label generation, tracking, packing slip, bill of l
 ### Industry Standard (SAP, Epicor, QuickBooks)
 General ledger, accounts receivable/payable, bank reconciliation, fixed asset depreciation, budgeting, financial statements (P&L, balance sheet, cash flow), multi-currency, tax filing, audit trail.
 
-### QB Engineer Implementation — **PARTIAL** (by design)
+### Forge Implementation — **PARTIAL** (by design)
 
 **Accounting Boundary Architecture:**
-QB Engineer explicitly avoids duplicating a full accounting system. It operates in two modes:
+Forge explicitly avoids duplicating a full accounting system. It operates in two modes:
 
 **Standalone Mode** (no accounting provider):
 - `Invoice` (20+ fields), `InvoiceLine`, `Payment`, `PaymentApplication` — full local CRUD
@@ -615,7 +615,7 @@ QB Engineer explicitly avoids duplicating a full accounting system. It operates 
 ### Industry Standard (Epicor, ProShop)
 Clock in/out, job-level time tracking, operation-level time tracking, overtime calculation, shift management, attendance policies, labor cost allocation, approval workflows.
 
-### QB Engineer Implementation — **STRONG**
+### Forge Implementation — **STRONG**
 
 **TimeEntry Entity (14 fields):**
 - `JobId`, `UserId`, `Date`, `DurationMinutes`, `Category`, `Notes`, `TimerStart`, `TimerStop`, `IsManual`, `IsLocked`, `AccountingTimeActivityId`
@@ -657,7 +657,7 @@ Clock in/out, job-level time tracking, operation-level time tracking, overtime c
 ### Industry Standard (SAP PM, Fiix, UpKeep)
 Preventive/predictive maintenance, work order generation, spare parts inventory, asset lifecycle (acquisition → depreciation → disposal), failure analysis (FMEA), condition monitoring, calibration management.
 
-### QB Engineer Implementation — **STRONG**
+### Forge Implementation — **STRONG**
 
 **Asset Entity (18 fields):**
 - `Name`, `AssetType` (Machine/Tool/Vehicle/Computer/Fixture/Mold/Die/Gage/Other), `Location`, `Manufacturer`, `Model`, `SerialNumber`, `Status` (Active/InMaintenance/Decommissioned), `PhotoFileId`, `CurrentHours`, `Notes`, `IsCustomerOwned`, `CavityCount`, `ToolLifeExpectancy`, `CurrentShotCount`, `SourceJobId`, `SourcePartId`
@@ -700,7 +700,7 @@ Preventive/predictive maintenance, work order generation, spare parts inventory,
 ### Industry Standard (ADP, BambooHR, SAP HCM)
 Employee records, onboarding, benefits enrollment, performance reviews, training management, compliance documents, organizational chart, skills matrix, certification tracking.
 
-### QB Engineer Implementation — **STRONG**
+### Forge Implementation — **STRONG**
 
 **EmployeeProfile Entity (30+ fields):**
 - Full personal info, address, emergency contact, employment info (start date, department, job title, employee number), pay info (hourly rate, salary amount, pay type), compliance tracking dates (W-4, state withholding, I-9, direct deposit, workers comp, handbook)
@@ -758,7 +758,7 @@ Employee records, onboarding, benefits enrollment, performance reviews, training
 ### Industry Standard (Epicor APS, Preactor, PlanetTogether)
 Finite capacity scheduling, Gantt charts, what-if scenarios, constraint-based scheduling, resource leveling, priority dispatching, backwards/forward scheduling.
 
-### QB Engineer Implementation — **PARTIAL**
+### Forge Implementation — **PARTIAL**
 
 **PlanningCycle Entity (8 fields):**
 - `Name`, `StartDate`, `EndDate`, `Goals`, `Status` (Active/Completed), `DurationDays`
@@ -794,7 +794,7 @@ Finite capacity scheduling, Gantt charts, what-if scenarios, constraint-based sc
 ### Industry Standard (Epicor BAQ, SAP BW, Power BI integration)
 Ad-hoc query builder, KPI dashboards, drill-down, scheduled reports, export (Excel/PDF/CSV), role-based report access, data warehouse, embedded analytics.
 
-### QB Engineer Implementation — **FULL**
+### Forge Implementation — **FULL**
 
 **Pre-built Reports (28):** Jobs by stage, overdue jobs, time by user, expense summary, lead pipeline, job completion trend, on-time delivery, average lead time, team workload, customer activity, my work history, my time log, AR aging, revenue, simple P&L, my expense history, quote-to-close, shipping summary, time in stage, employee productivity, inventory levels, maintenance, quality/scrap, cycle review, job margin, my cycle summary, lead-to-sales, R&D report.
 
@@ -835,7 +835,7 @@ Ad-hoc query builder, KPI dashboards, drill-down, scheduled reports, export (Exc
 ### Industry Standard (SAP DMS, SharePoint integration)
 Version control, check-in/check-out, approval workflows, document distribution, revision-controlled drawings, ECN (Engineering Change Notice) linkage, watermarking.
 
-### QB Engineer Implementation — **STRONG**
+### Forge Implementation — **STRONG**
 
 **FileAttachment Entity (14 fields):**
 - `FileName`, `ContentType`, `Size`, `BucketName`, `ObjectKey`, `EntityType`, `EntityId`, `UploadedById`, `DocumentType`, `ExpirationDate`, `PartRevisionId`, `RequiredRole`, `Sensitivity`
@@ -878,7 +878,7 @@ Version control, check-in/check-out, approval workflows, document distribution, 
 ### Industry Standard (SAP, Epicor)
 EDI (Electronic Data Interchange), API (REST/SOAP), webhook support, ETL, accounting integration, shipping carrier APIs, e-commerce connectors, IoT/SCADA.
 
-### QB Engineer Implementation — **STRONG**
+### Forge Implementation — **STRONG**
 
 **Accounting Integration (5 providers):**
 - `IAccountingService` — vendor-agnostic interface
@@ -935,7 +935,7 @@ EDI (Electronic Data Interchange), API (REST/SOAP), webhook support, ETL, accoun
 ### Industry Standard
 Most manufacturing ERPs have minimal real-time capabilities. Some (Plex, IQMS) have shop floor dashboards. Email notifications are standard. Real-time chat is rare in manufacturing ERP.
 
-### QB Engineer Implementation — **FULL** / **NOVEL**
+### Forge Implementation — **FULL** / **NOVEL**
 
 **SignalR Hubs (4):**
 - `BoardHub` — real-time kanban board sync (job created/moved/updated/positioned)
@@ -962,7 +962,7 @@ Most manufacturing ERPs have minimal real-time capabilities. Some (Plex, IQMS) h
 - Connection state banner (reconnecting/disconnected)
 - Multi-tab connection handling
 
-> **This significantly exceeds industry standard.** Most manufacturing ERPs have zero real-time collaboration features. QB Engineer's real-time kanban, chat, and notification system is a genuine differentiator.
+> **This significantly exceeds industry standard.** Most manufacturing ERPs have zero real-time collaboration features. Forge's real-time kanban, chat, and notification system is a genuine differentiator.
 
 ---
 
@@ -971,7 +971,7 @@ Most manufacturing ERPs have minimal real-time capabilities. Some (Plex, IQMS) h
 ### Industry Standard
 Virtually no manufacturing ERP includes built-in AI. Some offer "AI-powered" forecasting as a cloud add-on (SAP AI Core, Oracle AI). None include self-hosted LLM or RAG.
 
-### QB Engineer Implementation — **FULL** / **NOVEL**
+### Forge Implementation — **FULL** / **NOVEL**
 
 **Self-Hosted AI (Ollama):**
 - llama3.2:3b model running locally
@@ -1004,7 +1004,7 @@ Virtually no manufacturing ERP includes built-in AI. Some offer "AI-powered" for
 ### Industry Standard (Epicor Kinetic, Plex)
 Mobile-responsive web interface or native apps. Some offer offline data capture. Few have dedicated mobile worker views.
 
-### QB Engineer Implementation — **STRONG**
+### Forge Implementation — **STRONG**
 
 **PWA Architecture:**
 - Service worker for app shell caching
@@ -1043,7 +1043,7 @@ Mobile-responsive web interface or native apps. Some offer offline data capture.
 ### Industry Standard (ProShop, Plex)
 Touchscreen workstation, scan-to-start, operation-level time tracking, work instructions display, real-time production data, operator login/logout.
 
-### QB Engineer Implementation — **STRONG**
+### Forge Implementation — **STRONG**
 
 **Kiosk Features:**
 - Full-screen display at `/display/shop-floor`
@@ -1089,7 +1089,7 @@ Touchscreen workstation, scan-to-start, operation-level time tracking, work inst
 ### Industry Standard (SAP, FDA-regulated)
 Role-based access control, field-level security, audit trail, electronic signatures (21 CFR Part 11), data encryption, SSO, MFA, SOX compliance, GDPR.
 
-### QB Engineer Implementation — **STRONG**
+### Forge Implementation — **STRONG**
 
 **Authentication:**
 - Tiered: RFID/NFC → barcode → credentials → SSO
@@ -1145,7 +1145,7 @@ Role-based access control, field-level security, audit trail, electronic signatu
 ### Industry Standard (Epicor, SAP)
 System parameters, company setup, multi-company, fiscal calendar, number sequences, workflow configuration, print management, email templates.
 
-### QB Engineer Implementation — **STRONG**
+### Forge Implementation — **STRONG**
 
 **Reference Data System:**
 - Single `reference_data` table for all lookups
@@ -1214,7 +1214,7 @@ These features are uncommon or absent in competing manufacturing ERP products:
 | **Dynamic Report Builder** | User-configurable reports with 28 entity sources, 350+ fields, 6 chart types, saved/shared reports | Most ERPs have fixed reports or require external BI tools |
 | **Terminology Customization** | Admin can rename any entity, status, or action label in the UI (e.g., "Job" → "Work Order") | Not found in competitors — labels are hardcoded |
 | **Planning Day Guided Workflow** | Sprint-style planning with backlog curation, rollover handling, daily Top 3 prompts | Manufacturing ERPs don't incorporate agile planning concepts |
-| **Job Disposition Workflow** | Structured disposition (ship, inventory, capitalize-as-asset, scrap, hold) with full audit | Informal in most systems — QB Engineer makes it explicit |
+| **Job Disposition Workflow** | Structured disposition (ship, inventory, capitalize-as-asset, scrap, hold) with full audit | Informal in most systems — Forge makes it explicit |
 | **Form Draft Recovery System** | Auto-save dirty forms to IndexedDB, cross-tab sync, post-login recovery, TTL management | Not found in any ERP — web apps typically lose form data on navigation |
 | **Accounting Provider Abstraction** | Same app works standalone OR integrated with any of 5 accounting providers, with clean mode switching | Most ERPs either have built-in accounting or hard-integrate with one provider |
 
@@ -1243,7 +1243,7 @@ Ranked by impact for a manufacturing operation:
 
 ### Entity Count by Domain
 
-| Domain | QB Engineer Entities | Typical Industry ERP Entities | Coverage |
+| Domain | Forge Entities | Typical Industry ERP Entities | Coverage |
 |--------|---------------------|-------------------------------|----------|
 | Job/Work Order | 8 (Job, JobStage, JobSubtask, JobActivityLog, JobLink, JobNote, JobPart, ProductionRun) | 10-15 (+ operation scheduling, labor detail, material issue, subcontract) | 75% |
 | BOM/Parts | 7 (Part, BOMEntry, Operation, OperationMaterial, PartPrice, PartRevision, Barcode) | 12-18 (+ ECO, alternate BOM, UOM, part class) | 55% |
@@ -1262,11 +1262,11 @@ Ranked by impact for a manufacturing operation:
 | Config/Admin | 9 (ReferenceData, SystemSetting, TerminologyEntry, UserPreference, UserScanIdentifier, Team, KioskTerminal, CompanyLocation, SalesTaxRate) | 15-25 (+ workflow engine, number sequences, fiscal calendar) | 50% |
 | **TOTAL** | **104** | **200-350** | **~45%** |
 
-> Note: Entity count alone is misleading. QB Engineer covers surface area that typically requires 3-5 separate products (ERP + MES + LMS + Chat + AI). The gaps are primarily in depth within manufacturing-specific domains (MRP, SPC, scheduling) rather than breadth.
+> Note: Entity count alone is misleading. Forge covers surface area that typically requires 3-5 separate products (ERP + MES + LMS + Chat + AI). The gaps are primarily in depth within manufacturing-specific domains (MRP, SPC, scheduling) rather than breadth.
 
 ### API Endpoint Density
 
-| Metric | QB Engineer | Typical ERP |
+| Metric | Forge | Typical ERP |
 |--------|-------------|-------------|
 | Controllers | 62 | 80-150 |
 | Total endpoints | 300+ | 500-1000+ |
@@ -1278,10 +1278,10 @@ Ranked by impact for a manufacturing operation:
 
 ## Conclusion
 
-QB Engineer is a remarkably comprehensive manufacturing platform for a single codebase. It covers the full quote-to-cash lifecycle, shop floor execution, inventory management, CRM, HR/training, compliance, and real-time collaboration — an integration surface that typically requires purchasing and connecting 3-5 separate products.
+Forge is a remarkably comprehensive manufacturing platform for a single codebase. It covers the full quote-to-cash lifecycle, shop floor execution, inventory management, CRM, HR/training, compliance, and real-time collaboration — an integration surface that typically requires purchasing and connecting 3-5 separate products.
 
-**For a job shop / make-to-order manufacturer with <100 employees**, QB Engineer provides competitive or superior functionality to products like JobBOSS, ProShop, and Fishbowl — with the added advantages of self-hosted AI, real-time collaboration, and a modern PWA architecture.
+**For a job shop / make-to-order manufacturer with <100 employees**, Forge provides competitive or superior functionality to products like JobBOSS, ProShop, and Fishbowl — with the added advantages of self-hosted AI, real-time collaboration, and a modern PWA architecture.
 
-**For a larger manufacturer or one in regulated industries (automotive, aerospace, medical device)**, the gaps in MRP, SPC, CAPA/NCR, EDI, and finite scheduling would need to be addressed before QB Engineer could serve as a primary system.
+**For a larger manufacturer or one in regulated industries (automotive, aerospace, medical device)**, the gaps in MRP, SPC, CAPA/NCR, EDI, and finite scheduling would need to be addressed before Forge could serve as a primary system.
 
 The novel features (self-hosted AI/RAG, real-time SignalR collaboration, training LMS, compliance form extraction, terminology customization, form draft recovery) represent genuine innovation that no competitor offers in a manufacturing context.

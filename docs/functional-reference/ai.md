@@ -13,7 +13,7 @@ The system is fully optional -- all AI features degrade gracefully when the Olla
 | `gemma3:4b` | Text generation, chat, summarization | ~2.7 GB |
 | `all-minilm:l6-v2` | Embedding generation for vector search | ~23 MB |
 
-Models are auto-pulled by the `qb-engineer-ai-init` container on first startup.
+Models are auto-pulled by the `forge-ai-init` container on first startup.
 
 ---
 
@@ -367,7 +367,7 @@ Configured via `appsettings.json` under the `Ollama` section:
 
 | Setting | Default | Notes |
 |---------|---------|-------|
-| `BaseUrl` | `http://qb-engineer-ai:11434` | Ollama API endpoint |
+| `BaseUrl` | `http://forge-ai:11434` | Ollama API endpoint |
 | `Model` | `gemma3:4b` | Text generation model |
 | `EmbeddingModel` | `all-minilm:l6-v2` | Embedding model (384 dimensions) |
 | `VisionModel` | (optional) | Vision-capable model for PDF verification |
@@ -375,7 +375,7 @@ Configured via `appsettings.json` under the `Ollama` section:
 
 ### Docker Container
 
-The `qb-engineer-ai` service runs Ollama with GPU support (when available). The `qb-engineer-ai-init` sidecar container pulls the required models on first startup and exits.
+The `forge-ai` service runs Ollama with GPU support (when available). The `forge-ai-init` sidecar container pulls the required models on first startup and exits.
 
 ---
 
@@ -451,7 +451,7 @@ All fields from the request model, plus:
 
 ## Graceful Degradation
 
-When the Ollama container (`qb-engineer-ai`) is down or unreachable, the system degrades as follows:
+When the Ollama container (`forge-ai`) is down or unreachable, the system degrades as follows:
 
 | Feature | Behavior When AI Unavailable |
 |---------|------------------------------|

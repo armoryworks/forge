@@ -2,7 +2,7 @@
 
 ## 1. Overview
 
-QB Engineer includes a built-in Learning Management System (LMS) that provides employee training through multiple content formats. The system ships with 46 seeded training modules organized into 8 learning paths covering topics from onboarding to advanced manufacturing workflows.
+Forge includes a built-in Learning Management System (LMS) that provides employee training through multiple content formats. The system ships with 46 seeded training modules organized into 8 learning paths covering topics from onboarding to advanced manufacturing workflows.
 
 The LMS supports four content types (Article, Walkthrough, QuickRef, Quiz), randomized quiz question pools, interactive guided tours via driver.js, learning style filtering, progress tracking with time-spent analytics, and admin CRUD with per-user drill-down reporting.
 

@@ -400,7 +400,7 @@ This endpoint supports optional `dateFrom` and `dateTo` query parameters.
 ## File Structure
 
 ```
-qb-engineer-ui/src/app/features/vendors/
+forge-ui/src/app/features/vendors/
   vendors.component.ts / .html / .scss
   vendors.routes.ts
   services/
@@ -423,8 +423,8 @@ qb-engineer-ui/src/app/features/vendors/
     vendor-scorecard-tab/
       vendor-scorecard-tab.component.ts / .html / .scss
 
-qb-engineer-server/
-  qb-engineer.api/
+forge-api/
+  forge.api/
     Controllers/VendorsController.cs
     Features/Vendors/
       CreateVendor.cs
@@ -435,7 +435,7 @@ qb-engineer-server/
       GetVendorDropdown.cs
       GetVendorScorecard.cs
       GetVendorPerformanceReport.cs
-  qb-engineer.core/
+  forge.core/
     Entities/Vendor.cs
 ```
 

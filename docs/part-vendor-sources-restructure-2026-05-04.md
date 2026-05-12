@@ -1,7 +1,7 @@
 # Vendor Sources panel restructure — 2026-05-04
 
 > **Status:** for Dan's review.
-> **Code state:** changes are in the working tree of `qb-engineer-ui`. **Nothing committed, nothing pushed, no PR open.** Stacks on top of the part-UX-philosophy work from earlier in the day.
+> **Code state:** changes are in the working tree of `forge-ui`. **Nothing committed, nothing pushed, no PR open.** Stacks on top of the part-UX-philosophy work from earlier in the day.
 > Companion doc: `docs/part-ux-review-2026-05-04.md`.
 
 ---
@@ -112,7 +112,7 @@ The old `VendorPartFormDialogComponent`, `VendorPartListPanelComponent`, `Vendor
 
 ## Screenshots
 
-All in `qb-engineer-ui/e2e/screenshots/part-ux-audit/`.
+All in `forge-ui/e2e/screenshots/part-ux-audit/`.
 
 - **`vendor-sources-panel-1920x1080.png`** — desktop, with the **Acme PREFERRED stub group** at the top showing all 12 editable fields in a 3-column grid, "+ Add another vendor source" below, and the right context pane with the new "Why this step?" rationale that explicitly explains PO pricing dependency.
 - **`vendor-sources-panel-414x896.png`** — mobile (414×896), same content reflowed: rail icons-only on left, fields stacked 1-column, right pane dropped beneath the form as a collapsible.
@@ -185,7 +185,7 @@ The new files + the modifications stack on top of the part-UX-philosophy work th
 
 **Option A — one big effort PR** containing both passes (philosophy + vendor-sources):
 ```bash
-cd qb-engineer-ui
+cd forge-ui
 git checkout -b effort/part-ux-philosophy-and-vendor-sources
 git add public/assets/i18n/ \
         src/app/shared/components/workflow/ \
@@ -200,4 +200,4 @@ cd .. && git add docs/part-ux-review-2026-05-04.md docs/part-vendor-sources-rest
 
 I'd lean Option A — they're conceptually one continuous "make Part workflow great" effort, and splitting them creates rebase work on the second PR for no real value.
 
-To **discard** instead: `cd qb-engineer-ui && git checkout -- public/ src/ && git clean -fd e2e/tests/vendor-sources-screenshot.spec.ts src/app/features/parts/components/vendor-sources-panel/`.
+To **discard** instead: `cd forge-ui && git checkout -- public/ src/ && git clean -fd e2e/tests/vendor-sources-screenshot.spec.ts src/app/features/parts/components/vendor-sources-panel/`.

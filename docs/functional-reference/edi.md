@@ -2,7 +2,7 @@
 
 ## 1. Overview
 
-QB Engineer includes an EDI subsystem for exchanging structured business documents (purchase orders, invoices, advance ship notices) with trading partners using X12 and EDIFACT standards. The system supports multiple transport methods (AS2, SFTP, VAN, Email, API, Manual), transaction lifecycle tracking with retry support, per-partner field mappings, and inbound polling.
+Forge includes an EDI subsystem for exchanging structured business documents (purchase orders, invoices, advance ship notices) with trading partners using X12 and EDIFACT standards. The system supports multiple transport methods (AS2, SFTP, VAN, Email, API, Manual), transaction lifecycle tracking with retry support, per-partner field mappings, and inbound polling.
 
 **Key entities:** `EdiTradingPartner`, `EdiTransaction`, `EdiMapping`
 

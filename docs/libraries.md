@@ -60,8 +60,8 @@ All AI runs locally — no cloud calls, no data leaves the network.
 
 | Component | Tool | Deployment |
 |---|---|---|
-| LLM Runtime | Ollama | Docker container (`qb-engineer-ai`) |
-| Vector Storage | pgvector | Postgres extension (same `qb-engineer-db`) |
+| LLM Runtime | Ollama | Docker container (`forge-ai`) |
+| Vector Storage | pgvector | Postgres extension (same `forge`) |
 | Embedding Model | nomic-embed-text | Via Ollama |
 | LLM Models | Llama 3.3 / Mistral / Qwen3 | Via Ollama, user's choice based on hardware |
 | Web UI (optional) | Open WebUI | Docker container for direct model interaction |
@@ -110,7 +110,7 @@ All AI runs locally — no cloud calls, no data leaves the network.
 ### Docker Compose Addition
 
 ```yaml
-qb-engineer-ai:          # Ollama LLM runtime
+forge-ai:          # Ollama LLM runtime
   image: ollama/ollama
   volumes:
     - ollama-models:/root/.ollama

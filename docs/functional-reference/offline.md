@@ -2,7 +2,7 @@
 
 ## Overview
 
-QB Engineer is a Progressive Web App (PWA) with offline resilience. The system uses three complementary mechanisms to ensure the application remains usable during network interruptions:
+Forge is a Progressive Web App (PWA) with offline resilience. The system uses three complementary mechanisms to ensure the application remains usable during network interruptions:
 
 1. **Angular Service Worker** -- Caches the app shell (HTML, JS, CSS, fonts) for instant loads and provides stale-while-revalidate API response caching.
 2. **IndexedDB Action Queue** -- Queues write operations (POST, PUT, PATCH, DELETE) made while offline and drains them sequentially when connectivity returns.
@@ -14,7 +14,7 @@ The user is informed of offline state, sync progress, and conflicts through the 
 
 ## Service Worker Configuration
 
-**Location:** `qb-engineer-ui/ngsw-config.json`
+**Location:** `forge-ui/ngsw-config.json`
 
 The Angular service worker (`@angular/service-worker`) is configured with two asset groups and two data groups.
 
@@ -42,9 +42,9 @@ Both groups use the `freshness` strategy (stale-while-revalidate): the service w
 
 ### OfflineQueueService
 
-**Location:** `qb-engineer-ui/src/app/shared/services/offline-queue.service.ts`
+**Location:** `forge-ui/src/app/shared/services/offline-queue.service.ts`
 
-A signal-based service that persists pending write operations in an IndexedDB database (`qb-engineer-offline-queue`, object store: `queue`). Operations are queued when the application detects the user is offline and are drained in FIFO order when connectivity returns.
+A signal-based service that persists pending write operations in an IndexedDB database (`forge-offline-queue`, object store: `queue`). Operations are queued when the application detects the user is offline and are drained in FIFO order when connectivity returns.
 
 **Signals:**
 - `pendingCount: WritableSignal<number>` -- Number of queued operations
@@ -151,7 +151,7 @@ interface SyncResult {
 
 ## OfflineBannerComponent
 
-**Location:** `qb-engineer-ui/src/app/shared/components/offline-banner/`
+**Location:** `forge-ui/src/app/shared/components/offline-banner/`
 
 A bottom-center banner that communicates offline state, sync progress, and sync completion to the user.
 
@@ -179,7 +179,7 @@ A bottom-center banner that communicates offline state, sync progress, and sync 
 
 ## SyncConflictDialogComponent
 
-**Location:** `qb-engineer-ui/src/app/shared/components/sync-conflict-dialog/`
+**Location:** `forge-ui/src/app/shared/components/sync-conflict-dialog/`
 
 A `MatDialog`-based component that presents sync conflicts for user resolution. Opened when `OfflineQueueService.conflict` becomes non-null.
 
@@ -227,10 +227,10 @@ The system uses **last-write-wins** for most concurrent edits. This matches the 
 
 | File | Purpose |
 |------|---------|
-| `qb-engineer-ui/ngsw-config.json` | Angular service worker configuration (asset + data caching) |
-| `qb-engineer-ui/src/app/shared/services/offline-queue.service.ts` | IndexedDB action queue (enqueue, drain, conflict resolution) |
-| `qb-engineer-ui/src/app/shared/components/offline-banner/offline-banner.component.ts` | Offline/syncing/synced status banner |
-| `qb-engineer-ui/src/app/shared/components/sync-conflict-dialog/sync-conflict-dialog.component.ts` | 409 conflict resolution dialog |
-| `qb-engineer-ui/src/app/shared/models/offline-queue-entry.model.ts` | `OfflineQueueEntry`, `DrainResult` |
-| `qb-engineer-ui/src/app/shared/models/sync-conflict.model.ts` | `SyncConflict`, `SyncConflictResolution` |
-| `qb-engineer-ui/src/app/shared/models/sync-result.model.ts` | `SyncResult` |
+| `forge-ui/ngsw-config.json` | Angular service worker configuration (asset + data caching) |
+| `forge-ui/src/app/shared/services/offline-queue.service.ts` | IndexedDB action queue (enqueue, drain, conflict resolution) |
+| `forge-ui/src/app/shared/components/offline-banner/offline-banner.component.ts` | Offline/syncing/synced status banner |
+| `forge-ui/src/app/shared/components/sync-conflict-dialog/sync-conflict-dialog.component.ts` | 409 conflict resolution dialog |
+| `forge-ui/src/app/shared/models/offline-queue-entry.model.ts` | `OfflineQueueEntry`, `DrainResult` |
+| `forge-ui/src/app/shared/models/sync-conflict.model.ts` | `SyncConflict`, `SyncConflictResolution` |
+| `forge-ui/src/app/shared/models/sync-result.model.ts` | `SyncResult` |

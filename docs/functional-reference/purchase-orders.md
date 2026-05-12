@@ -665,7 +665,7 @@ Draft ──> Submitted ──> Acknowledged ──> PartiallyReceived ──> R
 ## File Structure
 
 ```
-qb-engineer-ui/src/app/features/purchase-orders/
+forge-ui/src/app/features/purchase-orders/
   purchase-orders.component.ts / .html / .scss
   purchase-orders.routes.ts
   services/
@@ -690,8 +690,8 @@ qb-engineer-ui/src/app/features/purchase-orders/
     receive-dialog/
       receive-dialog.component.ts / .html / .scss
 
-qb-engineer-server/
-  qb-engineer.api/
+forge-api/
+  forge.api/
     Controllers/PurchaseOrdersController.cs
     Features/PurchaseOrders/
       CreatePurchaseOrder.cs
@@ -708,7 +708,7 @@ qb-engineer-server/
       CreatePurchaseOrderRelease.cs
       GetPurchaseOrderReleases.cs
       UpdatePurchaseOrderRelease.cs
-  qb-engineer.core/
+  forge.core/
     Entities/
       PurchaseOrder.cs
       PurchaseOrderLine.cs

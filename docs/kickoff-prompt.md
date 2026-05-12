@@ -1,6 +1,6 @@
-# QB Engineer — Claude Code Project Initialization
+# Forge — Claude Code Project Initialization
 
-You are helping build **QB Engineer**, an open-source (GNU licensed), locally hosted operational web application for small manufacturers. This is NOT an accounting system — QuickBooks Online handles that. This is the operational layer: job tracking, R&D workflow, file management, production traceability, lead management, planning cycles, and an engineer focus dashboard.
+You are helping build **Forge**, an open-source (GNU licensed), locally hosted operational web application for small manufacturers. This is NOT an accounting system — QuickBooks Online handles that. This is the operational layer: job tracking, R&D workflow, file management, production traceability, lead management, planning cycles, and an engineer focus dashboard.
 
 **Nothing company-specific should be committed.** All branding, workflows, track types, and configurations are user-defined. This app must work for any small manufacturer who connects their own QB Online account.
 
@@ -95,17 +95,17 @@ See `docs/coding-standards.md` for the full 37-standard reference. Key rules enf
 
 | Item | Name |
 |---|---|
-| .NET Solution | `qb-engineer.sln` |
-| API Project | `qb-engineer.api` |
-| Data/EF Layer | `qb-engineer.data` |
-| Core/Domain | `qb-engineer.core` |
-| Integrations | `qb-engineer.integrations` |
-| Tests | `qb-engineer.tests` |
-| Angular App | `qb-engineer-ui` |
-| C# Namespaces | `QbEngineer.Api`, `QbEngineer.Data`, `QbEngineer.Core`, etc. |
-| Docker Services | `qb-engineer-ui`, `qb-engineer-api`, `qb-engineer-db`, `qb-engineer-storage`, `qb-engineer-backup` |
-| Postgres DB | `qb_engineer` |
-| MinIO Buckets | `qb-engineer-job-files`, `qb-engineer-receipts`, `qb-engineer-employee-docs` |
+| .NET Solution | `forge.sln` |
+| API Project | `forge.api` |
+| Data/EF Layer | `forge.data` |
+| Core/Domain | `forge.core` |
+| Integrations | `forge.integrations` |
+| Tests | `forge.tests` |
+| Angular App | `forge-ui` |
+| C# Namespaces | `Forge.Api`, `Forge.Data`, `Forge.Core`, etc. |
+| Docker Services | `forge-ui`, `forge-api`, `forge`, `forge-storage`, `forge-backup` |
+| Postgres DB | `forge` |
+| MinIO Buckets | `forge-job-files`, `forge-receipts`, `forge-employee-docs` |
 
 ---
 
@@ -114,12 +114,12 @@ See `docs/coding-standards.md` for the full 37-standard reference. Key rules enf
 ```yaml
 # Target structure:
 services:
-  qb-engineer-ui:       # Nginx + Angular build, proxies /api to backend
-  qb-engineer-api:      # .NET 9 Web API
-  qb-engineer-db:       # PostgreSQL + pgvector with persistent volume
-  qb-engineer-storage:  # MinIO with persistent volume
-  qb-engineer-backup:   # Scheduled pg_dump + rclone to Backblaze B2
-  qb-engineer-ai:       # Ollama LLM runtime (optional — app works without it)
+  forge-ui:       # Nginx + Angular build, proxies /api to backend
+  forge-api:      # .NET 9 Web API
+  forge:       # PostgreSQL + pgvector with persistent volume
+  forge-storage:  # MinIO with persistent volume
+  forge-backup:   # Scheduled pg_dump + rclone to Backblaze B2
+  forge-ai:       # Ollama LLM runtime (optional — app works without it)
   # Separate compose for secondary backup target on another machine
 ```
 
@@ -375,10 +375,10 @@ Admin can add/rename/reorder/deactivate values per group via admin settings. Dea
 
 ## Integration Service Layer
 
-Create `/src/integrations/` (or `qb-engineer.integrations` project) with interfaces + real + mock implementations:
+Create `/src/integrations/` (or `forge.integrations` project) with interfaces + real + mock implementations:
 
 ```
-qb-engineer.integrations/
+forge.integrations/
   Accounting/
     IAccountingService.cs      — common interface for all accounting operations
     AccountingServiceFactory.cs — resolves the active provider from system_settings

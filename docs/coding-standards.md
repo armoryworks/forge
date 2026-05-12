@@ -4,7 +4,7 @@
 
 **Before adding new endpoints or feature surface, decide which capability gates them.** Every controller / endpoint / nav entry / Hangfire job in the system flows through the Phase 4 capability-gating layer. New features must be registered the same way existing features were:
 
-1. **Pick or add a capability code in `qb-engineer-server/qb-engineer.api/Capabilities/CapabilityCatalog.cs`.** Either reuse an existing capability that semantically covers the new endpoint (e.g., adding a new lot-traceability query reuses `CAP-INV-LOTS`), or add a new `CapabilityDefinition` row with:
+1. **Pick or add a capability code in `forge-api/forge.api/Capabilities/CapabilityCatalog.cs`.** Either reuse an existing capability that semantically covers the new endpoint (e.g., adding a new lot-traceability query reuses `CAP-INV-LOTS`), or add a new `CapabilityDefinition` row with:
    - A stable `CAP-{AREA}-{NAME}` code (e.g., `CAP-PLAN-MPS`, `CAP-QC-GAGE`). Codes are immutable forever once shipped.
    - A `DefaultState` (on/off) — default-on for capabilities every install needs; default-off for opt-in features.
    - Optional `Dependencies` and `Mutexes` declared in `CapabilityCatalogRelations.cs`.
@@ -17,7 +17,7 @@
 
 5. **UI gating**: feature components and nav items consume `CapabilityService.isEnabled('CAP-...')` (signal-based) and either omit themselves with `@if` or use the `*appCap` structural directive. Server gate is the security boundary; UI gate is ergonomics.
 
-6. **Smoke test for the gate** lives in `qb-engineer-server/qb-engineer.tests/Capabilities/`. Pattern: pick one representative endpoint, disable its capability, assert 403 + envelope, restore. The Phase D `CapabilityPhaseDSmokeTests.cs` is the reference.
+6. **Smoke test for the gate** lives in `forge-api/forge.tests/Capabilities/`. Pattern: pick one representative endpoint, disable its capability, assert 403 + envelope, restore. The Phase D `CapabilityPhaseDSmokeTests.cs` is the reference.
 
 The full design lives in `phase-4-output/4D-gating-mechanism/` (mechanism), `phase-4-output/4A-capability-catalog/` (the 129 capability codes), and `phase-4-output/PHASE-4-CLOSEOUT.md` (rollup). The catalog is the source of truth for codes; the markdown is the human mirror.
 
@@ -155,7 +155,7 @@ features/kanban/
 | Parameters/locals | `camelCase` | `jobId`, `isActive` |
 | Interfaces | `I` prefix | `IJobService` |
 | Constants | `PascalCase` | `MaxRetryCount` |
-| Namespaces | `QbEngineer.{Project}.{Folder}` | `QbEngineer.Api.Controllers` |
+| Namespaces | `Forge.{Project}.{Folder}` | `Forge.Api.Controllers` |
 
 ---
 
@@ -245,7 +245,7 @@ features/kanban/
 - Integration tests for API endpoints using `WebApplicationFactory`
 - Bogus for test data generation
 - Mock external services (QB, MinIO, SMTP) — never hit real services in tests
-- Test project mirrors source structure: `QbEngineer.Tests/Handlers/Jobs/CreateJobHandlerTests.cs`
+- Test project mirrors source structure: `Forge.Tests/Handlers/Jobs/CreateJobHandlerTests.cs`
 
 ### E2E — Cypress
 
@@ -267,7 +267,7 @@ features/kanban/
 - Cypress runs against the full Docker Compose stack with `MOCK_INTEGRATIONS=true`
 - Tests use API seeding (not UI clicks) for test data setup — fast and reliable
 - CI pipeline: unit tests → integration tests → Cypress E2E
-- Cypress specs live in `qb-engineer-ui/cypress/e2e/` organized by feature:
+- Cypress specs live in `forge-ui/cypress/e2e/` organized by feature:
   ```
   cypress/e2e/
     auth/
@@ -290,11 +290,11 @@ features/kanban/
 ### E2E — Playwright (SignalR Diagnostics & Simulation)
 
 - Playwright for multi-browser context tests (required for SignalR real-time sync verification)
-- Tests in `qb-engineer-ui/e2e/tests/`, helpers in `e2e/helpers/`
+- Tests in `forge-ui/e2e/tests/`, helpers in `e2e/helpers/`
 - Run headless: `npm run e2e` | headed: `npm run e2e:headed`
 - Config: `e2e/playwright.config.ts` — Chromium only, no webServer (assumes Docker stack running)
 - Auth via API helper (`e2e/helpers/auth.helper.ts`) — sets localStorage directly, no UI login
-- Seeded test users: `admin@qbengineer.local`, `akim@qbengineer.local` — password set via `SEED_USER_PASSWORD` env var
+- Seeded test users: `admin@forge.local`, `akim@forge.local` — password set via `SEED_USER_PASSWORD` env var
 - `ui-actions.helper.ts`: reusable Playwright helpers (navigateTo, fillInput, fillMatSelect, fillDatepicker, clickButton)
 
 ### data-testid Conventions
@@ -336,7 +336,7 @@ Blank line between each group. Enforced by ESLint import-order rule.
 1. System namespaces
 2. Microsoft namespaces
 3. Third-party namespaces (FluentValidation, MediatR, Serilog, etc.)
-4. QbEngineer namespaces
+4. Forge namespaces
 ```
 
 Enforced by `.editorconfig`.

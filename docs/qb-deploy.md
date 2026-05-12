@@ -15,24 +15,24 @@ This is the document you'll re-read in six months on a Pi at 11pm.
   chosen tag exists, update `SERVER_IMAGE_TAG` / `UI_IMAGE_TAG` /
   `TEST_IMAGE_TAG` in `.env`, run `docker compose pull` + `up -d`, poll
   the healthcheck for up to 60s, roll back on failure, append every
-  outcome to `/var/log/qb-engineer-deploy.log`.
+  outcome to `/var/log/forge-deploy.log`.
 - **Doesn't:** build images, run tests, talk to GitHub Actions, expose any
   inbound network surface, accept the floating tag `latest`.
 
 ## Install
 
-On the Pi, with the deploy repo cloned at `/opt/qb-engineer-deploy`:
+On the Pi, with the deploy repo cloned at `/opt/forge-deploy`:
 
 ```bash
-sudo /opt/qb-engineer-deploy/scripts/install-qb-deploy.sh
+sudo /opt/forge-deploy/scripts/install-qb-deploy.sh
 ```
 
 The installer:
 
 1. Copies `qb-deploy` to `/usr/local/bin/qb-deploy` (mode 0755).
-2. Creates `/etc/qb-engineer/` (mode 0750, owned by the deploy user).
-3. Creates `/etc/qb-engineer/deploy-state.json` (mode 0640) if missing.
-4. Touches `/var/log/qb-engineer-deploy.log` (mode 0644).
+2. Creates `/etc/forge/` (mode 0750, owned by the deploy user).
+3. Creates `/etc/forge/deploy-state.json` (mode 0640) if missing.
+4. Touches `/var/log/forge-deploy.log` (mode 0644).
 5. Verifies `docker`, `docker compose`, `curl`, `jq` are all present.
 
 It's idempotent — re-run any time. An existing state file is preserved
@@ -42,7 +42,7 @@ If the deploy user isn't the user running the install (for example you're
 running it as root in a fresh setup), set `QB_DEPLOY_USER=qbedeploy`:
 
 ```bash
-sudo QB_DEPLOY_USER=qbedeploy /opt/qb-engineer-deploy/scripts/install-qb-deploy.sh
+sudo QB_DEPLOY_USER=qbedeploy /opt/forge-deploy/scripts/install-qb-deploy.sh
 ```
 
 ## Daily flow
@@ -77,7 +77,7 @@ qb-deploy --rollback --service api   # just api
 # Tail the deploy log
 qb-deploy --logs
 
-# Pull the latest qb-engineer-deploy code + reinstall the CLI
+# Pull the latest forge-deploy code + reinstall the CLI
 qb-deploy --self-update
 ```
 
@@ -100,9 +100,9 @@ semver tags that prints.
 
 | Service | How it's checked |
 |---|---|
-| `qb-engineer-api` | HTTP `GET http://127.0.0.1:${API_PORT}/api/v1/health` (port read from `.env`) |
-| `qb-engineer-ui` | Container `HEALTHCHECK` (nginx wget on `:80/`) |
-| `qb-engineer-test` | Container `HEALTHCHECK` (defined when the test image lands) |
+| `forge-api` | HTTP `GET http://127.0.0.1:${API_PORT}/api/v1/health` (port read from `.env`) |
+| `forge-ui` | Container `HEALTHCHECK` (nginx wget on `:80/`) |
+| `forge-test` | Container `HEALTHCHECK` (defined when the test image lands) |
 
 Polling runs for 60 s with a 2 s interval. On failure, the operative
 `.env` is reverted to the previous tag and the container is restarted
@@ -111,9 +111,9 @@ on the previous image.
 ## State and log
 
 ```
-/etc/qb-engineer/deploy-state.json   # current/prior/deployedAt per image
-/var/log/qb-engineer-deploy.log      # every deploy event, append-only
-/opt/qb-engineer-deploy/.env         # operative env file (image tags pinned here)
+/etc/forge/deploy-state.json   # current/prior/deployedAt per image
+/var/log/forge-deploy.log      # every deploy event, append-only
+/opt/forge-deploy/.env         # operative env file (image tags pinned here)
 ```
 
 Sample log line:
@@ -126,8 +126,8 @@ Sample log line:
 
 `qb-deploy --self-update` runs:
 
-1. `git -C /opt/qb-engineer-deploy pull --ff-only`
-2. `/opt/qb-engineer-deploy/scripts/install-qb-deploy.sh`
+1. `git -C /opt/forge-deploy pull --ff-only`
+2. `/opt/forge-deploy/scripts/install-qb-deploy.sh`
 
 It refuses to pull when the working tree has uncommitted changes —
 otherwise it would silently move local edits aside.
@@ -156,7 +156,7 @@ you see this.
 
 **`State file not writable`**
 The deploy user changed or you're running as a different user than the
-one that owns `/etc/qb-engineer/`. Re-run the installer with the right
+one that owns `/etc/forge/`. Re-run the installer with the right
 `QB_DEPLOY_USER`.
 
 **`Refusing to deploy 'latest'`**
@@ -171,7 +171,7 @@ replaces them on the Pi side: prod runs from prebuilt images, never
 builds locally.
 
 As of Phase 7, **`refresh.{sh,ps1}` actively refuse to run on the Pi**.
-They check for `/etc/qb-engineer/deploy-state.json` (created by
+They check for `/etc/forge/deploy-state.json` (created by
 `install-qb-deploy.sh`) and abort with a pointer at `qb-deploy` if
 present. On dev workstations the file is absent, so the local-build
 dev loop is unaffected.

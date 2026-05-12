@@ -1,4 +1,4 @@
-# QB Engineer
+# Forge
 
 ## Open Source Manufacturing Operations Platform
 
@@ -12,7 +12,7 @@ Version 2.0 | March 2026 | GNU Licensed
 
 Small and mid-size manufacturers commonly operate with QuickBooks as their primary business system. While QuickBooks handles financial reporting adequately for accounting staff and external CPAs, it does not align with the day-to-day operational reality of a production shop. It does not support production job tracking, R&D tooling workflows, CAD/STL file management, cycle-based work planning, or the focused work patterns required by engineering teams.
 
-QB Engineer is a purpose-built operational companion application — a locally hosted, containerized web application that sits alongside QuickBooks rather than replacing it. QuickBooks remains the financial system of record. QB Engineer becomes the operational system of record: managing jobs, production workflow, R&D iterations, CAD file attachments, production traceability, lead management, and a focus-oriented engineer dashboard.
+Forge is a purpose-built operational companion application — a locally hosted, containerized web application that sits alongside QuickBooks rather than replacing it. QuickBooks remains the financial system of record. Forge becomes the operational system of record: managing jobs, production workflow, R&D iterations, CAD file attachments, production traceability, lead management, and a focus-oriented engineer dashboard.
 
 The application is built on proven open-source technology, runs entirely in Docker containers on local infrastructure, and carries no ongoing SaaS fees or vendor dependencies. It is open-sourced under the GNU license and designed to be company-agnostic — all branding, workflows, and configurations are user-defined.
 
@@ -56,13 +56,13 @@ A locally hosted, containerized web application with the following architecture:
 
 | Container | Purpose |
 |---|---|
-| `qb-engineer-ui` | Nginx serving Angular build, proxies API calls |
-| `qb-engineer-api` | .NET 9 Web API, QB integration, business logic |
-| `qb-engineer-db` | PostgreSQL + pgvector with persistent volume |
-| `qb-engineer-storage` | MinIO with persistent volume |
-| `qb-engineer-backup` | Scheduled backup jobs (pg_dump + rclone) |
-| `qb-engineer-ai` | Ollama LLM runtime (optional -- app works without it) |
-| `qb-engineer-backup-target` | MinIO replica on secondary machine (separate compose) |
+| `forge-ui` | Nginx serving Angular build, proxies API calls |
+| `forge-api` | .NET 9 Web API, QB integration, business logic |
+| `forge` | PostgreSQL + pgvector with persistent volume |
+| `forge-storage` | MinIO with persistent volume |
+| `forge-backup` | Scheduled backup jobs (pg_dump + rclone) |
+| `forge-ai` | Ollama LLM runtime (optional -- app works without it) |
+| `forge-backup-target` | MinIO replica on secondary machine (separate compose) |
 
 ### 3.3 Relationship to Accounting Systems
 
@@ -474,7 +474,7 @@ Employee master data (name, address, SSN, pay rate, tax info, direct deposit) li
 
 **App-only storage (if needed):**
 - Signed documents, certifications, training records
-- Stored in MinIO `qb-engineer-employee-docs` bucket
+- Stored in MinIO `forge-employee-docs` bucket
 - Always restricted: visible only to the employee + Admin + Office Manager
 - `TODO: [ANALYSIS]` — evaluate whether this feature is needed or if the accounting system covers all requirements
 
@@ -921,7 +921,7 @@ Two layers: admin-configurable terminology (relabel concepts) and full language 
 ### 6.7 Backup Strategy
 
 **Primary — Backblaze B2 (off-site):**
-- `qb-engineer-backup` container runs scheduled jobs
+- `forge-backup` container runs scheduled jobs
 - Daily `pg_dump` → compress → upload to B2
 - Daily `rclone sync` for MinIO files to B2
 - Retention: 7 daily, 4 weekly, 3 monthly

@@ -1,6 +1,6 @@
 # AI System — Architecture & Interaction Reference
 
-QB Engineer's AI layer is powered by a self-hosted **Ollama** instance running inside Docker. All AI interactions are optional — the application degrades gracefully when the AI container is unavailable. No external AI APIs are used.
+Forge's AI layer is powered by a self-hosted **Ollama** instance running inside Docker. All AI interactions are optional — the application degrades gracefully when the AI container is unavailable. No external AI APIs are used.
 
 ---
 
@@ -8,15 +8,15 @@ QB Engineer's AI layer is powered by a self-hosted **Ollama** instance running i
 
 | Component | Details |
 |-----------|---------|
-| Container | `qb-engineer-ai` (Ollama) |
+| Container | `forge-ai` (Ollama) |
 | Generation model | `mistral:7b` (instruction following, help chat, search suggestions, RAG answers) |
 | Embedding model | `all-minilm:l6-v2` (384-dimension vectors for semantic search) |
 | Vector store | PostgreSQL + pgvector extension (`document_embeddings` table) |
 | Config | `appsettings.json` → `Ollama` section (`BaseUrl`, `Model`, `EmbeddingModel`, `TimeoutSeconds`) |
 | Mock | `MockAiService` — used when `MockIntegrations=true`, returns canned responses |
-| Interface | `IAiService` in `qb-engineer.core/Interfaces/IAiService.cs` |
+| Interface | `IAiService` in `forge.core/Interfaces/IAiService.cs` |
 
-Models are pulled automatically by the `qb-engineer-ai-init` container on first start.
+Models are pulled automatically by the `forge-ai-init` container on first start.
 
 ---
 

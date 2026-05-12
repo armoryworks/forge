@@ -1,4 +1,4 @@
-# QB Engineer — Gap Inventory: Path to FULL Parity
+# Forge — Gap Inventory: Path to FULL Parity
 
 > Comprehensive inventory of everything needed to reach FULL parity with top-tier manufacturing ERP/MES platforms, organized by priority tier. Each item includes: what to build, new entities/fields, new endpoints, new UI components, and estimated complexity.
 >
@@ -10,11 +10,11 @@
 
 | Tier | Label | Criteria |
 |------|-------|----------|
-| **P0** | **Showstopper** | Without this, QB Engineer cannot be called a manufacturing ERP. Blocks adoption at any serious manufacturer. |
+| **P0** | **Showstopper** | Without this, Forge cannot be called a manufacturing ERP. Blocks adoption at any serious manufacturer. |
 | **P1** | **Critical** | Required for ISO/regulated environments or any manufacturer above 25 employees. Most prospects will ask about these. |
 | **P2** | **Important** | Expected by mid-market manufacturers. Missing these limits competitiveness but doesn't block adoption. |
 | **P3** | **Standard** | Common in top-tier ERPs. Adds depth and polish. Missing these is noticeable but acceptable for smaller shops. |
-| **P4** | **Nice-to-Have** | Present in enterprise ERPs (SAP/Oracle tier). Adds capability but rarely a deciding factor for QB Engineer's target market. |
+| **P4** | **Nice-to-Have** | Present in enterprise ERPs (SAP/Oracle tier). Adds capability but rarely a deciding factor for Forge's target market. |
 
 ---
 
@@ -22,7 +22,7 @@
 
 ### 1. MRP / MPS Engine (Material Requirements Planning)
 
-**Why P0:** MRP is THE defining function of a manufacturing ERP. Without it, QB Engineer is a job tracker with inventory, not a planning system. Every serious prospect will ask "does it do MRP?"
+**Why P0:** MRP is THE defining function of a manufacturing ERP. Without it, Forge is a job tracker with inventory, not a planning system. Every serious prospect will ask "does it do MRP?"
 
 **What to build:**
 
@@ -89,7 +89,7 @@ POST   /api/v1/mrp/simulate               — What-if run (doesn't commit planne
 **Full C# Entity Definitions:**
 
 ```csharp
-// qb-engineer.core/Entities/MrpDemand.cs
+// forge.core/Entities/MrpDemand.cs
 public class MrpDemand : BaseEntity
 {
     public int PartId { get; set; }
@@ -107,7 +107,7 @@ public class MrpDemand : BaseEntity
     public MrpDemand? ParentDemand { get; set; }
 }
 
-// qb-engineer.core/Entities/MrpSupply.cs
+// forge.core/Entities/MrpSupply.cs
 public class MrpSupply : BaseEntity
 {
     public int PartId { get; set; }
@@ -122,7 +122,7 @@ public class MrpSupply : BaseEntity
     public MrpRun Run { get; set; } = null!;
 }
 
-// qb-engineer.core/Entities/MrpPlannedOrder.cs
+// forge.core/Entities/MrpPlannedOrder.cs
 public class MrpPlannedOrder : BaseAuditableEntity
 {
     public int PartId { get; set; }
@@ -145,7 +145,7 @@ public class MrpPlannedOrder : BaseAuditableEntity
     public ICollection<MrpPlannedOrder> ChildPlannedOrders { get; set; } = new List<MrpPlannedOrder>();
 }
 
-// qb-engineer.core/Entities/MrpRun.cs
+// forge.core/Entities/MrpRun.cs
 public class MrpRun : BaseAuditableEntity
 {
     public DateTimeOffset RunDate { get; set; }
@@ -166,7 +166,7 @@ public class MrpRun : BaseAuditableEntity
     public ICollection<MrpException> Exceptions { get; set; } = new List<MrpException>();
 }
 
-// qb-engineer.core/Entities/MrpException.cs
+// forge.core/Entities/MrpException.cs
 public class MrpException : BaseEntity
 {
     public int RunId { get; set; }
@@ -187,7 +187,7 @@ public class MrpException : BaseEntity
 
 **New Enums:**
 ```csharp
-// qb-engineer.core/Enums/MrpEnums.cs
+// forge.core/Enums/MrpEnums.cs
 public enum MrpDemandSource { SalesOrder, Forecast, SafetyStock, Dependent, Manual }
 public enum MrpSupplySource { OnHand, PurchaseOrder, PlannedPurchase, ProductionOrder, PlannedProduction }
 public enum MrpOrderType { Purchase, Production }
@@ -200,7 +200,7 @@ public enum LotSizingRule { LotForLot, FixedQuantity, MinMax, EconomicOrderQuant
 
 **New fields on Part entity:**
 ```csharp
-// Add to qb-engineer.core/Entities/Part.cs
+// Add to forge.core/Entities/Part.cs
 public LotSizingRule LotSizingRule { get; set; } = LotSizingRule.LotForLot;
 public decimal? FixedOrderQuantity { get; set; }      // For FixedQuantity rule
 public decimal? MinimumOrderQuantity { get; set; }     // Minimum per order
@@ -212,7 +212,7 @@ public bool IsMrpPlanned { get; set; } = true;        // False = manually manage
 
 **New Core Interface:**
 ```csharp
-// qb-engineer.core/Interfaces/IMrpService.cs
+// forge.core/Interfaces/IMrpService.cs
 public interface IMrpService
 {
     Task<MrpRun> ExecuteRunAsync(MrpRunParameters parameters, CancellationToken ct);
@@ -419,7 +419,7 @@ MasterScheduleLine
 
 **Full C# Entity Definitions:**
 ```csharp
-// qb-engineer.core/Entities/MasterSchedule.cs
+// forge.core/Entities/MasterSchedule.cs
 public class MasterSchedule : BaseAuditableEntity
 {
     public string Name { get; set; } = "";
@@ -432,7 +432,7 @@ public class MasterSchedule : BaseAuditableEntity
     public ICollection<MasterScheduleLine> Lines { get; set; } = new List<MasterScheduleLine>();
 }
 
-// qb-engineer.core/Entities/MasterScheduleLine.cs
+// forge.core/Entities/MasterScheduleLine.cs
 public class MasterScheduleLine : BaseEntity
 {
     public int MasterScheduleId { get; set; }
@@ -521,7 +521,7 @@ Statistical forecasting from historical sales order data. Even a simple moving a
 
 **Full C# Entity Definitions:**
 ```csharp
-// qb-engineer.core/Entities/DemandForecast.cs
+// forge.core/Entities/DemandForecast.cs
 public class DemandForecast : BaseAuditableEntity
 {
     public int PartId { get; set; }
@@ -537,7 +537,7 @@ public class DemandForecast : BaseAuditableEntity
     public ICollection<ForecastOverride> Overrides { get; set; } = new List<ForecastOverride>();
 }
 
-// qb-engineer.core/Entities/ForecastOverride.cs
+// forge.core/Entities/ForecastOverride.cs
 public class ForecastOverride : BaseEntity
 {
     public int ForecastId { get; set; }
@@ -558,7 +558,7 @@ public enum ForecastPeriodType { Weekly, Monthly }
 
 **Core Interface:**
 ```csharp
-// qb-engineer.core/Interfaces/IForecastService.cs
+// forge.core/Interfaces/IForecastService.cs
 public interface IForecastService
 {
     Task<DemandForecast> GenerateForecastAsync(int partId, ForecastMethod method, int lookbackMonths, CancellationToken ct);
@@ -695,7 +695,7 @@ POST   /api/v1/scheduling/simulate         — What-if scheduling
 
 **Full C# Entity Definitions:**
 ```csharp
-// qb-engineer.core/Entities/WorkCenter.cs
+// forge.core/Entities/WorkCenter.cs
 public class WorkCenter : BaseAuditableEntity
 {
     public string Name { get; set; } = "";
@@ -718,7 +718,7 @@ public class WorkCenter : BaseAuditableEntity
     public ICollection<Operation> Operations { get; set; } = new List<Operation>();
 }
 
-// qb-engineer.core/Entities/WorkCenterCalendar.cs
+// forge.core/Entities/WorkCenterCalendar.cs
 public class WorkCenterCalendar : BaseEntity
 {
     public int WorkCenterId { get; set; }
@@ -728,7 +728,7 @@ public class WorkCenterCalendar : BaseEntity
     public WorkCenter WorkCenter { get; set; } = null!;
 }
 
-// qb-engineer.core/Entities/Shift.cs
+// forge.core/Entities/Shift.cs
 public class Shift : BaseAuditableEntity
 {
     public string Name { get; set; } = "";              // "Day Shift", "Swing", "Graveyard"
@@ -740,7 +740,7 @@ public class Shift : BaseAuditableEntity
     public ICollection<WorkCenterShift> WorkCenterShifts { get; set; } = new List<WorkCenterShift>();
 }
 
-// qb-engineer.core/Entities/WorkCenterShift.cs
+// forge.core/Entities/WorkCenterShift.cs
 public class WorkCenterShift : BaseEntity
 {
     public int WorkCenterId { get; set; }
@@ -750,7 +750,7 @@ public class WorkCenterShift : BaseEntity
     public Shift Shift { get; set; } = null!;
 }
 
-// qb-engineer.core/Entities/ScheduledOperation.cs
+// forge.core/Entities/ScheduledOperation.cs
 public class ScheduledOperation : BaseAuditableEntity
 {
     public int JobId { get; set; }
@@ -775,7 +775,7 @@ public class ScheduledOperation : BaseAuditableEntity
     public ScheduleRun? ScheduleRun { get; set; }
 }
 
-// qb-engineer.core/Entities/ScheduleRun.cs
+// forge.core/Entities/ScheduleRun.cs
 public class ScheduleRun : BaseAuditableEntity
 {
     public DateTimeOffset RunDate { get; set; }
@@ -801,7 +801,7 @@ public enum ScheduleRunStatus { Queued, Running, Completed, Failed }
 
 **New fields on Operation entity:**
 ```csharp
-// Add to qb-engineer.core/Entities/Operation.cs
+// Add to forge.core/Entities/Operation.cs
 public decimal SetupMinutes { get; set; }              // Separate from run time
 public decimal RunMinutesEach { get; set; }            // Time per piece
 public decimal RunMinutesLot { get; set; }             // Fixed time per lot regardless of qty
@@ -814,7 +814,7 @@ public decimal? SubcontractCost { get; set; }
 
 **Core Interface:**
 ```csharp
-// qb-engineer.core/Interfaces/ISchedulingService.cs
+// forge.core/Interfaces/ISchedulingService.cs
 public interface ISchedulingService
 {
     Task<ScheduleRun> ScheduleAsync(ScheduleParameters parameters, CancellationToken ct);
@@ -978,7 +978,7 @@ features/scheduling/
 
 #### C# Entity Definitions
 
-**New fields on `Job` entity (`qb-engineer.core/Entities/Job.cs`):**
+**New fields on `Job` entity (`forge.core/Entities/Job.cs`):**
 ```csharp
 // Estimated costs (set during quoting/estimation)
 public decimal EstimatedMaterialCost { get; set; }
@@ -990,7 +990,7 @@ public decimal QuotedPrice { get; set; }
 public decimal EstimatedMarginPercent => QuotedPrice > 0 ? (QuotedPrice - EstimatedTotalCost) / QuotedPrice * 100 : 0;
 ```
 
-**New fields on `Operation` entity (`qb-engineer.core/Entities/Operation.cs`):**
+**New fields on `Operation` entity (`forge.core/Entities/Operation.cs`):**
 ```csharp
 public decimal SetupMinutes { get; set; }
 public decimal RunMinutesEach { get; set; }
@@ -1006,7 +1006,7 @@ public decimal? SubcontractCost { get; set; }
 public Vendor? SubcontractVendor { get; set; }
 ```
 
-**New fields on `TimeEntry` entity (`qb-engineer.core/Entities/TimeEntry.cs`):**
+**New fields on `TimeEntry` entity (`forge.core/Entities/TimeEntry.cs`):**
 ```csharp
 public int? OperationId { get; set; }               // FK → Operation (nullable for job-level tracking)
 public decimal LaborCost { get; set; }               // Computed: duration × employee rate
@@ -1014,7 +1014,7 @@ public decimal BurdenCost { get; set; }               // Computed: duration × b
 public Operation? Operation { get; set; }
 ```
 
-**New entity: `LaborRate` (`qb-engineer.core/Entities/LaborRate.cs`):**
+**New entity: `LaborRate` (`forge.core/Entities/LaborRate.cs`):**
 ```csharp
 public class LaborRate : BaseEntity
 {
@@ -1031,7 +1031,7 @@ public class LaborRate : BaseEntity
 }
 ```
 
-**New entity: `MaterialIssue` (`qb-engineer.core/Entities/MaterialIssue.cs`):**
+**New entity: `MaterialIssue` (`forge.core/Entities/MaterialIssue.cs`):**
 ```csharp
 public class MaterialIssue : BaseAuditableEntity
 {
@@ -1062,7 +1062,7 @@ public class MaterialIssue : BaseAuditableEntity
 
 #### Enums
 
-**`MaterialIssueType` (`qb-engineer.core/Enums/MaterialIssueType.cs`):**
+**`MaterialIssueType` (`forge.core/Enums/MaterialIssueType.cs`):**
 ```csharp
 public enum MaterialIssueType
 {
@@ -1074,7 +1074,7 @@ public enum MaterialIssueType
 
 #### Models
 
-**`JobCostSummaryModel` (`qb-engineer.core/Models/JobCostModels.cs`):**
+**`JobCostSummaryModel` (`forge.core/Models/JobCostModels.cs`):**
 ```csharp
 public record JobCostSummaryModel
 {
@@ -1164,7 +1164,7 @@ public record JobProfitabilityReportRow
 
 #### Core Interface
 
-**`IJobCostService` (`qb-engineer.core/Interfaces/IJobCostService.cs`):**
+**`IJobCostService` (`forge.core/Interfaces/IJobCostService.cs`):**
 ```csharp
 public interface IJobCostService
 {
@@ -1287,14 +1287,14 @@ export class JobCostService {
 
 #### C# Entity Changes
 
-**New fields on `TimeEntry` (`qb-engineer.core/Entities/TimeEntry.cs`):**
+**New fields on `TimeEntry` (`forge.core/Entities/TimeEntry.cs`):**
 ```csharp
 public int? OperationId { get; set; }               // FK → Operation (nullable for job-level tracking)
 public TimeEntryCategory Category { get; set; } = TimeEntryCategory.Run;
 public Operation? Operation { get; set; }
 ```
 
-**New fields on `ClockEvent` (`qb-engineer.core/Entities/ClockEvent.cs`):**
+**New fields on `ClockEvent` (`forge.core/Entities/ClockEvent.cs`):**
 ```csharp
 public int? OperationId { get; set; }               // FK → Operation (nullable)
 public Operation? Operation { get; set; }
@@ -1302,7 +1302,7 @@ public Operation? Operation { get; set; }
 
 #### Enums
 
-**`TimeEntryCategory` (`qb-engineer.core/Enums/TimeEntryCategory.cs`):**
+**`TimeEntryCategory` (`forge.core/Enums/TimeEntryCategory.cs`):**
 ```csharp
 public enum TimeEntryCategory
 {
@@ -1318,7 +1318,7 @@ public enum TimeEntryCategory
 
 #### Models
 
-**`OperationTimeAnalysisModel` (`qb-engineer.core/Models/OperationTimeModels.cs`):**
+**`OperationTimeAnalysisModel` (`forge.core/Models/OperationTimeModels.cs`):**
 ```csharp
 public record OperationTimeAnalysisModel
 {
@@ -1418,7 +1418,7 @@ export type TimeEntryCategory = 'Setup' | 'Run' | 'Teardown' | 'Inspection' | 'R
 
 #### C# Entity Definitions
 
-**`SpcCharacteristic` (`qb-engineer.core/Entities/SpcCharacteristic.cs`):**
+**`SpcCharacteristic` (`forge.core/Entities/SpcCharacteristic.cs`):**
 ```csharp
 public class SpcCharacteristic : BaseAuditableEntity
 {
@@ -1446,7 +1446,7 @@ public class SpcCharacteristic : BaseAuditableEntity
 }
 ```
 
-**`SpcMeasurement` (`qb-engineer.core/Entities/SpcMeasurement.cs`):**
+**`SpcMeasurement` (`forge.core/Entities/SpcMeasurement.cs`):**
 ```csharp
 public class SpcMeasurement : BaseEntity
 {
@@ -1480,7 +1480,7 @@ public class SpcMeasurement : BaseEntity
 }
 ```
 
-**`SpcControlLimit` (`qb-engineer.core/Entities/SpcControlLimit.cs`):**
+**`SpcControlLimit` (`forge.core/Entities/SpcControlLimit.cs`):**
 ```csharp
 public class SpcControlLimit : BaseEntity
 {
@@ -1519,7 +1519,7 @@ public class SpcControlLimit : BaseEntity
 }
 ```
 
-**`SpcOocEvent` (`qb-engineer.core/Entities/SpcOocEvent.cs`):**
+**`SpcOocEvent` (`forge.core/Entities/SpcOocEvent.cs`):**
 ```csharp
 public class SpcOocEvent : BaseEntity
 {
@@ -1571,7 +1571,7 @@ public enum SpcOocStatus
 
 #### Core Interface
 
-**`ISpcService` (`qb-engineer.core/Interfaces/ISpcService.cs`):**
+**`ISpcService` (`forge.core/Interfaces/ISpcService.cs`):**
 ```csharp
 public interface ISpcService
 {
@@ -1770,11 +1770,11 @@ export class SpcService {
 
 ### 6. CAPA / NCR Workflow
 
-**Why P1:** ISO 9001 Section 10.2 requires documented corrective action. ISO 13485 (medical) and IATF 16949 (automotive) require formal CAPA processes. Without this, regulated manufacturers cannot use QB Engineer.
+**Why P1:** ISO 9001 Section 10.2 requires documented corrective action. ISO 13485 (medical) and IATF 16949 (automotive) require formal CAPA processes. Without this, regulated manufacturers cannot use Forge.
 
 #### C# Entity Definitions
 
-**`NonConformance` (`qb-engineer.core/Entities/NonConformance.cs`):**
+**`NonConformance` (`forge.core/Entities/NonConformance.cs`):**
 ```csharp
 public class NonConformance : BaseAuditableEntity
 {
@@ -1831,7 +1831,7 @@ public class NonConformance : BaseAuditableEntity
 }
 ```
 
-**`CorrectiveAction` (`qb-engineer.core/Entities/CorrectiveAction.cs`):**
+**`CorrectiveAction` (`forge.core/Entities/CorrectiveAction.cs`):**
 ```csharp
 public class CorrectiveAction : BaseAuditableEntity
 {
@@ -1888,7 +1888,7 @@ public class CorrectiveAction : BaseAuditableEntity
 }
 ```
 
-**`CapaTask` (`qb-engineer.core/Entities/CapaTask.cs`):**
+**`CapaTask` (`forge.core/Entities/CapaTask.cs`):**
 ```csharp
 public class CapaTask : BaseEntity
 {
@@ -1942,7 +1942,7 @@ public enum CapaTaskStatus { Open, InProgress, Completed, Cancelled }
 
 #### Core Interface
 
-**`INcrCapaService` (`qb-engineer.core/Interfaces/INcrCapaService.cs`):**
+**`INcrCapaService` (`forge.core/Interfaces/INcrCapaService.cs`):**
 ```csharp
 public interface INcrCapaService
 {
@@ -2127,11 +2127,11 @@ export class NcrCapaService {
 
 ### 7. EDI Support (Electronic Data Interchange)
 
-**Why P1:** Large customers (automotive OEMs, aerospace primes, retail chains) require EDI for PO/ASN/Invoice exchange. Without EDI, QB Engineer cannot serve Tier 1/2 suppliers.
+**Why P1:** Large customers (automotive OEMs, aerospace primes, retail chains) require EDI for PO/ASN/Invoice exchange. Without EDI, Forge cannot serve Tier 1/2 suppliers.
 
 #### C# Entity Definitions
 
-**`EdiTradingPartner` (`qb-engineer.core/Entities/EdiTradingPartner.cs`):**
+**`EdiTradingPartner` (`forge.core/Entities/EdiTradingPartner.cs`):**
 ```csharp
 public class EdiTradingPartner : BaseAuditableEntity
 {
@@ -2169,7 +2169,7 @@ public class EdiTradingPartner : BaseAuditableEntity
 }
 ```
 
-**`EdiTransaction` (`qb-engineer.core/Entities/EdiTransaction.cs`):**
+**`EdiTransaction` (`forge.core/Entities/EdiTransaction.cs`):**
 ```csharp
 public class EdiTransaction : BaseEntity
 {
@@ -2206,7 +2206,7 @@ public class EdiTransaction : BaseEntity
 }
 ```
 
-**`EdiMapping` (`qb-engineer.core/Entities/EdiMapping.cs`):**
+**`EdiMapping` (`forge.core/Entities/EdiMapping.cs`):**
 ```csharp
 public class EdiMapping : BaseAuditableEntity
 {
@@ -2259,7 +2259,7 @@ public enum EdiTransactionStatus { Received, Parsing, Parsed, Validating, Valida
 
 #### Core Interface
 
-**`IEdiService` (`qb-engineer.core/Interfaces/IEdiService.cs`):**
+**`IEdiService` (`forge.core/Interfaces/IEdiService.cs`):**
 ```csharp
 public interface IEdiService
 {
@@ -2284,7 +2284,7 @@ public interface IEdiService
 }
 ```
 
-**`IEdiTransportService` (`qb-engineer.core/Interfaces/IEdiTransportService.cs`):**
+**`IEdiTransportService` (`forge.core/Interfaces/IEdiTransportService.cs`):**
 ```csharp
 public interface IEdiTransportService
 {
@@ -2443,11 +2443,11 @@ export class EdiService {
 
 ### 8. Multi-Factor Authentication (MFA)
 
-**Why P1:** Required by NIST 800-171 (DoD contractors), ITAR, and increasingly by cyber insurance policies. Without MFA, regulated manufacturers cannot deploy QB Engineer.
+**Why P1:** Required by NIST 800-171 (DoD contractors), ITAR, and increasingly by cyber insurance policies. Without MFA, regulated manufacturers cannot deploy Forge.
 
 #### C# Entity Definitions
 
-**`UserMfaDevice` (`qb-engineer.core/Entities/UserMfaDevice.cs`):**
+**`UserMfaDevice` (`forge.core/Entities/UserMfaDevice.cs`):**
 ```csharp
 public class UserMfaDevice : BaseEntity
 {
@@ -2475,7 +2475,7 @@ public class UserMfaDevice : BaseEntity
 }
 ```
 
-**`MfaRecoveryCode` (`qb-engineer.core/Entities/MfaRecoveryCode.cs`):**
+**`MfaRecoveryCode` (`forge.core/Entities/MfaRecoveryCode.cs`):**
 ```csharp
 public class MfaRecoveryCode : BaseEntity
 {
@@ -2513,7 +2513,7 @@ public enum MfaDeviceType
 
 #### Models
 
-**MFA Models (`qb-engineer.core/Models/MfaModels.cs`):**
+**MFA Models (`forge.core/Models/MfaModels.cs`):**
 ```csharp
 public record MfaSetupResponseModel
 {
@@ -2583,7 +2583,7 @@ public record MfaDeviceSummary
 
 #### Core Interface
 
-**`IMfaService` (`qb-engineer.core/Interfaces/IMfaService.cs`):**
+**`IMfaService` (`forge.core/Interfaces/IMfaService.cs`):**
 ```csharp
 public interface IMfaService
 {
@@ -2664,7 +2664,7 @@ export type MfaDeviceType = 'Totp' | 'Sms' | 'Email' | 'WebAuthn';
 
 export interface MfaSetupResponse {
   secret: string;
-  qrCodeUri: string;          // otpauth://totp/QBEngineer:user@email?secret=...&issuer=QBEngineer
+  qrCodeUri: string;          // otpauth://totp/Forge:user@email?secret=...&issuer=Forge
   manualEntryKey: string;     // Base32 key for manual entry
   deviceId: number;
 }
@@ -2763,7 +2763,7 @@ export class MfaService {
 
 #### C# Entity Definitions
 
-**`DowntimeEvent` (`qb-engineer.core/Entities/DowntimeEvent.cs`):**
+**`DowntimeEvent` (`forge.core/Entities/DowntimeEvent.cs`):**
 ```csharp
 public class DowntimeEvent : BaseAuditableEntity
 {
@@ -2785,7 +2785,7 @@ public class DowntimeEvent : BaseAuditableEntity
 }
 ```
 
-**New fields on `ProductionRun` (`qb-engineer.core/Entities/ProductionRun.cs`):**
+**New fields on `ProductionRun` (`forge.core/Entities/ProductionRun.cs`):**
 ```csharp
 public int? WorkCenterId { get; set; }
 public decimal PlannedQuantity { get; set; }
@@ -2977,7 +2977,7 @@ public string? SubcontractInstructions { get; set; }     // Special instructions
 public Vendor? SubcontractVendor { get; set; }
 ```
 
-**`SubcontractOrder` (`qb-engineer.core/Entities/SubcontractOrder.cs`):**
+**`SubcontractOrder` (`forge.core/Entities/SubcontractOrder.cs`):**
 ```csharp
 public class SubcontractOrder : BaseAuditableEntity
 {
@@ -3102,7 +3102,7 @@ export interface SubcontractOrder {
 
 #### C# Entity Changes
 
-**New fields on `ReceivingRecord` (`qb-engineer.core/Entities/ReceivingRecord.cs`):**
+**New fields on `ReceivingRecord` (`forge.core/Entities/ReceivingRecord.cs`):**
 ```csharp
 public ReceivingInspectionStatus InspectionStatus { get; set; } = ReceivingInspectionStatus.NotRequired;
 public int? InspectedById { get; set; }
@@ -3205,7 +3205,7 @@ export interface PendingInspectionItem {
 
 #### C# Entity Definitions
 
-**`UnitOfMeasure` (`qb-engineer.core/Entities/UnitOfMeasure.cs`):**
+**`UnitOfMeasure` (`forge.core/Entities/UnitOfMeasure.cs`):**
 ```csharp
 public class UnitOfMeasure : BaseEntity
 {
@@ -3223,7 +3223,7 @@ public class UnitOfMeasure : BaseEntity
 }
 ```
 
-**`UomConversion` (`qb-engineer.core/Entities/UomConversion.cs`):**
+**`UomConversion` (`forge.core/Entities/UomConversion.cs`):**
 ```csharp
 public class UomConversion : BaseEntity
 {
@@ -3368,7 +3368,7 @@ export interface UomConversion {
 
 #### C# Entity Definitions
 
-**`ApprovalWorkflow` (`qb-engineer.core/Entities/ApprovalWorkflow.cs`):**
+**`ApprovalWorkflow` (`forge.core/Entities/ApprovalWorkflow.cs`):**
 ```csharp
 public class ApprovalWorkflow : BaseAuditableEntity
 {
@@ -3385,7 +3385,7 @@ public class ApprovalWorkflow : BaseAuditableEntity
 }
 ```
 
-**`ApprovalStep` (`qb-engineer.core/Entities/ApprovalStep.cs`):**
+**`ApprovalStep` (`forge.core/Entities/ApprovalStep.cs`):**
 ```csharp
 public class ApprovalStep : BaseEntity
 {
@@ -3406,7 +3406,7 @@ public class ApprovalStep : BaseEntity
 }
 ```
 
-**`ApprovalRequest` (`qb-engineer.core/Entities/ApprovalRequest.cs`):**
+**`ApprovalRequest` (`forge.core/Entities/ApprovalRequest.cs`):**
 ```csharp
 public class ApprovalRequest : BaseEntity
 {
@@ -3428,7 +3428,7 @@ public class ApprovalRequest : BaseEntity
 }
 ```
 
-**`ApprovalDecision` (`qb-engineer.core/Entities/ApprovalDecision.cs`):**
+**`ApprovalDecision` (`forge.core/Entities/ApprovalDecision.cs`):**
 ```csharp
 public class ApprovalDecision : BaseEntity
 {
@@ -3563,7 +3563,7 @@ export interface ApprovalStep {
 
 #### C# Entity Changes
 
-**New fields on `Customer` (`qb-engineer.core/Entities/Customer.cs`):**
+**New fields on `Customer` (`forge.core/Entities/Customer.cs`):**
 ```csharp
 public decimal? CreditLimit { get; set; }                // Max outstanding AR balance
 public bool IsOnCreditHold { get; set; }
@@ -3647,7 +3647,7 @@ export interface CreditStatus {
 
 #### C# Entity Definitions
 
-**`VendorScorecard` (`qb-engineer.core/Entities/VendorScorecard.cs`):**
+**`VendorScorecard` (`forge.core/Entities/VendorScorecard.cs`):**
 ```csharp
 public class VendorScorecard : BaseEntity
 {
@@ -3796,7 +3796,7 @@ export interface VendorComparisonRow {
 
 #### C# Entity Definitions
 
-**`RequestForQuote` (`qb-engineer.core/Entities/RequestForQuote.cs`):**
+**`RequestForQuote` (`forge.core/Entities/RequestForQuote.cs`):**
 ```csharp
 public class RequestForQuote : BaseAuditableEntity
 {
@@ -3822,7 +3822,7 @@ public class RequestForQuote : BaseAuditableEntity
 }
 ```
 
-**`RfqVendorResponse` (`qb-engineer.core/Entities/RfqVendorResponse.cs`):**
+**`RfqVendorResponse` (`forge.core/Entities/RfqVendorResponse.cs`):**
 ```csharp
 public class RfqVendorResponse : BaseEntity
 {
@@ -3942,7 +3942,7 @@ export interface RfqVendorResponse {
 
 #### C# Entity Definition
 
-**`PartAlternate` (`qb-engineer.core/Entities/PartAlternate.cs`):**
+**`PartAlternate` (`forge.core/Entities/PartAlternate.cs`):**
 ```csharp
 public class PartAlternate : BaseAuditableEntity
 {
@@ -3975,7 +3975,7 @@ public class PartAlternate : BaseAuditableEntity
 
 #### C# Entity Definitions
 
-**`EngineeringChangeOrder` (`qb-engineer.core/Entities/EngineeringChangeOrder.cs`):**
+**`EngineeringChangeOrder` (`forge.core/Entities/EngineeringChangeOrder.cs`):**
 ```csharp
 public class EngineeringChangeOrder : BaseAuditableEntity
 {
@@ -4001,7 +4001,7 @@ public class EngineeringChangeOrder : BaseAuditableEntity
 }
 ```
 
-**`EcoAffectedItem` (`qb-engineer.core/Entities/EcoAffectedItem.cs`):**
+**`EcoAffectedItem` (`forge.core/Entities/EcoAffectedItem.cs`):**
 ```csharp
 public class EcoAffectedItem : BaseEntity
 {
@@ -4043,7 +4043,7 @@ public DateTimeOffset? BlanketExpirationDate { get; set; }
 public decimal? AgreedUnitPrice { get; set; }            // Locked-in price for all releases
 ```
 
-**`PurchaseOrderRelease` (`qb-engineer.core/Entities/PurchaseOrderRelease.cs`):**
+**`PurchaseOrderRelease` (`forge.core/Entities/PurchaseOrderRelease.cs`):**
 ```csharp
 public class PurchaseOrderRelease : BaseAuditableEntity
 {
@@ -4112,7 +4112,7 @@ public record AtpBucket
 
 #### C# Entity Definition
 
-**`SerialNumber` (`qb-engineer.core/Entities/SerialNumber.cs`):**
+**`SerialNumber` (`forge.core/Entities/SerialNumber.cs`):**
 ```csharp
 public class SerialNumber : BaseAuditableEntity
 {
@@ -4138,7 +4138,7 @@ public class SerialNumber : BaseAuditableEntity
 }
 ```
 
-**`SerialHistory` (`qb-engineer.core/Entities/SerialHistory.cs`):**
+**`SerialHistory` (`forge.core/Entities/SerialHistory.cs`):**
 ```csharp
 public class SerialHistory : BaseEntity
 {
@@ -4165,7 +4165,7 @@ public class SerialHistory : BaseEntity
 
 #### C# Entity Definitions
 
-**`Gage` (`qb-engineer.core/Entities/Gage.cs`):**
+**`Gage` (`forge.core/Entities/Gage.cs`):**
 ```csharp
 public class Gage : BaseAuditableEntity
 {
@@ -4192,7 +4192,7 @@ public class Gage : BaseAuditableEntity
 }
 ```
 
-**`CalibrationRecord` (`qb-engineer.core/Entities/CalibrationRecord.cs`):**
+**`CalibrationRecord` (`forge.core/Entities/CalibrationRecord.cs`):**
 ```csharp
 public class CalibrationRecord : BaseEntity
 {
@@ -4233,7 +4233,7 @@ GET /api/v1/quality/gages/due — Gages due for calibration
 
 Separate Angular app (or route group) with customer-scoped auth:
 
-**`CustomerPortalUser` (`qb-engineer.core/Entities/CustomerPortalUser.cs`):**
+**`CustomerPortalUser` (`forge.core/Entities/CustomerPortalUser.cs`):**
 ```csharp
 public class CustomerPortalUser : BaseEntity
 {
@@ -4269,7 +4269,7 @@ public class CustomerPortalUser : BaseEntity
 
 #### C# Entity Definitions
 
-**`ShiftAssignment` (`qb-engineer.core/Entities/ShiftAssignment.cs`):**
+**`ShiftAssignment` (`forge.core/Entities/ShiftAssignment.cs`):**
 ```csharp
 public class ShiftAssignment : BaseEntity
 {
@@ -4294,7 +4294,7 @@ public class ShiftAssignment : BaseEntity
 
 #### C# Entity Definition
 
-**`OvertimeRule` (`qb-engineer.core/Entities/OvertimeRule.cs`):**
+**`OvertimeRule` (`forge.core/Entities/OvertimeRule.cs`):**
 ```csharp
 public class OvertimeRule : BaseAuditableEntity
 {
@@ -4339,7 +4339,7 @@ public record OvertimeBreakdown
 
 #### C# Entity Definitions
 
-**`LeavePolicy` (`qb-engineer.core/Entities/LeavePolicy.cs`):**
+**`LeavePolicy` (`forge.core/Entities/LeavePolicy.cs`):**
 ```csharp
 public class LeavePolicy : BaseAuditableEntity
 {
@@ -4354,7 +4354,7 @@ public class LeavePolicy : BaseAuditableEntity
 }
 ```
 
-**`LeaveBalance` (`qb-engineer.core/Entities/LeaveBalance.cs`):**
+**`LeaveBalance` (`forge.core/Entities/LeaveBalance.cs`):**
 ```csharp
 public class LeaveBalance : BaseEntity
 {
@@ -4370,7 +4370,7 @@ public class LeaveBalance : BaseEntity
 }
 ```
 
-**`LeaveRequest` (`qb-engineer.core/Entities/LeaveRequest.cs`):**
+**`LeaveRequest` (`forge.core/Entities/LeaveRequest.cs`):**
 ```csharp
 public class LeaveRequest : BaseAuditableEntity
 {
@@ -4402,7 +4402,7 @@ public class LeaveRequest : BaseAuditableEntity
 
 #### C# Entity Definitions
 
-**`ReviewCycle` (`qb-engineer.core/Entities/ReviewCycle.cs`):**
+**`ReviewCycle` (`forge.core/Entities/ReviewCycle.cs`):**
 ```csharp
 public class ReviewCycle : BaseAuditableEntity
 {
@@ -4416,7 +4416,7 @@ public class ReviewCycle : BaseAuditableEntity
 }
 ```
 
-**`PerformanceReview` (`qb-engineer.core/Entities/PerformanceReview.cs`):**
+**`PerformanceReview` (`forge.core/Entities/PerformanceReview.cs`):**
 ```csharp
 public class PerformanceReview : BaseAuditableEntity
 {
@@ -4450,7 +4450,7 @@ public class PerformanceReview : BaseAuditableEntity
 
 #### C# Entity Definitions
 
-**`ControlledDocument` (`qb-engineer.core/Entities/ControlledDocument.cs`):**
+**`ControlledDocument` (`forge.core/Entities/ControlledDocument.cs`):**
 ```csharp
 public class ControlledDocument : BaseAuditableEntity
 {
@@ -4472,7 +4472,7 @@ public class ControlledDocument : BaseAuditableEntity
 }
 ```
 
-**`DocumentRevision` (`qb-engineer.core/Entities/DocumentRevision.cs`):**
+**`DocumentRevision` (`forge.core/Entities/DocumentRevision.cs`):**
 ```csharp
 public class DocumentRevision : BaseEntity
 {
@@ -4502,7 +4502,7 @@ public class DocumentRevision : BaseEntity
 
 #### C# Entity Definitions
 
-**`WebhookSubscription` (`qb-engineer.core/Entities/WebhookSubscription.cs`):**
+**`WebhookSubscription` (`forge.core/Entities/WebhookSubscription.cs`):**
 ```csharp
 public class WebhookSubscription : BaseAuditableEntity
 {
@@ -4522,7 +4522,7 @@ public class WebhookSubscription : BaseAuditableEntity
 }
 ```
 
-**`WebhookDelivery` (`qb-engineer.core/Entities/WebhookDelivery.cs`):**
+**`WebhookDelivery` (`forge.core/Entities/WebhookDelivery.cs`):**
 ```csharp
 public class WebhookDelivery : BaseEntity
 {
@@ -4562,7 +4562,7 @@ public interface IWebhookService
 
 #### C# Entity Definition
 
-**`ReportSchedule` (`qb-engineer.core/Entities/ReportSchedule.cs`):**
+**`ReportSchedule` (`forge.core/Entities/ReportSchedule.cs`):**
 ```csharp
 public class ReportSchedule : BaseAuditableEntity
 {
@@ -4592,7 +4592,7 @@ public class ReportSchedule : BaseAuditableEntity
 
 #### Implementation
 
-**Backend (`qb-engineer.api/Features/Reports/ExportReport.cs`):**
+**Backend (`forge.api/Features/Reports/ExportReport.cs`):**
 ```csharp
 public class ExportReportHandler : IRequestHandler<ExportReportQuery, byte[]>
 {
@@ -4623,7 +4623,7 @@ public class ExportReportHandler : IRequestHandler<ExportReportQuery, byte[]>
 
 #### C# Entity Definitions
 
-**`ProductConfigurator` (`qb-engineer.core/Entities/ProductConfigurator.cs`):**
+**`ProductConfigurator` (`forge.core/Entities/ProductConfigurator.cs`):**
 ```csharp
 public class ProductConfigurator : BaseAuditableEntity
 {
@@ -4641,7 +4641,7 @@ public class ProductConfigurator : BaseAuditableEntity
 }
 ```
 
-**`ConfiguratorOption` (`qb-engineer.core/Entities/ConfiguratorOption.cs`):**
+**`ConfiguratorOption` (`forge.core/Entities/ConfiguratorOption.cs`):**
 ```csharp
 public class ConfiguratorOption : BaseEntity
 {
@@ -4662,7 +4662,7 @@ public class ConfiguratorOption : BaseEntity
 }
 ```
 
-**`ProductConfiguration` (`qb-engineer.core/Entities/ProductConfiguration.cs`):**
+**`ProductConfiguration` (`forge.core/Entities/ProductConfiguration.cs`):**
 ```csharp
 public class ProductConfiguration : BaseAuditableEntity
 {
@@ -4825,7 +4825,7 @@ export class CpqService {
 
 #### C# Entity Definitions
 
-**`Plant` (`qb-engineer.core/Entities/Plant.cs`):**
+**`Plant` (`forge.core/Entities/Plant.cs`):**
 ```csharp
 public class Plant : BaseAuditableEntity
 {
@@ -4843,7 +4843,7 @@ public class Plant : BaseAuditableEntity
 }
 ```
 
-**`InterPlantTransfer` (`qb-engineer.core/Entities/InterPlantTransfer.cs`):**
+**`InterPlantTransfer` (`forge.core/Entities/InterPlantTransfer.cs`):**
 ```csharp
 public class InterPlantTransfer : BaseAuditableEntity
 {
@@ -4864,7 +4864,7 @@ public class InterPlantTransfer : BaseAuditableEntity
 }
 ```
 
-**`InterPlantTransferLine` (`qb-engineer.core/Entities/InterPlantTransferLine.cs`):**
+**`InterPlantTransferLine` (`forge.core/Entities/InterPlantTransferLine.cs`):**
 ```csharp
 public class InterPlantTransferLine : BaseEntity
 {
@@ -5003,7 +5003,7 @@ export class PlantService {
 
 #### C# Entity Definitions
 
-**`Currency` (`qb-engineer.core/Entities/Currency.cs`):**
+**`Currency` (`forge.core/Entities/Currency.cs`):**
 ```csharp
 public class Currency : BaseEntity
 {
@@ -5017,7 +5017,7 @@ public class Currency : BaseEntity
 }
 ```
 
-**`ExchangeRate` (`qb-engineer.core/Entities/ExchangeRate.cs`):**
+**`ExchangeRate` (`forge.core/Entities/ExchangeRate.cs`):**
 ```csharp
 public class ExchangeRate : BaseEntity
 {
@@ -5124,7 +5124,7 @@ export interface ExchangeRate {
 
 #### C# Entity Definition
 
-**`TranslatedLabel` (`qb-engineer.core/Entities/TranslatedLabel.cs`):**
+**`TranslatedLabel` (`forge.core/Entities/TranslatedLabel.cs`):**
 ```csharp
 public class TranslatedLabel : BaseEntity
 {
@@ -5138,7 +5138,7 @@ public class TranslatedLabel : BaseEntity
 }
 ```
 
-**`SupportedLanguage` (`qb-engineer.core/Entities/SupportedLanguage.cs`):**
+**`SupportedLanguage` (`forge.core/Entities/SupportedLanguage.cs`):**
 ```csharp
 public class SupportedLanguage : BaseEntity
 {
@@ -5219,7 +5219,7 @@ export interface TranslationEntry {
 
 #### C# Entity Definitions
 
-**`MachineConnection` (`qb-engineer.core/Entities/MachineConnection.cs`):**
+**`MachineConnection` (`forge.core/Entities/MachineConnection.cs`):**
 ```csharp
 public class MachineConnection : BaseAuditableEntity
 {
@@ -5240,7 +5240,7 @@ public class MachineConnection : BaseAuditableEntity
 }
 ```
 
-**`MachineTag` (`qb-engineer.core/Entities/MachineTag.cs`):**
+**`MachineTag` (`forge.core/Entities/MachineTag.cs`):**
 ```csharp
 public class MachineTag : BaseEntity
 {
@@ -5259,7 +5259,7 @@ public class MachineTag : BaseEntity
 }
 ```
 
-**`MachineDataPoint` (`qb-engineer.core/Entities/MachineDataPoint.cs`):**
+**`MachineDataPoint` (`forge.core/Entities/MachineDataPoint.cs`):**
 ```csharp
 public class MachineDataPoint : BaseEntity
 {
@@ -5350,7 +5350,7 @@ export interface MachineDataPoint {
 | `MachineAlertBannerComponent` | `features/shop-floor/components/machine-alert-banner.component.ts` | Warning/alarm banner when tags exceed thresholds |
 
 **Library:** `OPCFoundation.NetStandard.Opc.Ua` NuGet package.
-**Deployment:** Separate Docker container (`qb-engineer-iot`), pushes data via internal API or SignalR.
+**Deployment:** Separate Docker container (`forge-iot`), pushes data via internal API or SignalR.
 **Data storage:** TimescaleDB extension or time-partitioned table for high-frequency data (avoid bloating main DB).
 **Complexity:** Very High — hardware-dependent, requires on-site PLC connectivity, real-time streaming architecture.
 
@@ -5362,7 +5362,7 @@ export interface MachineDataPoint {
 
 #### C# Entity Definitions
 
-**`ECommerceIntegration` (`qb-engineer.core/Entities/ECommerceIntegration.cs`):**
+**`ECommerceIntegration` (`forge.core/Entities/ECommerceIntegration.cs`):**
 ```csharp
 public class ECommerceIntegration : BaseAuditableEntity
 {
@@ -5380,7 +5380,7 @@ public class ECommerceIntegration : BaseAuditableEntity
 }
 ```
 
-**`ECommerceOrderSync` (`qb-engineer.core/Entities/ECommerceOrderSync.cs`):**
+**`ECommerceOrderSync` (`forge.core/Entities/ECommerceOrderSync.cs`):**
 ```csharp
 public class ECommerceOrderSync : BaseEntity
 {
@@ -5495,7 +5495,7 @@ export interface ECommerceOrderSync {
 
 #### C# Entity Definitions
 
-**`AndonAlert` (`qb-engineer.core/Entities/AndonAlert.cs`):**
+**`AndonAlert` (`forge.core/Entities/AndonAlert.cs`):**
 ```csharp
 public class AndonAlert : BaseEntity
 {
@@ -5596,7 +5596,7 @@ export interface AndonBoardWorkCenter {
 
 #### Implementation
 
-**`BiApiKey` (`qb-engineer.core/Entities/BiApiKey.cs`):**
+**`BiApiKey` (`forge.core/Entities/BiApiKey.cs`):**
 ```csharp
 public class BiApiKey : BaseAuditableEntity
 {
@@ -5699,7 +5699,7 @@ DELETE /api/v1/admin/bi-api-keys/{id}                    — Revoke key
 
 #### C# Entities
 
-**`ConsignmentAgreement` (`qb-engineer.core/Entities/ConsignmentAgreement.cs`):**
+**`ConsignmentAgreement` (`forge.core/Entities/ConsignmentAgreement.cs`):**
 ```csharp
 public class ConsignmentAgreement : BaseAuditableEntity
 {
@@ -5725,7 +5725,7 @@ public class ConsignmentAgreement : BaseAuditableEntity
 }
 ```
 
-**`ConsignmentTransaction` (`qb-engineer.core/Entities/ConsignmentTransaction.cs`):**
+**`ConsignmentTransaction` (`forge.core/Entities/ConsignmentTransaction.cs`):**
 ```csharp
 public class ConsignmentTransaction : BaseEntity
 {
@@ -5764,7 +5764,7 @@ public enum ConsignmentTransactionType { Receipt, Consumption, Return, Adjustmen
 
 #### Core Interface
 
-**`IConsignmentService` (`qb-engineer.core/Interfaces/IConsignmentService.cs`):**
+**`IConsignmentService` (`forge.core/Interfaces/IConsignmentService.cs`):**
 ```csharp
 public interface IConsignmentService
 {
@@ -5889,7 +5889,7 @@ deleteAgreement(id: number): Observable<void>;
 
 #### C# Entities
 
-**`AbcClassification` (`qb-engineer.core/Entities/AbcClassification.cs`):**
+**`AbcClassification` (`forge.core/Entities/AbcClassification.cs`):**
 ```csharp
 public class AbcClassification : BaseEntity
 {
@@ -5909,7 +5909,7 @@ public class AbcClassification : BaseEntity
 }
 ```
 
-**`AbcClassificationRun` (`qb-engineer.core/Entities/AbcClassificationRun.cs`):**
+**`AbcClassificationRun` (`forge.core/Entities/AbcClassificationRun.cs`):**
 ```csharp
 public class AbcClassificationRun : BaseEntity
 {
@@ -5941,7 +5941,7 @@ public enum AbcClass { A, B, C }
 
 #### Core Interface
 
-**`IAbcClassificationService` (`qb-engineer.core/Interfaces/IAbcClassificationService.cs`):**
+**`IAbcClassificationService` (`forge.core/Interfaces/IAbcClassificationService.cs`):**
 ```csharp
 public interface IAbcClassificationService
 {
@@ -6067,7 +6067,7 @@ applyRun(runId: number): Observable<void>;
 
 #### C# Entities
 
-**`PickWave` (`qb-engineer.core/Entities/PickWave.cs`):**
+**`PickWave` (`forge.core/Entities/PickWave.cs`):**
 ```csharp
 public class PickWave : BaseAuditableEntity
 {
@@ -6088,7 +6088,7 @@ public class PickWave : BaseAuditableEntity
 }
 ```
 
-**`PickLine` (`qb-engineer.core/Entities/PickLine.cs`):**
+**`PickLine` (`forge.core/Entities/PickLine.cs`):**
 ```csharp
 public class PickLine : BaseEntity
 {
@@ -6124,7 +6124,7 @@ public enum PickWaveStrategy { Zone, Batch, Discrete, WaveByCarrier }
 
 #### Core Interface
 
-**`IPickWaveService` (`qb-engineer.core/Interfaces/IPickWaveService.cs`):**
+**`IPickWaveService` (`forge.core/Interfaces/IPickWaveService.cs`):**
 ```csharp
 public interface IPickWaveService
 {
@@ -6265,7 +6265,7 @@ public CustomerAddress? ShipToCustomerAddress { get; set; }
 
 #### Core Interface
 
-**`IDropShipService` (`qb-engineer.core/Interfaces/IDropShipService.cs`):**
+**`IDropShipService` (`forge.core/Interfaces/IDropShipService.cs`):**
 ```csharp
 public interface IDropShipService
 {
@@ -6357,7 +6357,7 @@ public SalesOrderLine? BackToBackSalesOrderLine { get; set; }
 
 #### Core Interface
 
-**`IBackToBackService` (`qb-engineer.core/Interfaces/IBackToBackService.cs`):**
+**`IBackToBackService` (`forge.core/Interfaces/IBackToBackService.cs`):**
 ```csharp
 public interface IBackToBackService
 {
@@ -6429,7 +6429,7 @@ getPendingBackToBacks(): Observable<BackToBackStatus[]>;
 
 #### C# Entities
 
-**`KanbanCard` (`qb-engineer.core/Entities/KanbanCard.cs`):**
+**`KanbanCard` (`forge.core/Entities/KanbanCard.cs`):**
 ```csharp
 public class KanbanCard : BaseAuditableEntity
 {
@@ -6460,7 +6460,7 @@ public class KanbanCard : BaseAuditableEntity
 }
 ```
 
-**`KanbanTriggerLog` (`qb-engineer.core/Entities/KanbanTriggerLog.cs`):**
+**`KanbanTriggerLog` (`forge.core/Entities/KanbanTriggerLog.cs`):**
 ```csharp
 public class KanbanTriggerLog : BaseEntity
 {
@@ -6490,7 +6490,7 @@ public enum KanbanTriggerType { Manual, Scan, AutoLevel }
 
 #### Core Interface
 
-**`IKanbanReplenishmentService` (`qb-engineer.core/Interfaces/IKanbanReplenishmentService.cs`):**
+**`IKanbanReplenishmentService` (`forge.core/Interfaces/IKanbanReplenishmentService.cs`):**
 ```csharp
 public interface IKanbanReplenishmentService
 {
@@ -6616,7 +6616,7 @@ deleteCard(id: number): Observable<void>;
 
 #### C# Entities
 
-**`Project` (`qb-engineer.core/Entities/Project.cs`):**
+**`Project` (`forge.core/Entities/Project.cs`):**
 ```csharp
 public class Project : BaseAuditableEntity
 {
@@ -6645,7 +6645,7 @@ public class Project : BaseAuditableEntity
 }
 ```
 
-**`WbsElement` (`qb-engineer.core/Entities/WbsElement.cs`):**
+**`WbsElement` (`forge.core/Entities/WbsElement.cs`):**
 ```csharp
 public class WbsElement : BaseEntity
 {
@@ -6676,7 +6676,7 @@ public class WbsElement : BaseEntity
 }
 ```
 
-**`WbsCostEntry` (`qb-engineer.core/Entities/WbsCostEntry.cs`):**
+**`WbsCostEntry` (`forge.core/Entities/WbsCostEntry.cs`):**
 ```csharp
 public class WbsCostEntry : BaseEntity
 {
@@ -6713,7 +6713,7 @@ public enum WbsCostCategory { Labor, Material, Subcontract, Other }
 
 #### Core Interface
 
-**`IProjectAccountingService` (`qb-engineer.core/Interfaces/IProjectAccountingService.cs`):**
+**`IProjectAccountingService` (`forge.core/Interfaces/IProjectAccountingService.cs`):**
 ```csharp
 public interface IProjectAccountingService
 {
@@ -6897,7 +6897,7 @@ linkJobToWbs(projectId: number, elementId: number, jobId: number): Observable<vo
 
 #### C# Models
 
-**`CopqReport` (`qb-engineer.core/Models/CopqModels.cs`):**
+**`CopqReport` (`forge.core/Models/CopqModels.cs`):**
 ```csharp
 public record CopqReport
 {
@@ -6945,7 +6945,7 @@ public record CopqParetoItem
 
 #### Core Interface
 
-**`ICopqService` (`qb-engineer.core/Interfaces/ICopqService.cs`):**
+**`ICopqService` (`forge.core/Interfaces/ICopqService.cs`):**
 ```csharp
 public interface ICopqService
 {
@@ -7047,7 +7047,7 @@ getPareto(startDate: string, endDate: string): Observable<CopqParetoItem[]>;
 
 #### C# Entities
 
-**`PpapSubmission` (`qb-engineer.core/Entities/PpapSubmission.cs`):**
+**`PpapSubmission` (`forge.core/Entities/PpapSubmission.cs`):**
 ```csharp
 public class PpapSubmission : BaseAuditableEntity
 {
@@ -7075,7 +7075,7 @@ public class PpapSubmission : BaseAuditableEntity
 }
 ```
 
-**`PpapElement` (`qb-engineer.core/Entities/PpapElement.cs`):**
+**`PpapElement` (`forge.core/Entities/PpapElement.cs`):**
 ```csharp
 public class PpapElement : BaseEntity
 {
@@ -7131,7 +7131,7 @@ public enum PpapSubmissionReason { NewPart, EngineeringChange, Tooling, Correcti
 
 #### Core Interface
 
-**`IPpapService` (`qb-engineer.core/Interfaces/IPpapService.cs`):**
+**`IPpapService` (`forge.core/Interfaces/IPpapService.cs`):**
 ```csharp
 public interface IPpapService
 {
@@ -7255,7 +7255,7 @@ getLevelRequirements(level: number): Observable<PpapLevelRequirement[]>;
 
 #### C# Entities
 
-**`Fmea` (`qb-engineer.core/Entities/Fmea.cs`):**
+**`Fmea` (`forge.core/Entities/Fmea.cs`):**
 ```csharp
 public class Fmea : BaseAuditableEntity
 {
@@ -7281,7 +7281,7 @@ public class Fmea : BaseAuditableEntity
 }
 ```
 
-**`FmeaItem` (`qb-engineer.core/Entities/FmeaItem.cs`):**
+**`FmeaItem` (`forge.core/Entities/FmeaItem.cs`):**
 ```csharp
 public class FmeaItem : BaseEntity
 {
@@ -7325,7 +7325,7 @@ public enum FmeaStatus { Draft, Active, Closed, Superseded }
 
 #### Core Interface
 
-**`IFmeaService` (`qb-engineer.core/Interfaces/IFmeaService.cs`):**
+**`IFmeaService` (`forge.core/Interfaces/IFmeaService.cs`):**
 ```csharp
 public interface IFmeaService
 {
@@ -7478,7 +7478,7 @@ getRiskSummary(fmeaId: number): Observable<FmeaRiskSummary>;
 
 #### C# Entities
 
-**`MaintenancePrediction` (`qb-engineer.core/Entities/MaintenancePrediction.cs`):**
+**`MaintenancePrediction` (`forge.core/Entities/MaintenancePrediction.cs`):**
 ```csharp
 public class MaintenancePrediction : BaseEntity
 {
@@ -7506,7 +7506,7 @@ public class MaintenancePrediction : BaseEntity
 }
 ```
 
-**`MlModel` (`qb-engineer.core/Entities/MlModel.cs`):**
+**`MlModel` (`forge.core/Entities/MlModel.cs`):**
 ```csharp
 public class MlModel : BaseEntity
 {
@@ -7532,7 +7532,7 @@ public class MlModel : BaseEntity
 }
 ```
 
-**`PredictionFeedback` (`qb-engineer.core/Entities/PredictionFeedback.cs`):**
+**`PredictionFeedback` (`forge.core/Entities/PredictionFeedback.cs`):**
 ```csharp
 public class PredictionFeedback : BaseEntity
 {
@@ -7559,7 +7559,7 @@ public enum MlModelStatus { Training, Active, Inactive, Failed }
 
 #### Core Interface
 
-**`IPredictiveMaintenanceService` (`qb-engineer.core/Interfaces/IPredictiveMaintenanceService.cs`):**
+**`IPredictiveMaintenanceService` (`forge.core/Interfaces/IPredictiveMaintenanceService.cs`):**
 ```csharp
 public interface IPredictiveMaintenanceService
 {
@@ -7623,7 +7623,7 @@ public record PredictiveMaintenanceDashboardResponseModel
                          └──────────────────┘              │
                                                            ▼
 ┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
-│  Feedback Loop   │ ◄── │  QB Engineer API  │ ◄── │  Prediction      │
+│  Feedback Loop   │ ◄── │  Forge API  │ ◄── │  Prediction      │
 │                  │     │                   │     │  Results         │
 │  - Actual vs     │     │  - Store in DB    │     │                  │
 │    predicted     │     │  - Create alerts  │     │  - Failure type  │
@@ -7765,7 +7765,7 @@ getModelPerformance(modelId: string): Observable<MlModelPerformance>;
 - `ExpireStalePredictionsJob` — daily, marks old unacknowledged predictions as Expired
 - `ModelRetrainingTriggerJob` — weekly, checks if enough new feedback data exists to trigger retraining
 
-**Complexity:** Very High — requires IoT infrastructure (#36), ML training pipeline (Python microservice or ML.NET), model deployment/versioning, continuous feedback loop. Best implemented as a separate microservice with Python/scikit-learn or ML.NET ONNX runtime. The QB Engineer side is mostly consumption (display predictions, manage responses) which is medium complexity.
+**Complexity:** Very High — requires IoT infrastructure (#36), ML training pipeline (Python microservice or ML.NET), model deployment/versioning, continuous feedback loop. Best implemented as a separate microservice with Python/scikit-learn or ML.NET ONNX runtime. The Forge side is mostly consumption (display predictions, manage responses) which is medium complexity.
 
 ---
 

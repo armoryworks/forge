@@ -37,10 +37,10 @@ The backend has a `terminology` endpoint and presumably a database table to back
 The exact opposite of what the design intended.
 
 ```
-$ grep -c "| terminology" qb-engineer-ui/src/app
+$ grep -c "| terminology" forge-ui/src/app
 0
 
-$ grep -c "| translate" qb-engineer-ui/src/app
+$ grep -c "| translate" forge-ui/src/app
 4,297
 ```
 
@@ -80,7 +80,7 @@ Per **D1**, option (b) is the chosen path: terminology bundles are preset attrib
 
 ### What it is
 
-`qb-engineer.api/Capabilities/CapabilityCatalog.cs` is a static C# list of `CapabilityDefinition` records — code, area, name, description, default-on flag, optional required-roles list. The seeder upserts these into the `capabilities` table on startup (INSERT-on-missing only, never overwrites the `Enabled` column).
+`forge.api/Capabilities/CapabilityCatalog.cs` is a static C# list of `CapabilityDefinition` records — code, area, name, description, default-on flag, optional required-roles list. The seeder upserts these into the `capabilities` table on startup (INSERT-on-missing only, never overwrites the `Enabled` column).
 
 Gating is wired at two seams:
 
@@ -181,7 +181,7 @@ Per **the user's directive** that seed data should be JSON-based: the bundles li
 
 ### What it is
 
-`qb-engineer.api/Workflows/` houses the workflow substrate:
+`forge.api/Workflows/` houses the workflow substrate:
 
 - `WorkflowSeedData.cs` — embedded JSON definitions, one per entity type. Today covers `Part` with 14 combo-specific definitions per the Pillar 6 audit.
 - `IWorkflowEntityCreator`, `IWorkflowEntityPromoter` — interfaces that handle the gathering → ready promotion lifecycle.
@@ -222,7 +222,7 @@ Per the user's "seed data as part of the stereotype harnesses" directive, track-
 
 Three entities carry a `CustomFieldValues` JSONB column today: `Job`, `Part`, `Lead`. The new-lead-fork dialog already serializes shape-specific extras into `Lead.CustomFieldValues` (see `new-lead-fork-dialog.component.ts:212-216`).
 
-`qb-engineer.core/Models/CustomFieldDefinitionModel.cs` exists but has no admin UI plumbing — no `custom_field_definitions` table seeder, no `/admin/custom-fields` page, no field-resolver service.
+`forge.core/Models/CustomFieldDefinitionModel.cs` exists but has no admin UI plumbing — no `custom_field_definitions` table seeder, no `/admin/custom-fields` page, no field-resolver service.
 
 ### How much it's used today
 

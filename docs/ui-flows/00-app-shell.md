@@ -1,4 +1,4 @@
-# QB Engineer — App Shell & Navigation
+# Forge — App Shell & Navigation
 
 **Generated:** 2026-03-22
 
@@ -59,7 +59,7 @@ features are accessible and how the user moves between modules.
 
 ## Finding Controls — Universal Layout
 
-Every page in QB Engineer follows the same spatial layout. Use this guide first
+Every page in Forge follows the same spatial layout. Use this guide first
 before looking at page-specific landmarks below.
 
 ```

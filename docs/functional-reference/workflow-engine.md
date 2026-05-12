@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Workflow Engine is the shared substrate behind every multi-step entity creation or refinement flow in QB Engineer. It hosts the data model, lifecycle handlers, predicate-driven readiness validation, and an entity-agnostic Angular shell that lets any entity type wire a guided wizard or a single-page express form against the same primitives.
+The Workflow Engine is the shared substrate behind every multi-step entity creation or refinement flow in Forge. It hosts the data model, lifecycle handlers, predicate-driven readiness validation, and an entity-agnostic Angular shell that lets any entity type wire a guided wizard or a single-page express form against the same primitives.
 
 In production today the engine drives Part creation (14 combo-specific definitions across the Make / Buy / Subcontract / Phantom procurement axis). The substrate is built to extend to Customer, Quote, Vendor, ECO, supplier-qualification and other entity types by registering three small per-type adapters and a set of seed rows.
 
@@ -123,7 +123,7 @@ Source: `Features/Workflows/Runs/AbandonWorkflow.cs`.
 
 ## Defining a Workflow
 
-Every workflow definition is a row in `workflow_definitions` with these columns (entity at `qb-engineer-server/qb-engineer.core/Entities/WorkflowDefinition.cs`):
+Every workflow definition is a row in `workflow_definitions` with these columns (entity at `forge-api/forge.core/Entities/WorkflowDefinition.cs`):
 
 | Column | Notes |
 |--------|-------|
@@ -136,7 +136,7 @@ Every workflow definition is a row in `workflow_definitions` with these columns 
 
 ### Step shape
 
-Each element in `StepsJson` is a `WorkflowStepDefinition` (`qb-engineer-server/qb-engineer.core/Models/WorkflowStepDefinition.cs`):
+Each element in `StepsJson` is a `WorkflowStepDefinition` (`forge-api/forge.core/Models/WorkflowStepDefinition.cs`):
 
 ```json
 {
@@ -158,7 +158,7 @@ Each element in `StepsJson` is a `WorkflowStepDefinition` (`qb-engineer-server/q
 
 ### Authoring flow
 
-The seeded built-in definitions are inlined as C# constants in `qb-engineer-server/qb-engineer.api/Workflows/WorkflowSeedData.cs`. New seeded definitions are added there as another `DefinitionSeed` record:
+The seeded built-in definitions are inlined as C# constants in `forge-api/forge.api/Workflows/WorkflowSeedData.cs`. New seeded definitions are added there as another `DefinitionSeed` record:
 
 ```csharp
 public static IReadOnlyList<DefinitionSeed> PartWorkflowDefinitions { get; } =
@@ -242,7 +242,7 @@ In return the step is expected to call `WorkflowService.registerStepForm(form, l
 Step components are mapped to their string keys at feature-module load:
 
 ```typescript
-// qb-engineer-ui/src/app/features/parts/workflow/register-part-workflow-steps.ts
+// forge-ui/src/app/features/parts/workflow/register-part-workflow-steps.ts
 export function providePartWorkflowSteps(): EnvironmentProviders {
   return provideEnvironmentInitializer(() => {
     const registry = inject(WorkflowStepRegistryService);
@@ -258,7 +258,7 @@ Wired into the parts route via `providers: [providePartWorkflowSteps()]` so it r
 
 If the shell looks up a `componentName` that is not registered, it falls back to `WorkflowStepStubComponent` -- intentional during phased rollout so a definition can ship before all its components do.
 
-Source: `qb-engineer-ui/src/app/shared/services/workflow-step-registry.service.ts`.
+Source: `forge-ui/src/app/shared/services/workflow-step-registry.service.ts`.
 
 ---
 
@@ -266,7 +266,7 @@ Source: `qb-engineer-ui/src/app/shared/services/workflow-step-registry.service.t
 
 ### EntityReadinessValidator
 
-Validators are reusable named predicates stored in `entity_readiness_validators` (entity at `qb-engineer.core/Entities/EntityReadinessValidator.cs`). One row per `(EntityType, ValidatorId)`, predicate stored as `jsonb`:
+Validators are reusable named predicates stored in `entity_readiness_validators` (entity at `forge.core/Entities/EntityReadinessValidator.cs`). One row per `(EntityType, ValidatorId)`, predicate stored as `jsonb`:
 
 | Column | Notes |
 |--------|-------|
@@ -295,7 +295,7 @@ Two intentionally-not-defined gates the seed data calls out: `hasVendorParts` (P
 
 ### Predicate DSL
 
-Both the C# evaluator (`qb-engineer.api/Workflows/PredicateEvaluator.cs`) and the Angular twin (`qb-engineer-ui/src/app/shared/services/predicate-evaluator.ts`) implement the same v1 operator surface. There is a drift test (`predicate-drift-fixtures.spec.ts` on the client) that runs the same fixtures through both to keep them in sync.
+Both the C# evaluator (`forge.api/Workflows/PredicateEvaluator.cs`) and the Angular twin (`forge-ui/src/app/shared/services/predicate-evaluator.ts`) implement the same v1 operator surface. There is a drift test (`predicate-drift-fixtures.spec.ts` on the client) that runs the same fixtures through both to keep them in sync.
 
 | Operator | Schema | Meaning |
 |----------|--------|---------|
@@ -318,7 +318,7 @@ The custom-function registry (`IPredicateCustomFunctionRegistry` server-side, th
 `IEntityReadinessService.GetMissingValidatorsAsync(entityType, entityId, ct)` orchestrates loading + evaluation. It depends on `IEntityReadinessLoader` -- one implementation per entity type that knows how to `Include()` whatever relations the predicates need. For Part:
 
 ```csharp
-// qb-engineer.api/Workflows/PartReadinessLoader.cs
+// forge.api/Workflows/PartReadinessLoader.cs
 public Task<object?> LoadAsync(int entityId, CancellationToken ct) =>
     db.Parts.AsNoTracking()
         .Include(p => p.BOMEntries)
@@ -389,7 +389,7 @@ The `DraftService` / IndexedDB form-draft system (CLAUDE.md -> "Form Draft / Uns
 
 Base: `/api/v1/workflows`. All endpoints require any authenticated caller; admin role is only required for definition / validator authoring.
 
-Source: `qb-engineer.api/Controllers/WorkflowsController.cs`.
+Source: `forge.api/Controllers/WorkflowsController.cs`.
 
 | Method | Path | Description | Request | Response |
 |--------|------|-------------|---------|----------|
@@ -465,7 +465,7 @@ The envelope is built by `ExceptionHandlingMiddleware.cs` from `WorkflowMissingV
 
 Base: `/api/v1/workflow-definitions`. Reads open to authenticated; writes admin-only.
 
-Source: `qb-engineer.api/Controllers/WorkflowDefinitionsController.cs`.
+Source: `forge.api/Controllers/WorkflowDefinitionsController.cs`.
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
@@ -481,7 +481,7 @@ Source: `qb-engineer.api/Controllers/WorkflowDefinitionsController.cs`.
 
 Base: `/api/v1/entity-validators`. Reads open to authenticated; writes admin-only.
 
-Source: `qb-engineer.api/Controllers/EntityValidatorsController.cs`.
+Source: `forge.api/Controllers/EntityValidatorsController.cs`.
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
@@ -504,7 +504,7 @@ Body: { "targetStatus": "Active" | "Obsolete" | "Prototype" }
 
 When the user has an in-flight workflow run against the part, the handler scopes the readiness check to that run's required-step gates only -- preventing global validators outside the run's scope (e.g. `hasSourcing` on a Make+Subassembly part) from blocking promotion. On success, both the entity status flip and the workflow's `CompletedAt` are written in the same SaveChanges.
 
-Source: `qb-engineer.api/Features/Parts/PromoteStatus/PromotePartStatus.cs`.
+Source: `forge.api/Features/Parts/PromoteStatus/PromotePartStatus.cs`.
 
 ---
 
@@ -512,7 +512,7 @@ Source: `qb-engineer.api/Features/Parts/PromoteStatus/PromotePartStatus.cs`.
 
 ### The shell
 
-`<app-workflow>` (`qb-engineer-ui/src/app/shared/components/workflow/workflow.component.ts`) is the entity-agnostic shell. It accepts inputs (`run`, `definition`, `entity`, `validators`, `entityTitle`, `missingValidators`, `readonly`) and emits typed events (`stepJumped`, `modeChanged`, `stepAdvanced`, `stepBacked`, `stepSkipped`, `completeRequested`, `closed`).
+`<app-workflow>` (`forge-ui/src/app/shared/components/workflow/workflow.component.ts`) is the entity-agnostic shell. It accepts inputs (`run`, `definition`, `entity`, `validators`, `entityTitle`, `missingValidators`, `readonly`) and emits typed events (`stepJumped`, `modeChanged`, `stepAdvanced`, `stepBacked`, `stepSkipped`, `completeRequested`, `closed`).
 
 Per-feature parents own the HTTP wiring: read URL params, call `WorkflowService` methods, write back to URL on success, push results into the shell's signals. The shell never imports a feature service.
 
@@ -585,7 +585,7 @@ If the entity doesn't yet have a `Draft` status, that is a separate refactor -- 
 For Vendor, write a single class implementing all three (mirrors `PartWorkflowAdapter`):
 
 ```csharp
-// qb-engineer.api/Workflows/VendorWorkflowAdapter.cs
+// forge.api/Workflows/VendorWorkflowAdapter.cs
 public class VendorWorkflowAdapter(AppDbContext db, IVendorRepository repo)
     : IWorkflowEntityCreator, IWorkflowFieldApplier, IWorkflowEntityPromoter
 {
@@ -624,7 +624,7 @@ builder.Services.AddScoped<IWorkflowEntityPromoter>(sp => sp.GetRequiredService<
 Per-entity-type loader that pulls the entity with whatever relations the predicates need:
 
 ```csharp
-// qb-engineer.api/Workflows/VendorReadinessLoader.cs
+// forge.api/Workflows/VendorReadinessLoader.cs
 public class VendorReadinessLoader(AppDbContext db) : IEntityReadinessLoader
 {
     public string EntityType => "Vendor";
@@ -693,7 +693,7 @@ Each component implements the step contract: declare the input bag, build the re
 ### 7. Register the step components
 
 ```typescript
-// qb-engineer-ui/src/app/features/vendors/workflow/register-vendor-workflow-steps.ts
+// forge-ui/src/app/features/vendors/workflow/register-vendor-workflow-steps.ts
 export function provideVendorWorkflowSteps(): EnvironmentProviders {
   return provideEnvironmentInitializer(() => {
     const registry = inject(WorkflowStepRegistryService);
@@ -719,7 +719,7 @@ To `public/assets/i18n/en.json` (and parallel files):
 - `validators.vendors.hasBasics`, `.hasBasicsMissing`, etc. -- gate labels and messages
 - Optional: `vendors.workflow.basics.rationale`, `.contacts.rationale`, `.w9.rationale` -- "?" sidecar text
 
-Server-supplied keys (workflow step `labelKey`s and validator `DisplayNameKey` / `MissingMessageKey`) are auto-scanned by the `lint:i18n` script from `qb-engineer-server/qb-engineer.api/Workflows/*.cs` -- the script will fail if you ship the server-side strings without matching client keys.
+Server-supplied keys (workflow step `labelKey`s and validator `DisplayNameKey` / `MissingMessageKey`) are auto-scanned by the `lint:i18n` script from `forge-api/forge.api/Workflows/*.cs` -- the script will fail if you ship the server-side strings without matching client keys.
 
 ### 10. Surface the resume affordance
 
@@ -776,10 +776,10 @@ These are behaviors that surprised the original implementers, captured from comm
 - `docs/functional-reference/database-schema.md` -- column-level reference for `workflow_definitions`, `workflow_runs`, `workflow_run_entities`, `entity_readiness_validators`
 - `phase-4-output/part-type-field-relevance.md` -- the audit that produced the 14 combo-specific Part definitions and the readiness-gate scoping rules
 - Source roots:
-  - Server entities: `qb-engineer-server/qb-engineer.core/Entities/WorkflowDefinition.cs`, `WorkflowRun.cs`, `WorkflowRunEntity.cs`, `EntityReadinessValidator.cs`
-  - Server runtime: `qb-engineer-server/qb-engineer.api/Workflows/` (services, adapters, predicate evaluator, seeder, audit events)
-  - Server handlers: `qb-engineer-server/qb-engineer.api/Features/Workflows/Definitions/`, `.../Runs/`, `.../Validators/`
+  - Server entities: `forge-api/forge.core/Entities/WorkflowDefinition.cs`, `WorkflowRun.cs`, `WorkflowRunEntity.cs`, `EntityReadinessValidator.cs`
+  - Server runtime: `forge-api/forge.api/Workflows/` (services, adapters, predicate evaluator, seeder, audit events)
+  - Server handlers: `forge-api/forge.api/Features/Workflows/Definitions/`, `.../Runs/`, `.../Validators/`
   - Server controllers: `WorkflowsController.cs`, `WorkflowDefinitionsController.cs`, `EntityValidatorsController.cs`
-  - Client services: `qb-engineer-ui/src/app/shared/services/workflow.service.ts`, `workflow-resume.service.ts`, `workflow-step-registry.service.ts`, `predicate-evaluator.ts`
-  - Client components: `qb-engineer-ui/src/app/shared/components/workflow/`, `qb-engineer-ui/src/app/shared/components/workflow-active-list/`
-  - Part workflow wiring: `qb-engineer-ui/src/app/features/parts/workflow/` and `register-part-workflow-steps.ts`
+  - Client services: `forge-ui/src/app/shared/services/workflow.service.ts`, `workflow-resume.service.ts`, `workflow-step-registry.service.ts`, `predicate-evaluator.ts`
+  - Client components: `forge-ui/src/app/shared/components/workflow/`, `forge-ui/src/app/shared/components/workflow-active-list/`
+  - Part workflow wiring: `forge-ui/src/app/features/parts/workflow/` and `register-part-workflow-steps.ts`

@@ -1,12 +1,12 @@
 # Roles & Permissions Reference
 
-Comprehensive reference for all roles, permissions, and access control in QB Engineer. Derived from actual source code (`[Authorize]` attributes on controllers, Angular `roleGuard()` on routes, and sidebar `allowedRoles` filtering).
+Comprehensive reference for all roles, permissions, and access control in Forge. Derived from actual source code (`[Authorize]` attributes on controllers, Angular `roleGuard()` on routes, and sidebar `allowedRoles` filtering).
 
 ---
 
 ## 1. Role Definitions
 
-QB Engineer defines six roles. Roles are **additive** -- a user can hold multiple roles simultaneously, and their effective permissions are the **union** of all assigned roles.
+Forge defines six roles. Roles are **additive** -- a user can hold multiple roles simultaneously, and their effective permissions are the **union** of all assigned roles.
 
 | Role | Description |
 |------|-------------|

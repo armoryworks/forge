@@ -93,7 +93,7 @@ The component **TABLE** (with selector + key inputs) stays in CLAUDE.md — Clau
 the component exists. The example markup + behavior detail moves to ui-components.md.
 
 **Inbound trigger:** PreToolUse hook on `Write|Edit` matching
-`qb-engineer-ui/src/app/features/**/*.component.html` or `**/*.component.ts`. Hook injects:
+`forge-ui/src/app/features/**/*.component.html` or `**/*.component.ts`. Hook injects:
 *"Editing a feature component: consult `docs/ui-components.md` for shared-component usage and
 `docs/coding-standards.md` for form-control rules."*
 
@@ -186,7 +186,7 @@ right moment. Hooks live in `.claude/settings.json` (project-scoped, committed).
         "hooks": [
           {
             "type": "prompt",
-            "prompt": "If the file path matches a UI component (qb-engineer-ui/src/app/features/**/*.component.{html,ts} or qb-engineer-ui/src/app/shared/components/**/*.{html,ts}), respond with the contents of docs/ui-components.md filtered to the components referenced in the file. Otherwise respond with empty string."
+            "prompt": "If the file path matches a UI component (forge-ui/src/app/features/**/*.component.{html,ts} or forge-ui/src/app/shared/components/**/*.{html,ts}), respond with the contents of docs/ui-components.md filtered to the components referenced in the file. Otherwise respond with empty string."
           }
         ]
       }

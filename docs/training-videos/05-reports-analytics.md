@@ -10,7 +10,7 @@
 
 ## Purpose
 
-The report builder is one of the most powerful and underused features in QB Engineer. This video transforms it from intimidating to approachable by starting with pre-built templates and progressively introducing customization. The target audience includes managers who need business intelligence, engineers who want production insights, and office staff who need financial summaries.
+The report builder is one of the most powerful and underused features in Forge. This video transforms it from intimidating to approachable by starting with pre-built templates and progressively introducing customization. The target audience includes managers who need business intelligence, engineers who want production insights, and office staff who need financial summaries.
 
 ### Learning Objectives
 - Navigate the reports page and understand the two-panel layout
@@ -164,7 +164,7 @@ When you are satisfied with a report, save it so you and your team can run it ag
 **Chapter label:** "Exporting"
 
 **Narration Script:**
-Export the current report results using the Export button in the report toolbar. Choose between CSV for spreadsheet analysis and PDF for formatted presentation. The CSV export includes all columns in your report — including calculated fields — with column headers matching the field names you chose. The PDF export renders a formatted report with your company name and logo in the header, the report title, the date and time it was generated, and the full result table paginated across multiple pages if needed. For large result sets, the CSV is usually more practical. For sharing with clients or executives who do not have QB Engineer access, the formatted PDF is the professional choice.
+Export the current report results using the Export button in the report toolbar. Choose between CSV for spreadsheet analysis and PDF for formatted presentation. The CSV export includes all columns in your report — including calculated fields — with column headers matching the field names you chose. The PDF export renders a formatted report with your company name and logo in the header, the report title, the date and time it was generated, and the full result table paginated across multiple pages if needed. For large result sets, the CSV is usually more practical. For sharing with clients or executives who do not have Forge access, the formatted PDF is the professional choice.
 
 **Alternative paths:** The CSV format uses UTF-8 encoding and standard comma separators — compatible with Excel, Google Sheets, and every major data analysis tool. If your report includes date fields, they export in ISO 8601 format — you may need to reformat them in Excel depending on your regional settings.
 
@@ -266,7 +266,7 @@ Export results as CSV for spreadsheet analysis or PDF for professional sharing. 
       "element": "app-reports",
       "popover": {
         "title": "Exporting",
-        "description": "Export current results with the Export button. Choose CSV for spreadsheet analysis or PDF for formatted presentation. CSV includes all columns including calculated fields, UTF-8 encoded, standard comma separators — compatible with Excel, Google Sheets, and every major data tool. PDF renders with your company name and logo in the header, report title, generation timestamp, and the full result table paginated across pages. Use CSV for analysis, PDF for sharing with clients or executives who do not have QB Engineer access."
+        "description": "Export current results with the Export button. Choose CSV for spreadsheet analysis or PDF for formatted presentation. CSV includes all columns including calculated fields, UTF-8 encoded, standard comma separators — compatible with Excel, Google Sheets, and every major data tool. PDF renders with your company name and logo in the header, report title, generation timestamp, and the full result table paginated across pages. Use CSV for analysis, PDF for sharing with clients or executives who do not have Forge access."
       }
     }
   ],
