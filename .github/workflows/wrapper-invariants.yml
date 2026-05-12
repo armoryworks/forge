@@ -1,0 +1,43 @@
+name: wrapper invariants
+
+# Verifies the wrapper's two cross-repo invariants on every PR and every
+# push to main:
+#
+#   1. .ps1 BOM — every wrapper-tracked .ps1 file starts with a UTF-8 BOM.
+#      Required for Windows PowerShell 5 to parse non-ASCII characters
+#      correctly (.editorconfig declares the convention; this enforces it).
+#
+#   2. Overlay parity — the four overlay compose files
+#      (docker-compose.{dev,demo,cohost,export}.yml) are byte-identical
+#      to forge-deploy/'s copies. They're hard-linked locally; an editor's
+#      atomic-save can silently break the inode share and let the wrapper
+#      copy drift. This check catches that drift before it merges.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout wrapper
+        uses: actions/checkout@v4
+
+      - name: .ps1 BOM check
+        run: bash scripts/check-ps1-bom.sh
+
+      - name: Checkout forge-deploy (sibling) for parity comparison
+        uses: actions/checkout@v4
+        with:
+          repository: armoryworks/forge-deploy
+          path: forge-deploy
+          # If forge-deploy is private, the default GITHUB_TOKEN won't
+          # have cross-repo read access. In that case, add a repo secret
+          # FORGE_DEPLOY_PAT (personal access token or GitHub App token
+          # with Contents:read on armoryworks/forge-deploy) and uncomment:
+          # token: ${{ secrets.FORGE_DEPLOY_PAT }}
+
+      - name: Overlay parity check
+        run: bash scripts/check-overlay-parity.sh
