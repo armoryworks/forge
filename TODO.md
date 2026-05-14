@@ -68,104 +68,88 @@ it's visibly broken even at the first A+ step (20px).
 
 ---
 
-## 🚧 Phase C vertical restructure — Identity-and-onward blocked on cross-references
+## 🚧 Phase C vertical restructure — Identity data layer done, handlers/controllers blocked on `IAppDbContext`
 
-**Where things stand (commits b8e2885, 7000243, db5a9e4 on `armoryworks/forge` and `armoryworks/forge-api`).**
+**Where things stand.**
 
 1. ✅ Plan written: `docs/vertical-restructure-plan.md` defines the 11
-   verticals, classification rules, migration order, and stopping
-   criteria.
-2. ✅ Skeleton created: all 14 csproj projects exist (11 verticals +
-   Platform + Database + Host), wired into `forge.slnx`, empty but
-   build-clean.
-3. ✅ Forge.Platform foundation migrated: `BaseEntity` +
-   `BaseAuditableEntity` + `IConcurrencyVersioned` + `IClock` +
-   `SystemClock` + `MockClock`. Implicit-using strategy on the
-   existing csprojs handles the ~249 entity files that inherit
-   `BaseEntity` without per-file edits.
-4. ❌ Forge.Identity entity migration attempted, rolled back.
+   verticals, classification rules, migration order, stopping criteria.
+   Dependency rule **amended** (wrapper `b824227`): "Platform only" →
+   "Platform + earlier-in-DAG verticals; no cycles; concrete navs OK"
+   (EF Core can't map interface-typed navigations, so verticals must
+   reference each other's projects for cross-vertical navs).
+2. ✅ Skeleton created: all 14 csproj projects exist, wired into the
+   solution, build-clean.
+3. ✅ `Forge.Platform` foundation migrated: `BaseEntity` /
+   `BaseAuditableEntity` / `IConcurrencyVersioned` / `IClock` /
+   `SystemClock` / `MockClock`.
+4. ✅ **Enums centralized** (`forge-api` `f6fdb09`): all 167 enum files
+   moved `forge.core/Enums/` → `Forge.Platform/Enums/`. Implicit-using
+   shims on the 5 consuming csprojs; 865 explicit `using` lines dropped.
+5. ✅ **`Forge.Identity` data layer migrated** (`forge-api` `594ec36`):
+   12 entities (`ApplicationUser` + 9 user-scoped + the cloud-storage
+   cluster `CloudStorageProvider` / `UserCloudStorageLink` /
+   `EntityCloudLink`), 4 interfaces, 12 EF configs. `forge.core` has
+   zero references to `Forge.Identity` — the old circular edge is gone.
+   `Forge.Identity → forge.core` is a one-way DAG dep (CompanyLocation,
+   RoleTemplate, IActiveAware). `AppDbContext` gained a second
+   `ApplyConfigurationsFromAssembly(typeof(ApplicationUser).Assembly)`.
+   Build `-warnaserror` + 815 tests green. **PR:**
+   `armoryworks/forge-api#1` (open, awaiting review).
+6. ⛔ **Handlers + controllers NOT moved — blocked.** See below.
 
-**What blocked the Identity migration.**
+**Why handlers/controllers are blocked.**
 
-Moved 9 simple Identity entities + 9 configs (UserMfaDevice,
-MfaRecoveryCode, UserPreference, UserScanDevice, UserScanIdentifier,
-UserIntegration, UserCloudStorageLink, OAuthStateToken,
-KioskTerminal) from `forge.core/Entities` and `forge.data/Configuration`
-into `Forge.Identity/Entities` and `Forge.Identity/Configuration`,
-updated namespaces. Build broke on inbound and outbound dependencies
-that need untangling:
+The plan wants verticals to own their controllers + MediatR handlers,
+but moving Identity's handlers closes a cycle:
 
-**Inbound — `forge.core` references Identity entities.** Three files
-in `forge.core` use moved entities:
+- 16 of 41 Identity handlers take the **concrete `AppDbContext`** (in
+  `forge.data`). `forge.data → Forge.Identity` already exists, so
+  `Forge.Identity → forge.data` would be circular.
+- 12 handlers also `using Forge.Api.Data` / `Forge.Api.Services` —
+  `forge.api → Forge.Identity` already exists, so that's circular too.
+- There is **no `IAppDbContext`** — handlers bind the concrete context.
 
-- `forge.core/Entities/CloudStorageProvider.cs` — navigation collection
-  of `UserCloudStorageLink`.
-- `forge.core/Interfaces/ICloudStorageTokenManager.cs` — service
-  interface managing `UserCloudStorageLink`.
-- `forge.core/Interfaces/IUserIntegrationService.cs` — manages
-  `UserIntegration`.
-- `forge.core/Interfaces/IUserPreferenceRepository.cs` — manages
-  `UserPreference`.
+This is the "significant refactor on its own" the plan flagged. It must
+be solved before *any* vertical can take its handlers.
 
-Can't add `forge.core → Forge.Identity` reference because…
+## ⏭️ Next effort — extract `IAppDbContext` (its own branch/PR)
 
-**Outbound — Identity files need types from `forge.core` and
-`forge.data`.** The moved configs reference `ApplicationUser` (in
-`forge.data/Context/ApplicationUser.cs`) and the moved entities use
-enums from `forge.core/Enums/MfaDeviceType.cs` etc.
+Infrastructure prerequisite for every vertical's handler migration.
+**Design direction: interface-segregated DbSets, not one fat interface.**
 
-…adding `Forge.Identity → forge.core` would close a cycle.
+A single `IAppDbContext` exposing all ~250 `DbSet<T>`s would have to
+reference every vertical's entity types — inverting the dependency graph
+(whatever holds it depends on everything). Instead:
 
-**Resolution path for next session.**
+1. **Per-vertical context interface owned by the vertical.** E.g.
+   `IIdentityDbContext` in `Forge.Identity`, exposing only Identity's
+   `DbSet<T>`s (`ApplicationUser`, `UserPreference`, `UserMfaDevice`, …)
+   plus `SaveChangesAsync` / `Database` / `Entry()` / whatever handlers
+   actually use. `Forge.Identity` references only its own entities —
+   no outward dep.
+2. **`AppDbContext` implements all of them.** `AppDbContext :
+   IdentityDbContext<…>, IIdentityDbContext, ISalesDbContext, …` — it
+   already has every `DbSet`, so implementation is "free" (the DbSet
+   properties satisfy the interface members).
+3. **Handlers rebind to the vertical interface.** Identity handlers take
+   `IIdentityDbContext` instead of `AppDbContext`. DI registers
+   `AppDbContext` as the impl for each interface (`AddScoped<IIdentityDbContext>(sp => sp.GetRequiredService<AppDbContext>())`).
+4. **Relocate the `Forge.Api.Services` / `Forge.Api.Data` bits Identity
+   handlers need** — `ITokenService`, session store, etc. — into
+   `Forge.Platform` (if cross-cutting) or `Forge.Identity` (if
+   Identity-owned). Audit the 12 handlers' `using Forge.Api.*` lines to
+   scope this.
 
-The clean fix is to move *more* in one coordinated pass so the
-graph un-circles:
+Once `IIdentityDbContext` exists and the service deps are relocated,
+moving Identity's Features + controllers becomes mechanical (controllers
+go into a web-capable `Forge.Identity` via `FrameworkReference
+Microsoft.AspNetCore.App`, registered as an application part in
+`Program.cs`). The same `I{Vertical}DbContext` pattern then unblocks
+MasterData, Sales, and the rest.
 
-1. **Move `ApplicationUser` to `Forge.Identity/Entities/ApplicationUser.cs`**
-   (namespace `Forge.Identity.Entities`). It's the natural owner. But
-   it extends `IdentityUser<int>` from
-   `Microsoft.AspNetCore.Identity.EntityFrameworkCore`, has a
-   navigation to `CompanyLocation` (still in `forge.core/Entities`),
-   and implements `IActiveAware` (interface in
-   `forge.core/Interfaces`). So plan to also:
-2. **Move `IActiveAware` to `Forge.Platform/Common/IActiveAware.cs`**
-   (cross-cutting marker interface — multiple verticals' entities
-   implement it).
-3. **Move enums Identity entities depend on** (`MfaDeviceType`,
-   etc.) to `Forge.Identity/Enums/`, OR move all enums to
-   `Forge.Platform/Enums/` since they're declared once and
-   referenced by many entities — easier than per-vertical enum
-   splits.
-4. **Move the four `forge.core` files that reference Identity
-   entities into `Forge.Identity`** — they're cohesive with the
-   vertical anyway (cloud storage token management, user preference
-   repo). After this, `forge.core` has zero inbound references *to*
-   Identity entities, so the circular-dep risk dissolves.
-5. **Keep `ApplicationUser`'s `WorkLocationId` navigation to
-   `CompanyLocation`** by referencing `forge.core` from
-   `Forge.Identity` (acceptable — `CompanyLocation` is `MasterData`
-   territory and once it moves in a later session,
-   `Forge.Identity → Forge.MasterData` is the clean state).
-   Alternative: lazy-resolve `CompanyLocation` via just the FK int
-   id and drop the navigation property.
-
-**`AppDbContext` impact to watch for.** `AppDbContext` lives in
-`forge.data/Context/AppDbContext.cs` and extends
-`IdentityDbContext<ApplicationUser, IdentityRole<int>, int>`. Once
-`ApplicationUser` moves to `Forge.Identity`, `forge.data` references
-`Forge.Identity` (the implicit-using directives in `forge.data.csproj`
-already point at `Forge.Identity.Entities` from the rollback —
-verify they're still there or re-add). `IdentityDbContext` itself
-stays from the Microsoft NuGet package.
-
-**Estimated effort for the next session.** ~2 hours of focused work
-to land Forge.Identity cleanly (entities + configs only, controllers
-still deferred), assuming the moves above unblock everything. If
-`AppDbContext`'s identity-typed DbSets surface fresh issues, budget
-~1 more hour.
-
-**Where to pick up.**
-Current branch is at db5a9e4. Read
-`docs/vertical-restructure-plan.md` first for the architectural
-intent, then read this section for the unblocking sequence. Don't
-re-do the moves piecemeal; do them together in the right order.
+**Where to pick up.** Branch `feature/forge-identity-vertical` is at
+`forge-api` `594ec36` (PR #1). Start `IAppDbContext` extraction as a
+fresh branch — ideally after PR #1 merges so it's reviewed
+independently. Read `docs/vertical-restructure-plan.md` for intent,
+then this section for the sequence.
