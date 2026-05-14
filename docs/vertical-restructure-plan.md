@@ -60,9 +60,28 @@ Migration order (dependency-first):
 
 ## Dependency rules
 
-- Every vertical → `Forge.Platform` only.
-- No vertical → another vertical at the data layer. Cross-vertical
-  reads happen through `forge.data` (which references all verticals)
+- Every vertical → `Forge.Platform`, plus verticals **earlier in the
+  dependency DAG**. No cycles. Dependencies flow transactional →
+  definitional — the same order as the migration sequence below
+  (Identity → MasterData → Sales → …). So `Forge.Identity` may
+  reference `Forge.MasterData` (e.g. `ApplicationUser.WorkLocation`
+  navigating to `CompanyLocation`), but never the reverse.
+  - **Why not "Platform only":** that rule is stricter than a DAG and
+    fights EF Core, which cannot map an interface-typed navigation
+    property — reference navs must be concrete entity types. Keeping
+    concrete cross-vertical navs (e.g. `ApplicationUser → CompanyLocation`)
+    requires the owning vertical to reference the target vertical's
+    project. A one-way DAG dependency is sound; it's only *cycles*
+    that break the build and the architecture. The migration order is
+    already dependency-first, so the DAG is implicit — this rule just
+    makes it explicit and permits the concrete navs.
+  - During the transition a vertical may also reference the old
+    shrinking `forge.core` for types not yet migrated (e.g.
+    `Forge.Identity → forge.core` for `CompanyLocation` until
+    `Forge.MasterData` migrates and the reference retargets).
+- No vertical → another vertical that is *later* in the DAG, and no
+  cycles. Cross-vertical reads that would need an upstream→downstream
+  reference go through `forge.data` (which references all verticals)
   during the transition and eventually through events.
 - `forge.data` keeps `AppDbContext` for now — it depends on all
   verticals' entities. Moving `AppDbContext` to Platform is deferred
