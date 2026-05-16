@@ -372,7 +372,7 @@ Opens as an `<app-dialog>` with title "About Forge" at 420px width. Contains:
 - Metadata table:
   - **Your build**: Git commit SHA from `VersionService.local()`, or "dev" for development builds
   - **Latest on main**: Latest SHA from `VersionService`, with "up to date" (green check) or "update available" (yellow update icon) badge
-  - **License**: GNU General Public License v3.0
+  - **License**: Apache License 2.0
   - **Stack**: Angular 21, .NET 9, PostgreSQL
 - Description paragraph about the project
 

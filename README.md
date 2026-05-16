@@ -119,7 +119,7 @@ master tag you're targeting.
 
 ## License
 
-[GPL](./LICENSE) — see the LICENSE file for full terms.
+[Apache 2.0](./LICENSE) — see the LICENSE file for full terms.
 
 ---
 
