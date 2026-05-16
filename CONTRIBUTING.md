@@ -8,11 +8,11 @@ For per-repo specifics (build instructions, test commands), see the
 
 | Repo | What it owns |
 |---|---|
-| [forge](https://github.com/danielhokanson/forge) | Project docs, architecture, governance, release manifest |
-| [forge-ui](https://github.com/danielhokanson/forge-ui) | Angular frontend |
-| [forge-api](https://github.com/danielhokanson/forge-api) | .NET backend + EF migrations |
-| [forge-deploy](https://github.com/danielhokanson/forge-deploy) | docker-compose, ops scripts |
-| [forge-test](https://github.com/danielhokanson/forge-test) | Manual test plans |
+| [forge](https://github.com/armoryworks/forge) | Project docs, architecture, governance, release manifest |
+| [forge-ui](https://github.com/armoryworks/forge-ui) | Angular frontend |
+| [forge-api](https://github.com/armoryworks/forge-api) | .NET backend + EF migrations |
+| [forge-deploy](https://github.com/armoryworks/forge-deploy) | docker-compose, ops scripts |
+| [forge-test](https://github.com/armoryworks/forge-test) | Manual test plans |
 
 Open issues, PRs, and discussions in the repo that owns the affected
 code. Cross-cutting design discussions go in this umbrella repo.
@@ -20,13 +20,13 @@ code. Cross-cutting design discussions go in this umbrella repo.
 ## Getting set up
 
 ```bash
-git clone https://github.com/danielhokanson/forge.git
+git clone https://github.com/armoryworks/forge.git
 cd forge
 ./bootstrap.sh        # clones all four sibling repos as ../forge-*
 ```
 
 For dev environment setup (running the app locally), follow the README
-in [forge-deploy](https://github.com/danielhokanson/forge-deploy).
+in [forge-deploy](https://github.com/armoryworks/forge-deploy).
 
 ## Branch model
 
