@@ -68,16 +68,38 @@ it's visibly broken even at the first A+ step (20px).
 
 ---
 
-## 🚧 Phase C vertical restructure — data-layer extraction in progress (on `main`)
+## ❌ Phase C vertical restructure — ABANDONED, reversed to horizontal (2026-05-20)
 
-> Re-baselined 2026-05-19. The original `feature/forge-identity-vertical`
-> branch went 24 commits stale (pre-.NET-10) and was abandoned; the work
-> below was redone fresh against current `main` and lands directly on `main`
-> (pre-beta direct-push), each increment kept green + **DB-neutral**.
+> The vertical-bounded-context split was **fully reversed** (forge-api
+> `7b842e1`). `main` is back to the horizontal `forge.api` / `forge.core` /
+> `forge.data` / `forge.integrations` + `forge.tests` layout. All 14 scaffold
+> projects (incl. `Forge.Platform`) are deleted; `BaseEntity` / `IClock` /
+> `SystemClock` / `MockClock` are restored to their original homes in
+> forge.core / forge.integrations. `docs/vertical-restructure-plan.md` is now
+> historical only.
+>
+> **Why abandoned:** the split delivered little organizational value — only
+> leaf-vertical *data layers* (Identity, Maintenance, Insights) extracted
+> cleanly; every handler/controller stayed in `forge.api`, so the
+> work-a-feature-in-isolation payoff never materialized. The structural
+> overhead (14 projects, implicit-using shims, FK-name pins, per-vertical
+> config scans) was added without the benefit.
+>
+> **The decisive learning (keep if anyone revisits this):** the codebase has
+> dense concrete cross-entity navigation. "Hub" entities (`Part`, `Vendor`,
+> `Customer`, `PurchaseOrder`, `SalesOrder`, `Job`) are referenced *into* by
+> dozens of still-in-core entities — e.g. 10 forge.core entities hold
+> `PurchaseOrder` navs, ~137 code sites touch `.PurchaseOrder`. Extracting a
+> hub vertical forces a `forge.core → vertical` cycle unless every inbound nav
+> is first converted to the FK-only pattern (a large behavioral change). That
+> coupling is itself evidence the domain boundaries aren't clean enough to
+> justify vertical slicing for a pre-beta single-developer codebase. The
+> horizontal layout is the right fit; revisit verticals only at team scale and
+> only after deliberately decoupling the hub entities.
 
-**Done (on `main`):**
+<details><summary>Historical: what had been done before the reversal</summary>
 
-1. ✅ Plan: `docs/vertical-restructure-plan.md` — 11 verticals + 3
+1. Plan: `docs/vertical-restructure-plan.md` — 11 verticals + 3
    cross-cutting projects, dependency-DAG rule (Platform + earlier-in-DAG;
    no cycles; concrete navs OK).
 2. ✅ Skeleton: all 14 csproj projects exist, wired into `forge.slnx`.
@@ -158,3 +180,5 @@ pattern (proven for Identity) unblocks moving them, but each also needs the
 `Forge.Api.Services` / `Forge.Api.Data` helper deps relocated (to
 `Forge.Platform` if cross-cutting, or the vertical if owned). That's the
 follow-on once data layers are extracted.
+
+</details>
