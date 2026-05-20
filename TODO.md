@@ -126,11 +126,32 @@ it's visibly broken even at the first A+ step (20px).
    Re-run until **"No changes."**
 6. `dotnet test` (full suite), commit, `git merge --ff-only` to `main`, push.
 
-**Remaining verticals** (data-layer extraction; handlers deferred): Procurement,
-Sales, Production, Inventory, Quality, People, Operations, and **MasterData**.
-MasterData (Customers/Vendors/Parts/BOMs/PriceLists/Assets/ReferenceData) is
-largest + most cross-referenced + has genuine entity-classification ambiguity
-— do it with focus, not as a quick roll.
+**⚠️ Leaf vs hub — the blocker discovered 2026-05-19.** The three done so far
+(Identity, Maintenance, Insights) are **leaf** verticals: nothing else holds a
+concrete navigation INTO their entities, so they extract cleanly. The rest are
+**hub** verticals — entities still in `forge.core` (belonging to not-yet-migrated
+verticals) carry concrete nav properties pointing *into* them, which forces a
+`forge.core → vertical` edge and closes a cycle (the vertical also needs
+`→ forge.core` for its own unmigrated deps).
+
+Concretely, a Procurement attempt failed: 10 `forge.core` entities (`Job`,
+`Barcode`, `ConsignmentTransaction`, `AutoPoSuggestion`, `MrpPlannedOrder`,
+`LotRecord`, `SubcontractOrder`, …) have `PurchaseOrder` / `PurchaseOrderLine`
+navs. forge.core can't reference `Forge.Procurement`.
+
+**Resolution (needs a deliberate decision — do NOT auto-roll):** convert those
+inbound concrete navs to the established **FK-only pattern** (keep the `int` FK,
+drop the nav property) before extracting the hub vertical — same pattern
+`forge.core` already uses for `ApplicationUser`. But this is a behavioral change:
+~137 code sites reference `.PurchaseOrder` / `.PurchaseOrderLine` alone (Includes,
+property access). Each hub vertical (Procurement, Sales=`SalesOrder`,
+Production=`Job`, MasterData=`Part`/`Vendor`/`Customer`, Inventory) has its own
+inbound-nav fan-in to convert first. This warrants its own reviewed effort, not
+an unsupervised pass.
+
+**Remaining verticals** (blocked on the above): Procurement, Sales, Production,
+Inventory, Quality, People, Operations, **MasterData**. MasterData is also the
+largest + most classification-ambiguous — do it with focus.
 
 **Handlers/controllers** still live in `forge.api`. The `I{Vertical}DbContext`
 pattern (proven for Identity) unblocks moving them, but each also needs the
