@@ -1,0 +1,16 @@
+# Local rollback overlay — lets forge-local-deploy.sh pin the api/ui services to a
+# specific, previously-built image tag (e.g. forge-api:main-<sha>) instead of the
+# default locally-built :latest. Used for SHA-tagged builds + re-pin rollback.
+#
+#   build  : `... -f docker-compose.yml -f docker-compose.pin.yml up -d --build`
+#            builds and TAGS the images as ${FORGE_API_IMAGE}/${FORGE_UI_IMAGE}.
+#   pin    : same files with `--no-build` recreates containers from the named
+#            (already-built, retained) images — that is the rollback.
+#
+# Defaults fall back to the stock compose image names, so plain
+# `docker compose up` still behaves exactly as before without this overlay.
+services:
+  forge-api:
+    image: ${FORGE_API_IMAGE:-forge-forge-api:latest}
+  forge-ui:
+    image: ${FORGE_UI_IMAGE:-forge-forge-ui:latest}
