@@ -137,6 +137,7 @@
 | **F-053** | [SEC] | BUG | MAJOR | P1 | TBD | impl → review | Hardcoded JWT fallback key |
 | **F-054** | [SEC] | BUG | BLOCKER | P0 | **YES** | STR · not started | MFA full-auth bypass; structural; live when MFA enrolled |
 | **F-055** | [QA] | BUG/GAP | MAJOR | P1 | TBD | open | Price-lock invariant — SO.unit_price vs accepted Quote |
+| **F-056** | [ENG] | GAP | MINOR | P3 | NO | open | ETag If-Match not injected on Kanban job sub-path PATCHes (`/stage`, `/subtasks/{id}`, etc.) — URL-key mismatch in interceptor |
 
 > Priority ratifications (source: `[ORCH]` 2026-05-21): F-021/F-030/F-031/F-043/F-047 = BLOCKER/ship-gate; F-051 = BLOCKER/P0 live-security; F-020 = code-PASS/DoD-pending (not ship-blocking). F-054 = BLOCKER/P0 per [SEC] H-015. Remaining P1 TBDs await `[ORCH]` priority call.
 
@@ -258,6 +259,17 @@ Both held — no merge — pending DevOps rollback gate + QA verification. Will 
 - **F-042** (3 invoices wrong "Paid" status — BUG/MAJOR)
 - **F-043** (lot/serial-on-shipped absent — GAP/BLOCKER)
 - **F-044** (CAP-ACCT-EXTERNAL disabled — coverage hole)
+
+### H-016 [SEC] 2026-05-21 — REDACTION LIST for DevOps (PATH-a scrub-then-commit, re #9 gate)
+
+`[DEVOPS]` — `[ORCH]` approved PATH (a): scrub-then-commit. Two live secrets are embedded in finding bodies. Redact each to a placeholder (global, so any stray copy elsewhere is caught), keep the surrounding sentence so finding semantics stay intact, then commit.
+
+1. **Seed password (live — works for `admin@forge.local` + all 24 users).** Location: **F-039** body — 3 spots: Observed, Impact, and the Evidence line (where it also appears in the `SEED_USER_PASSWORD=<value>` form). Action: replace the password value (read it in-place) with `<SEED_PASSWORD redacted — see secrets note>`. Leave the `.env:20` path reference; redact only the value.
+2. **JWT signing key (live HS256 key for the running instance).** Location: **F-036[SEC]** body, Observed section — the base64 value after `JWT_KEY=`. Action: replace with `<JWT_KEY redacted — see secrets note>`. ⚠ Do NOT touch the `dev-secret-key-change-in-production-min-32-chars!!` fallback literal — it is the public hardcoded default and quoting it IS the finding (F-053).
+
+Leave as-is (not sensitive): bare usernames (`admin@forge.local`, `bkelly@forge.local`) and the public fallback key above. The **credential-mint recipe is NOT in this file** (no pbkdf2/hashlib/security_stamp/password_hash-write content) — nothing to scrub there; it lives only in an untracked SEC note outside the repo.
+
+Durability: suggest the two real values go into a gitignored secrets note (e.g. `AUDIT.secrets.local.md`) keyed by finding ID, so the scrubbed register is committable and the live values stay recoverable. Before `git add`, re-read F-039 + F-036[SEC] and confirm both placeholders are in place and no other copies remain.
 
 ### H-013 [QA] 2026-05-21 — F-034/F-035/F-036 collision → canonical map; next free ID = F-054
 
@@ -441,6 +453,7 @@ Filed the 3 spine blockers not yet ledgered: **F-028** (no estimating engine), *
 **Status log**:
   - `2026-05-05` `[PM]` opened
   - `2026-05-21` `[QA]` **in-fix** — frontend-engineer confirmed in-progress alongside F-001; FE pipeline active per `[ORCH]` 2026-05-21.
+  - `2026-05-21` `[ENG]` **resolved** — `AiService.checkAvailability()` now gates on `capability.descriptor() !== null` before firing the HTTP check. When the descriptor is not yet loaded it chains on `capability.load()` (which also benefits from the F-001 dedup guard) and defers the check to the subscription callback (`_fireAvailabilityCheck()`). Existing layer-3 pre-flight (`isKnown` / `isEnabled`) then short-circuits before the `/ai/status` GET if the capability is confirmed disabled — no 403 emitted. `ai.service.ts`. TypeScript clean.
 
 ### F-003 [PM] [MINOR] [data · ux] · Dashboard · "Margin Summary" widget shows 0% margin alongside −$26,417.79 margin in dollars
 **Where**: route `/dashboard`, "Margin Summary" widget (right column, second row)
@@ -496,6 +509,7 @@ Filed the 3 spine blockers not yet ledgered: **F-028** (no estimating engine), *
   - `2026-05-20` `[QA]` opened — **confirmed** (code verified present in tree). Provisional BLOCKER/P0; Priority to be ratified at post-GT triage. **Baseline caveat:** until fixed, treat all seeded/GT `shipped_quantity` values as suspect (possible 2×).
   - `2026-05-20` `[ENG]` **resolved** — removed duplicate `+= shipmentLine.Quantity` from `OnShipmentCreated_UpdateSalesOrder.cs:38`; handler now updates SO **status only** (no ShippedQuantity mutation). Inline increment in `CreateShipment.cs:78` retained (atomic with shipment insert + single `SaveChanges`). DoD INV-SH1 validated: `CreateShipmentMediatorIntegrationTests.CreateShipment_ShippedQuantityIncrementedExactlyOnce_NotDoubled` — **red before fix, green after** (10/10 shipment tests pass). **Held — no merge — pending DevOps rollback gate + QA probe confirmation.**
   - `2026-05-21` `[QA]` **DoD signed off — LIVE HANDLER VERIFIED.** Code fix confirmed in source: `OnShipmentCreated_UpdateSalesOrder.cs:31` comment confirms no ShippedQuantity mutation; `CreateShipment.cs:78` retains single increment. Live API proof (GT C7 re-run 2026-05-21): `POST /api/v1/shipments` — 5 units against SO-00001 SOL-22 (ordered=10) → `shipped_quantity=5.0000` after one call, exactly once. INV-SH1 probe: **0 violations** across all SO lines. Seed caveat: 21 legacy seed SO lines still show `shipped_quantity=0` (seeder used direct-insert, not the handler — backfill is a `[DEVOPS]` action independent of the fix). Real-mediator integration test (`CreateShipmentMediatorIntegrationTests`) is the automation DoD gate; QA sign-off on DB probe granted. **F-020 CLOSED pending seed backfill.**
+  - `2026-05-21` `[ENG]` **UI-read verified — PASS.** Playwright smoke against live `:4200` (nginx, post-861b82d). SOL 5 (SO-2401, P-1006, ordered=8): API returns `shippedQuantity=3.0`; LINE ITEMS tab displays `3 / 5` (shipped / remaining). SOL 22 (SO-00001, P-1001, ordered=10): API returns `shippedQuantity=5.0`; LINE ITEMS tab displays `5 / 5`. No client-side doubling or inflation. Noted: SH-2401 seed shipment carries `quantity=8` in its line record (pre-fix historical seed, direct-insert bypass) while the SO line shows 3 — this is a data-quality artifact already scoped to the `[BA]`/`[DEVOPS]` backfill item below, not a UI bug. UI reads canonical `ShippedQuantity` from the SO line correctly. F-020 UI DoD: **CLOSED**.
   - `2026-05-21` `[BA]` **Backfill assessment — MIGRATION REQUIRED (not cosmetic).** Full read-site sweep confirms `shipped_quantity` drives four live downstream systems: (1) **`AtpService.cs:32-33,126-128`** — ATP/open-demand computation (`Quantity − ShippedQuantity`); zeroed values overstate open demand by cumulative shipped qty → ATP and demand-pegging are corrupted. (2) **`AutoPurchaseOrderJob.cs:70,122`** — auto-PO trigger + PO quantity (`remainingQty = Quantity − ShippedQuantity`); zeroed values re-trigger PO generation for already-shipped quantities — financial integrity hazard. (3) **`MrpService.cs:86,91`** — MRP gross demand netting; same over-demand error, affects material planning. (4) **`SalesOrderLine.RemainingQuantity` / `IsFullyShipped` (entity:20-21)** — computed properties consumed throughout the UI (SO detail, shipment create guard); with zeroed values all 20 shipped SO lines display as fully open/unshipped in both UI and reports. **Production customer data risk: confirmed real.** The gap arises from `SeedData.Historical.cs` bypassing `CreateShipment.Handle()` — identical risk exists for any customer that migrates historical data via direct DB insert or script, which is the standard on-boarding pattern. **Derivation path is clean and idempotent:** `SUM(shipment_lines.quantity) WHERE sales_order_line_id = sol.id` — always authoritative from existing FKs. **Acceptance spec for `[ENG]`/`[DEVOPS]` backfill script:** `UPDATE sales_order_lines sol SET shipped_quantity = (SELECT COALESCE(SUM(sl.quantity), 0) FROM shipment_lines sl WHERE sl.sales_order_line_id = sol.id) WHERE EXISTS (SELECT 1 FROM shipment_lines sl WHERE sl.sales_order_line_id = sol.id);` — idempotent (overwrites with derivation), safe to re-run, no schema change (EF migration not needed). **Post-backfill DoD:** QA re-run INV-SH1 probe (0 violations expected); verify SO statuses update to `PartiallyShipped`/`Shipped` where appropriate; ATP and MRP open-demand counts should drop to reflect actual remaining quantities. **Routing:** `[DEVOPS]` F-036 repair list; run before GT re-probe of C7/C8 to unblock INV-SH1/SH2 and SO-status assertions.
 
 ### F-021 [QA] [GAP] [BLOCKER] [P1] [PRIMARY] [func · data] · QBO sync seam · Real Invoice/Payment never sync; blocker-class defects latent under `MOCK_INTEGRATIONS`
@@ -521,6 +535,7 @@ Filed the 3 spine blockers not yet ledgered: **F-028** (no estimating engine), *
 **Status log**:
   - `2026-05-20` `[ENG]` opened + **resolved in working tree** (2-line template fix, validated against rendered behavior). Not yet deployed to shared `:4200` — needs the eng-lead's UI redeploy/queue. `taxAmount` (the $ figure) was always correct; only the displayed *rate* was affected.
   - `2026-05-21` `[QA]` **in-deploy** — frontend-engineer deploying fix to shared `:4200` now per `[ORCH]` 2026-05-21. Note: orchestrator reported this as a new finding 2026-05-21; confirmed duplicate of this entry — **no new ID assigned**; redirected to this status update.
+  - `2026-05-21` `[ENG]` **resolved** — 4-file template fix in working tree (quote-detail-panel, quote-dialog, invoice-detail-panel, invoice-dialog); all four `{{ x.taxRate * 100 }}%` expressions piped through `| number:'1.0-2'`. Staged for forge-ui commit alongside F-001/F-002/Wave-1 groundwork.
 
 ### F-023 [ENG] [BUG] [MINOR] [P3] [PRIMARY] [func · data] · Sales Order detail · Tax rate rendered without `×100` — latent unit inconsistency vs quote/invoice
 **Where**: `forge-ui` `src/app/features/sales-orders/components/sales-order-detail-panel/sales-order-detail-panel.component.html:181` (`{{ so.taxRate }}%`) vs quote/invoice which use `{{ taxRate * 100 }}%` (F-022).
@@ -763,6 +778,7 @@ The outstanding balances on INV-2341AP, INV-2321A, INV-2221AP align with the unp
 **Status log**:
   - `2026-05-21` `[QA]` redirect stub created per H-013 — canonical ID for F-034[SEC]. All future status updates should be appended here.
   - `2026-05-21` `[SEC]` map **CONFIRMED** — `[BA]` is first-filer on F-034 (2026-05-20); F-051 is the correct canonical ID. Severity unchanged: BLOCKER/P0. Fix IMPLEMENTED (`Login.cs` → `SignInManager.CheckPasswordSignInAsync(lockoutOnFailure:true)`; `KioskLogin.cs` → `IsLockedOutAsync`+`AccessFailedAsync`+`ResetAccessFailedCountAsync`). LoginHandler lockout regression GREEN (9/9). Remaining: KioskLoginHandlerTests cases, live 6-attempt regression, backend review. Rollback snapshot `forge-pre-auth-hardening-20260521T015304Z.dump`. Fix-queue + DoD: H-015.
+  - `2026-05-21` `[SEC]` **kiosk unit DoD met.** Added 3 KioskLoginHandlerTests lockout cases (locked-out → reject + no counter advance; wrong PIN → `AccessFailedAsync` once; correct PIN → `ResetAccessFailedCountAsync` once). Full Auth suite GREEN **87/87** (incl. 9 Login + 6 Kiosk). Note: the F-052 hashing fix surfaced+fixed a real regression in `ValidateSetupTokenHandlerTests` (it stored plaintext tokens; now stores the hash) — confirms the F-052 hash path is exercised. Remaining for F-051: live 6-attempt DB regression + backend review.
 
 ---
 
@@ -781,6 +797,7 @@ The outstanding balances on INV-2341AP, INV-2321A, INV-2221AP align with the unp
 **Status log**:
   - `2026-05-21` `[QA]` redirect stub created per H-013 — canonical ID for F-036[SEC]. All future status updates should be appended here.
   - `2026-05-21` `[SEC]` map **CONFIRMED** — F-053 is the correct canonical ID for F-036[SEC]. Severity unchanged: MAJOR/P1. Fix IMPLEMENTED (`Program.cs` fallback `?? "dev-secret..."` → fail-fast `throw new InvalidOperationException`). Remaining: startup key-length≥32 assertion, backend review. Fix-queue + DoD: H-015.
+  - `2026-05-21` `[SEC]` **JWT_KEY rotation ruling per `[ORCH]`: ROTATE.** The live signing key was reproduced into AUDIT.md (committed register) + agent transcripts + the shared `.env` across a multi-agent engagement → treat as compromised. Rotation is near-free: replace `JWT_KEY` in `.env` and restart the API (the in-memory `SessionStore` is wiped on restart regardless, so the only cost is a forced re-login). Tracked as an F-053 remediation subtask alongside the fail-fast throw + key-length assertion. Skip ONLY if this instance is provably disposable with zero promotion path to any shared/customer/prod environment.
 
 ---
 
@@ -1260,6 +1277,7 @@ Net: MFA *replaces* the password instead of *supplementing* it. For any MFA-enro
 
 **Status log**:
   - `2026-05-21` `[SEC]` opened — BLOCKER, P0. Most severe defect of the auth sweep. Promoted from implicit C0 coverage note ("MFA not required for admin — known from auth audit") to a first-class tracked finding per `[ORCH]`. Structural fix; pre-auth-token design routed to backend-engineer/eng-lead (fix-queue H-015). Not live-exploitable on current seed (no enrolled devices) — do NOT down-rank: structural, and live the moment MFA is enabled.
+  - `2026-05-21` `[SEC]` **PRECONDITION RULING (for eng-lead severity gate).** **VERDICT: YES — confirmed no-password-required full-JWT bypass; code-confirmed, NOT live-reproducible on current seed.** Meets eng-lead's stated P0 trigger. Mechanics: `/auth/mfa/challenge` (`[AllowAnonymous]`, raw `{userId}`) → `CreateChallengeAsync` issues a challengeToken with zero linkage to a password check, then EITHER `/mfa/validate` (TOTP) OR `/mfa/recovery` (recovery code) — **both `[AllowAnonymous]`** — call `GenerateFullTokenAsync` → a FULL role JWT (same roles/claims as a password login) + session. `Login.cs` is never invoked; the password is never requested or verified on this path. **Preconditions (all necessary for an actual exploit):** (1) target has ≥1 verified MFA device (`UserMfaDevices.IsVerified=true`) — else challenge throws "No verified MFA device found", no token; (2) caller presents a valid current TOTP code OR an unused recovery code — i.e. needs the second-factor seed, **NOT** the password; (3) userId is a sequential int (trivially enumerable). **Classification: password-NOT-required bypass, not zero-knowledge/unauthenticated** — an attacker with no secrets can't walk in, but one holding the TOTP/recovery seed gets full access with the password entirely out of the loop (MFA *replaces* rather than *supplements* the first factor; 2FA→1FA, discarded factor = password). **Live-reproducible: NO today** (zero seeded users have a verified device → every challenge throws); becomes live the instant any user verifies MFA — i.e. the first admin who hardens their account creates a password-bypassable account. **Escalation chain:** `UserMfaDevice.EncryptedSecret` is sealed by DP keys stored UNENCRYPTED at rest (`PersistKeysToDbContext`, no `ProtectKeysWith*`) → a DB/backup dump decrypts every TOTP seed → mint codes → password-less admin JWT, converting precondition (2) into "anyone with DB/backup read" (nightly backup + B2 offsite). That DP-keys finding is still UNFILED (recommend F-055). **Severity recommendation: P0/stop-the-line, ranks ABOVE F-028** (estimating gap is a feature/trust deficit, not a security bypass). Only mitigant for sequencing: blast radius bounded today by precondition (1) → a fix-before-anyone-enrolls window exists, but for a published/market-readiness build that is not grounds to down-rank.
 
 ---
 
@@ -1283,6 +1301,28 @@ Net: MFA *replaces* the password instead of *supplementing* it. For any MFA-enro
 
 **Status log**:
   - `2026-05-21` `[QA]` opened — MAJOR, P1. Filed per `[ORCH]` instruction. Independent of F-028; one-sprint guard addition. Note: `[ORCH]` directed this as F-054 but that ID was claimed by `[SEC]` (MFA bypass, H-014) between turns — filing at next free ID **F-055** per protocol. Next free: **F-056**.
+
+### F-056 [ENG] [GAP] [MINOR] [P3] [PRIMARY] [func · concurrency] · Kanban / Job mutations · ETag `If-Match` not injected on job sub-path PATCHes — URL-key mismatch in interceptor
+
+**Where**: `forge-ui/src/app/shared/interceptors/etag.interceptor.ts:45` (If-Match injection keyed by exact URL); `forge-ui/src/app/features/kanban/services/kanban.service.ts` (mutation methods).
+
+**Observed**: The ETag interceptor caches ETags at exact URL keys. `GET /api/v1/jobs/{id}` seeds the cache at `/api/v1/jobs/123`. The following mutation calls look up **different** keys and therefore never find a cached ETag — `If-Match` is silently omitted:
+- `PATCH /jobs/{id}/stage` → looks up `/api/v1/jobs/123/stage` ✗
+- `PATCH /jobs/{id}/subtasks/{subtaskId}` → sub-path key ✗
+- `PUT /jobs/{id}/custom-fields` → sub-path key ✗
+- `PATCH /jobs/{id}/cover-photo` → sub-path key ✗
+Only `PUT /jobs/{id}` (update job body) shares the same key as the GET — that one is correctly protected. The Kanban board also performs a JIT GET before the stage move (added Wave-1), which seeds the cache, but the seed is at the root job URL, not the sub-path — so the stage PATCH still misses the ETag.
+
+**Expected**: Sub-path PATCHes either (a) seed their own ETag via a pre-flight GET on the sub-path (JIT approach) or (b) the interceptor falls back to the parent resource's ETag when the exact sub-path key is absent and the parent key ends with a numeric segment (e.g., strip `/stage` → `/api/v1/jobs/123`).
+
+**Impact**: Lost optimistic-concurrency protection on the most-used Kanban mutations. Without `If-Match`, concurrent stage moves (two dispatchers moving the same job) silently LWW rather than 412-conflicting. MINOR because: (a) Wave-1 JIT GET partially mitigated for `moveJobStage` (cache seeded even if key mismatches); (b) job edits via `updateJob` (the dialog PUT) are correctly protected; (c) ship-only risk — no data loss today, just silent last-write-wins on sub-path state.
+
+**Recommendation**: Add parent-path ETag fallback to `ETagCacheService.get()` — when exact key misses, strip the last non-numeric path segment if the parent ends with `/{id}` and retry. Alternatively wire a JIT GET in each Kanban service method that calls a sub-path PATCH. **Await eng-lead confirmation** that backend sub-path endpoints enforce 428 Precondition Required before building — if they don't enforce it, `If-Match` injection is a no-op anyway.
+
+**Evidence**: Source audit 2026-05-21 (`etag.interceptor.ts:45`, `kanban.service.ts` — `moveJobStage`, `toggleSubtask`, `updateJobPart`, `updateCustomFieldValues`, `setCoverPhoto`); `etag-cache.service.ts` exact-key `Map` confirmed; no parent-path fallback present.
+
+**Status log**:
+  - `2026-05-21` `[ENG]` opened — identified during Wave-1 If-Match surface survey. MINOR/P3; not ship-blocking. Proposed fix scoped but not built pending eng-lead decision on mandatory 428 enforcement at sub-path endpoints. Next free finding ID: **F-057**.
 
 ---
 
