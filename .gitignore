@@ -29,6 +29,10 @@
 # --- Local Claude / IDE config ---
 /.claude/
 
+# --- Database dumps and local deploy state (huge / machine-specific, never committed) ---
+/.db-backups/
+/.local-deploy/
+
 # --- Personal scratch (not part of the meta repo) ---
 /Future Prompts/
 /phase-*-output/
