@@ -216,16 +216,72 @@ The following are explicitly deferred. They should not be built in the MVP sprin
 
 | Feature | Reason deferred |
 |---|---|
+| **Productivity / efficiency layer** — worker efficiency %, machine uptime factors, learning-curve adjustments applied to standard times | Out of MVP per DOM ruling; MVP uses standard times as-entered; efficiency tuning is a post-launch calibration feature |
 | Templated / historical-cost estimating | Requires a cost history corpus; MVP must build the cost engine first |
 | What-if scenario comparison | UI complexity; core engine must be stable first |
 | Estimating analytics (win rate, quote-to-SO ratio, margin distribution) | Requires converted quote history to exist |
 | Win-rate-feedback pricing (adjust margins based on win/loss patterns) | Requires analytics corpus |
+| Scrap analysis feedback (actual scrap vs. BOM scrap factor reconciliation) | Requires actual production data corpus |
 
 ---
 
 ### F-028 acceptance summary for eng-lead
 
-F-028 is a **P0 BLOCKER**. The estimating engine build closes it. Acceptance requires all six REQ-QUOTE-01 through REQ-QUOTE-06 DoD checklists to be green, plus REQ-QUOTE-07 downstream couplings (price lock + estimated cost baseline). QA validates against DOM §A1 invariants INV-Q1 through INV-Q4 and the REQ-QUOTE-07 DoD items. The domain specialist is the final validation oracle.
+**Status:** BLOCKER / P0 / PRIMARY — DOM ratified 2026-05-21. Gate cleared; build may proceed against this spec.
+
+F-028 closes when **all** of the following are green:
+1. REQ-QUOTE-01 DoD (labor + burden, setup amortization)
+2. REQ-QUOTE-02 DoD (material, scrap factor, UOM conversion)
+3. REQ-QUOTE-03 DoD (OSP, vendor minimums)
+4. REQ-QUOTE-04 DoD (quantity breaks, monotonicity)
+5. REQ-QUOTE-05 DoD (margin-to-price, anti-markup guard)
+6. REQ-QUOTE-06 DoD (quote total integrity, `Stale` status)
+7. REQ-QUOTE-07 DoD-B (estimated cost baseline → Job on creation)
+8. **Full end-to-end acceptance test** (below) — `[DOM]` validates against §A1.
+
+REQ-QUOTE-07-A (price lock → SO) is a downstream guard tracked separately; it is a prerequisite for SO but does not gate F-028 closure.
+
+#### End-to-end acceptance test — F-028-E2E
+
+**Purpose:** A single chained case that exercises all cost components together. Every component must produce the expected subtotal, and the chain must produce the expected final price. If any component is wrong the chain will fail.
+
+**Inputs:**
+
+| Component | Input |
+|---|---|
+| Part | Bracket, Q = **25** ea |
+| Op 1 (WC1) | Setup = 120 min, Run = 3 min/ea, Labor = $60/hr, Burden = $30/hr |
+| Op 2 (WC2) | Setup = 30 min, Run = 1 min/ea, Labor = $48/hr, Burden = $24/hr |
+| BOM | 1.5 in aluminum bar per ea; scrap rate = 8%; purchased in feet at $2.40/ft; 1 ft = 12 in |
+| OSP | Anodize; vendor unit rate = $4.00/ea; vendor minimum = $75.00 |
+| Target margin | 35% |
+
+**Expected intermediate values (must match to ±$0.01):**
+
+| Step | Formula | Expected |
+|---|---|---|
+| Op1 time/unit | 120/25 + 3 | 7.80 min/ea |
+| Op1 unit labor | 7.80 × ($60/60) | **$7.80/ea** |
+| Op1 unit burden | 7.80 × ($30/60) | **$3.90/ea** |
+| Op2 time/unit | 30/25 + 1 | 2.20 min/ea |
+| Op2 unit labor | 2.20 × ($48/60) | **$1.76/ea** |
+| Op2 unit burden | 2.20 × ($24/60) | **$0.88/ea** |
+| Total labor | $7.80 + $1.76 | **$9.56/ea** |
+| Total burden | $3.90 + $0.88 | **$4.78/ea** |
+| Material qty (converted) | 1.5 × 1.08 / 12 | 0.135 ft/ea |
+| Material cost | 0.135 × $2.40 | **$0.32/ea** (rounded) |
+| OSP effective cost | MAX($4.00×25, $75) / 25 = MAX($100,$75)/25 | **$4.00/ea** (minimum does not bind at Q=25) |
+| Total unit cost | $9.56 + $4.78 + $0.32 + $4.00 | **$18.66/ea** |
+| Unit price at 35% margin | $18.66 / (1 − 0.35) = $18.66 / 0.65 | **$28.71/ea** |
+| Displayed margin | ($28.71 − $18.66) / $28.71 | **35.0%** ✓ |
+| Displayed markup | ($28.71 − $18.66) / $18.66 | **53.8%** (secondary display) |
+| Quote line total | 25 × $28.71 | **$717.75** |
+
+**Additional assertions for the E2E run:**
+- [ ] OSP minimum check at Q=5: MAX($4.00×5,$75)/5 = MAX($20,$75)/5 = $75/5 = **$15.00/ea** (minimum binds — price is higher than unit rate).
+- [ ] Rerun with identical inputs → identical output (INV-Q1).
+- [ ] Set target_margin=35% displayed as margin (not markup) on quote summary.
+- [ ] Change Op1 labor rate → quote marked `Stale`; conversion blocked until recomputed.
 
 **Schema additions the engine requires (flag for eng-lead sizing):**
 - `WorkCenter.LaborRatePerHour` and `WorkCenter.BurdenRatePerHour` — verify these exist or add them.
