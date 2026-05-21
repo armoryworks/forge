@@ -1,6 +1,6 @@
 # Forge — UI Flow Documentation
 
-**Generated:** 2026-03-22
+**Generated:** 2026-05-17
 **Purpose:** Training documentation for the AI help system and human onboarding.
 Each file describes a feature's complete UI structure, user flows, and UX analysis.
 
