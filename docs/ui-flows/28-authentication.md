@@ -32,8 +32,8 @@ Office employees and PMs use standard email/password login.
 ### Login Form Fields
 | Field | Type | Required |
 |:------|:-----|:---------|
-| auth.email | Text | — |
-| auth.password | Text | — |
+| Email | Text | — |
+| Password | Text | — |
 
 
 ## Tier 4: SSO (Google / Microsoft / OIDC)

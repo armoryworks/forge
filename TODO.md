@@ -6,65 +6,44 @@ once they're resolved.
 
 ---
 
-## 🐛 Shop floor footer falls off-screen at increased font sizes
+## ✅ RESOLVED — Shop floor footer falls off-screen at increased font sizes
 
-**Symptom.** On `/display/shop-floor` (the kiosk display), clicking the
-`A+` font-scale button pushes the bottom "Scan your badge or RFID to
-clock in" action bar (`.sf-action-bar`) below the viewport. User reports
-it's visibly broken even at the first A+ step (20px).
+**Symptom.** On `/display/shop-floor` (the kiosk display), clicking `A+`
+pushed the bottom "Scan your badge or RFID to clock in" action bar
+(`.sf-action-bar`) below the viewport — visibly broken at the first A+ step
+and worse at each step up.
 
-**What was tried (commits 43f17ef + 27a994b on `armoryworks/forge-ui`).**
+**Actual root cause (the SW hypothesis was a red herring).** The font-scale
+control applies CSS `zoom` to the component host (`applyFontSize()` →
+`el.style.zoom = scale`), and `:host` was `height: 100vh; overflow: hidden`.
+`zoom` magnifies the host's *entire* box — including its `100vh` height — so
+the host rendered at `scale × 100vh` and grew taller than the viewport. Its
+own `overflow: hidden` then clipped against that oversized host box (not the
+viewport), so the action bar (last flex child) sat below the fold. Measured
+in a real paired-kiosk Chromium session: host height = `768 × zoom` at every
+step (896 / 1024 / 1152 / 1280 px against a 768 px viewport). The earlier
+`min-height: 0` work couldn't help — the overflow is at the host level, not
+inside `.sf-body`. The service worker only ever masked *verification* of the
+prior attempts (it serves the same bundle); it was never the cause. Verified
+with the SW blocked entirely and the bug still reproduced.
 
-1. `shop-floor-clock.component.scss` — added `min-height: 0` +
-   `grid-template-rows: minmax(0, 1fr)` to `.sf-body`; `min-height: 0` to
-   `.sf-section`; `flex-shrink: 0` to `.sf-section__title`; `flex: 1` +
-   `min-height: 0` to `.sf-team-list` and `.sf-jobs-list`. Mis-targeted —
-   that component is the `/display/shop-floor/clock` subroute, not the
-   one the user lands on.
-2. `shop-floor-display.component.scss` — same `min-height: 0` added to
-   `.sf-body`. **Container verified to ship the new rule** (chunk-ELC3SYUG.js
-   contains `min-height:0` in the rendered `.sf-body[_ngcontent-%COMP%]`
-   rule), but user reports the layout still breaks after a hard refresh.
+**Fix (commit pending on `armoryworks/forge-ui`).** Divide the zoom back out
+of the host height so the host stays exactly one viewport tall at any scale:
+- `shop-floor-display.component.ts` — `applyFontSize()` also sets a matching
+  `--sf-zoom` custom property alongside `el.style.zoom`.
+- `shop-floor-display.component.scss` — `:host { height: calc(100vh / var(--sf-zoom, 1)); }`
+  (and `.sf-error` switched from `100vh` to `100%` for the same reason).
 
-**Open hypotheses.**
+With the host pinned to the viewport, `overflow: hidden` clips at the
+viewport, `flex-shrink: 0` keeps the header + action bar pinned, and
+`.sf-body` (`flex: 1; min-height: 0; overflow-y: auto`) absorbs the extra
+content as internal scroll.
 
-- **Service worker stale assets.** `ngsw-config.json` has
-  `installMode: prefetch, updateMode: prefetch` on `/*.css`, `/*.js`,
-  `/index.html`. SW may keep serving the cached old bundle even after
-  hard refresh on a kiosk session. Mitigation: unregister SW via
-  DevTools (Application → Service Workers → Unregister) and reload.
-- **`min-height: 0` insufficient.** Some other element in the flex
-  column (between `.sf-header` and `.sf-action-bar`) — possibly
-  `<app-training-mode-banner>` or `<app-kiosk-session-bar>`, which
-  have no explicit `:host` styles and inherit `display: inline` by
-  default — may be eating vertical space or not behaving as expected
-  as flex children. Need to inspect the actual rendered DOM at the
-  problematic font scale to know.
-- **Some outer wrapper not constrained.** `<main id="main-content">`
-  in `app.component.html` (the `@else` / no-shell branch) has no
-  height constraint; relies on inner `:host { height: 100vh }` of
-  shop-floor-display to constrain. If anything between root and the
-  kiosk display is misbehaving, the host won't actually clip overflow.
-
-**To investigate.**
-
-1. Get a paired-kiosk Playwright session running so the actual layout
-   can be screenshot-verified at each font scale (the throwaway specs
-   in this session landed on the unpaired Terminal Setup screen and
-   couldn't measure the real chrome).
-2. Open the kiosk in DevTools and inspect the computed height of
-   `<app-shop-floor-display>` and `.sf-body` at xl font — confirm
-   whether `:host` is genuinely 100vh and whether body is honoring
-   the flex: 1 + min-height: 0 contract.
-3. Try ALSO setting `flex-shrink: 0` explicitly on
-   `<app-training-mode-banner>` and `<app-kiosk-session-bar>` via
-   `app-training-mode-banner, app-kiosk-session-bar { flex-shrink: 0; }`
-   in shop-floor-display.component.scss in case their lack of
-   `:host { display: block }` is breaking flex sizing.
-
-**Files touched so far.**
-- `forge-ui/src/app/features/shop-floor/clock/shop-floor-clock.component.scss`
-- `forge-ui/src/app/features/shop-floor/shop-floor-display.component.scss`
+**Verified** against rendered behavior on the seeded instance (rebuilt
+`forge-ui` container, fresh Chromium context, service worker blocked): footer
+bottom == viewport bottom and host height == viewport height at all five font
+scales (12→20px) and on the way back down. Screenshots confirm the footer
+visible at max zoom with the worker grid scrolling within the body.
 
 ---
 
