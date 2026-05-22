@@ -1,0 +1,75 @@
+{
+  "queueInitial": {
+    "appComps": [
+      "app-root",
+      "app-header",
+      "app-chat",
+      "app-ai-help-panel",
+      "app-training-context-panel",
+      "app-connection-banner",
+      "app-announcement-overlay",
+      "app-onboarding-banner",
+      "app-sidebar",
+      "app-leads-queue",
+      "app-page-header",
+      "app-offline-banner",
+      "app-loading-overlay",
+      "app-keyboard-shortcuts-help",
+      "app-chat-preview-popup",
+      "app-demo-marker"
+    ],
+    "queueText": "WORKER QUEUE\nPull-based queue for high-volume outreach. Single-keystroke dispositions, J/K to advance.\nspeed\nReady to work\n\nPull a slice of leads and the queue serves them one at a time. Two reps pulling at the same time get disjoint slices — no overlap.\n\nPULL SIZE\nplay_arrow\nPULL NEXT 5",
+    "url": "http://localhost:4200/leads/queue"
+  },
+  "allButtons": [
+    {
+      "txt": "school",
+      "cls": "mat-mdc-tooltip-trigger icon-btn"
+    },
+    {
+      "txt": "notifications_none",
+      "cls": "mat-mdc-tooltip-trigger icon-btn"
+    },
+    {
+      "txt": "light_mode",
+      "cls": "mat-mdc-tooltip-trigger icon-btn"
+    },
+    {
+      "txt": "Admin, Forge\nmenu",
+      "cls": "user-trigger"
+    },
+    {
+      "txt": "arrow_back",
+      "cls": "mat-mdc-tooltip-trigger nav-item nav-ite"
+    },
+    {
+      "txt": "settings",
+      "cls": "mat-mdc-tooltip-trigger nav-item nav-ite"
+    },
+    {
+      "txt": "play_arrow\nPULL NEXT 5",
+      "cls": "action-btn action-btn--primary"
+    }
+  ],
+  "afterPull": {
+    "appComps": [
+      "app-root",
+      "app-header",
+      "app-chat",
+      "app-ai-help-panel",
+      "app-training-context-panel",
+      "app-connection-banner",
+      "app-announcement-overlay",
+      "app-onboarding-banner",
+      "app-sidebar",
+      "app-leads-queue",
+      "app-page-header",
+      "app-offline-banner",
+      "app-loading-overlay",
+      "app-keyboard-shortcuts-help",
+      "app-chat-preview-popup",
+      "app-demo-marker"
+    ],
+    "queueText": "WORKER QUEUE\nPull-based queue for high-volume outreach. Single-keystroke dispositions, J/K to advance.\nspeed\nReady to work\n\nPull a slice of leads and the queue serves them one at a time. Two reps pulling at the same time get disjoint slices — no overlap.\n\nPULL SIZE\nplay_arrow\nPULL NEXT 5"
+  }
+}

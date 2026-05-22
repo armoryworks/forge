@@ -1,0 +1,79 @@
+{
+  "gap1": {
+    "hasBomTree": false,
+    "treeText": "",
+    "hasBomRevHistory": true,
+    "revHistoryText": "Revision history\nEach component change creates an immutable snapshot.\nv1\nCURRENT\n5/22/2026, 1:14:35 AM\n1 lines\nComponent added\nexpand_more"
+  },
+  "gap2": {
+    "hasAlt": true,
+    "altText": "add\nADD ALTERNATE\nswap_horiz\n\nNo alternate parts defined",
+    "appComps": [
+      "app-root",
+      "app-header",
+      "app-chat",
+      "app-ai-help-panel",
+      "app-training-context-panel",
+      "app-connection-banner",
+      "app-announcement-overlay",
+      "app-onboarding-banner",
+      "app-sidebar",
+      "app-parts",
+      "app-page-header",
+      "app-input",
+      "app-select",
+      "app-data-table",
+      "app-entity-completeness-badge",
+      "app-offline-banner",
+      "app-loading-overlay",
+      "app-toast-container",
+      "app-keyboard-shortcuts-help",
+      "app-chat-preview-popup",
+      "app-demo-marker",
+      "app-part-detail-dialog",
+      "app-part-detail-panel",
+      "app-entity-completeness-chip",
+      "app-part-alternates-cluster",
+      "app-part-alternates-tab",
+      "app-empty-state"
+    ]
+  },
+  "creditCap": {
+    "found": true,
+    "enabled": false,
+    "etag": "W/\"1\""
+  },
+  "enableCredit": {
+    "status": 200
+  },
+  "gap3": {
+    "hasCard": true,
+    "cardText": "CREDIT STATUS\nLOW\nCREDIT LIMIT\nNone\nOPEN AR\n$0.00\nPENDING ORDERS\n$0.00\nTOTAL EXPOSURE\n$0.00\nCREDIT ON FILE\n$0.00\n\nNo unapplied credits.\n\nblock\nPLACE HOLD",
+    "appComps": [
+      "app-root",
+      "app-header",
+      "app-chat",
+      "app-ai-help-panel",
+      "app-training-context-panel",
+      "app-connection-banner",
+      "app-announcement-overlay",
+      "app-onboarding-banner",
+      "app-sidebar",
+      "app-customer-detail",
+      "app-entity-completeness-chip",
+      "app-currency-display",
+      "app-customer-identity-cluster",
+      "app-input",
+      "app-toggle",
+      "app-customer-overview-tab",
+      "app-credit-status-card",
+      "app-recent-communications",
+      "app-offline-banner",
+      "app-loading-overlay",
+      "app-toast-container",
+      "app-keyboard-shortcuts-help",
+      "app-chat-preview-popup",
+      "app-demo-marker"
+    ]
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "bomTableView": {
+    "headerText": "1 COMPONENTS\ntable_rows\naccount_tree\nadd\nADD",
+    "hasDataTable": true,
+    "hasBomRevHistory": true,
+    "bomRevText": "Revision history\nEach component change creates an immutable snapshot.\nv1\nCURRENT\n5/22/2026, 1:14:35 AM\n1 lines\nComponent added\nexpand_more",
+    "appComps": [
+      "app-part-detail-dialog",
+      "app-part-detail-panel",
+      "app-entity-completeness-chip",
+      "app-data-table",
+      "app-bom-revision-history"
+    ],
+    "text": "able\nMRP\npayments\nCOST\nsell\nPRICING\nfact_check\nQUALITY\nswap_horiz\nALTERNATES\ntimeline\nACTIVITY\nattach_file\nFILES\n1 COMPONENTS\ntable_rows\naccount_tree\nadd\nADD\n#\nmore_vert\n\t\nPART\nmore_vert\n\t\nQTY\nmore_vert\n\t\nSOURCE\nmore_vert\n\t\nLEAD TIME\nmore_vert\n\t\nREF DES\nmore_vert\n\t\nmore_vert\n\t\ndownload\ngrid_on\nsettings\n\n1\t\nPRT-00001\nWidget A\n\t1\tMAKE\t---\t---\t\ndelete\n\t\nRevision history\nEach component change creates an immutable snapshot.\nv1\nCURRENT\n5/22/2026, 1:14:35 AM\n1 lines\nComponent added\nexpand_more"
+  },
+  "bomTreeState": {
+    "hasBomTree": true,
+    "bomTreeText": "1\nPRT-00001\nWidget A\nMAKE\n1\n—\ndelete",
+    "hasBomRevHistory": true,
+    "bomRevText": "Revision history\nEach component change creates an immutable snapshot.\nv1\nCURRENT\n5/22/2026, 1:14:35 AM\n1 lines\nComponent added\nexpand_more",
+    "appComps": [
+      "app-part-detail-dialog",
+      "app-part-detail-panel",
+      "app-entity-completeness-chip",
+      "app-bom-tree",
+      "app-bom-revision-history"
+    ],
+    "fullText": "able\nMRP\npayments\nCOST\nsell\nPRICING\nfact_check\nQUALITY\nswap_horiz\nALTERNATES\ntimeline\nACTIVITY\nattach_file\nFILES\n1 COMPONENTS\ntable_rows\naccount_tree\nadd\nADD\n1\nPRT-00001\nWidget A\nMAKE\n1\n—\ndelete\nRevision history\nEach component change creates an immutable snapshot.\nv1\nCURRENT\n5/22/2026, 1:14:35 AM\n1 lines\nComponent added\nexpand_more"
+  },
+  "qualityTab": {
+    "hasCluster": true,
+    "clusterText": "QUALITY & COMPLIANCE\nRequires Receiving Inspection\nInspection Frequency\nEvery Receipt\nSkip After N Receipts",
+    "appComps": [
+      "app-part-detail-dialog",
+      "app-part-detail-panel",
+      "app-entity-completeness-chip",
+      "app-part-quality-cluster",
+      "app-toggle",
+      "app-select",
+      "app-input"
+    ],
+    "text": "able\nMRP\npayments\nCOST\nsell\nPRICING\nfact_check\nQUALITY\nswap_horiz\nALTERNATES\ntimeline\nACTIVITY\nattach_file\nFILES\nQUALITY & COMPLIANCE\nRequires Receiving Inspection\nInspection Frequency\nEvery Receipt\nSkip After N Receipts"
+  },
+  "pricingTab": {
+    "hasCluster": true,
+    "clusterText": "CURRENT EFFECTIVE PRICE\nNo price configured\nPRICE HISTORY\nhistory\n\nNo price history yet.",
+    "appComps": [
+      "app-part-detail-dialog",
+      "app-part-detail-panel",
+      "app-entity-completeness-chip",
+      "app-part-pricing-cluster",
+      "app-empty-state"
+    ],
+    "text": "able\nMRP\npayments\nCOST\nsell\nPRICING\nfact_check\nQUALITY\nswap_horiz\nALTERNATES\ntimeline\nACTIVITY\nattach_file\nFILES\nCURRENT EFFECTIVE PRICE\nNo price configured\nPRICE HISTORY\nhistory\n\nNo price history yet."
+  },
+  "purchaseHistoryTab": {
+    "appComps": [
+      "app-part-detail-dialog",
+      "app-part-detail-panel",
+      "app-entity-completeness-chip",
+      "app-input",
+      "app-data-table",
+      "app-empty-state"
+    ],
+    "text": "able\nMRP\npayments\nCOST\nsell\nPRICING\nfact_check\nQUALITY\nswap_horiz\nALTERNATES\ntimeline\nACTIVITY\nattach_file\nFILES\nSearch\nShowing last 0 (max 50)\nreceipt_long\n\nNo purchase orders include this part yet."
+  },
+  "activityTab": {
+    "appComps": [
+      "app-part-detail-dialog",
+      "app-part-detail-panel",
+      "app-entity-completeness-chip",
+      "app-part-activity-cluster",
+      "app-entity-activity-section"
+    ],
+    "text": "able\nMRP\npayments\nCOST\nsell\nPRICING\nfact_check\nQUALITY\nswap_horiz\nALTERNATES\ntimeline\nACTIVITY\nattach_file\nFILES\nACTIVITY\nALL\nCONVERSATION\nNOTES\nHISTORY\n\nNo activity yet."
+  },
+  "filesTab": {
+    "appComps": [
+      "app-part-detail-dialog",
+      "app-part-detail-panel",
+      "app-entity-completeness-chip",
+      "app-part-files-cluster",
+      "app-file-upload-zone",
+      "app-empty-state"
+    ],
+    "text": "able\nMRP\npayments\nCOST\nsell\nPRICING\nfact_check\nQUALITY\nswap_horiz\nALTERNATES\ntimeline\nACTIVITY\nattach_file\nFILES\nFILES\ncloud_upload\nDrag files here or click to browse\nMax 50MB per file\nattach_file\n\nNo files attached"
+  }
+}

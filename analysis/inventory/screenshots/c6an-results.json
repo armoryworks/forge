@@ -1,0 +1,175 @@
+{
+  "contactSeed": {
+    "status": 201,
+    "id": 1
+  },
+  "addressSeed": {
+    "status": 400
+  },
+  "noteSeed": {
+    "status": 201
+  },
+  "contactsTab": {
+    "bodyText": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nCUSTOMERS\nchevron_right\nALL CUSTOMERS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\nlist\ncontacts\nvpn_key\nfilter_alt\nupload_file\nstorefront\nsettings\nchevron_left\nCustomers\nedit\nEDIT\narchive\nAcme Corp\nACTIVE\ncheck_circle\nReady\nemail\ncontact@acme.com\nphone\n555-100-2000\n1\nOPEN ESTIMATES\n0\nOPEN QUOTES\n0\nOPEN ORDERS\n0\nACTIVE JOBS\n$0.00\nOUTSTANDING\n$0.00\nYTD REVENUE\nOverview\nContacts\nAddresses\nEstimates\nQuotes\nOr",
+    "hasContactRow": true,
+    "appComps": [
+      "app-root",
+      "app-header",
+      "app-chat",
+      "app-ai-help-panel",
+      "app-training-context-panel",
+      "app-connection-banner",
+      "app-announcement-overlay",
+      "app-onboarding-banner",
+      "app-sidebar",
+      "app-customer-detail",
+      "app-entity-completeness-chip",
+      "app-currency-display",
+      "app-customer-contacts-cluster",
+      "app-avatar",
+      "app-offline-banner",
+      "app-loading-overlay",
+      "app-toast-container",
+      "app-keyboard-shortcuts-help",
+      "app-chat-preview-popup",
+      "app-demo-marker"
+    ]
+  },
+  "addrTab": {
+    "bodyText": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nCUSTOMERS\nchevron_right\nALL CUSTOMERS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\nlist\ncontacts\nvpn_key\nfilter_alt\nupload_file\nstorefront\nsettings\nchevron_left\nCustomers\nedit\nEDIT\narchive\nAcme Corp\nACTIVE\ncheck_circle\nReady\nemail\ncontact@acme.com\nphone\n555-100-2000\n1\nOPEN ESTIMATES\n0\nOPEN QUOTES\n0\nOPEN ORDERS\n0\nACTIVE JOBS\n$0.00\nOUTSTANDING\n$0.00\nYTD REVENUE\nOverview\nContacts\nAddresses\nEstimates\nQuotes\nOr",
+    "hasAddrCluster": true,
+    "appComps": [
+      "app-root",
+      "app-header",
+      "app-chat",
+      "app-ai-help-panel",
+      "app-training-context-panel",
+      "app-connection-banner",
+      "app-announcement-overlay",
+      "app-onboarding-banner",
+      "app-sidebar",
+      "app-customer-detail",
+      "app-entity-completeness-chip",
+      "app-currency-display",
+      "app-customer-addresses-cluster",
+      "app-offline-banner",
+      "app-loading-overlay",
+      "app-toast-container",
+      "app-keyboard-shortcuts-help",
+      "app-chat-preview-popup",
+      "app-demo-marker"
+    ]
+  },
+  "activityTab": {
+    "bodyText": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nCUSTOMERS\nchevron_right\nALL CUSTOMERS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\nlist\ncontacts\nvpn_key\nfilter_alt\nupload_file\nstorefront\nsettings\nchevron_left\nCustomers\nedit\nEDIT\narchive\nAcme Corp\nACTIVE\ncheck_circle\nReady\nemail\ncontact@acme.com\nphone\n555-100-2000\n1\nOPEN ESTIMATES\n0\nOPEN QUOTES\n0\nOPEN ORDERS\n0\nACTIVE JOBS\n$0.00\nOUTSTANDING\n$0.00\nYTD REVENUE\nOverview\nContacts\nAddresses\nEstimates\nQuotes\nOrders\nJobs\nInvoices\nPricing\nInteractions\nActivity\nACTIVITY\nALL\nCONVERSATION\nNOTES\n1\nHISTORY\nFA\nNOTE\n0",
+    "hasActivityCluster": true,
+    "appComps": [
+      "app-root",
+      "app-header",
+      "app-chat",
+      "app-ai-help-panel",
+      "app-training-context-panel",
+      "app-connection-banner",
+      "app-announcement-overlay",
+      "app-onboarding-banner",
+      "app-sidebar",
+      "app-customer-detail",
+      "app-entity-completeness-chip",
+      "app-currency-display",
+      "app-customer-activity-cluster",
+      "app-entity-activity-section",
+      "app-avatar",
+      "app-rich-text-display",
+      "app-offline-banner",
+      "app-loading-overlay",
+      "app-toast-container",
+      "app-keyboard-shortcuts-help"
+    ]
+  },
+  "custContactsPage": {
+    "bodyText": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nCUSTOMERS\nchevron_right\nCONTACTS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\nlist\ncontacts\nvpn_key\nfilter_alt\nupload_file\nstorefront\nsettings\nALL CONTACTS\nFlat cross-customer view of every contact — \"who do I know at company X?\".\nCONTACT NAME\nmore_vert\n\t\nCUSTOMERS\nmore_vert\n\t\nROLE\nmore_vert\n\t\nEMAIL\nmore_vert\n\t\nPHONE\nmore_vert\n\t\nSUPPRESSION\nmore_vert\n\t\nPRIMARY\nmore_vert\n\t\ndownload\ngrid_on\nsettings\n\nMitchel",
+    "rowCount": 0,
+    "appComps": [
+      "app-root",
+      "app-header",
+      "app-chat",
+      "app-ai-help-panel",
+      "app-training-context-panel",
+      "app-connection-banner",
+      "app-announcement-overlay",
+      "app-onboarding-banner",
+      "app-sidebar",
+      "app-customer-contacts-page",
+      "app-page-header",
+      "app-data-table",
+      "app-offline-banner",
+      "app-loading-overlay",
+      "app-toast-container"
+    ]
+  },
+  "portalSeed": {
+    "status": 403
+  },
+  "portalState": {
+    "bodyText": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nCUSTOMERS\nchevron_right\nPORTAL ACCESS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\nlist\ncontacts\nvpn_key\nfilter_alt\nupload_file\nstorefront\nsettings\nPORTAL ACCESS\nAdmin oversight of which contacts can sign in to the customer portal.\nadd\nPROVISION ACCESS\nvpn_key\n\nNo contacts have portal access yet. Click \"Provision Access\" above to pick a contact.",
+    "rowCount": 0,
+    "appComps": [
+      "app-root",
+      "app-header",
+      "app-chat",
+      "app-ai-help-panel",
+      "app-training-context-panel",
+      "app-connection-banner",
+      "app-announcement-overlay",
+      "app-onboarding-banner",
+      "app-sidebar",
+      "app-customer-portal-access-page",
+      "app-page-layout",
+      "app-toolbar",
+      "app-data-table",
+      "app-empty-state",
+      "app-offline-banner"
+    ]
+  },
+  "segmentsState": {
+    "bodyText": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nCUSTOMERS\nchevron_right\nSEGMENTS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\nlist\ncontacts\nvpn_key\nfilter_alt\nupload_file\nstorefront\nsettings\nSEGMENTS\nSaved cross-customer filter sets for marketing + reporting.\nconstruction\nComing soon — preview only\nDefine a filter (e.g. \"open AR > $10K AND industry = aero",
+    "appComps": [
+      "app-root",
+      "app-header",
+      "app-chat",
+      "app-ai-help-panel",
+      "app-training-context-panel",
+      "app-connection-banner",
+      "app-announcement-overlay",
+      "app-onboarding-banner",
+      "app-sidebar",
+      "app-customer-segments-page",
+      "app-page-header",
+      "app-offline-banner",
+      "app-loading-overlay",
+      "app-toast-container",
+      "app-keyboard-shortcuts-help"
+    ]
+  },
+  "importState": {
+    "bodyText": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nCUSTOMERS\nchevron_right\nIMPORT\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\nlist\ncontacts\nvpn_key\nfilter_alt\nupload_file\nstorefront\nsettings\nBULK IMPORT\nUpload a CSV of customers + contacts, dedup against existing rows.\nconstruction\nComing soon — preview only\nSame dedup-wizard pattern as Leads bulk intake — upload CSV, preview matches, gate quality before commit. Differs in that customers carry billing/shi",
+    "rowCount": 0,
+    "appComps": [
+      "app-root",
+      "app-header",
+      "app-chat",
+      "app-ai-help-panel",
+      "app-training-context-panel",
+      "app-connection-banner",
+      "app-announcement-overlay",
+      "app-onboarding-banner",
+      "app-sidebar",
+      "app-customer-import-page",
+      "app-page-header",
+      "app-offline-banner",
+      "app-loading-overlay",
+      "app-toast-container",
+      "app-keyboard-shortcuts-help"
+    ]
+  }
+}

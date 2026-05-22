@@ -1,0 +1,67 @@
+{
+  "capEntry": {
+    "id": "CAP-MD-CUSTOMER-INTERACTIONS",
+    "code": "CAP-MD-CUSTOMER-INTERACTIONS",
+    "area": "MD",
+    "name": "Customer — interaction log (CRM)",
+    "description": "Surfaces the Interactions tab + ContactInteraction CRUD: chronological log of calls, emails, meetings, and notes per contact / per customer. Disable for shops that don't track sales activity at this granularity (most small shops).",
+    "enabled": false,
+    "isDefaultOn": false,
+    "requiresRoles": null,
+    "version": 1,
+    "eTag": "W/\"1\"",
+    "configVersion": null,
+    "configETag": null,
+    "configId": null,
+    "dependencies": [
+      "CAP-MD-CUSTOMERS",
+      "CAP-MD-CUSTOMER-CONTACTS"
+    ],
+    "mutexes": []
+  },
+  "enableResp": {
+    "status": 200,
+    "data": "{\"id\":\"CAP-MD-CUSTOMER-INTERACTIONS\",\"code\":\"CAP-MD-CUSTOMER-INTERACTIONS\",\"area\":\"MD\",\"name\":\"Customer — interaction log (CRM)\",\"description\":\"Surfaces the Interactions tab + ContactInteraction CRUD: chronological log of calls, emails, meetings, and notes per contact / per customer. Disable for shops that don't track sales activity at this granularity (most small shops).\",\"enabled\":true,\"isDefaultOn\":false,\"requiresRoles\":null,\"version\":2,\"eTag\":\"W/\\\"2\\\"\",\"configVersion\":null,\"configETag\":null,\"configId\":null,\"dependencies\":[\"CAP-MD-CUSTOMERS\",\"CAP-MD-CUSTOMER-CONTACTS\"],\"mutexes\":[]}"
+  },
+  "interactionsState": {
+    "allApp": [
+      "app-root",
+      "app-header",
+      "app-chat",
+      "app-ai-help-panel",
+      "app-training-context-panel",
+      "app-connection-banner",
+      "app-announcement-overlay",
+      "app-onboarding-banner",
+      "app-sidebar",
+      "app-customer-detail",
+      "app-entity-completeness-chip",
+      "app-currency-display",
+      "app-customer-interactions-cluster",
+      "app-select",
+      "app-data-table",
+      "app-empty-state",
+      "app-offline-banner",
+      "app-loading-overlay",
+      "app-toast-container",
+      "app-keyboard-shortcuts-help",
+      "app-chat-preview-popup",
+      "app-demo-marker"
+    ],
+    "tabs": [
+      "Overview",
+      "Contacts",
+      "Addresses",
+      "Estimates",
+      "Quotes",
+      "Orders",
+      "Jobs",
+      "Invoices",
+      "Pricing",
+      "Interactions",
+      "Activity"
+    ],
+    "url": "http://localhost:4200/customers/2/interactions",
+    "bodyText": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nCUSTOMERS\nchevron_right\nALL CUSTOMERS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\nlist\ncontacts\nvpn_key\nfilter_alt\nupload_file\nstorefront\nsettings\nchevron_left\nCustomers\nedit\nEDIT\narchive\nAcme Corp\nACTIVE\ncheck_circle\nReady\nemail\ncontact@acme.com\nphone\n555-100-2000\n1\nOPEN ESTIMATES\n0\nOPEN QUOTES\n0\nOPEN ORDERS\n0\nACTIVE JOBS\n$0.00\nOUTSTANDING\n$0.00\nYTD REVENUE\nOverview\nContacts\nAddresses\nEstimates\nQuotes\nOrders\nJobs\nInvoices\nPricing\nInteractions\nActivity\nContact\nType\n-- All Types --\nadd\nLOG INTERACTION\nfo"
+  }
+}

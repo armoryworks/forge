@@ -1,0 +1,155 @@
+{
+  "catalogState": {
+    "hasListPanel": true,
+    "listPanelText": "upload_file\nIMPORT CSV\nadd\nADD PART\ncategory\n\nThis vendor has no parts in the catalog yet.\n\nAdd a part this vendor supplies.\n\nADD PART",
+    "appComps": [
+      "app-vendor-detail-dialog",
+      "app-vendor-detail-panel",
+      "app-entity-completeness-chip",
+      "app-vendor-part-list-panel",
+      "app-empty-state"
+    ],
+    "text": "this vendor supplies.\n\nADD PART"
+  },
+  "addPartDialog": {
+    "type": "mat",
+    "text": "ADD VENDOR SOURCE\nclose\nCOMPANY NAME\nGlobal Supply Co\nPart\nsearch\nVendor is the Manufacturer\n\nTick when buying direct from the OEM (not a distributor). Manufacturer name is taken from the vendor; one Part # field replaces the separate vendor SKU and MPN.\n\nVendor Part # / External SKU\nManufacturer\nManufacturer Part #\n\nOEM identity as carried by this vendor. Different distributors of the same part c"
+  },
+  "addPartSelected": "PRT-00001Widget A",
+  "addPartSaved": true,
+  "catalogPopulated": {
+    "hasListPanel": true,
+    "listPanelText": "upload_file\nIMPORT CSV\nadd\nADD PART\nPART #\nmore_vert\n\t\nNAME\nmore_vert\n\t\nVENDOR PART # / EXTERNAL SKU\nmore_vert\n\t\nMANUFACTURER PART #\nmore_vert\n\t\nLEAD TIME (DAYS)\nmore_vert\n\t\nMIN ORDER QTY\nmore_vert\n\t\nPACK SIZE\nmore_vert\n\t\nPRICE TIERS\nmore_vert\n\t\nAPPROVED (AVL)\nmore_vert\n\t\nPREFERRED SOURCE\nmore_vert\n\t\nNOTES\nmore_vert\n\t\nmore_vert\n\t\ndownload\ngrid_on\nsettings\n\n\nPRT-00001\n\tWidget A\t---\t---\t---\t---\t---\t---\tcheck_circle\t\nstar_border\n\t---\t\nhistory\nedit\ndelete\n\t",
+    "appComps": [
+      "app-vendor-detail-dialog",
+      "app-vendor-detail-panel",
+      "app-entity-completeness-chip",
+      "app-vendor-part-list-panel",
+      "app-data-table"
+    ],
+    "text": "re_vert\n\t\nMANUFACTURER PART #\nmore_vert\n\t\nLEAD TIME (DAYS)\nmore_vert\n\t\nMIN ORDER QTY\nmore_vert\n\t\nPACK SIZE\nmore_vert\n\t\nPRICE TIERS\nmore_vert\n\t\nAPPROVED (AVL)\nmore_vert\n\t\nPREFERRED SOURCE\nmore_vert\n\t\nNOTES\nmore_vert\n\t\nmore_vert\n\t\ndownload\ngrid_on\nsettings\n\n\nPRT-00001\n\tWidget A\t---\t---\t---\t---\t---\t---\tcheck_circle\t\nstar_border\n\t---\t\nhistory\nedit\ndelete\n\t"
+  },
+  "rowActionButtons": [
+    {
+      "txt": "---",
+      "title": "",
+      "ariaLabel": "Price Tiers"
+    },
+    {
+      "txt": "star_border",
+      "title": "",
+      "ariaLabel": "Preferred Source"
+    },
+    {
+      "txt": "history",
+      "title": "",
+      "ariaLabel": "Price tier history"
+    },
+    {
+      "txt": "edit",
+      "title": "",
+      "ariaLabel": "Edit"
+    },
+    {
+      "txt": "delete",
+      "title": "",
+      "ariaLabel": "Remove from catalog"
+    }
+  ],
+  "allVendorPanelButtons": [
+    {
+      "txt": "check_circleReady",
+      "cls": "mat-mdc-tooltip-trigger comple"
+    },
+    {
+      "txt": "edit",
+      "cls": "mat-mdc-tooltip-trigger icon-b"
+    },
+    {
+      "txt": "close",
+      "cls": "mat-mdc-tooltip-trigger icon-b"
+    },
+    {
+      "txt": "Info",
+      "cls": "tab"
+    },
+    {
+      "txt": "Purchase Orders (0)",
+      "cls": "tab"
+    },
+    {
+      "txt": "Catalog",
+      "cls": "tab tab--active"
+    },
+    {
+      "txt": "Scorecard",
+      "cls": "tab"
+    },
+    {
+      "txt": "upload_file Import CSV",
+      "cls": "action-btn action-btn--sm"
+    },
+    {
+      "txt": "add Add Part",
+      "cls": "action-btn action-btn--sm acti"
+    },
+    {
+      "txt": "more_vert",
+      "cls": "mat-mdc-menu-trigger mat-mdc-t"
+    },
+    {
+      "txt": "more_vert",
+      "cls": "mat-mdc-menu-trigger mat-mdc-t"
+    },
+    {
+      "txt": "more_vert",
+      "cls": "mat-mdc-menu-trigger mat-mdc-t"
+    },
+    {
+      "txt": "more_vert",
+      "cls": "mat-mdc-menu-trigger mat-mdc-t"
+    },
+    {
+      "txt": "more_vert",
+      "cls": "mat-mdc-menu-trigger mat-mdc-t"
+    },
+    {
+      "txt": "more_vert",
+      "cls": "mat-mdc-menu-trigger mat-mdc-t"
+    },
+    {
+      "txt": "more_vert",
+      "cls": "mat-mdc-menu-trigger mat-mdc-t"
+    },
+    {
+      "txt": "more_vert",
+      "cls": "mat-mdc-menu-trigger mat-mdc-t"
+    },
+    {
+      "txt": "more_vert",
+      "cls": "mat-mdc-menu-trigger mat-mdc-t"
+    },
+    {
+      "txt": "more_vert",
+      "cls": "mat-mdc-menu-trigger mat-mdc-t"
+    },
+    {
+      "txt": "more_vert",
+      "cls": "mat-mdc-menu-trigger mat-mdc-t"
+    }
+  ],
+  "prt1Tabs": [
+    "badge Identity",
+    "category Material",
+    "receipt_long Purchase History",
+    "inventory_2 Inventory",
+    "event_available MRP",
+    "alt_route Routing",
+    "payments Cost",
+    "sell Pricing",
+    "fact_check Quality",
+    "swap_horiz Alternates",
+    "timeline Activity",
+    "attach_file Files"
+  ]
+}

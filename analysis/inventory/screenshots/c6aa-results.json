@@ -1,0 +1,69 @@
+{
+  "prt001Tabs": [
+    {
+      "i": 0,
+      "txt": "badge Identity"
+    },
+    {
+      "i": 1,
+      "txt": "category Material"
+    },
+    {
+      "i": 2,
+      "txt": "receipt_long Purchase History"
+    },
+    {
+      "i": 3,
+      "txt": "inventory_2 Inventory"
+    },
+    {
+      "i": 4,
+      "txt": "event_available MRP"
+    },
+    {
+      "i": 5,
+      "txt": "alt_route Routing"
+    },
+    {
+      "i": 6,
+      "txt": "payments Cost"
+    },
+    {
+      "i": 7,
+      "txt": "sell Pricing"
+    },
+    {
+      "i": 8,
+      "txt": "fact_check Quality"
+    },
+    {
+      "i": 9,
+      "txt": "swap_horiz Alternates"
+    },
+    {
+      "i": 10,
+      "txt": "timeline Activity"
+    },
+    {
+      "i": 11,
+      "txt": "attach_file Files"
+    },
+    {
+      "i": 12,
+      "txt": "qr_code_2 Serials"
+    }
+  ],
+  "serialsTab": {
+    "appComps": [
+      "app-part-detail-dialog",
+      "app-part-detail-panel",
+      "app-entity-completeness-chip",
+      "app-serial-numbers-tab",
+      "app-select",
+      "app-empty-state"
+    ],
+    "hasSerialNumbersTab": true,
+    "serialsText": "Status\nadd\nNEW SERIAL\nqr_code_2\n\nNo serial numbers registered for this part",
+    "text": "IAL\nreceipt_long\nPURCHASE HISTORY\ninventory_2\nINVENTORY\nevent_available\nMRP\nalt_route\nROUTING\npayments\nCOST\nsell\nPRICING\nfact_check\nQUALITY\nswap_horiz\nALTERNATES\ntimeline\nACTIVITY\nattach_file\nFILES\nqr_code_2\nSERIALS\nStatus\nadd\nNEW SERIAL\nqr_code_2\n\nNo serial numbers registered for this part"
+  }
+}
