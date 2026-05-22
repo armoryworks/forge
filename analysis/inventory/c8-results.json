@@ -1,0 +1,293 @@
+{
+  "leadsText": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nLEADS\nchevron_right\nALL LEADS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nhelp_outline\nMark yourself as onboarded? Your pending paperwork won't be completed — HR may still require it.\nYES, MARK AS ONBOARDED\nCANCEL\narrow_back\nlist\nupload_file\nspeed\ncampaign\nblock\ncard_giftcard\nbusiness\nstorefront\nsettings\nLEADS\nTrack and qualify potential sales opportunities\nview_list\nview_column\nadd\nNEW LEAD\nexpand_more\nSearch\nStatu",
+  "leadPanel": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nLEADS\nchevron_right\nALL LEADS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nhelp_outline\nMark yourself as onboarded? Your pending paperwork won't be completed — HR may still require it.\nYES, MARK AS ONBOARDED\nCANCEL\narrow_back\nlist\nupload_file\nspeed\ncampaign\nblock\ncard_giftcard\nbusiness\nstorefront\nsettings\nLEADS\nTrack and qualify potential sales opportunities\nview_list\nview_column\nadd\nNEW LEAD\nexpand_more\nSearch\nStatus\n\t\nCOMPANY\nmore_vert\n\t\nCONTACT\nmore_vert\n\t\nSOURCE\nmore_vert\n\t\nSTATUS\nmore_vert\n\t\nFOLLOW-UP\nmore_vert\n\t\nCREATED\nmore_vert\n\t\ndownload\ngrid_on\nsettings\n\n\n\tBeta Industries\t—\tDirect\t\nNEW\n\t—\t05/21/2026\t\nbusiness\nBeta Industries\nedit\nclose\nSTATUS\nNEW\nSOURCE\nDirect\nCLASSIFICATION\nprecision_manufacturing\nCAP FIT: NOT ASSESSED\narrow_drop_down\nlock\nNDA: NONE\narrow_drop_down\npublic\nITAR: N/A\narrow_drop_down\nUPDATE STATUS\nNEW\nCONTACTED\nQUOTING\nLOST\nCONVERT\nperson_add\nCONVERT TO CUSTOMER\nforum\nRECENT COMMUNICATIONS\n0\nmail_outline\nNo recent communications. Connect a mailbox or phone line under Account > Communications to start auto-logging.\nACTIVITY\nALL\nCONVERSATION\nNOTES\nHISTORY\n\nNo activity yet.",
+  "leadPanelButtons": [
+    "school",
+    "notifications_none",
+    "light_mode",
+    "Admin, Forgemenu",
+    "Yes, mark as onboarded",
+    "Cancel",
+    "arrow_back",
+    "settings",
+    "view_list",
+    "view_column",
+    "add New Lead",
+    "expand_more",
+    "more_vert",
+    "more_vert",
+    "more_vert",
+    "more_vert",
+    "more_vert",
+    "more_vert",
+    "download",
+    "grid_on",
+    "settings",
+    "edit",
+    "close",
+    "precision_manufacturingCap fit: not assessedarrow_drop_down",
+    "lockNDA: nonearrow_drop_down",
+    "publicITAR: n/aarrow_drop_down",
+    "New",
+    "Contacted",
+    "Quoting",
+    "Lost",
+    "person_add Convert to Customer",
+    "All",
+    "Conversation",
+    "Notes",
+    "History"
+  ],
+  "leadEditDialog": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nLEADS\nchevron_right\nALL LEADS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nhelp_outline\nMark yourself as onboarded? Your pending paperwork won't be completed — HR may still require it.\nYES, MARK AS ONBOARDED\nCANCEL\narrow_back\nlist\nupload_file\nspeed\ncampaign\nblock\ncard_giftcard\nbusiness\nstorefront\nsettings\nLEADS\nTrack and qualify potential sales opportunities\nview_list\nview_column\nadd\nNEW LEAD\nexpand_more\nSearch\nStatus\n\t\nCOMPANY\nmore_vert\n\t\nCONTACT\nmore_vert\n\t\nSOURCE\nmore_vert\n\t\nSTATUS\nmore_vert\n\t\nFOLLOW-UP\nmore_vert\n\t\nCREATED\nmore_vert\n\t\ndownload\ngrid_on\nsettings\n\n\n\tBeta Industries\t—\tDirect\t\nNEW\n\t—\t05/21/2026\t\nEDIT LEAD\nclose\nCompany Name\nContact Name\nEmail\nPhone\nSource\nFollow-Up Date\nAccount name\nNotes\nCANCEL\nsave\nSAVE CHANGES",
+  "callbackScheduler": "button-not-found",
+  "leadDblClick": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nLEADS\nchevron_right\nALL LEADS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nhelp_outline\nMark yourself as onboarded? Your pending paperwork won't be completed — HR may still require it.\nYES, MARK AS ONBOARDED\nCANCEL\narrow_back\nlist\nupload_file\nspeed\ncampaign\nblock\ncard_giftcard\nbusiness\nstorefront\nsettings\nLEADS\nTrack and qualify potential sales opportunities\nview_list\nview_column\nadd\nNEW LEAD\nexpand_more\nSearch\nStatus\n\t\nCOMPANY\nmore_vert\n\t\nCONTACT\nmore_vert\n\t\nSOURCE\nmore_vert\n\t\nSTATUS\nmore_vert\n\t\nFOLLOW-UP\nmore_vert\n\t\nCREATED\nmore_vert\n\t\ndownload\ngrid_on\nsettings\n\n\n\tBeta Industries\t—\tDirect\t\nNEW\n\t—\t05/21/2026\t\nbusiness\nBeta Industries\nedit\nclose\nSTATUS\nNEW\nSOURCE\nDirect\nCLASSIFICATION\nprecision_manufacturing\nCAP FIT: NOT ASSESSED\narrow_drop_down\nlock\nNDA: NONE\narrow_drop_down\npublic\nITAR: N/A\narrow_drop_down\nUPDATE STATUS\nNEW\nCONTACTED\nQUOTING\nLOST\nCONVERT\nperson_add\nCONVERT TO CUSTOMER\nforum\nRECENT COMMUNI",
+  "leadsQueue": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nLEADS\nchevron_right\nWORKER QUEUE\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nhelp_outline\nMark yourself as onboarded? Your pending paperwork won't be completed — HR may still require it.\nYES, MARK AS ONBOARDED\nCANCEL\narrow_back\nlist\nupload_file\nspeed\ncampaign\nblock\ncard_giftcard\nbusiness\nstorefront\nsettings\nWORKER QUEUE\nPull-based queue for high-volume outreach. Single-keystroke dispositions, J/K to advance.\nspeed\nReady to work\n\nPull a slice of leads and the queue serves them one at a time. Two reps pulling at the same time get disjoint slices — no overlap.\n\nPULL SIZE\nplay_arrow\nPULL NEXT 5",
+  "guidedCustomerDialog": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nCUSTOMERS\nchevron_right\nALL CUSTOMERS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nhelp_outline\nMark yourself as onboarded? Your pending paperwork won't be completed — HR may still require it.\nYES, MARK AS ONBOARDED\nCANCEL\narrow_back\nlist\ncontacts\nvpn_key\nfilter_alt\nupload_file\nstorefront\nsettings\nCUSTOMERS\nManage customer contacts and addresses\nadd\nNEW CUSTOMER\nSearch\nStatus\nNAME\nmore_vert\n\t\nCOMPANY\nmore_vert\n\t\nEMAIL\nmore_vert\n\t\nPHONE\nmore_vert\n\t\nACTIVE\nmore_vert\n\t\nCONTACTS\nmore_vert\n\t\nJOBS\nmore_vert\n\t\nCREATED\nmore_vert\n\t\ndownload\ngrid_on\nsettings\n\nAcme Corp\t—\tcontact@acme.com\t555-100-2000\t\nACTIVE\n\t0\t0\t05/21/2026\t\nAcme Corp\t—\tacme@example.com\t555-100-0001\t\nACTIVE\n\t0\t0\t05/21/2026\t\nGUIDED CUSTOMER SETUP\nclose\n1\nIdentity\n2\nEngagement\n3\nAddresses\n4\nCredit & tax\n5\nReview\n\nWho is this customer? Capture the basics first.\n\nDisplay name\nCompany name\nPrimary contact name\nEmail\nPhone\nCANCEL\nNEXT",
+  "guidedCustomerSteps": [
+    "1Identity",
+    "Identity",
+    "2Engagement",
+    "Engagement",
+    "3Addresses",
+    "Addresses",
+    "4Credit & tax",
+    "Credit & tax",
+    "5Review",
+    "Review"
+  ],
+  "customerDetailDialogUrl": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nCUSTOMERS\nchevron_right\nALL CUSTOMERS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nwarning\nComplete your employee profile — 3 sections remaining\nCOMPLETE NOW\nSKIP ONBOARDING\nclose\narrow_back\nlist\ncontacts\nvpn_key\nfilter_alt\nupload_file\nstorefront\nsettings\nCUSTOMERS\nManage customer contacts and addresses\nadd\nNEW CUSTOMER\nSearch\nStatus\nNAME\nmore_vert\n\t\nCOMPANY\nmore_vert\n\t\nEMAIL\nmore_vert\n\t\nPHONE\nmore_vert\n\t\nACTIVE\nmore_vert\n\t\nCONTACTS\nmore_vert\n\t\nJOBS\nmore_vert\n\t\nCREATED\nmore_vert\n\t\ndownload\ngrid_on\nsettings\n\nAcme Corp\t—\tcontact@acme.com\t555-100-2000\t\nACTIVE\n\t0\t0\t05/21/2026\t\nAcme Corp\t—\tacme@example.com\t555-100-0001\t\nACTIVE\n\t0\t0\t05/21/2026\t\nACME CORP\nclose\nOVERVIEW\nName\nCompany Name\nEmail\nPhone\nActive\nACCOUNT DETAILS\nCUSTOMER NAME\nAcme Corp\nEMAIL\ncontact@acme.com\nPHONE\n555-100-2000\nSTATUS\nACTIVE\nCUSTOMER SINCE\n05/21/2026\nREGULATED INDUSTRIES\n\nToggles flag this customer for downstream QA / documentation requirements. Each can be set independently.\n\nFDA-regulated\nMedical device or pharma. Triggers QA review of capability fit on every related lead.\nAS9100 / aerospace\nAerospace certified work. Affects part documentation requirements.\nIATF 16949 / automotive\nAutomotive supplier. Drives PPAP requirements + traceability rigor.\nITAR-controlled / defense\nExport-controlled defense work. Gates ITAR clearance on every related lead.\nREFERENCE CUSTOMER CONSENT\n\nWhen enabled, this customer can be used as a referen",
+  "partsCardView": "Skip to main content\nHOME\nchevron_right\nPRODUCTION\nchevron_right\nPARTS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nhelp_outline\nMark yourself as onboarded? Your pending paperwork won't be completed — HR may still require it.\nYES, MARK AS ONBOARDED\nCANCEL\narrow_back\ncategory\nhub\nevent_available\nbatch_prediction\nspeed\nstorefront\nsettings\nPARTS CATALOG\nManage parts, BOMs, and specifications\nhelp_outline\nadd\nNEW PART\nSearch\nStatus\nActive\nProcurement Source\nAll procurement so",
+  "partDetailPanel": "Skip to main content\nHOME\nchevron_right\nPRODUCTION\nchevron_right\nPARTS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nhelp_outline\nMark yourself as onboarded? Your pending paperwork won't be completed — HR may still require it.\nYES, MARK AS ONBOARDED\nCANCEL\narrow_back\ncategory\nhub\nevent_available\nbatch_prediction\nspeed\nstorefront\nsettings\nPARTS CATALOG\nManage parts, BOMs, and specifications\nhelp_outline\nadd\nNEW PART\nSearch\nStatus\nActive\nProcurement Source\nAll procurement sources\nInventory Class\nAll inventory classes\nPART #\nmore_vert\n\t\nNAME\nmore_vert\n\t\nREV\nmore_vert\n\t\nPROCUREMENT\nmore_vert\n\t\nCLASS\nmore_vert\n\t\nSTATUS\nmore_vert\n\t\nPRICE\nmore_vert\n\t\nBOM\nmore_vert\n\t\ntable_rows\ngrid_view\ndownload\ngrid_on\nsettings\n\nDRAFT\t(Unnamed draft)Step: basics · Last edited 5/21/26, 11:35 PM\nclose\n\t\tBUY\tCOMPONENT\tDRAFT\t---\t---\t\nDRAFT\t(Unnamed draft)Step: basics · Last edited 5/21/26, 11:35 PM\nclose\n\t\tMAKE\tCOMPONENT\tDRAFT\t---\t---\t\nDRAFT\t(Unnamed draft)Step: basics · Last edited 5/21/26, 11:35 PM\nclose\n\t\tBUY\tCOMPONENT\tDRAFT\t---\t---\t\nDRAFT\t(Unnamed draft)Step: basics · Last edited 5/21/26, 11:35 PM\nclose\n\t\tBUY\tCOMPONENT\tDRAFT\t---\t---\t\nDRAFT\t(Unnamed draft)Step: basics · Last edited 5/21/26, 11:35 PM\nclose\n\t\tBUY\tCOMPONENT\tDRAFT\t---\t---\t\nDRAFT\t(Unnamed draft)Step: basics · Last edited 5/21/26, 11:35 PM\nclose\n\t\tBUY\tCOMPONENT\tDRAFT\t---\t---\t\nDRAFT\t(Unnamed draft)Step: basics · Last edited 5/21/26, 11:35 PM\nclose\n\t\tBUY\tCOMPONENT\tDRAFT\t---\t---\t\nDRAFT\t(Unnamed draft)Step: basics · Last edited 5/21/26, 11:35 PM\nclose\n\t\tBUY\tCOMPONENT\tDRAFT\t---\t---\t\nPRT-00001\tWidget A\tA\tMAKE\tCOMPONENT\tACTIVE\t---\t---\t",
+  "partPanelInfo": {
+    "found": false
+  },
+  "partPanelButtons": [
+    {
+      "text": "school",
+      "ariaLabel": "Training help for this page"
+    },
+    {
+      "text": "notifications_none",
+      "ariaLabel": "Notifications"
+    },
+    {
+      "text": "light_mode",
+      "ariaLabel": "Toggle theme"
+    },
+    {
+      "text": "Admin, Forgemenu",
+      "ariaLabel": "User menu"
+    },
+    {
+      "text": "Yes, mark as onboarded",
+      "ariaLabel": "Confirm mark as onboarded"
+    },
+    {
+      "text": "Cancel",
+      "ariaLabel": null
+    },
+    {
+      "text": "arrow_back",
+      "ariaLabel": "Back"
+    },
+    {
+      "text": "settings",
+      "ariaLabel": "Admin"
+    },
+    {
+      "text": "help_outline",
+      "ariaLabel": "Start page help tour"
+    },
+    {
+      "text": "add New Part",
+      "ariaLabel": null
+    },
+    {
+      "text": "more_vert",
+      "ariaLabel": "Part # options"
+    },
+    {
+      "text": "more_vert",
+      "ariaLabel": "Name options"
+    },
+    {
+      "text": "more_vert",
+      "ariaLabel": "Rev options"
+    },
+    {
+      "text": "more_vert",
+      "ariaLabel": "Procurement options"
+    },
+    {
+      "text": "more_vert",
+      "ariaLabel": "Class options"
+    },
+    {
+      "text": "more_vert",
+      "ariaLabel": "Status options"
+    },
+    {
+      "text": "more_vert",
+      "ariaLabel": "Price options"
+    },
+    {
+      "text": "more_vert",
+      "ariaLabel": "BOM options"
+    },
+    {
+      "text": "table_rows",
+      "ariaLabel": "Table"
+    },
+    {
+      "text": "grid_view",
+      "ariaLabel": "Cards"
+    },
+    {
+      "text": "download",
+      "ariaLabel": "Export CSV"
+    },
+    {
+      "text": "grid_on",
+      "ariaLabel": "Export Excel"
+    },
+    {
+      "text": "settings",
+      "ariaLabel": "Manage columns"
+    },
+    {
+      "text": "close",
+      "ariaLabel": "Abandon"
+    },
+    {
+      "text": "close",
+      "ariaLabel": "Abandon"
+    },
+    {
+      "text": "close",
+      "ariaLabel": "Abandon"
+    },
+    {
+      "text": "close",
+      "ariaLabel": "Abandon"
+    },
+    {
+      "text": "close",
+      "ariaLabel": "Abandon"
+    },
+    {
+      "text": "close",
+      "ariaLabel": "Abandon"
+    },
+    {
+      "text": "close",
+      "ariaLabel": "Abandon"
+    },
+    {
+      "text": "close",
+      "ariaLabel": "Abandon"
+    }
+  ],
+  "partDblClick": "Skip to main content\nHOME\nchevron_right\nPRODUCTION\nchevron_right\nPARTS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nhelp_outline\nMark yourself as onboarded? Your pending paperwork won't be completed — HR may still require it.\nYES, MARK AS ONBOARDED\nCANCEL\narrow_back\ncategory\nhub\nevent_available\nbatch_prediction\nspeed\nstorefront\nsettings\nNew part\nSTEP 1 OF 6\n·\nBASICS\nExpress\nAll at once\nGuided\nStep by step\nhelp_outline\nclose\n1\nBasics\nchevron_right\nlock\nManufacturing\nchevron_right\nlock\nBill of Materials\nOPTIONAL\nchevron_right\nlock\nRouting\nchevron_right\nlock\nCost\nchevron_right\nlock\nAlternates\nOPTIONAL\nBasics\n\nName and a short description — the minimum to identify this part. The procurement and inventory axes were chosen on the previous screen.\n\nName\nDescription\n\nLong-form notes (optional).\n\nchevron_left\nBACK\nwarning\n1\nCONTINUE\nchevron_right",
+  "newPartFork": "Skip to main content\nHOME\nchevron_right\nPRODUCTION\nchevron_right\nPARTS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nhelp_outline\nMark yourself as onboarded? Your pending paperwork won't be completed — HR may still require it.\nYES, MARK AS ONBOARDED\nCANCEL\narrow_back\ncategory\nhub\nevent_available\nbatch_prediction\nspeed\nstorefront\nsettings\nPARTS CATALOG\nManage parts, BOMs, and specifications\nhelp_outline\nadd\nNEW PART\nSearch\nStatus\nActive\nProcurement Source\nAll procurement sources\nInventory Class\nAll inventory classes\nPART #\nmore_vert\n\t\nNAME\nmore_vert\n\t\nREV\nmore_vert\n\t\nPROCUREMENT\nmore_vert\n\t\nCLASS\nmore_vert\n\t\nSTATUS\nmore_vert\n\t\nPRICE\nmore_vert\n\t\nBOM\nmore_vert\n\t\ntable_rows\ngrid_view\ndownload\ngrid_on\nsettings\n\nDRAFT\t(Unnamed draft)Step: basics · Last edited 5/21/26, 11:35 PM\nclose\n\t\tBUY\tCOMPONENT\tDRAFT\t---\t---\t\nDRAFT\t(Unnamed draft)Step: basics · Last edited 5/21/26, 11:35 PM\nclose\n\t\tMAKE\tCOMPONENT\tDRAFT\t---\t---\t\nDRAFT\t(Unnamed draft)Step: basics · Last edited 5/21/2",
+  "part2Main": "Skip to main content\nHOME\nchevron_right\nPRODUCTION\nchevron_right\nPARTS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nwarning\nComplete your employee profile — 3 sections remaining\nCOMPLETE NOW\nSKIP ONBOARDING\nclose\narrow_back\ncategory\nhub\nevent_available\nbatch_prediction\nspeed\nstorefront\nsettings\nLoading workflow…",
+  "part2Links": [
+    {
+      "href": "#main-content",
+      "text": "Skip to main content"
+    },
+    {
+      "href": "/dashboard",
+      "text": ""
+    },
+    {
+      "href": "/dashboard",
+      "text": "Home"
+    },
+    {
+      "href": "/parts",
+      "text": "Parts"
+    },
+    {
+      "href": "/parts",
+      "text": "category"
+    },
+    {
+      "href": "/mrp",
+      "text": "hub"
+    },
+    {
+      "href": "/scheduling",
+      "text": "event_available"
+    },
+    {
+      "href": "/lots",
+      "text": "batch_prediction"
+    },
+    {
+      "href": "/oee",
+      "text": "speed"
+    },
+    {
+      "href": "/display/shop-floor",
+      "text": "storefront"
+    }
+  ],
+  "part2-overview": {
+    "url": "http://localhost:4200/dashboard",
+    "text": "Skip to main content\nHOME\nchevron_right\nDASHBOARD\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nhelp_outline\nMark yourself as onboarded? Your pending paperwork won't be completed — HR may still require it.\nYES, MARK AS ONBOARDED\nCANCEL\nchevron_right\ndashboard\nspace_dashboard\nsell\nprecision_manufacturing\ninventory_2\nlocal_shipping\ngroups\ninsights\nstorefront\nsettings\nDASHBOARD\nKey metrics and upcoming work at a glance\nhelp_outline\nPRODUCTION\ncenter_focus_strong\nFOCUS MODE\nnightlight\nAMBIENT\ndownload\nEXPORT\nedit\nCUSTOMIZE\nrocket_launch\nGetting Started\n1 of 4 complete\nclose\n"
+  },
+  "part2-serial-numbers": {
+    "url": "http://localhost:4200/dashboard",
+    "text": "Skip to main content\nHOME\nchevron_right\nDASHBOARD\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nhelp_outline\nMark yourself as onboarded? Your pending paperwork won't be completed — HR may still require it.\nYES, MARK AS ONBOARDED\nCANCEL\nchevron_right\ndashboard\nspace_dashboard\nsell\nprecision_manufacturing\ninventory_2\nlocal_shipping\ngroups\ninsights\nstorefront\nsettings\nDASHBOARD\nKey metrics and upcoming work at a glance\nhelp_outline\nPRODUCTION\ncenter_focus_strong\nFOCUS MODE\nnightlight\nAMBIENT\ndownload\nEXPORT\nedit\nCUSTOMIZE\nrocket_launch\nGetting Started\n1 of 4 complete\nclose\n"
+  },
+  "part2-vendor-sources": {
+    "url": "http://localhost:4200/dashboard",
+    "text": "Skip to main content\nHOME\nchevron_right\nDASHBOARD\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nhelp_outline\nMark yourself as onboarded? Your pending paperwork won't be completed — HR may still require it.\nYES, MARK AS ONBOARDED\nCANCEL\nchevron_right\ndashboard\nspace_dashboard\nsell\nprecision_manufacturing\ninventory_2\nlocal_shipping\ngroups\ninsights\nstorefront\nsettings\nDASHBOARD\nKey metrics and upcoming work at a glance\nhelp_outline\nPRODUCTION\ncenter_focus_strong\nFOCUS MODE\nnightlight\nAMBIENT\ndownload\nEXPORT\nedit\nCUSTOMIZE\nrocket_launch\nGetting Started\n1 of 4 complete\nclose\n"
+  },
+  "part2-alternates": {
+    "url": "http://localhost:4200/dashboard",
+    "text": "Skip to main content\nHOME\nchevron_right\nDASHBOARD\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nhelp_outline\nMark yourself as onboarded? Your pending paperwork won't be completed — HR may still require it.\nYES, MARK AS ONBOARDED\nCANCEL\nchevron_right\ndashboard\nspace_dashboard\nsell\nprecision_manufacturing\ninventory_2\nlocal_shipping\ngroups\ninsights\nstorefront\nsettings\nDASHBOARD\nKey metrics and upcoming work at a glance\nhelp_outline\nPRODUCTION\ncenter_focus_strong\nFOCUS MODE\nnightlight\nAMBIENT\ndownload\nEXPORT\nedit\nCUSTOMIZE\nrocket_launch\nGetting Started\n1 of 4 complete\nclose\n"
+  },
+  "part2-routing": {
+    "url": "http://localhost:4200/dashboard",
+    "text": "Skip to main content\nHOME\nchevron_right\nDASHBOARD\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nhelp_outline\nMark yourself as onboarded? Your pending paperwork won't be completed — HR may still require it.\nYES, MARK AS ONBOARDED\nCANCEL\nchevron_right\ndashboard\nspace_dashboard\nsell\nprecision_manufacturing\ninventory_2\nlocal_shipping\ngroups\ninsights\nstorefront\nsettings\nDASHBOARD\nKey metrics and upcoming work at a glance\nhelp_outline\nPRODUCTION\ncenter_focus_strong\nFOCUS MODE\nnightlight\nAMBIENT\ndownload\nEXPORT\nedit\nCUSTOMIZE\nrocket_launch\nGetting Started\n1 of 4 complete\nclose\n"
+  },
+  "part2-bom": {
+    "url": "http://localhost:4200/dashboard",
+    "text": "Skip to main content\nHOME\nchevron_right\nDASHBOARD\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nhelp_outline\nMark yourself as onboarded? Your pending paperwork won't be completed — HR may still require it.\nYES, MARK AS ONBOARDED\nCANCEL\nchevron_right\ndashboard\nspace_dashboard\nsell\nprecision_manufacturing\ninventory_2\nlocal_shipping\ngroups\ninsights\nstorefront\nsettings\nDASHBOARD\nKey metrics and upcoming work at a glance\nhelp_outline\nPRODUCTION\ncenter_focus_strong\nFOCUS MODE\nnightlight\nAMBIENT\ndownload\nEXPORT\nedit\nCUSTOMIZE\nrocket_launch\nGetting Started\n1 of 4 complete\nclose\n"
+  },
+  "part2-costing": {
+    "url": "http://localhost:4200/dashboard",
+    "text": "Skip to main content\nHOME\nchevron_right\nDASHBOARD\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nhelp_outline\nMark yourself as onboarded? Your pending paperwork won't be completed — HR may still require it.\nYES, MARK AS ONBOARDED\nCANCEL\nchevron_right\ndashboard\nspace_dashboard\nsell\nprecision_manufacturing\ninventory_2\nlocal_shipping\ngroups\ninsights\nstorefront\nsettings\nDASHBOARD\nKey metrics and upcoming work at a glance\nhelp_outline\nPRODUCTION\ncenter_focus_strong\nFOCUS MODE\nnightlight\nAMBIENT\ndownload\nEXPORT\nedit\nCUSTOMIZE\nrocket_launch\nGetting Started\n1 of 4 complete\nclose\n"
+  },
+  "part2-quality": {
+    "url": "http://localhost:4200/dashboard",
+    "text": "Skip to main content\nHOME\nchevron_right\nDASHBOARD\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nhelp_outline\nMark yourself as onboarded? Your pending paperwork won't be completed — HR may still require it.\nYES, MARK AS ONBOARDED\nCANCEL\nchevron_right\ndashboard\nspace_dashboard\nsell\nprecision_manufacturing\ninventory_2\nlocal_shipping\ngroups\ninsights\nstorefront\nsettings\nDASHBOARD\nKey metrics and upcoming work at a glance\nhelp_outline\nPRODUCTION\ncenter_focus_strong\nFOCUS MODE\nnightlight\nAMBIENT\ndownload\nEXPORT\nedit\nCUSTOMIZE\nrocket_launch\nGetting Started\n1 of 4 complete\nclose\n"
+  },
+  "inv-overview": {
+    "url": "http://localhost:4200/inventory/stock",
+    "text": "Skip to main content\nHOME\nchevron_right\nINVENTORY\nchevron_right\nINVENTORY\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nhelp_outline\nMark yourself as onboarded? Your pending paperwork won't be completed — HR may still require it.\nYES, MARK AS ONBOARDED\nCANCEL\narrow_back\ninventory\nbuild\nprecision_manufacturing\nstorefront\nsettings\nINVENTORY\nTrack stock levels, locations, and movements\nhelp_outline\ninventory\nSTOCK LEVELS\nwarehouse\nLOCATIONS\nswap_horiz\nMOVEMENTS\nlocal_shipping\nRECEIVING\ntune\nSTOCK OPS\nfact_check\nCYCLE COUNTS\nlock\nRESERVATIONS\nshopping_cart\nREPLENISHMENT\nstraighten\nUNITS OF MEASURE\nSearch\n0 PARTS WITH STOCK\ninventory_2\n\nNo inventory data\n\nStock appears here when parts are received into bin locations. Use the Receiving tab to log incoming goods."
+  },
+  "inv-stock": {
+    "url": "http://localhost:4200/inventory/stock",
+    "text": "Skip to main content\nHOME\nchevron_right\nINVENTORY\nchevron_right\nINVENTORY\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nhelp_outline\nMark yourself as onboarded? Your pending paperwork won't be completed — HR may still require it.\nYES, MARK AS ONBOARDED\nCANCEL\narrow_back\ninventory\nbuild\nprecision_manufacturing\nstorefront\nsettings\nINVENTORY\nTrack stock levels, locations, and movements\nhelp_outline\ninventory\nSTOCK LEVELS\nwarehouse\nLOCATIONS\nswap_horiz\nMOVEMENTS\nlocal_shipping\nRECEIVING\ntune\nSTOCK OPS\nfact_check\nCYCLE COUNTS\nlock\nRESERVATIONS\nshopping_cart\nREPLENISHMENT\nstraighten\nUNITS OF MEASURE\nSearch\n0 PARTS WITH STOCK\ninventory_2\n\nNo inventory data\n\nStock appears here when parts are received into bin locations. Use the Receiving tab to log incoming goods."
+  },
+  "inv-receiving": {
+    "url": "http://localhost:4200/inventory/receiving",
+    "text": "Skip to main content\nHOME\nchevron_right\nINVENTORY\nchevron_right\nINVENTORY\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nhelp_outline\nMark yourself as onboarded? Your pending paperwork won't be completed — HR may still require it.\nYES, MARK AS ONBOARDED\nCANCEL\narrow_back\ninventory\nbuild\nprecision_manufacturing\nstorefront\nsettings\nINVENTORY\nTrack stock levels, locations, and movements\nhelp_outline\nadd\nRECEIVE GOODS\ninventory\nSTOCK LEVELS\nwarehouse\nLOCATIONS\nswap_horiz\nMOVEMENTS\nlocal_shipping\nRECEIVING\ntune\nSTOCK OPS\nfact_check\nCYCLE COUNTS\nlock\nRESERVATIONS\nshopping_cart\nREPLENISHMENT\nstraighten\nUNITS OF MEASURE\n0 RECORDS\nlocal_shipping\n\nNo receiving records"
+  },
+  "inv-lots": {
+    "url": "http://localhost:4200/inventory/lots",
+    "text": "Skip to main content\nHOME\nchevron_right\nINVENTORY\nchevron_right\nINVENTORY\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nhelp_outline\nMark yourself as onboarded? Your pending paperwork won't be completed — HR may still require it.\nYES, MARK AS ONBOARDED\nCANCEL\narrow_back\ninventory\nbuild\nprecision_manufacturing\nstorefront\nsettings\nINVENTORY\nTrack stock levels, locations, and movements\nhelp_outline\ninventory\nSTOCK LEVELS\nwarehouse\nLOCATIONS\nswap_horiz\nMOVEMENTS\nlocal_shipping\nRECEIVING\ntune\nSTOCK OPS\nfact_check\nCYCLE COUNTS\nlock\nRESERVATIONS\nshopping_cart\nREPLENISHMENT\nstraighten\nUNITS OF MEASURE\nSearch\n0 PARTS WITH STOCK\ninventory_2\n\nNo inventory data\n\nStock appears here when parts are received into bin locations. Use the Receiving tab to log incoming goods."
+  },
+  "inv-adjustments": {
+    "url": "http://localhost:4200/inventory/adjustments",
+    "text": "Skip to main content\nHOME\nchevron_right\nINVENTORY\nchevron_right\nINVENTORY\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nhelp_outline\nMark yourself as onboarded? Your pending paperwork won't be completed — HR may still require it.\nYES, MARK AS ONBOARDED\nCANCEL\narrow_back\ninventory\nbuild\nprecision_manufacturing\nstorefront\nsettings\nINVENTORY\nTrack stock levels, locations, and movements\nhelp_outline\ninventory\nSTOCK LEVELS\nwarehouse\nLOCATIONS\nswap_horiz\nMOVEMENTS\nlocal_shipping\nRECEIVING\ntune\nSTOCK OPS\nfact_check\nCYCLE COUNTS\nlock\nRESERVATIONS\nshopping_cart\nREPLENISHMENT\nstraighten\nUNITS OF MEASURE\nSearch\n0 PARTS WITH STOCK\ninventory_2\n\nNo inventory data\n\nStock appears here when parts are received into bin locations. Use the Receiving tab to log incoming goods."
+  },
+  "lotsText": "Skip to main content\nHOME\nchevron_right\nPRODUCTION\nchevron_right\nPRODUCTION LOTS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nhelp_outline\nMark yourself as onboarded? Your pending paperwork won't be completed — HR may still require it.\nYES, MARK AS ONBOARDED\nCANCEL\narrow_back\ncategory\nhub\nevent_available\nbatch_prediction\nspeed\nstorefront\nsettings\nPRODUCTION LOTS\nTrack production lot traceability\nSearch lot number or part\nsearch\nSEARCH\nadd\nNEW LOT\nLOT NUMBER\nmore_vert\n\t\nPA",
+  "lotPanel": "Skip to main content\nHOME\nchevron_right\nPRODUCTION\nchevron_right\nPRODUCTION LOTS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nhelp_outline\nMark yourself as onboarded? Your pending paperwork won't be completed — HR may still require it.\nYES, MARK AS ONBOARDED\nCANCEL\narrow_back\ncategory\nhub\nevent_available\nbatch_prediction\nspeed\nstorefront\nsettings\nPRODUCTION LOTS\nTrack production lot traceability\nSearch lot number or part\nsearch\nSEARCH\nadd\nNEW LOT\nLOT NUMBER\nmore_vert\n\t\nPART NUMBER\nmore_vert\n\t\nDESCRIPTION\nmore_vert\n\t\nQUANTITY\nmore_vert\n\t\nJOB\nmore_vert\n\t\nSUPPLIER LOT\nmore_vert\n\t\nEXPIRES\nmore_vert\n\t\nCREATED\nmore_vert\n\t\ndownload\ngrid_on\nsettings\n\nLOT-20260522-001\tPRT-00001\tTest widget\t50\t—\tSUP-LOT-001\t\t05/22/2026 01:14 AM\t\nLOT-20260522-001\nclose\nPART NUMBER\nPRT-00001\nQUANTITY\nTRACEABILITY HISTORY\nHISTORY\n\nNo activity yet.",
+  "newLotDialog": "Skip to main content\nHOME\nchevron_right\nPRODUCTION\nchevron_right\nPRODUCTION LOTS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nhelp_outline\nMark yourself as onboarded? Your pending paperwork won't be completed — HR may still require it.\nYES, MARK AS ONBOARDED\nCANCEL\narrow_back\ncategory\nhub\nevent_available\nbatch_prediction\nspeed\nstorefront\nsettings\nPRODUCTION LOTS\nTrack production lot traceability\nSearch lot number or part\nsearch\nSEARCH\nadd\nNEW LOT\nLOT NUMBER\nmore_vert\n\t\nPART NUMBER\nmore_vert\n\t\nDESCRIPTION\nmore_vert\n\t\nQUANTITY\nmore_vert\n\t\nJOB\nmore_vert\n\t\nSUPPLIER LOT\nmore_vert\n\t\nEXPIRES\nmore_vert\n\t\nCREATED\nmore_vert\n\t\ndownload\ngrid_on\nsettings\n\nLOT-20260522-001\tPRT-00001\tTest widget\t50\t—\tSUP-LOT-001\t\t05/22/2026 01:14 AM\t\nNEW LOT\nclose\nPart\nsearch\nQuantity\nSupplier Lot",
+  "poList": "Skip to main content\nHOME\nchevron_right\nPURCHASING\nchevron_right\nPURCHASE ORDERS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nhelp_outline\nMark yourself as onboarded? Your pending paperwork won't be completed — HR may still require it.\nYES, MARK AS ONBOARDED\nCANCEL\narrow_back\nstorefront\ndescription\nrequest_page\nstorefront\nsettings\nPURCHASE ORDERS\nOrder materials and track vendor deliveries\nadd\nNEW PO\ndescription\nORDERS\nauto_awesome\nSUGGESTIONS\nsettings\nSETTINGS\nSearch\nVendor\nStatus\ndescription\n\nNo purchase orders found",
+  "routingMain": "Skip to main content\nHOME\nchevron_right\nDASHBOARD\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nhelp_outline\nMark yourself as onboarded? Your pending paperwork won't be completed — HR may still require it.\nYES, MARK AS ONBOARDED\nCANCEL\nchevron_right\ndashboard\nspace_dashboard\nsell\nprecision_manufacturing\ninventory_2\nlocal_shipping\ngroups\ninsights\nstorefront\nsettings\nDASHBOARD\nKey metrics and upcoming work at a glance\nhelp_outline\nPRODUCTION\ncenter_focus_strong\nFOCUS MODE\nnightlight\nAMBIENT\ndownload\nEXPORT\nedit\nCUSTOMIZE\nrocket_launch\nGetting Started\n1 of 4 complete\nclose\nradio_button_unchecked\nCreate your first job\narrow_forward\ncheck_circle\nAdd a customer\nradio_button_unchecked\nSet up track types\narrow_forward\nradio_button_unchecked\nExplore reports\narrow_forward\n0\nAC",
+  "routingFlow": "Skip to main content\nHOME\nchevron_right\nDASHBOARD\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nhelp_outline\nMark yourself as onboarded? Your pending paperwork won't be completed — HR may still require it.\nYES, MARK AS ONBOARDED\nCANCEL\nchevron_right\ndashboard\nspace_dashboard\nsell\nprecision_manufacturing\ninventory_2\nlocal_shipping\ngroups\ninsights\nstorefront\nsettings\nDASHBOARD\nKey metrics and upcoming work at a glance\nhelp_outline\nPRODUCTION\ncenter_focus_strong\nFOCUS MODE\nnightlight\nAMBIENT\ndownload\nEXPORT\nedit\nCUSTOMIZE\nrocket_launch\nGetting Started\n1 of 4 complete\nclose\nradio_button_unchecked\nCreate your first job\narrow_forward\ncheck_circle\nAdd a customer\nradio_button_unchecked\nSet up track types\narrow_forward\nradio_button_unchecked\nExplore reports\narrow_forward\n0\nAC"
+}
