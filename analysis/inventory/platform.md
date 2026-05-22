@@ -33,29 +33,32 @@ _Cross-link: dashboard widgets that render O2C/operations data → cross-linked 
 
 ### Shared components referenced by platform features
 
-| Component | Selector | Path | Used by |
-|-----------|----------|------|---------|
-| `app-notification-panel` | `NotificationPanelComponent` | `shared/components/notification-panel/` | AppHeader (notification bell dropdown) |
-| `app-dashboard-widget` | `DashboardWidgetComponent` | `shared/components/dashboard-widget/` | D-01 (dashboard page — widget shell) |
-| `app-kpi-chip` | `KpiChipComponent` | `shared/components/kpi-chip/` | D-01 (dashboard KPI strip) |
-| `app-page-header` | `PageHeaderComponent` | `shared/components/page-header/` | D-01, R-01, N-01, AP-01, CA-01 |
-| `app-data-table` | `DataTableComponent` | `shared/components/data-table/` | N-01, AP-02, AP-03, R-01, R-02 |
-| `app-select` | `SelectComponent` | `shared/components/select/` | N-01, CA-01, R-02 |
-| `app-input` | `InputComponent` | `shared/components/input/` | N-01, AP-03, R-02 |
-| `app-toolbar` | `ToolbarComponent` | `shared/components/toolbar/` | N-01 |
-| `app-empty-state` | `EmptyStateComponent` | `shared/components/empty-state/` | AP-02, R-02 |
-| `app-dialog` | `DialogComponent` | `shared/components/dialog/` | AP-02, AP-03, R-02, C-03, C-04, C-05 |
-| `app-textarea` | `TextareaComponent` | `shared/components/textarea/` | AP-02, AP-03 |
-| `app-drillable-chart` | `DrillableChartComponent` | `shared/components/drillable-chart/` | R-01 (expense drill-down) |
-| `app-datepicker` | `DatepickerComponent` | `shared/components/datepicker/` | R-01 (date range), R-03 (sankey date range) |
-| `app-sankey-chart` | `SankeyChartComponent` | `shared/components/sankey-chart/` | R-03 |
-| `app-page-layout` | `PageLayoutComponent` | `shared/components/page-layout/` | R-02 (report-builder page layout) |
-| `app-validation-button` | `ValidationButtonComponent` | `shared/components/validation-button/` | AP-03, R-02 |
-| `app-avatar` | `AvatarComponent` | `shared/components/avatar/` | C-01 (chat message avatars), notification-panel |
-| `app-entity-link` | `EntityLinkComponent` | `shared/components/entity-link/` | D-11 (action-items widget follow-up tasks) |
-| `app-ai-help-panel` | `AiHelpPanelComponent` | `shared/components/ai-help-panel/` | AppHeader (AI help side-panel) |
-| `app-training-context-panel` | `TrainingContextPanelComponent` | `shared/components/training-context-panel/` | AppHeader (training context panel) |
-| `app-chat-preview-popup` | `ChatPreviewPopupComponent` | `shared/components/chat-preview-popup/` | app.component (shell-level chat preview popup) |
+_Template file:line = first occurrence in each consuming template; abbreviated paths relative to `forge-ui/src/app/`._
+
+| ID | Selector | Path | Consuming templates (file:line) |
+|----|----------|------|---------------------------------|
+| SH-01 | `app-notification-panel` | `shared/components/notification-panel/` | `core/layout/app-header.component.html:208` |
+| SH-02 | `app-dashboard-widget` | `shared/components/dashboard-widget/` | `features/dashboard/dashboard.component.html:118` |
+| SH-03 | `app-kpi-chip` | `shared/components/kpi-chip/` | `features/dashboard/dashboard.component.html:79` (×3: lines 79,84,90) |
+| SH-04 | `app-page-header` | `shared/components/page-header/` | `dashboard.component.html:7` · `reports.component.html:1` · `sankey-reports.component.html:1` · `notifications.component.html` (toolbar area) · `approvals.component.html:1` · `calendar.component.html:1` |
+| SH-05 | `app-data-table` | `shared/components/data-table/` | `reports.component.html:57` (×28 instances) · `report-builder.component.html:127` · `notifications.component.html:27` · `approval-inbox.component.html:2` · `approval-workflow-editor.component.html:9` |
+| SH-06 | `app-select` | `shared/components/select/` | `notifications.component.html:16` · `calendar.component.html:3` · `report-builder.component.html:3` (×7 instances) · `approval-workflow-editor.component.html:41` |
+| SH-07 | `app-input` | `shared/components/input/` | `notifications.component.html:15` · `report-builder.component.html:45` · `save-report-dialog.component.html:3` · `approval-workflow-editor.component.html:21` (×5 instances) |
+| SH-08 | `app-toolbar` | `shared/components/toolbar/` | `notifications.component.html:14` |
+| SH-09 | `app-empty-state` | `shared/components/empty-state/` | `todays-tasks-widget.component.html:2` · `action-items-widget.component.html:2` · `cycle-progress-widget.component.html:3` · `approval-inbox.component.html` (empty pending list) · `report-builder.component.html:142` |
+| SH-10 | `app-dialog` | `shared/components/dialog/` | `approval-inbox.component.html:40` · `approval-workflow-editor.component.html:37` · `save-report-dialog.component.html:1` · (chat dialogs C-03/C-04/C-05 each use it in their own templates) |
+| SH-11 | `app-textarea` | `shared/components/textarea/` | `eod-prompt-widget.component.html:9` · `approval-inbox.component.html:44` · `approval-workflow-editor.component.html:44` · `save-report-dialog.component.html:4` |
+| SH-12 | `app-drillable-chart` | `shared/components/drillable-chart/` | `reports.component.html:51` (×4 instances: lines 51,82,96,215) |
+| SH-13 | `app-datepicker` | `shared/components/datepicker/` | `reports.component.html:35` (×2) · `sankey-reports.component.html:27` (×2) |
+| SH-14 | `app-sankey-chart` | `shared/components/sankey-chart/` | `sankey-reports.component.html:40` |
+| SH-15 | `app-page-layout` | `shared/components/page-layout/` | `report-builder.component.html:1` |
+| SH-16 | `app-validation-button` | `shared/components/validation-button/` | `save-report-dialog.component.html:10` · `approval-workflow-editor.component.html:84` |
+| SH-17 | `app-avatar` | `shared/components/avatar/` | `chat.component.html:11` (×6: lines 11,79,184,211,256,271) · `todays-tasks-widget.component.html:18` · `team-load-widget.component.html:3` · `notification-panel.component.html` (SH-01 template) |
+| SH-18 | `app-entity-link` | `shared/components/entity-link/` | `action-items-widget.component.html:17` |
+| SH-19 | `app-ai-help-panel` | `shared/components/ai-help-panel/` | `core/layout/app-header.component.html:212` |
+| SH-20 | `app-training-context-panel` | `shared/components/training-context-panel/` | `core/layout/app-header.component.html:213` |
+| SH-21 | `app-chat-preview-popup` | `shared/components/chat-preview-popup/` | `app.component.html:28` |
+| SH-22 | `app-status-badge` | `shared/components/status-badge/` | `todays-tasks-widget.component.html:19` — **added**: discovered during template grep; not in initial list |
 
 ---
 
@@ -141,6 +144,7 @@ _Cross-link: dashboard widgets that render O2C/operations data → cross-linked 
 | `shared/components/ai-help-panel/ai-help-panel.component.ts` | SH-19 | source-confirmed (AppHeader) |
 | `shared/components/training-context-panel/training-context-panel.component.ts` | SH-20 | source-confirmed (AppHeader) |
 | `shared/components/chat-preview-popup/chat-preview-popup.component.ts` | SH-21 | source-confirmed (app.component) |
+| `shared/components/status-badge/status-badge.component.ts` | SH-22 | source-confirmed (todays-tasks-widget.component.html:19) — discovered in template grep |
 
 ---
 
@@ -149,9 +153,9 @@ _Cross-link: dashboard widgets that render O2C/operations data → cross-linked 
 _Source tree + imports analysis 2026-05-22._
 
 - **Feature components**: 32 (dashboard 14 · reports 4 · notifications 1 · chat 9 · approvals 3 · calendar 1 · events 0)
-- **Shared components**: 21
+- **Shared components**: 22 (SH-01–SH-21 initial + SH-22 StatusBadge discovered via template grep)
 - **Shell search/bell cluster (AppHeader)**: 2 (SR-01 search bar, SR-02 notification bell; clusters in AppHeaderComponent, not standalone files)
-- **Total denominator**: 53 items (32 feature + 21 shared; SR items are sub-entries of AppHeader)
+- **Total denominator**: 54 items (32 feature + 22 shared; SR items are sub-entries of AppHeader)
 
 _Chat denominator note (resolved 2026-05-22): C-06 CreateAnnouncementDialog is admin-owned (used by `features/admin/components/announcements-panel/`). C-07 ShareEntityDialog, C-08 EntityMentionPopover, C-12 ChatMessageAttachment, C-14 ThreadPanel are confirmed unused — no imports in any .ts or .html. Removed 5, leaving chat=9 active files (C-01–C-05, C-09–C-11, C-13). C-09/C-10/C-11/C-13 confirmed in ChatPopoutComponent (C-02) and features/mobile/pages/mobile-chat.component.ts (cross-region usage, component still owned here)._
 
@@ -293,11 +297,12 @@ _No UI components. `features/events/` contains models (`event.model.ts`) and `Ev
 | SankeyChartComponent | shared-cmp | `/reports/sankey` | `shared/components/sankey-chart/sankey-chart.component.ts:1` | Admin·Manager·PM | empty·populated | D3-based Sankey flow diagram |
 | PageLayoutComponent | shared-cmp | `/reports/builder` | `shared/components/page-layout/page-layout.component.ts:1` | Admin·Manager·PM | — | Two-panel page layout (sidebar slot + content slot) |
 | ValidationButtonComponent | shared-cmp | `/approvals/*`, `/reports/builder` | `shared/components/validation-button/validation-button.component.ts:1` | all authenticated | idle·loading·disabled | Submit button with built-in loading state + validation |
-| AvatarComponent | shared-cmp | `/chat`, notification-panel | `shared/components/avatar/avatar.component.ts:1` | all authenticated | — | User initials/color avatar |
-| EntityLinkComponent | shared-cmp | `/dashboard` (action-items widget) | `shared/components/entity-link/entity-link.component.ts:1` | all authenticated | — | Clickable entity link (job, quote, invoice, etc.) |
-| AiHelpPanelComponent | shared-cmp | AppHeader (all authenticated) | `shared/components/ai-help-panel/ai-help-panel.component.ts:1` | all authenticated | empty·populated | AI help side-panel from header; RAG-powered assistance |
-| TrainingContextPanelComponent | shared-cmp | AppHeader (all authenticated) | `shared/components/training-context-panel/training-context-panel.component.ts:1` | all authenticated | active | Training context/hints panel from header |
-| ChatPreviewPopupComponent | panel | all authenticated routes | `shared/components/chat-preview-popup/chat-preview-popup.component.ts:1` | all authenticated | empty·populated | Shell-level popup for inline chat entity share previews |
+| AvatarComponent | shared-cmp | `/chat`, `/dashboard` (widgets), notification-panel | `shared/components/avatar/avatar.component.ts:1` | all authenticated | — | User initials/color avatar; chat.component.html:11 + todays-tasks-widget.component.html:18 + team-load-widget.component.html:3 |
+| EntityLinkComponent | shared-cmp | `/dashboard` (action-items widget) | `shared/components/entity-link/entity-link.component.ts:1` | all authenticated | — | Clickable entity link; action-items-widget.component.html:17 |
+| AiHelpPanelComponent | shared-cmp | AppHeader (all authenticated) | `shared/components/ai-help-panel/ai-help-panel.component.ts:1` | all authenticated | empty·populated | AI help side-panel; app-header.component.html:212 |
+| TrainingContextPanelComponent | shared-cmp | AppHeader (all authenticated) | `shared/components/training-context-panel/training-context-panel.component.ts:1` | all authenticated | active | Training context/hints panel; app-header.component.html:213 |
+| ChatPreviewPopupComponent | panel | all authenticated routes | `shared/components/chat-preview-popup/chat-preview-popup.component.ts:1` | all authenticated | empty·populated | Shell-level chat preview popup; app.component.html:28 |
+| StatusBadgeComponent | shared-cmp | `/dashboard` (todays-tasks widget) | `shared/components/status-badge/status-badge.component.ts:1` | all authenticated | — | Job/task status badge pill; todays-tasks-widget.component.html:19 — SH-22 |
 
 ---
 
@@ -309,8 +314,8 @@ _No UI components. `features/events/` contains models (`event.model.ts`) and `Ev
 4. **PLT-Q-004** — Reports: 28 report types — need live sweep; roleGuard(Admin/Manager/PM) so sweep as admin@.
 5. **PLT-Q-005** — Reports: report-builder (entity/field/filter/chart-type forms, saved reports, CSV export).
 6. **PLT-Q-006** — Reports: sankey reports (flow types, date range, chart render).
-7. **PLT-Q-007–Q-015** — Chat: C-06 CreateAnnouncementDialog, C-07 ShareEntityDialog, C-08 EntityMentionPopover, C-09 ChatChannelHeader, C-10 ChatChannelList, C-11 ChatMessageArea, C-12 ChatMessageAttachment, C-13 ChatThreadPanel, C-14 ThreadPanel — NOT in chat.component.ts imports; need to verify if used in ChatPopoutComponent (C-02) or elsewhere. If unused, remove from denominator.
-8. **PLT-Q-016** — Chat: C-02 ChatPopoutComponent — verify route `/chat/popout` is actually reachable (standalone route in app.routes.ts line 43-45 exists with authGuard only).
+7. ~~**PLT-Q-007–Q-015**~~ — **CLOSED** (commit fbec6f1): C-06 admin-owned; C-07/C-08/C-12/C-14 confirmed unused; C-09/C-10/C-11/C-13 source-confirmed in ChatPopoutComponent. Denominator corrected.
+8. **PLT-Q-016** — Chat: C-02 ChatPopoutComponent — live render of `/chat/popout` still needed.
 9. **PLT-Q-017** — Notifications: all states (empty/populated), preferences tab.
 10. **PLT-Q-018** — Approvals: inbox with pending approvals (needs seeded approval requests); approve + reject flow.
 11. **PLT-Q-019** — Approvals: workflow editor + create/edit workflow dialog; confirm Workflows tab hidden from PM/OfficeManager.
