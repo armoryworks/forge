@@ -182,14 +182,14 @@ Route is under `/display/` path with **no auth guard** — public kiosk terminal
 
 | # | component | type | file | purpose |
 |---|-----------|------|------|---------|
-| SF-12 | ScanJobFlowComponent | panel | `features/shop-floor/components/scan-job-flow/scan-job-flow.component.ts:1` | Report time/progress on a job |
-| SF-13 | ScanMoveFlowComponent | panel | `features/shop-floor/components/scan-move-flow/scan-move-flow.component.ts:1` | Move inventory to a different location |
-| SF-14 | ScanReceiveFlowComponent | panel | `features/shop-floor/components/scan-receive-flow/scan-receive-flow.component.ts:1` | Receive PO items (cross-ref: Q2C PO-receiving) |
-| SF-15 | ScanReturnFlowComponent | panel | `features/shop-floor/components/scan-return-flow/scan-return-flow.component.ts:1` | Return material to stock |
-| SF-16 | ScanShipFlowComponent | panel | `features/shop-floor/components/scan-ship-flow/scan-ship-flow.component.ts:1` | Ship outbound order items |
-| SF-17 | ScanCountFlowComponent | panel | `features/shop-floor/components/scan-count-flow/scan-count-flow.component.ts:1` | Physical inventory count |
-| SF-18 | ScanInspectFlowComponent | panel | `features/shop-floor/components/scan-inspect-flow/scan-inspect-flow.component.ts:1` | QC inspection on kiosk |
-| SF-19 | ScanIssueFlowComponent | panel | `features/shop-floor/components/scan-issue-flow/scan-issue-flow.component.ts:1` | Issue material to a job |
+| SF-12 | `app-scan-job-flow` / ScanJobFlowComponent | panel | `features/shop-floor/components/scan-job-flow/scan-job-flow.component.ts:14` | Report time/progress on a job |
+| SF-13 | `app-scan-move-flow` / ScanMoveFlowComponent | panel | `features/shop-floor/components/scan-move-flow/scan-move-flow.component.ts:16` | Move inventory to a different location |
+| SF-14 | `app-scan-receive-flow` / ScanReceiveFlowComponent | panel | `features/shop-floor/components/scan-receive-flow/scan-receive-flow.component.ts:16` | Receive PO items (cross-ref: Q2C PO-receiving) |
+| SF-15 | `app-scan-return-flow` / ScanReturnFlowComponent | panel | `features/shop-floor/components/scan-return-flow/scan-return-flow.component.ts:26` | Return material to stock |
+| SF-16 | `app-scan-ship-flow` / ScanShipFlowComponent | panel | `features/shop-floor/components/scan-ship-flow/scan-ship-flow.component.ts:19` | Ship outbound order items |
+| SF-17 | `app-scan-count-flow` / ScanCountFlowComponent | panel | `features/shop-floor/components/scan-count-flow/scan-count-flow.component.ts:13` | Physical inventory count |
+| SF-18 | `app-scan-inspect-flow` / ScanInspectFlowComponent | panel | `features/shop-floor/components/scan-inspect-flow/scan-inspect-flow.component.ts:12` | QC inspection on kiosk |
+| SF-19 | `app-scan-issue-flow` / ScanIssueFlowComponent | panel | `features/shop-floor/components/scan-issue-flow/scan-issue-flow.component.ts:13` | Issue material to a job |
 
 > All scan-flow components render for `all (public)` — they are inside the no-auth kiosk route. States: TODO:live-sweep with ProductionWorker (worker@, ForgeRun!2026).
 
@@ -243,10 +243,10 @@ Tabs (from `quality.component.ts:38`): `inspections` · `lots` · `spc-charts` �
 | Q-01 | `app-quality` / QualityComponent | page | `/quality/:tab` | `features/quality/quality.component.ts:42` | Admin · Manager · Engineer | TODO:live | Tab host for all quality views; inspections and lots rendered inline |
 | Q-02 | Inspections tab (inline in Q-01) | tab | `/quality/inspections` | `features/quality/quality.component.ts:42` | Admin · Manager · Engineer | TODO:live | QC inspection list: create/edit inspections against QC templates |
 | Q-03 | Lots tab (inline in Q-01) | tab | `/quality/lots` | `features/quality/quality.component.ts:42` | Admin · Manager · Engineer | TODO:live | Lot records table with traceability lookups |
-| Q-04 | `app-spc-characteristics` / SpcCharacteristicsComponent | tab | `/quality/spc-charts` | `features/quality/components/spc-characteristics.component.ts:1` | Admin · Manager · Engineer | TODO:live | SPC characteristics list; select characteristic to view chart |
-| Q-05 | `app-spc-chart` / SpcChartComponent | tab | `/quality/spc-charts` (detail) | `features/quality/components/spc-chart.component.ts:1` | Admin · Manager · Engineer | TODO:live | Control chart for selected SPC characteristic |
-| Q-06 | `app-spc-data-entry` / SpcDataEntryComponent | tab | `/quality/spc-data` | `features/quality/components/spc-data-entry.component.ts:1` | Admin · Manager · Engineer | TODO:live | Enter new SPC measurement data points |
-| Q-07 | `app-spc-ooc-list` / SpcOocListComponent | tab | `/quality/spc-ooc` | `features/quality/components/spc-ooc-list.component.ts:1` | Admin · Manager · Engineer | TODO:live | Out-of-control alerts list |
+| Q-04 | `app-spc-characteristics` / SpcCharacteristicsComponent | tab | `/quality/spc-charts` | `features/quality/components/spc-characteristics.component.ts:20` | Admin · Manager · Engineer | TODO:live | SPC characteristics list; select characteristic to view chart |
+| Q-05 | `app-spc-chart` / SpcChartComponent | tab | `/quality/spc-charts` (detail) | `features/quality/components/spc-chart.component.ts:12` | Admin · Manager · Engineer | TODO:live | Control chart for selected SPC characteristic |
+| Q-06 | `app-spc-data-entry` / SpcDataEntryComponent | tab | `/quality/spc-data` | `features/quality/components/spc-data-entry.component.ts:10` | Admin · Manager · Engineer | TODO:live | Enter new SPC measurement data points |
+| Q-07 | `app-spc-ooc-list` / SpcOocListComponent | tab | `/quality/spc-ooc` | `features/quality/components/spc-ooc-list.component.ts:16` | Admin · Manager · Engineer | TODO:live | Out-of-control alerts list |
 | Q-08 | `app-ncr-list` / NcrListComponent | tab | `/quality/ncrs` | `features/quality/components/ncr-list.component.ts:22` | Admin · Manager · Engineer | TODO:live | Non-conformance records list + inline create/edit dialog |
 | Q-09 | `app-capa-list` / CapaListComponent | tab | `/quality/capas` | `features/quality/components/capa-list.component.ts:22` | Admin · Manager · Engineer | TODO:live | Corrective and preventive actions list + inline create/edit dialog |
 | Q-10 | `app-eco-list` / EcoListComponent | tab | `/quality/ecos` | `features/quality/components/eco-list.component.ts:24` | Admin · Manager · Engineer | TODO:live | Engineering change orders list + inline create/edit dialog + affected-items |
@@ -285,7 +285,7 @@ Tabs (from `mrp.component.ts:55`): `dashboard` · `planned-orders` · `exception
 | # | component | type | route | file | renders-for | states | purpose |
 |---|-----------|------|-------|------|-------------|--------|---------|
 | A-01 | `app-assets` / AssetsComponent | page | `/assets` | `features/assets/assets.component.ts:27` | Admin · Manager | TODO:live | Asset list with search/type/status filters; create-asset dialog inline |
-| A-02 | `app-asset-detail-panel` / AssetDetailPanelComponent | panel | `/assets` (slide-out) | `features/assets/components/asset-detail-panel/asset-detail-panel.component.ts:1` | Admin · Manager | TODO:live | Asset detail: fields, downtime log, maintenance log, subcontract orders |
+| A-02 | `app-asset-detail-panel` / AssetDetailPanelComponent | panel | `/assets` (slide-out) | `features/assets/components/asset-detail-panel/asset-detail-panel.component.ts:17` | Admin · Manager | TODO:live | Asset detail: fields, downtime log, maintenance log, subcontract orders |
 | A-03 | `app-asset-detail-dialog` / AssetDetailDialogComponent | dialog | `/assets` | `features/assets/components/asset-detail-dialog/asset-detail-dialog.component.ts:1` | Admin · Manager | TODO:live | Dialog wrapper around AssetDetailPanelComponent |
 | A-04 | Create/Edit Asset form (inline in A-01) | form | `/assets` | `features/assets/assets.component.ts:27` | Admin · Manager | TODO:live | Asset fields: name, type, status, location, description; draft-aware |
 | A-05 | AssetsService | service | `/assets` | `features/assets/services/assets.service.ts:1` | n/a | n/a | Asset CRUD, downtime log, maintenance log, subcontract orders |
@@ -297,7 +297,7 @@ Tabs (from `mrp.component.ts:55`): `dashboard` · `planned-orders` · `exception
 | # | component | type | route | file | renders-for | states | purpose |
 |---|-----------|------|-------|------|-------------|--------|---------|
 | MN-01 | `app-predictions` / PredictionsComponent | page | `/maintenance/predictions` | `features/maintenance/pages/predictions/predictions.component.ts:42` | Admin · Manager | TODO:live | Predictive maintenance dashboard: KPI strip (active/critical/accuracy) + predictions table |
-| MN-02 | `app-resolve-prediction-dialog` / ResolvePredictionDialogComponent | dialog | `/maintenance/predictions` | `features/maintenance/components/resolve-prediction-dialog/resolve-prediction-dialog.component.ts:1` | Admin · Manager | TODO:live | Resolve / acknowledge / schedule-PM / mark-false-positive on a prediction |
+| MN-02 | `app-resolve-prediction-dialog` / ResolvePredictionDialogComponent | dialog | `/maintenance/predictions` | `features/maintenance/components/resolve-prediction-dialog/resolve-prediction-dialog.component.ts:16` | Admin · Manager | TODO:live | Resolve / acknowledge / schedule-PM / mark-false-positive on a prediction |
 | MN-03 | PredictiveMaintenanceService | service | `/maintenance` | `features/maintenance/services/predictive-maintenance.service.ts:1` | n/a | n/a | Predictive maintenance data + resolve actions |
 
 ---
@@ -321,12 +321,14 @@ _This section tracks entries that need live-sweep confirmation. All TODO:live st
 5. **Planning CAP-PLAN-MRP state** — confirm whether capability is enabled or disabled in this env.
 
 ### Known incomplete (awaiting source read)
-- Scan-flow components SF-12–SF-19: exact `path:line` selector declarations not yet confirmed (paths recorded, class names from explore scan).
-- SPC components Q-04–Q-07: exact `path:line` selectors pending read.
-- Asset detail panel A-02: exact `path:line` pending read.
-- Quality inline inspection/lot panel dialogs: may have additional dialog components inside QualityComponent not surfaced by source scan.
+- ~~Scan-flow components SF-12–SF-19: exact `path:line` selector declarations not yet confirmed.~~ **CLOSED** — all 8 selectors confirmed.
+- ~~SPC components Q-04–Q-07: exact `path:line` selectors pending read.~~ **CLOSED** — all 4 confirmed.
+- ~~Asset detail panel A-02: exact `path:line` pending read.~~ **CLOSED** — `:17` confirmed.
+- ~~MN-02: exact `path:line` pending read.~~ **CLOSED** — `:16` confirmed.
+- Quality inline inspection/lot panel dialogs: may have additional dialog components inside QualityComponent not surfaced by source scan. **Pending live sweep.**
+- Kiosk sub-components SF-03–SF-11, SF-22: `path:line` stubs at `:1` — need targeted source read. **Queued.**
 
 ---
 
-_Commit: initial scaffold — source map complete, 82 source-confirmed entries, live states queued_
-_Next: ui-scout live sweep; dequeue states as confirmed_
+_Commit: source gaps closed — SF-12–SF-19, Q-04–Q-07, A-02, MN-02 path:line confirmed; 57-item live queue open_
+_Next: dequeue ui-scout live results (states + dialog triggers) as they land_
