@@ -3,7 +3,7 @@
 > **Phase:** quote-to-cash · **Method:** observe-and-record (no code changes)
 > **Single writer:** source-cataloger owns this file. Scout writes queue only.
 > **Source on disk:** HEAD e9b7802 (file:line mappings from source; states `unconfirmed` until scout observes live)
-> **Last updated:** Cycle 1 (source prelocation)
+> **Last updated:** Cycle 3 (tree-reconciliation pass — features/ tree fully covered, shared/ usages noted)
 
 ---
 
@@ -110,6 +110,35 @@
 - [ ] `components/customer-return-dialog/customer-return-dialog.component.ts`
 - [ ] `components/customer-return-detail-dialog/customer-return-detail-dialog.component.ts`
 - [ ] `components/customer-return-detail-panel/customer-return-detail-panel.component.ts`
+
+### Shared components (usages noted in feature entries; ticked when usage documented)
+
+> Sub-components of `DataTableComponent` (`column-filter-popover`, `column-manager-panel`) are internal DataTable infrastructure — not directly imported by q2c features; covered by DataTableComponent reference.
+
+- [x] `AutocompleteComponent` — quote-dialog, so-dialog, po-dialog, shipment-dialog
+- [x] `BarcodeInfoComponent` — so-detail-panel, po-detail-panel
+- [x] `ConfirmDialogComponent` — quote-detail-panel, so-detail-panel, po-detail-panel, auto-po-panel, recurring-orders, invoice-detail-panel, payment-detail-panel, customer-return-detail-panel
+- [x] `CurrencyDisplayComponent` — quotes (list), so (list), invoice (list), payment (list), quote-dialog, quote-detail-panel, so-detail-panel, po-detail-panel, rfq-detail-dialog, off-tier-prompt-dialog, invoice-dialog, invoice-detail-panel, payment-dialog, payment-detail-panel
+- [x] `CurrencyInputComponent` — receive-dialog, po-dialog, po-detail-panel
+- [x] `DataTableComponent` — all list pages; rfq-list, recurring-orders, auto-po-panel, rfq-detail-dialog (vendor response rows)
+- [x] `DatepickerComponent` — quote-dialog, so-dialog, po-dialog, rfq-dialog, rfq-detail-dialog, invoice-dialog, payment-dialog, customer-return-dialog, recurring-order-dialog
+- [x] `DialogComponent` — quote-dialog, so-dialog, po-dialog, po-detail-panel, rfq-dialog, rfq-detail-dialog, estimate-form-dialog, receive-dialog, invoice-dialog, uninvoiced-jobs-panel, shipping-rates-dialog, payment-dialog, customer-return-dialog, customer-return-detail-panel
+- [x] `EmptyStateComponent` — receive-dialog (zero-lines state)
+- [x] `EntityActivitySectionComponent` — quote-detail-panel, so-detail-panel, po-detail-panel, rfq-detail-dialog, invoice-detail-panel, payment-detail-panel, customer-return-detail-panel
+- [x] `EntityLinkComponent` — quote-detail-panel, so-detail-panel, po-detail-panel, auto-po-panel, rfq-detail-dialog, invoice-detail-panel, payment-detail-panel
+- [x] `EntityPickerComponent` — customer-return-dialog, recurring-order-dialog
+- [x] `FileUploadZoneComponent` — so-detail-panel (documents tab)
+- [x] `InputComponent` — all list pages (search), all create dialogs
+- [x] `PageHeaderComponent` — quotes, sales-orders, purchase-orders, purchasing, shipments, invoices, payments, customer-returns (all list pages)
+- [x] `PageLayoutComponent` — recurring-orders
+- [x] `SelectComponent` — all list pages (filters); receive-dialog (freight method); auto-po-panel; auto-po-settings-panel; po-detail-panel; rfq-detail-dialog; multiple create dialogs
+- [x] `TextareaComponent` — quote-dialog, so-dialog, po-dialog, rfq-dialog, rfq-detail-dialog, invoice-dialog, customer-return-dialog, recurring-order-dialog
+- [x] `ToggleComponent` — auto-po-settings-panel
+- [x] `ToolbarComponent` — recurring-orders
+- [x] `ValidationButtonComponent` — all create dialogs; po-detail-panel (inline header edit); rfq-detail-dialog; auto-po-settings-panel
+- [x] `ColumnCellDirective` — all list pages with DataTable; rfq-list; recurring-orders; auto-po-panel; rfq-detail-dialog
+- [x] `LoadingBlockDirective` — all list pages; auto-po-panel; auto-po-settings-panel; rfq-detail-dialog; invoice-detail-panel; payment-detail-panel; customer-return-detail-panel; shipping-rates-dialog
+- [x] `SpacerDirective` — recurring-orders (toolbar layout)
 
 ---
 
@@ -763,13 +792,15 @@
 
 ## Open Items / Caveats
 
-### Source-resolved (Cycle 2)
+### Source-resolved (Cycles 2–3)
 
 - ~~**Approximate line numbers**~~ — PoDialogComponent `:42`, OffTierPromptDialogComponent `:30`, ScheduleTimelineComponent `:16` all confirmed exact.
 - ~~**SoDialogComponent role gate**~~ — template has no `*appHasRole`/`*appHasCapability` on the create button; gate is the route guard only: Admin, Manager, PM, OfficeManager. Confirmed.
 - ~~**RecurringOrders role gate**~~ — no additional guard in `sales-orders.routes.ts`; template no button-level gating. Confirmed: Admin, Manager, PM, OfficeManager.
 - ~~**Payment method full list**~~ — source-confirmed in `payments.component.ts:56-63`: Cash · Check · CreditCard · BankTransfer · Wire · Other.
 - ~~**AutoPoSuggestionsComponent nesting**~~ — confirmed dead code; not imported anywhere; no entry needed.
+- ~~**features/ tree reconciliation**~~ — Cycle 3 walk found 0 new component files; all 43 live + 1 dead-code files accounted for.
+- ~~**shared/ tree coverage**~~ — 21 shared components + 3 directives confirmed in use; all usages documented in feature entries; DataTable sub-components (column-filter-popover, column-manager-panel) are internal infrastructure, covered by DataTableComponent reference.
 
 ### Scout-gated (need live observation)
 
