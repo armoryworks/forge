@@ -154,7 +154,7 @@ Tabs (from `scheduling.component.ts:29`): `gantt` · `dispatch` · `work-centers
 | S-06 | Runs tab | tab | `/scheduling/runs` | `features/scheduling/scheduling.component.ts:29` | Admin · Manager | TODO:live | Schedule run history |
 | S-07 | SchedulingService | service | `/scheduling` | `features/scheduling/services/scheduling.service.ts:1` | n/a | n/a | Schedule data (gantt, dispatch, work-centers, shifts, runs) |
 
-> All tabs are rendered within the single SchedulingComponent; tab model types at `scheduling.model.ts` include: `ScheduleRun`, `ScheduledOperation`, `WorkCenter`, `DispatchListItem`, `WorkCenterLoad`, `Shift`.
+> All tabs are rendered within the single SchedulingComponent; tab model types at `scheduling.model.ts` include: `ScheduleRun`, `ScheduledOperation`, `WorkCenter`, `DispatchListItem`, `WorkCenterLoad`, `Shift`. **Source-confirmed: SchedulingComponent does NOT inject MatDialog — there are zero dialogs in the scheduling area.** All actions are inline (execute-schedule is a direct service call; dispatch loads on work-center selection).
 
 ---
 
@@ -176,7 +176,7 @@ Route is under `/display/` path with **no auth guard** — public kiosk terminal
 | SF-08 | `app-scan-undo-list` / ScanUndoListComponent | panel | `/display/shop-floor` | `features/shop-floor/components/scan-undo-list/scan-undo-list.component.ts:12` | all (public) | TODO:live | Recent scan history with undo capability |
 | SF-09 | `app-scan-devices-panel` / ScanDevicesPanelComponent | panel | `/display/shop-floor` | `features/shop-floor/components/scan-devices-panel/scan-devices-panel.component.ts:13` | all (public) | TODO:live | Connected scan device management panel |
 | SF-10 | `app-scan-location-view` / ScanLocationViewComponent | panel | `/display/shop-floor` | `features/shop-floor/components/scan-location-view/scan-location-view.component.ts:7` | all (public) | TODO:live | Current inventory location view on kiosk |
-| SF-11 | `app-training-mode-banner` / TrainingModeBannerComponent | state | `/display/shop-floor` | `features/shop-floor/components/training-mode-banner/training-mode-banner.component.ts:4` | all (public) | TODO:live | Banner shown when kiosk is in training mode |
+| SF-11 | `app-training-mode-banner` / TrainingModeBannerComponent | state | `/display/shop-floor` | `features/shop-floor/components/training-mode-banner/training-mode-banner.component.ts:4` | all (public) | TODO:live | Banner shown when kiosk training mode active; triggered by `trainingMode = signal(false)` in ShopFloorDisplayComponent:95; actions are simulated (no backend calls) when true |
 
 #### 5B — Scan Flows (rendered within SF-01 or SF-07)
 
@@ -215,10 +215,12 @@ Route is under `/display/` path with **no auth guard** — public kiosk terminal
 
 | # | component | type | route | file | renders-for | states | purpose |
 |---|-----------|------|-------|------|-------------|--------|---------|
-| TT-01 | `app-time-tracking` / TimeTrackingComponent | page | `/time-tracking` | `features/time-tracking/time-tracking.component.ts:27` | all authenticated | TODO:live | Time entry list, add/edit/correct entries, clock-in/out, active-timer display |
-| TT-02 | Add/Edit Time Entry dialog | form | `/time-tracking` (inline DialogComponent) | `features/time-tracking/time-tracking.component.ts:27` | all authenticated | TODO:live | Inline dialog: date, job, operation, duration, notes |
-| TT-03 | TimeTrackingService | service | `/time-tracking` | `features/time-tracking/services/time-tracking.service.ts:1` | n/a | n/a | Time entries, clock events, timer control, pay periods |
-| TT-04 | TimerHubService (shared) | service | shared | `shared/services/timer-hub.service.ts:1` | n/a | n/a | SignalR hub for real-time timer events (used by TT + job detail panel) |
+| TT-01 | `app-time-tracking` / TimeTrackingComponent | page | `/time-tracking` | `features/time-tracking/time-tracking.component.ts:27` | all authenticated | TODO:live | Time entry list with date-range filter; active-timer row highlighted; delete uses ConfirmDialog |
+| TT-02 | Add Time Entry inline dialog | form | `/time-tracking` (inline `showDialog` signal) | `features/time-tracking/time-tracking.component.ts:72` | all authenticated | TODO:live | Manual entry: date, hours, minutes, category, notes; draft-aware |
+| TT-03 | Start Timer inline dialog | form | `/time-tracking` (inline `showTimerDialog` signal) | `features/time-tracking/time-tracking.component.ts:87` | all authenticated | TODO:live | Start timer: category + notes; timer state tracked via `activeTimer` signal |
+| TT-04 | Stop Timer inline dialog | form | `/time-tracking` (inline `showStopDialog` signal) | `features/time-tracking/time-tracking.component.ts:94` | all authenticated | TODO:live | Stop active timer with optional notes |
+| TT-05 | TimeTrackingService | service | `/time-tracking` | `features/time-tracking/services/time-tracking.service.ts:1` | n/a | n/a | Time entries, clock events, timer control, pay periods |
+| TT-06 | TimerHubService (shared) | service | shared | `shared/services/timer-hub.service.ts:1` | n/a | n/a | SignalR hub for real-time timer events (used by TT + job detail panel) |
 
 ---
 
@@ -238,11 +240,16 @@ Route is under `/display/` path with **no auth guard** — public kiosk terminal
 
 Tabs (from `quality.component.ts:38`): `inspections` · `lots` · `spc-charts` · `spc-data` · `spc-ooc` · `ncrs` · `capas` · `ecos` · `gages`
 
+> **Source-confirmed**: `QualityComponent` has no intra-component role branches or capability checks. Route guard `['Admin','Manager','Engineer']` is the sole gate; all three roles see identical content.
+
 | # | component | type | route | file | renders-for | states | purpose |
 |---|-----------|------|-------|------|-------------|--------|---------|
 | Q-01 | `app-quality` / QualityComponent | page | `/quality/:tab` | `features/quality/quality.component.ts:42` | Admin · Manager · Engineer | TODO:live | Tab host for all quality views; inspections and lots rendered inline |
-| Q-02 | Inspections tab (inline in Q-01) | tab | `/quality/inspections` | `features/quality/quality.component.ts:42` | Admin · Manager · Engineer | TODO:live | QC inspection list: create/edit inspections against QC templates |
-| Q-03 | Lots tab (inline in Q-01) | tab | `/quality/lots` | `features/quality/quality.component.ts:42` | Admin · Manager · Engineer | TODO:live | Lot records table with traceability lookups |
+| Q-02 | Inspections tab (inline in Q-01) | tab | `/quality/inspections` | `features/quality/quality.component.ts:42` | Admin · Manager · Engineer | TODO:live | QC inspection list: status filter (InProgress/Passed/Failed); inline create-inspection dialog (`showInspectionDialog` signal) |
+| Q-02a | Create Inspection inline dialog | form | `/quality/inspections` | `features/quality/quality.component.ts:92` | Admin · Manager · Engineer | TODO:live | New inspection: job, template, lot number, notes |
+| Q-03 | Lots tab (inline in Q-01) | tab | `/quality/lots` | `features/quality/quality.component.ts:42` | Admin · Manager · Engineer | TODO:live | Lot records table; inline create-lot dialog + traceability dialog |
+| Q-03a | Create Lot inline dialog | form | `/quality/lots` | `features/quality/quality.component.ts:141` | Admin · Manager · Engineer | TODO:live | New lot: part, quantity, lot number, supplier lot, expiration |
+| Q-03b | Lot Traceability inline dialog | panel | `/quality/lots` | `features/quality/quality.component.ts:142` | Admin · Manager · Engineer | TODO:live | Trace lot lineage; triggered by `showTraceDialog` signal |
 | Q-04 | `app-spc-characteristics` / SpcCharacteristicsComponent | tab | `/quality/spc-charts` | `features/quality/components/spc-characteristics.component.ts:20` | Admin · Manager · Engineer | TODO:live | SPC characteristics list; select characteristic to view chart |
 | Q-05 | `app-spc-chart` / SpcChartComponent | tab | `/quality/spc-charts` (detail) | `features/quality/components/spc-chart.component.ts:12` | Admin · Manager · Engineer | TODO:live | Control chart for selected SPC characteristic |
 | Q-06 | `app-spc-data-entry` / SpcDataEntryComponent | tab | `/quality/spc-data` | `features/quality/components/spc-data-entry.component.ts:10` | Admin · Manager · Engineer | TODO:live | Enter new SPC measurement data points |
@@ -271,11 +278,11 @@ Tabs (from `mrp.component.ts:55`): `dashboard` · `planned-orders` · `exception
 | M-05 | Runs tab (inline in M-01) | tab | `/mrp/runs` | `features/mrp/mrp.component.ts:59` | Admin · Manager | TODO:live | MRP run history |
 | M-06 | Master-schedule tab (inline in M-01) | tab | `/mrp/master-schedule` | `features/mrp/mrp.component.ts:59` | Admin · Manager | TODO:live | Master production schedule |
 | M-07 | Forecasts tab (inline in M-01) | tab | `/mrp/forecasts` | `features/mrp/mrp.component.ts:59` | Admin · Manager | TODO:live | Demand forecasts |
-| M-08 | `ExecuteMrpRunDialogComponent` | dialog | `/mrp` | `features/mrp/components/execute-mrp-run-dialog.component.ts:1` | Admin · Manager | TODO:live | Trigger a new MRP run |
-| M-09 | `MasterScheduleDialogComponent` | dialog | `/mrp` | `features/mrp/components/master-schedule-dialog.component.ts:1` | Admin · Manager | TODO:live | Create/edit master schedule entry |
-| M-10 | `GenerateForecastDialogComponent` | dialog | `/mrp` | `features/mrp/components/generate-forecast-dialog.component.ts:1` | Admin · Manager | TODO:live | Generate demand forecast |
-| M-11 | `MrpRunDetailDialogComponent` | dialog | `/mrp` | `features/mrp/components/mrp-run-detail-dialog.component.ts:1` | Admin · Manager | TODO:live | View MRP run detail + planned orders |
-| M-12 | `MpsVsActualDialogComponent` | dialog | `/mrp` | `features/mrp/components/mps-vs-actual-dialog.component.ts:1` | Admin · Manager | TODO:live | MPS vs actual comparison chart |
+| M-08 | `ExecuteMrpRunDialogComponent` | dialog | `/mrp` | `features/mrp/components/execute-mrp-run-dialog.component.ts:1` | Admin · Manager | TODO:live | Run-params dialog (type, horizon, simulation flag); triggered by `executeRun()` / `executeRun(true)` from gantt+runs tabs |
+| M-09 | `MasterScheduleDialogComponent` | dialog | `/mrp` | `features/mrp/components/master-schedule-dialog.component.ts:1` | Admin · Manager | TODO:live | Create/edit master schedule; triggered by `openCreateSchedule()` / `openEditSchedule()` from master-schedule tab |
+| M-10 | `GenerateForecastDialogComponent` | dialog | `/mrp` | `features/mrp/components/generate-forecast-dialog.component.ts:1` | Admin · Manager | TODO:live | Forecast generation params; triggered by `openGenerateForecast()` from forecasts tab |
+| M-11 | `MrpRunDetailDialogComponent` | dialog | `/mrp` | `features/mrp/components/mrp-run-detail-dialog.component.ts:1` | Admin · Manager | TODO:live | Run detail + planned-order breakdown; triggered by `openRunDetail(run)` from runs-tab row |
+| M-12 | `MpsVsActualDialogComponent` | dialog | `/mrp` | `features/mrp/components/mps-vs-actual-dialog.component.ts:1` | Admin · Manager | TODO:live | MPS vs actual comparison chart; triggered by `openMpsVsActual(schedule)` from master-schedule tab row |
 | M-13 | MrpService | service | `/mrp` | `features/mrp/services/mrp.service.ts:1` | n/a | n/a | MRP run execution, planned orders, exceptions, forecasts, master schedule |
 
 ---
@@ -285,7 +292,7 @@ Tabs (from `mrp.component.ts:55`): `dashboard` · `planned-orders` · `exception
 | # | component | type | route | file | renders-for | states | purpose |
 |---|-----------|------|-------|------|-------------|--------|---------|
 | A-01 | `app-assets` / AssetsComponent | page | `/assets` | `features/assets/assets.component.ts:27` | Admin · Manager | TODO:live | Asset list with search/type/status filters; create-asset dialog inline |
-| A-02 | `app-asset-detail-panel` / AssetDetailPanelComponent | panel | `/assets` (slide-out) | `features/assets/components/asset-detail-panel/asset-detail-panel.component.ts:17` | Admin · Manager | TODO:live | Asset detail: fields, downtime log, maintenance log, subcontract orders |
+| A-02 | `app-asset-detail-panel` / AssetDetailPanelComponent | panel | `/assets` (slide-out) | `features/assets/components/asset-detail-panel/asset-detail-panel.component.ts:17` | Admin · Manager | TODO:live | Asset detail: asset fields, maintenance-log list, barcode info, entity activity; edit triggers `editRequested` output back to A-01 |
 | A-03 | `app-asset-detail-dialog` / AssetDetailDialogComponent | dialog | `/assets` | `features/assets/components/asset-detail-dialog/asset-detail-dialog.component.ts:1` | Admin · Manager | TODO:live | Dialog wrapper around AssetDetailPanelComponent |
 | A-04 | Create/Edit Asset form (inline in A-01) | form | `/assets` | `features/assets/assets.component.ts:27` | Admin · Manager | TODO:live | Asset fields: name, type, status, location, description; draft-aware |
 | A-05 | AssetsService | service | `/assets` | `features/assets/services/assets.service.ts:1` | n/a | n/a | Asset CRUD, downtime log, maintenance log, subcontract orders |
@@ -297,7 +304,7 @@ Tabs (from `mrp.component.ts:55`): `dashboard` · `planned-orders` · `exception
 | # | component | type | route | file | renders-for | states | purpose |
 |---|-----------|------|-------|------|-------------|--------|---------|
 | MN-01 | `app-predictions` / PredictionsComponent | page | `/maintenance/predictions` | `features/maintenance/pages/predictions/predictions.component.ts:42` | Admin · Manager | TODO:live | Predictive maintenance dashboard: KPI strip (active/critical/accuracy) + predictions table |
-| MN-02 | `app-resolve-prediction-dialog` / ResolvePredictionDialogComponent | dialog | `/maintenance/predictions` | `features/maintenance/components/resolve-prediction-dialog/resolve-prediction-dialog.component.ts:16` | Admin · Manager | TODO:live | Resolve / acknowledge / schedule-PM / mark-false-positive on a prediction |
+| MN-02 | `app-resolve-prediction-dialog` / ResolvePredictionDialogComponent | dialog | `/maintenance/predictions` | `features/maintenance/components/resolve-prediction-dialog/resolve-prediction-dialog.component.ts:16` | Admin · Manager | TODO:live | Notes dialog for resolve-or-false-positive (2 modes: `resolve`\|`false-positive`); ack + schedule-PM are inline row actions with no dialog |
 | MN-03 | PredictiveMaintenanceService | service | `/maintenance` | `features/maintenance/services/predictive-maintenance.service.ts:1` | n/a | n/a | Predictive maintenance data + resolve actions |
 
 ---
@@ -320,17 +327,20 @@ _This section tracks entries that need live-sweep confirmation. All TODO:live st
 4. **MRP dialogs (M-08–M-12)** — 5 dialogs; need live trigger conditions.
 5. **Planning CAP-PLAN-MRP state** — confirm whether capability is enabled or disabled in this env.
 
-### Known incomplete (awaiting source read)
-- ~~Scan-flow components SF-12–SF-19: exact `path:line` selector declarations not yet confirmed.~~ **CLOSED** — all 8 selectors confirmed.
-- ~~SPC components Q-04–Q-07: exact `path:line` selectors pending read.~~ **CLOSED** — all 4 confirmed.
-- ~~Asset detail panel A-02: exact `path:line` pending read.~~ **CLOSED** — `:17` confirmed.
-- ~~MN-02: exact `path:line` pending read.~~ **CLOSED** — `:16` confirmed.
-- ~~Kiosk sub-components SF-03–SF-11, SF-22: `path:line` stubs at `:1`.~~ **CLOSED** — all 10 confirmed.
-- Quality inline inspection/lot panel dialogs: may have additional dialog components inside QualityComponent not surfaced by source scan. **Pending live sweep.**
+### Source-side closures (no live needed)
+- ~~SF-12–SF-19, Q-04–Q-07, A-02, MN-02, SF-03–SF-11, SF-22: path:line stubs.~~ **CLOSED** — all source gaps resolved.
+- **Q-SC-06 CLOSED**: `SchedulingComponent` does not inject `MatDialog` — **zero dialogs** in scheduling area. All actions are inline service calls.
+- **Q-QL-10 CLOSED**: No intra-component role branches in `QualityComponent`. Route guard is the sole gate — Admin/Manager/Engineer see identical UI.
+- **Q-SF-15 CLOSED**: Kiosk route has no auth guard; no Angular role-based rendering inside any kiosk component. ProductionWorker uses internal PIN-based kiosk session — not a render gate.
+- **Q-MN-02 CORRECTED** from source: dialog has exactly 2 modes (`resolve`/`false-positive`). Ack + schedule-PM are inline row actions with no dialog.
+- **A-02 CORRECTED** from source: panel shows asset fields + maintenance-log list + barcode + entity activity. No downtime-log or subcontract-orders sub-section in the component.
+- **Q-02a, Q-03a, Q-03b ADDED** from source: inline dialogs in QualityComponent confirmed via `showInspectionDialog`, `showLotDialog`, `showTraceDialog` signals.
+- **TT-02/03/04 SPLIT** from source: time-tracking has 3 distinct inline dialogs (add-entry, start-timer, stop-timer) confirmed via signals at component lines 72/87/94. No correction-dialog found in component source.
+- **M-08–M-12 triggers confirmed** from source: all 5 MRP dialog open-methods located (`executeRun`, `openCreateSchedule`/`openEditSchedule`, `openGenerateForecast`, `openRunDetail`, `openMpsVsActual`).
 
-**Source side carries zero `:1` placeholders as of this commit.**
+**Source side fully resolved. Remaining 54 queue items are `needs-live`.**
 
 ---
 
-_Commit: all source stubs closed — zero `:1` placeholders remain; 57-item live queue open_
+_Commit: 3 queue items closed from source, 54 tagged needs-live; operations.md corrections applied_
 _Next: dequeue ui-scout live results (states + dialog triggers) as they land_

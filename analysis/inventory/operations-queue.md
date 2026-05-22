@@ -7,9 +7,20 @@ _Format: ID · area · what to sweep · trigger/note · status_
 
 ## Status legend
 - `OPEN` — not yet swept
+- `needs-live` — source exhausted; requires live app observation
 - `IN-PROGRESS` — scout actively working
-- `DONE` — swept; source-cataloger to pull into operations.md
+- `DONE` — swept and pulled into operations.md
 - `DN-8` — capability-gated off; terminal closure recorded
+
+---
+
+## Closed from source (no live sweep needed)
+
+| ID | area | finding | status |
+|----|------|---------|--------|
+| Q-SC-06 | scheduling | `SchedulingComponent` does NOT inject `MatDialog` — zero dialogs anywhere in scheduling. All actions are inline service calls (`executeSchedule` → direct API; dispatch loads on work-center select). | DONE |
+| Q-QL-10 | quality | No intra-component role branches or capability checks in `QualityComponent`. Route guard `['Admin','Manager','Engineer']` is the sole gate — all three roles see identical UI. | DONE |
+| Q-SF-15 | shop-floor | Kiosk route has no auth guard. No Angular role-based rendering inside any kiosk component. ProductionWorker identity is tracked by internal kiosk-session PIN flow — not an Angular render gate. | DONE |
 
 ---
 
@@ -17,98 +28,95 @@ _Format: ID · area · what to sweep · trigger/note · status_
 
 | ID | area | target | trigger / note | status |
 |----|------|--------|----------------|--------|
-| Q-SF-01 | shop-floor | Main display `/display/shop-floor` — phases: main, pin, actions, job-select | Navigate to route unauthenticated; capture all phase transitions | OPEN |
-| Q-SF-02 | shop-floor | KioskSetup flow (admin-login → configure) | Phase 'setup' shown when no terminal configured | OPEN |
-| Q-SF-03 | shop-floor | Clock kiosk `/display/shop-floor/clock` — phases: setup/dashboard/identifying/pin/job-scanned/manual-login/clock | Navigate to sub-route | OPEN |
-| Q-SF-04 | shop-floor | Inventory scan `/display/shop-floor/scan` | Navigate to sub-route; scan or manual-entry a barcode | OPEN |
-| Q-SF-05 | shop-floor | Scan log `/display/shop-floor/scan-log` | Navigate to sub-route | OPEN |
-| Q-SF-06 | shop-floor | ScanJobFlow (SF-12) | Trigger from action-overlay after job barcode scan | OPEN |
-| Q-SF-07 | shop-floor | ScanMoveFlow (SF-13) | Trigger from action-overlay — move action | OPEN |
-| Q-SF-08 | shop-floor | ScanReceiveFlow (SF-14) | Trigger from action-overlay — receive action | OPEN |
-| Q-SF-09 | shop-floor | ScanReturnFlow (SF-15) | Trigger from action-overlay — return action | OPEN |
-| Q-SF-10 | shop-floor | ScanShipFlow (SF-16) | Trigger from action-overlay — ship action | OPEN |
-| Q-SF-11 | shop-floor | ScanCountFlow (SF-17) | Trigger from action-overlay — count action | OPEN |
-| Q-SF-12 | shop-floor | ScanInspectFlow (SF-18) | Trigger from action-overlay — inspect action | OPEN |
-| Q-SF-13 | shop-floor | ScanIssueFlow (SF-19) | Trigger from action-overlay — issue action | OPEN |
-| Q-SF-14 | shop-floor | TrainingModeBanner (SF-11) | Confirm how to trigger training mode; check setting in kiosk-setup | OPEN |
-| Q-SF-15 | shop-floor | ProductionWorker sweep — confirm any role-specific rendering differences in kiosk | Login as worker@, ForgeRun!2026; check for worker-gated content vs public content | OPEN |
+| Q-SF-01 | shop-floor | Main display `/display/shop-floor` — all phases: main, pin, actions, job-select, receiving, shipping | Navigate unauthenticated; `DisplayPhase` union source-confirmed at `shop-floor-display.component.ts:50` | needs-live |
+| Q-SF-02 | shop-floor | KioskSetup flow (admin-login → configure) | **Trigger confirmed from source**: `isUnpaired = signal(!localStorage.getItem('forge-kiosk-device-token'))` at `:107` — setup shows when device token absent. Phases `'admin-login'\|'configure'` confirmed at `kiosk-setup.component.ts:13` | needs-live |
+| Q-SF-03 | shop-floor | Clock kiosk `/display/shop-floor/clock` — all 7 phases | `KioskPhase` union source-confirmed at `shop-floor-clock.component.ts:26`; navigate to sub-route | needs-live |
+| Q-SF-04 | shop-floor | Inventory scan `/display/shop-floor/scan` | Navigate to sub-route; manual-enter or scan a barcode | needs-live |
+| Q-SF-05 | shop-floor | Scan log `/display/shop-floor/scan-log` | Navigate to sub-route | needs-live |
+| Q-SF-06 | shop-floor | ScanJobFlow (SF-12) | Trigger: action-overlay phase `'job'` after job barcode scan | needs-live |
+| Q-SF-07 | shop-floor | ScanMoveFlow (SF-13) | Trigger: action-overlay phase `'move'` | needs-live |
+| Q-SF-08 | shop-floor | ScanReceiveFlow (SF-14) | Trigger: action-overlay phase `'receive'` | needs-live |
+| Q-SF-09 | shop-floor | ScanReturnFlow (SF-15) | Trigger: action-overlay phase `'return'` | needs-live |
+| Q-SF-10 | shop-floor | ScanShipFlow (SF-16) | Trigger: action-overlay phase `'ship'` | needs-live |
+| Q-SF-11 | shop-floor | ScanCountFlow (SF-17) | Trigger: action-overlay phase `'count'` | needs-live |
+| Q-SF-12 | shop-floor | ScanInspectFlow (SF-18) | Trigger: action-overlay phase `'inspect'` | needs-live |
+| Q-SF-13 | shop-floor | ScanIssueFlow (SF-19) | Trigger: action-overlay phase `'issue'` | needs-live |
+| Q-SF-14 | shop-floor | TrainingModeBanner (SF-11) visible state | **Trigger confirmed from source**: `trainingMode = signal(false)` at `shop-floor-display.component.ts:95`; actions simulated (no backend calls) when true. Toggle button location needs live confirmation | needs-live |
 
 ## Priority 2 — Scheduling (Admin/Manager)
 
 | ID | area | target | trigger / note | status |
 |----|------|--------|----------------|--------|
-| Q-SC-01 | scheduling | `/scheduling/gantt` — populate + empty | Login admin@ or manager@; need jobs with scheduled operations | OPEN |
-| Q-SC-02 | scheduling | `/scheduling/dispatch` | Switch tab | OPEN |
-| Q-SC-03 | scheduling | `/scheduling/work-centers` | Switch tab | OPEN |
-| Q-SC-04 | scheduling | `/scheduling/shifts` | Switch tab | OPEN |
-| Q-SC-05 | scheduling | `/scheduling/runs` | Switch tab | OPEN |
-| Q-SC-06 | scheduling | Any dialogs/panels within scheduling tabs not visible from source | Sweep all tab interactions | OPEN |
+| Q-SC-01 | scheduling | `/scheduling/gantt` — empty + populated; KPI chips; lock-column | Login admin@; gantt loads last 30 days from today | needs-live |
+| Q-SC-02 | scheduling | `/scheduling/dispatch` — work-center select + dispatch table | Switch tab; select a work center from dropdown | needs-live |
+| Q-SC-03 | scheduling | `/scheduling/work-centers` — work-center table | Switch tab | needs-live |
+| Q-SC-04 | scheduling | `/scheduling/shifts` — shift table | Switch tab | needs-live |
+| Q-SC-05 | scheduling | `/scheduling/runs` — run history table; run status chips (Completed/Running/Failed/Queued) | Switch tab | needs-live |
 
 ## Priority 3 — Quality (Admin/Manager/Engineer)
 
 | ID | area | target | trigger / note | status |
 |----|------|--------|----------------|--------|
-| Q-QL-01 | quality | `/quality/inspections` — empty + populated; create-inspection dialog | Login admin@; may need a job/part to attach inspection to | OPEN |
-| Q-QL-02 | quality | `/quality/lots` — empty + populated; lot traceability | Switch tab | OPEN |
-| Q-QL-03 | quality | `/quality/spc-charts` — characteristics list + chart detail | Switch tab; select a characteristic | OPEN |
-| Q-QL-04 | quality | `/quality/spc-data` — data entry form | Switch tab | OPEN |
-| Q-QL-05 | quality | `/quality/spc-ooc` — OOC list | Switch tab | OPEN |
-| Q-QL-06 | quality | `/quality/ncrs` — list + create/edit NCR dialog | Switch tab; create NCR | OPEN |
-| Q-QL-07 | quality | `/quality/capas` — list + create/edit CAPA dialog | Switch tab; create CAPA | OPEN |
-| Q-QL-08 | quality | `/quality/ecos` — list + create/edit ECO dialog + affected items | Switch tab; create ECO | OPEN |
-| Q-QL-09 | quality | `/quality/gages` — list + create/edit gage + calibration records | Switch tab; create gage | OPEN |
-| Q-QL-10 | quality | Engineer-only render differences (if any) | Login engineer@; check for any capability/role differences vs admin | OPEN |
+| Q-QL-01 | quality | `/quality/inspections` — empty + populated; create-inspection inline dialog (Q-02a) | Login admin@; status filter (InProgress/Passed/Failed) confirmed from source | needs-live |
+| Q-QL-02 | quality | `/quality/lots` — empty + populated; create-lot dialog (Q-03a) + traceability dialog (Q-03b) | Switch tab; both dialog signals confirmed from source (`showLotDialog`, `showTraceDialog`) | needs-live |
+| Q-QL-03 | quality | `/quality/spc-charts` — characteristics list + select to view chart | Switch tab; click a characteristic | needs-live |
+| Q-QL-04 | quality | `/quality/spc-data` — data entry form | Switch tab | needs-live |
+| Q-QL-05 | quality | `/quality/spc-ooc` — OOC list | Switch tab | needs-live |
+| Q-QL-06 | quality | `/quality/ncrs` — list + create/edit NCR inline dialog | Switch tab; create NCR | needs-live |
+| Q-QL-07 | quality | `/quality/capas` — list + create/edit CAPA inline dialog | Switch tab; create CAPA | needs-live |
+| Q-QL-08 | quality | `/quality/ecos` — list + create/edit ECO inline dialog + affected-items | Switch tab; create ECO | needs-live |
+| Q-QL-09 | quality | `/quality/gages` — list + create/edit gage + calibration records | Switch tab; create gage | needs-live |
 
 ## Priority 4 — MRP dialogs (Admin/Manager)
 
 | ID | area | target | trigger / note | status |
 |----|------|--------|----------------|--------|
-| Q-MR-01 | mrp | `/mrp/dashboard` — empty + populated | Login admin@; may be empty without an MRP run | OPEN |
-| Q-MR-02 | mrp | `/mrp/planned-orders` | Switch tab | OPEN |
-| Q-MR-03 | mrp | `/mrp/exceptions` | Switch tab | OPEN |
-| Q-MR-04 | mrp | `/mrp/runs` + ExecuteMrpRunDialog | Switch tab; click "Run MRP" | OPEN |
-| Q-MR-05 | mrp | `/mrp/master-schedule` + MasterScheduleDialog | Switch tab; create entry | OPEN |
-| Q-MR-06 | mrp | `/mrp/forecasts` + GenerateForecastDialog | Switch tab; generate forecast | OPEN |
-| Q-MR-07 | mrp | MrpRunDetailDialog | Click run in runs list | OPEN |
-| Q-MR-08 | mrp | MpsVsActualDialog | Trigger from master-schedule tab | OPEN |
+| Q-MR-01 | mrp | `/mrp/dashboard` — KPI chips (latest run, unresolved exceptions, planned/firmed order counts) | Login admin@; dashboard loads runs+orders+exceptions | needs-live |
+| Q-MR-02 | mrp | `/mrp/planned-orders` — table; firm + release inline row actions | Switch tab; status filter (Planned/Firmed/Released/Cancelled) | needs-live |
+| Q-MR-03 | mrp | `/mrp/exceptions` — table; resolve inline row action | Switch tab; unresolved-only filter default | needs-live |
+| Q-MR-04 | mrp | `/mrp/runs` + ExecuteMrpRunDialog (M-08) | **Trigger confirmed**: `executeRun()` / `executeRun(true)` — "Run MRP" button on runs tab; dialog at `execute-mrp-run-dialog.component.ts:1` | needs-live |
+| Q-MR-05 | mrp | `/mrp/master-schedule` + MasterScheduleDialog (M-09) | **Trigger confirmed**: `openCreateSchedule()` / `openEditSchedule()` — create + edit buttons on master-schedule tab | needs-live |
+| Q-MR-06 | mrp | `/mrp/forecasts` + GenerateForecastDialog (M-10) | **Trigger confirmed**: `openGenerateForecast()` — generate button on forecasts tab; `approveForecast()` is inline row action | needs-live |
+| Q-MR-07 | mrp | MrpRunDetailDialog (M-11) | **Trigger confirmed**: `openRunDetail(run)` — row click on runs tab | needs-live |
+| Q-MR-08 | mrp | MpsVsActualDialog (M-12) | **Trigger confirmed**: `openMpsVsActual(schedule)` — row action on master-schedule tab | needs-live |
 
 ## Priority 5 — Kanban / Backlog / Planning (all authenticated + Admin roles)
 
 | ID | area | target | trigger / note | status |
 |----|------|--------|----------------|--------|
-| Q-KB-01 | kanban | Empty board (no jobs) | First load; check empty-state component | OPEN |
-| Q-KB-02 | kanban | Populated board — drag-drop between columns | Need seeded jobs; SO-00001 exists (reuse) | OPEN |
-| Q-KB-03 | kanban | JobDetailPanel — Details tab | Click job number | OPEN |
-| Q-KB-04 | kanban | JobDetailPanel — Cost tab (K-08) | Switch to Cost tab in detail panel | OPEN |
-| Q-KB-05 | kanban | JobDetailPanel — Operation Time tab (K-09) | Switch to OpTime tab | OPEN |
-| Q-KB-06 | kanban | JobDialog create (K-06) | Click "New Job" | OPEN |
-| Q-KB-07 | kanban | JobDialog edit (K-07) | Open detail → click Edit | OPEN |
-| Q-KB-08 | kanban | CoverPhotoUploadDialog (K-10) | Action in job detail panel | OPEN |
-| Q-KB-09 | kanban | DisposeJobDialog (K-11) | Action in job detail panel | OPEN |
-| Q-KB-10 | kanban | Team view mode (vs board view) | Toggle view mode button | OPEN |
-| Q-BL-01 | backlog | Empty + populated backlog; table vs card view | Login any role | OPEN |
-| Q-PL-01 | planning | CAP-PLAN-MRP status — enabled or disabled in this env | Login admin@/pm@; note state seen | OPEN |
-| Q-PL-02 | planning | CycleDialog create + edit | If capability enabled: click New Cycle | OPEN |
-| Q-PL-03 | planning | CycleBoard with entries | If capability enabled: add job to cycle | OPEN |
+| Q-KB-01 | kanban | Empty board state | First load before jobs are seeded; `EmptyStateComponent` imported in `board-column.component.ts` | needs-live |
+| Q-KB-02 | kanban | Populated board — drag-drop between columns | Seed from SO-00001; `ViewMode = 'board'\|'team'` at `kanban.component.ts:39` | needs-live |
+| Q-KB-03 | kanban | JobDetailPanel — Details tab (K-04) | Click job-number link on a card | needs-live |
+| Q-KB-04 | kanban | JobDetailPanel — Cost tab (K-08) | Switch to Cost tab inside detail panel | needs-live |
+| Q-KB-05 | kanban | JobDetailPanel — Operation Time tab (K-09) | Switch to OpTime tab | needs-live |
+| Q-KB-06 | kanban | JobDialog create (K-06) | Click "New Job" | needs-live |
+| Q-KB-07 | kanban | JobDialog edit (K-07) | Open detail → click Edit | needs-live |
+| Q-KB-08 | kanban | CoverPhotoUploadDialog (K-10) | Action menu in job detail panel | needs-live |
+| Q-KB-09 | kanban | DisposeJobDialog (K-11) | Action menu in job detail panel | needs-live |
+| Q-KB-10 | kanban | Team view mode (board vs team toggle) | `ViewMode` confirmed from source; toggle button location needs live | needs-live |
+| Q-BL-01 | backlog | Empty + populated; table vs card-grid view | Login any role; `BacklogCardGridComponent` import confirmed from source | needs-live |
+| Q-PL-01 | planning | CAP-PLAN-MRP status in this env | Login admin@/pm@; mechanism confirmed at `planning.service.ts:11+56` | needs-live |
+| Q-PL-02 | planning | CycleDialog create + edit (P-03) | If capability enabled: click New Cycle | needs-live |
+| Q-PL-03 | planning | CycleBoard with entries (P-02) | If capability enabled: drag job onto cycle | needs-live |
 
 ## Priority 6 — OEE / Assets / Maintenance / Time-Tracking
 
 | ID | area | target | trigger / note | status |
 |----|------|--------|----------------|--------|
-| Q-OE-01 | oee | `/oee` — empty (no work centers) vs populated | Login admin@ | OPEN |
-| Q-OE-02 | oee | Work-center card click → trend chart + losses chart | Click card | OPEN |
-| Q-OE-03 | oee | Date-range filter effect | Change date range | OPEN |
-| Q-AS-01 | assets | `/assets` — list; empty + populated | Login admin@ | OPEN |
-| Q-AS-02 | assets | Create-asset dialog (inline A-01) | Click New Asset | OPEN |
-| Q-AS-03 | assets | AssetDetailPanel — all sub-sections (downtime, maintenance, subcontracts) | Click asset row | OPEN |
-| Q-AS-04 | assets | AssetDetailDialog (dialog wrapper of A-02) | Open detail via dialog path | OPEN |
-| Q-MN-01 | maintenance | `/maintenance/predictions` — empty + populated | Login admin@ | OPEN |
-| Q-MN-02 | maintenance | ResolvePredictionDialog — all action types (ack/schedule/resolve/false-positive) | Click action on prediction row | OPEN |
-| Q-TT-01 | time-tracking | `/time-tracking` — empty + populated list | Login any authenticated role | OPEN |
-| Q-TT-02 | time-tracking | Add time entry dialog | Click New Entry | OPEN |
-| Q-TT-03 | time-tracking | Active timer running state | Start timer; check header/status | OPEN |
-| Q-TT-04 | time-tracking | Correct time entry (correction log) | Edit a submitted entry | OPEN |
+| Q-OE-01 | oee | `/oee` — empty vs populated; date-range filter | Login admin@; `DateRangePickerComponent` confirmed from source | needs-live |
+| Q-OE-02 | oee | Work-center card click → trend chart + losses chart | Click `OeeWorkCenterCardComponent`; `selected` output → `selectedWorkCenterId` signal | needs-live |
+| Q-OE-03 | oee | Date-range filter effect on charts | Change date range picker value | needs-live |
+| Q-AS-01 | assets | `/assets` — list; empty + populated; type/status filters | Login admin@ | needs-live |
+| Q-AS-02 | assets | Create-asset inline dialog (A-04) | `showDialog = signal(false)` confirmed; click "New Asset" | needs-live |
+| Q-AS-03 | assets | AssetDetailPanel (A-02) — all sub-sections | **CORRECTED from source**: panel shows asset fields + maintenance-log list + barcode + entity activity. No downtime-log or subcontract-orders sub-section in component source. Click asset row | needs-live |
+| Q-AS-04 | assets | AssetDetailDialog (A-03) wrapper | Open detail via dialog path | needs-live |
+| Q-MN-01 | maintenance | `/maintenance/predictions` — empty + populated; severity + status filters | Login admin@; status types confirmed: Predicted/Acknowledged/MaintenanceScheduled/Resolved/FalsePositive/Expired | needs-live |
+| Q-MN-02 | maintenance | ResolvePredictionDialog (MN-02) live states | **CORRECTED from source**: dialog has exactly 2 modes (`resolve`\|`false-positive`), both need notes field. Ack + schedule-PM are inline row actions with no dialog. Observe both dialog modes | needs-live |
+| Q-TT-01 | time-tracking | `/time-tracking` — empty + populated list; date-range filter | Login any authenticated role | needs-live |
+| Q-TT-02 | time-tracking | Add Time Entry inline dialog (TT-02) | **Trigger confirmed**: `openManualEntry()` — `showDialog` signal at `time-tracking.component.ts:72` | needs-live |
+| Q-TT-03 | time-tracking | Active timer running state (TT-03) | **Trigger confirmed**: `openStartTimer()` — `showTimerDialog` signal at `:87`; active timer row gets `row--active` class; `activeTimer` signal tracks it | needs-live |
+| Q-TT-04 | time-tracking | Stop Timer inline dialog (TT-04) | **Trigger confirmed**: `openStopTimer()` — `showStopDialog` signal at `:94`; appears when `activeTimer` is non-null | needs-live |
 
 ---
 
-_Initialized: 2026-05-22 · 57 queue items · All OPEN pending ui-scout sweep_
+_Updated: 2026-05-22 · 3 DONE from source · 54 needs-live · 0 DN-8 in operations scope_
