@@ -2,7 +2,7 @@
 
 > Filed by: ui-scout phase-02  
 > Dequeue: open each item, observe live, update `quote-to-cash.md` entries, tick off.  
-> Single writer: ui-scout (sole writer of both queue AND catalog).  
+> Single writer: ui-scout owns this queue file. Source-cataloger owns quote-to-cash.md.  
 > **Cycle 4 update:** Q2 (create dialogs) fully resolved — all 8 create dialogs observed live. Q1-a (quote detail) and Q1-c (PO detail + receive) resolved. Q7 (role access) partially resolved — route-level access confirmed; capability-level still open. Q3-d (ReceiveDialog) resolved.
 
 ---
