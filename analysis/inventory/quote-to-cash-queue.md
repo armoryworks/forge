@@ -4,7 +4,8 @@
 > Dequeue: open each item, observe live, update `quote-to-cash.md` entries, tick off.  
 > Single writer: ui-scout owns this queue file. Source-cataloger owns quote-to-cash.md.  
 > **Cycle 4 update:** Q2 (create dialogs) fully resolved — all 8 create dialogs observed live. Q1-a (quote detail) and Q1-c (PO detail + receive) resolved. Q7 (role access) partially resolved — route-level access confirmed; capability-level still open. Q3-d (ReceiveDialog) resolved.  
-> **Cycle 5 update:** Q1-b (SO detail), Q1-e (invoice detail), Q1-f (shipment detail), Q1-g (payment detail) all resolved. Q1-i (RecurringOrderDialog) partially resolved — create dialog observed, populated list state blocked by CAP-O2C-RECURRING disabled. Q3-a/b resolved. Q5-b (ShippingRatesDialog) resolved. Q7-e/f resolved. New capability-gate findings: CAP-O2C-RMA, CAP-P2P-RFQ, CAP-O2C-RECURRING all disabled server-side — blocks Q1-d, Q1-h, and populated states for those entities.
+> **Cycle 5 update:** Q1-b (SO detail), Q1-e (invoice detail), Q1-f (shipment detail), Q1-g (payment detail) all resolved. Q1-i (RecurringOrderDialog) partially resolved — create dialog observed, populated list state blocked by CAP-O2C-RECURRING disabled. Q3-a/b resolved. Q5-b (ShippingRatesDialog) resolved. Q7-e/f resolved. New capability-gate findings: CAP-O2C-RMA, CAP-P2P-RFQ, CAP-O2C-RECURRING all disabled server-side — blocks Q1-d, Q1-h, and populated states for those entities.  
+> **Cycle 6 update:** Q6-a/b/c/d (customer Q2C tabs) resolved — all four tabs populated and source-confirmed. Q4 resolved — EstimateFormDialogComponent dead code confirmed; actual live estimate surface identified (CustomerEstimatesTabComponent). Q5-a status update — TrackingTimeline not rendered even for Shipped status; requires carrier events. Q7-f Manager buttons confirmed (full access). DN-7 resolved — PM redirects to /dashboard confirmed live. Q3-c remains unreachable. DN-9 added (customer tabs broader than Q6 scope).
 
 ---
 
@@ -68,13 +69,13 @@
 
 ---
 
-## Q4 — Quote/Estimate embedded flow
+## Q4 — Quote/Estimate embedded flow — RESOLVED (Cycle 6)
 
-| queue-id | component | route | notes |
-|----------|-----------|-------|-------|
-| Q4-a | `EstimateFormDialogComponent` (full form) | `/quotes` | **CONFIRMED UNREACHABLE** — No estimate/calculator button found on /quotes page in Cycle 5 sweep; zero callers grep confirmed (DN-3); dead code / pending wiring |
-| Q4-b | Estimate result display (populated) | Within estimate dialog | Blocked by Q4-a unreachable |
-| Q4-c | Quote detail tabs (within QuoteDetailPanel) | Quote detail panel | **CONFIRMED** — NO TABS; single scrollable panel (resolved in Q1-a) |
+| queue-id | component | route | result |
+|----------|-----------|-------|--------|
+| ~~Q4-a~~ | ~~`EstimateFormDialogComponent`~~ | ~~`/quotes`~~ | **RESOLVED (Cycle 6)** — Dead code CONFIRMED. No button/trigger found on /quotes page or in QuoteDetailPanel in Cycle 5+6 sweeps. Source confirmed zero callers. The ACTUAL live estimate-create surface is `CustomerEstimatesTabComponent` at `/customers/{id}` Estimates tab (separate system: simple dollar-amount estimates, not the compute-based cost model). The `EstimateFormDialogComponent` is a pending cost-estimate calculator feature not yet wired in (see DN-3). |
+| ~~Q4-b~~ | Estimate result display | — | **RESOLVED** — Blocked by Q4-a (EstimateFormDialogComponent unwired). The compute service is a mock stub returning fictional data. |
+| ~~Q4-c~~ | Quote detail tabs | Quote detail panel | **RESOLVED** — NO TABS; single scrollable panel (confirmed in Q1-a). Quote detail panel buttons: Delete \| Send \| activity filters. No estimate link within quote detail. |
 
 ---
 
@@ -82,21 +83,21 @@
 
 | queue-id | component | route | notes |
 |----------|-----------|-------|-------|
-| Q5-a | `TrackingTimelineComponent` | Shipment detail panel | **UNREACHED** — `app-tracking-timeline` not present in DOM for SH-00001 at Pending status; requires status progression to Shipped (click "Mark Shipped") or a real carrier tracking event; note: "Track" button IS visible in shipment detail panel action bar |
+| Q5-a | `TrackingTimelineComponent` | Shipment detail panel | **UNREACHED (Cycle 6 update)** — SH-00001 now at Shipped status; re-swept; `app-tracking-timeline` still NOT present in DOM; shipment panel now shows "Track" + "Mark Delivered" buttons (status progressed from Pending → Shipped); TrackingTimelineComponent appears to require carrier tracking webhook events or actual tracking data feed, not just status change; not observable in this env without carrier integration |
 | ~~Q5-b~~ | ~~`ShippingRatesDialogComponent`~~ | ~~`/shipments` or shipment detail~~ | **RESOLVED (Cycle 5)** — Trigger: "Get Rates" button (icon: request_quote) in shipment detail panel action bar; dialog content: Cancel \| Create Label buttons; functions as a shipping label creation dialog (not rate-shopping); dialog rendered from SH-00001 Pending state |
 
 ---
 
-## Q6 — Customer detail tabs (Q2C cross-link)
+## Q6 — Customer detail tabs (Q2C cross-link) — FULLY RESOLVED (Cycle 6)
 
-**Why queued:** Customer (id=1) was seeded but no Q2C records exist yet. Tab content = empty states only. Now that SO/invoice/payment/shipment exist for customer 1, these tabs should populate.
+**Customer 1 detail page tabs confirmed live:** Overview \| Contacts \| Addresses \| Estimates \| Quotes \| Orders \| Jobs \| Invoices \| Pricing \| Interactions \| Activity (11 tabs total — broader than Q6 scope; see DN-9).
 
-| queue-id | tab | route | pre-req | status |
-|----------|-----|-------|---------|--------|
-| Q6-a | estimates tab | `/customers/1/estimates` | 1 quote with estimate | OPEN — no estimate seeded (EstimateFormDialog unreachable) |
-| Q6-b | quotes tab | `/customers/1/quotes` | 1 quote for customer 1 | READY — QT-00001 exists for customer 1 |
-| Q6-c | orders tab | `/customers/1/orders` | 1 SO for customer 1 | READY — SO-00001/J-1 exists for customer 1 |
-| Q6-d | invoices tab | `/customers/1/invoices` | 1 invoice for customer 1 | READY — INV-00001 exists for customer 1 |
+| queue-id | tab | route | result |
+|----------|-----|-------|--------|
+| ~~Q6-a~~ | Estimates | `/customers/1/estimates` | **RESOLVED (Cycle 6)** — 1 row (seeded estimate #3 "Prototype run estimate"); `CustomerEstimatesTabComponent`; columns: Title \| Estimated Amount \| Status \| Valid Until \| Created \| Actions; row-click opens "Edit Estimate" dialog (source-confirmed — `openEdit()`); row-level actions: "Convert to Quote" icon (only if not yet converted) + "Delete" icon; "New Estimate" button in toolbar (add icon); dialog fields: Title \| Description \| Estimated Amount \| Valid Until \| Notes (create); + Status dropdown (edit only). This is the ACTUAL live estimate-create surface (see Q4/DN-3). |
+| ~~Q6-b~~ | Quotes | `/customers/1/quotes` | **RESOLVED (Cycle 6)** — 1 row (QT-00001); `CustomerQuotesTabComponent`; columns: Quote # \| Status \| Lines \| Total \| Expiration \| Created; row-click navigates to `/quotes?id={id}` to open quote detail panel there |
+| ~~Q6-c~~ | Orders | `/customers/1/orders` | **RESOLVED (Cycle 6)** — 1 row (J-1/SO-00001 at Order Confirmed); `CustomerOrdersTabComponent`; columns: Order # \| Status \| Lines \| Total \| Req. Date \| Created; row-click navigates to `/sales-orders?id={id}` |
+| ~~Q6-d~~ | Invoices | `/customers/1/invoices` | **RESOLVED (Cycle 6)** — 1 row (INV-00001 Draft); `CustomerInvoicesTabComponent`; columns: Invoice # \| Status \| Total \| Due Date \| Created; row-click navigates to `/invoices?id={id}` |
 
 ---
 
@@ -109,7 +110,7 @@
 | ~~Q7-c~~ | PM | **RESOLVED** — ALL Q2C routes ACCESSIBLE (including purchasing/shipments/invoices/payments — broader than source guards suggest, see DN-4) |
 | ~~Q7-d~~ | Engineer | **RESOLVED** — ALL Q2C routes blocked (→/dashboard); no access |
 | ~~Q7-e~~ | Manager vs Admin on settings | **RESOLVED (Cycle 5)** — isAdmin gate CONFIRMED LIVE: Admin sees Enable Auto-PO toggle + Default Mode + Buffer Days + Send Chat Notifications; Manager sees ONLY Default Mode + Buffer Days (Enable Auto-PO and Send Chat Notifications hidden from Manager) |
-| ~~Q7-f~~ | OM/Mgr/PM button-level | **RESOLVED (Cycle 5)** — OfficeManager: FULL CREATE ACCESS (New Quote \| New Order \| New PO \| New Invoice \| Uninvoiced Jobs \| New Payment all visible). PM: New Quote + New Order buttons visible; /purchase-orders/orders shows JOB BOARD content not PO list (PM lands on job production board instead of PO list — likely PM role includes board access only for POs; see DN-7). Manager: not separately swept (assumed similar to Admin based on route access). |
+| ~~Q7-f~~ | OM/Mgr/PM button-level | **RESOLVED (Cycle 6)** — OfficeManager: FULL CREATE ACCESS (New Quote \| New Order \| New PO \| New Invoice \| Uninvoiced Jobs \| New Payment all visible). Manager: FULL CREATE ACCESS — same as OfficeManager (New Quote \| New Order \| New PO \| New Invoice \| Uninvoiced Jobs \| New Payment all visible); also has PO tabs (Orders/Suggestions/Settings). PM: New Quote + New Order visible on their accessible routes; /purchase-orders/orders → redirected to /dashboard (PM blocked, see DN-7). |
 
 ---
 
@@ -151,8 +152,9 @@
 | DN-4 | PM role (`pm@forge.local`) accesses all Q2C routes despite `app.routes.ts` listing only Admin/Manager/OfficeManager in guards. Likely seeded with multiple roles. |
 | DN-5 | `taxRate` API field is a decimal fraction <1 (e.g. 0.085), NOT a percentage. `"'Tax Rate' must be less than '1'."` validation error returned for values ≥1. |
 | DN-6 | SO detail panel tab content selectors (`.field-label`, `dt`, `.prop-label`) returned empty in Playwright sweep — fields are likely rendered as plain `<td>` or custom layout elements. Screenshots at `q2c-cycle5/so-detail-tab*.png` capture visual content. Full field inventory requires source read of `sales-order-detail-panel.component.html`. |
-| DN-7 | PM on `/purchase-orders/orders` renders JOB BOARD content (production board with "Create your first job", focus mode, board view controls) rather than PO list. PM role may be mapped to job board context for the PO route, or route guard redirects PM to board while leaving URL at /purchase-orders/orders. Cycle 3 role sweep recorded this as ACCESSIBLE (page-header found), but content is job board, not PO management. Requires source read to clarify. |
+| DN-7 | **RESOLVED (Cycle 6).** PM on `/purchase-orders/orders` is REDIRECTED to `/dashboard` by `roleGuard`. Source `app.routes.ts` confirms: `/purchase-orders` guard allows only `['Admin','Manager','OfficeManager']` — PM is not listed. Guard redirects to `/dashboard` (not to `/kanban`). The job board content seen in Cycle 5 sweep WAS the dashboard page. Cycle 3 "ACCESSIBLE" classification was a false positive — `app-page-header` exists on `/dashboard` too. PM's final URL on /purchase-orders/orders visit confirmed as `/dashboard` in Cycle 6. |
 | DN-8 | Three capabilities are disabled server-side in this installation: `CAP-O2C-RMA` (customer returns), `CAP-P2P-RFQ` (purchasing/RFQs), `CAP-O2C-RECURRING` (recurring orders). The UI renders all pages and dialogs normally for these features (no capability-disabled message shown), but all API mutations return `{"code":"capability-disabled"}`. RecurringOrderDialogComponent create dialog IS accessible and observed. |
+| DN-9 | Customer detail page has 11 tabs, broader than Q6's scope: Overview \| Contacts \| Addresses \| Estimates \| Quotes \| Orders \| Jobs \| Invoices \| Pricing \| Interactions \| Activity. Q6 only targeted Q2C-relevant tabs (Estimates/Quotes/Orders/Invoices). Remaining tabs: Contacts (0 rows), Addresses (0 rows), Jobs (1 row — J-1), Pricing (0 rows), Interactions (0 rows), Activity (0 rows). The Jobs tab lists production jobs for this customer and is not a Q2C-owned component. |
 
 ---
 
@@ -175,18 +177,15 @@
 
 ---
 
-## Remaining open items after Cycle 5
+## Remaining open items after Cycle 6
 
-| item | blocker |
-|------|---------|
-| Q1-h Customer Return detail panel | CAP-O2C-RMA disabled — cannot seed return |
-| Q1-d RFQ detail panel | CAP-P2P-RFQ disabled — cannot seed RFQ |
-| Q3-c OffTierPromptDialog | requires off-tier pricing trigger in PO flow — untriggerable in current env |
-| Q4-a EstimateFormDialog (full/populated) | zero callers in source — unwired dead code |
-| Q5-a TrackingTimelineComponent | requires shipment at Shipped status or carrier tracking event |
-| Q6-b/c/d Customer detail tabs | READY to sweep — pre-reqs now met (QT-00001, SO-00001/J-1, INV-00001 all for customer 1) |
-| DN-7 investigation | PM on /purchase-orders/orders shows job board — source read needed to confirm route behavior |
+| item | blocker | prognosis |
+|------|---------|-----------|
+| Q1-h Customer Return detail panel | CAP-O2C-RMA disabled — cannot seed return | PERMANENTLY BLOCKED in this env |
+| Q1-d RFQ detail panel | CAP-P2P-RFQ disabled — cannot seed RFQ | PERMANENTLY BLOCKED in this env |
+| Q3-c OffTierPromptDialog | requires vendor pricing tier config + off-tier order in PO create flow | PERMANENTLY BLOCKED — no trigger path without pricing tier data |
+| Q5-a TrackingTimelineComponent | requires carrier tracking webhook/events, not just Shipped status | BLOCKED — not observable without carrier integration |
 
 ---
 
-_Queue skeleton filed: 2026-05-22 · ui-scout cycle 1. Cycle 4 update: Q2/Q3-d resolved, Q7 route-level resolved, all OQs resolved. Cycle 5 update: Q1-b/e/f/g resolved, Q1-i partially resolved (dialog observed, populated blocked), Q3-a/b resolved, Q5-b resolved, Q7-e/f resolved, Q8-b/e/f/g resolved. Capability gates discovered: DN-8. Remaining: Q1-d/h (capability-blocked) · Q3-c · Q4-a/b · Q5-a · Q6-b/c/d (READY) · DN-7 investigation._
+_Queue skeleton filed: 2026-05-22 · ui-scout cycle 1. Cycle 4 update: Q2/Q3-d resolved, Q7 route-level resolved, all OQs resolved. Cycle 5 update: Q1-b/e/f/g resolved, Q1-i partially resolved, Q3-a/b resolved, Q5-b resolved, Q7-e/f resolved, Q8-b/e/f/g resolved, DN-8 capability gates. Cycle 6 update: Q6-a/b/c/d resolved, Q4 resolved, Q7-f Manager confirmed, DN-7 resolved, Q5-a updated, DN-9 added. FINAL OPEN (all environment-blocked): Q1-d/h · Q3-c · Q5-a._
