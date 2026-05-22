@@ -98,19 +98,19 @@ _Cross-link: dashboard widgets that render O2C/operations data → cross-linked 
 | reports | `reports/components/save-report-dialog/save-report-dialog.component.ts` | R-04 | source-confirmed |
 | notifications | `notifications/notifications.component.ts` | N-01 | source-confirmed |
 | chat | `chat/chat.component.ts` | C-01 | source-confirmed |
-| chat | `chat/components/chat-popout/chat-popout.component.ts` | C-02 | needs-live (not imported in chat.component.ts — verify via routes) |
-| chat | `chat/components/channel-browser-dialog/channel-browser-dialog.component.ts` | C-03 | source-confirmed (imported C-01 line 22) |
-| chat | `chat/components/channel-settings-dialog/channel-settings-dialog.component.ts` | C-04 | source-confirmed (imported C-01 line 23) |
-| chat | `chat/components/create-channel-dialog/create-channel-dialog.component.ts` | C-05 | source-confirmed (imported C-01 line 21) |
-| chat | `chat/components/create-announcement-dialog/create-announcement-dialog.component.ts` | C-06 | needs-live (not imported in chat.component.ts — verify import path) |
-| chat | `chat/components/share-entity-dialog/share-entity-dialog.component.ts` | C-07 | needs-live (not imported in chat.component.ts — verify import path) |
-| chat | `chat/components/entity-mention-popover/entity-mention-popover.component.ts` | C-08 | needs-live (not imported in chat.component.ts — verify import path) |
-| chat | `chat/components/chat-channel-header/chat-channel-header.component.ts` | C-09 | needs-live (not imported in chat.component.ts — may be sub-component of C-02 popout) |
-| chat | `chat/components/chat-channel-list/chat-channel-list.component.ts` | C-10 | needs-live (not imported in chat.component.ts — may be sub-component of C-02 popout) |
-| chat | `chat/components/chat-message-area/chat-message-area.component.ts` | C-11 | needs-live (not imported in chat.component.ts — may be sub-component of C-02 popout) |
-| chat | `chat/components/chat-message-attachment/chat-message-attachment.component.ts` | C-12 | needs-live (not imported in chat.component.ts — verify) |
-| chat | `chat/components/chat-thread-panel/chat-thread-panel.component.ts` | C-13 | needs-live (not imported in chat.component.ts — verify) |
-| chat | `chat/components/thread-panel/thread-panel.component.ts` | C-14 | needs-live (not imported in chat.component.ts — verify; separate from C-13?) |
+| chat | `chat/components/chat-popout/chat-popout.component.ts` | C-02 | source-confirmed (standalone route `/chat/popout`; imports C-09/C-10/C-11/C-13) |
+| chat | `chat/components/channel-browser-dialog/channel-browser-dialog.component.ts` | C-03 | source-confirmed (imported C-01 line 22, C-02 line 15) |
+| chat | `chat/components/channel-settings-dialog/channel-settings-dialog.component.ts` | C-04 | source-confirmed (imported C-01 line 23, C-02 line 16) |
+| chat | `chat/components/create-channel-dialog/create-channel-dialog.component.ts` | C-05 | source-confirmed (imported C-01 line 21, C-02 line 14) |
+| ~~chat~~ | ~~`chat/components/create-announcement-dialog/create-announcement-dialog.component.ts`~~ | ~~C-06~~ | **CROSS-LINK ADMIN** — owned by `features/admin/components/announcements-panel/`; not in platform denominator |
+| ~~chat~~ | ~~`chat/components/share-entity-dialog/share-entity-dialog.component.ts`~~ | ~~C-07~~ | **confirmed unused** — no import found in any .ts or .html; removed from denominator |
+| ~~chat~~ | ~~`chat/components/entity-mention-popover/entity-mention-popover.component.ts`~~ | ~~C-08~~ | **confirmed unused** — no import found in any .ts or .html; removed from denominator |
+| chat | `chat/components/chat-channel-header/chat-channel-header.component.ts` | C-09 | source-confirmed (imported C-02 line 19; also mobile-chat.component.ts) |
+| chat | `chat/components/chat-channel-list/chat-channel-list.component.ts` | C-10 | source-confirmed (imported C-02 line 17; also mobile-chat.component.ts) |
+| chat | `chat/components/chat-message-area/chat-message-area.component.ts` | C-11 | source-confirmed (imported C-02 line 18; also mobile-chat.component.ts) |
+| ~~chat~~ | ~~`chat/components/chat-message-attachment/chat-message-attachment.component.ts`~~ | ~~C-12~~ | **confirmed unused** — no import found in any .ts or .html; removed from denominator |
+| chat | `chat/components/chat-thread-panel/chat-thread-panel.component.ts` | C-13 | source-confirmed (imported C-02 line 20; also mobile-chat.component.ts) |
+| ~~chat~~ | ~~`chat/components/thread-panel/thread-panel.component.ts`~~ | ~~C-14~~ | **confirmed unused** — duplicate thread-panel impl; not imported anywhere; removed from denominator |
 | approvals | `approvals/approvals.component.ts` | AP-01 | source-confirmed |
 | approvals | `approvals/components/approval-inbox/approval-inbox.component.ts` | AP-02 | source-confirmed |
 | approvals | `approvals/components/approval-workflow-editor/approval-workflow-editor.component.ts` | AP-03 | source-confirmed |
@@ -148,12 +148,12 @@ _Cross-link: dashboard widgets that render O2C/operations data → cross-linked 
 
 _Source tree + imports analysis 2026-05-22._
 
-- **Feature components**: 38 (dashboard 14 · reports 4 · notifications 1 · chat 14 · approvals 3 · calendar 1 · events 0)
+- **Feature components**: 32 (dashboard 14 · reports 4 · notifications 1 · chat 9 · approvals 3 · calendar 1 · events 0)
 - **Shared components**: 21
-- **Shell search/bell cluster (AppHeader)**: 2 (SR-01 search bar, SR-02 notification bell; these are clusters in AppHeaderComponent, not standalone files)
-- **Total denominator**: 59 items (38 feature + 21 shared; SR items are sub-entries of AppHeader, not separate files)
+- **Shell search/bell cluster (AppHeader)**: 2 (SR-01 search bar, SR-02 notification bell; clusters in AppHeaderComponent, not standalone files)
+- **Total denominator**: 53 items (32 feature + 21 shared; SR items are sub-entries of AppHeader)
 
-_Note: C-06–C-14 (9 chat sub-components) exist in the features/chat/components/ directory tree but were NOT found in chat.component.ts imports. They may be used by C-02 (ChatPopoutComponent) or by a refactored implementation. All 9 are flagged `needs-live` in the queue (PLT-Q-007 through PLT-Q-015). If confirmed unused, denominator will drop by up to 9._
+_Chat denominator note (resolved 2026-05-22): C-06 CreateAnnouncementDialog is admin-owned (used by `features/admin/components/announcements-panel/`). C-07 ShareEntityDialog, C-08 EntityMentionPopover, C-12 ChatMessageAttachment, C-14 ThreadPanel are confirmed unused — no imports in any .ts or .html. Removed 5, leaving chat=9 active files (C-01–C-05, C-09–C-11, C-13). C-09/C-10/C-11/C-13 confirmed in ChatPopoutComponent (C-02) and features/mobile/pages/mobile-chat.component.ts (cross-region usage, component still owned here)._
 
 ---
 
@@ -225,19 +225,19 @@ _(Each renders a chart + data table section inside ReportsComponent; no separate
 |-----------|------|-------|------|-------------|--------|---------|
 | ChatComponent | page | `/chat` | `features/chat/chat.component.ts:35` | all authenticated (`CAP-EXT-CHAT` gates header button only) | loading·populated·empty·dm-view·channel-view·user-picker-view | Full chat client — DM + channel list, message area, thread panel, file upload; also used as header panel when `isRoutedPage=false` |
 | ChatComponent (header panel) | panel | all authenticated routes | `features/chat/chat.component.ts:56` | all authenticated if `CAP-EXT-CHAT` enabled | empty·populated | Same ChatComponent rendered in AppHeader with panelOpen toggle (isRoutedPage=false); routes to /chat if popped out |
-| ChatPopoutComponent | page | `/chat/popout` | `features/chat/components/chat-popout/chat-popout.component.ts:1` | all authenticated | loading·populated | Detached browser-window chat view (window.open popout); coordinated with main window via ChatBroadcastService |
-| ChannelBrowserDialogComponent | dialog | `/chat` | `features/chat/components/channel-browser-dialog/channel-browser-dialog.component.ts:1` | all authenticated | loading·populated·empty | Browse + join existing channels dialog |
-| ChannelSettingsDialogComponent | dialog | `/chat` | `features/chat/components/channel-settings-dialog/channel-settings-dialog.component.ts:1` | all authenticated (channel member) | active | Channel settings (rename, topic, mute, leave) for selected channel |
-| CreateChannelDialogComponent | dialog | `/chat` | `features/chat/components/create-channel-dialog/create-channel-dialog.component.ts:1` | all authenticated | active | Create new chat channel (name, type, description) |
-| CreateAnnouncementDialogComponent | dialog | `/chat` | `features/chat/components/create-announcement-dialog/create-announcement-dialog.component.ts:1` | all authenticated | needs-live (not in chat.component.ts imports — verify if used in popout or elsewhere) | Create broadcast/announcement message to a channel |
-| ShareEntityDialogComponent | dialog | `/chat` | `features/chat/components/share-entity-dialog/share-entity-dialog.component.ts:1` | all authenticated | needs-live (not in chat.component.ts imports — verify) | Share a linked entity (job, order, etc.) into a chat conversation |
-| EntityMentionPopoverComponent | panel | `/chat` | `features/chat/components/entity-mention-popover/entity-mention-popover.component.ts:1` | all authenticated | needs-live (not in chat.component.ts imports — verify) | @-mention entity picker popover within chat message input |
-| ChatChannelHeaderComponent | cluster | `/chat` or `/chat/popout` | `features/chat/components/chat-channel-header/chat-channel-header.component.ts:1` | all authenticated | needs-live (not in chat.component.ts imports — likely C-02 popout sub-component) | Channel header bar (name, topic, settings button) |
-| ChatChannelListComponent | panel | `/chat` or `/chat/popout` | `features/chat/components/chat-channel-list/chat-channel-list.component.ts:1` | all authenticated | needs-live (not in chat.component.ts imports — likely C-02 popout sub-component) | Sidebar channel list panel |
-| ChatMessageAreaComponent | panel | `/chat` or `/chat/popout` | `features/chat/components/chat-message-area/chat-message-area.component.ts:1` | all authenticated | needs-live (not in chat.component.ts imports — likely C-02 popout sub-component) | Scrollable message history area with input |
-| ChatMessageAttachmentComponent | cluster | `/chat` | `features/chat/components/chat-message-attachment/chat-message-attachment.component.ts:1` | all authenticated | needs-live (not in chat.component.ts imports — verify) | File attachment preview/download within a chat message |
-| ChatThreadPanelComponent | panel | `/chat` | `features/chat/components/chat-thread-panel/chat-thread-panel.component.ts:1` | all authenticated | needs-live (not in chat.component.ts imports — verify vs C-14) | Thread reply panel side-panel for a parent message |
-| ThreadPanelComponent | panel | `/chat` | `features/chat/components/thread-panel/thread-panel.component.ts:1` | all authenticated | needs-live (not in chat.component.ts imports — verify vs C-13) | Alternative/refactored thread reply panel |
+| ChatPopoutComponent | page | `/chat/popout` | `features/chat/components/chat-popout/chat-popout.component.ts:22` | all authenticated | loading·populated | Detached browser-window chat view (window.open popout); composed of C-09/C-10/C-11/C-13; coordinated via ChatBroadcastService |
+| ChannelBrowserDialogComponent | dialog | `/chat`, `/chat/popout` | `features/chat/components/channel-browser-dialog/channel-browser-dialog.component.ts:1` | all authenticated | loading·populated·empty | Browse + join existing channels dialog |
+| ChannelSettingsDialogComponent | dialog | `/chat`, `/chat/popout` | `features/chat/components/channel-settings-dialog/channel-settings-dialog.component.ts:1` | all authenticated (channel member) | active | Channel settings (rename, topic, mute, leave) for selected channel |
+| CreateChannelDialogComponent | dialog | `/chat`, `/chat/popout` | `features/chat/components/create-channel-dialog/create-channel-dialog.component.ts:1` | all authenticated | active | Create new chat channel (name, type, description) |
+| ~~CreateAnnouncementDialogComponent~~ | ~~dialog~~ | — | `features/chat/components/create-announcement-dialog/create-announcement-dialog.component.ts:1` | — | **CROSS-LINK ADMIN** — opened only by `features/admin/components/announcements-panel/`; not platform-owned |
+| ~~ShareEntityDialogComponent~~ | ~~dialog~~ | — | `features/chat/components/share-entity-dialog/share-entity-dialog.component.ts:1` | — | **confirmed unused** — no imports anywhere |
+| ~~EntityMentionPopoverComponent~~ | ~~panel~~ | — | `features/chat/components/entity-mention-popover/entity-mention-popover.component.ts:1` | — | **confirmed unused** — no imports anywhere |
+| ChatChannelHeaderComponent | cluster | `/chat/popout` | `features/chat/components/chat-channel-header/chat-channel-header.component.ts:11` | all authenticated | source-confirmed (C-02 popout + mobile-chat) | Channel/DM header bar (name, avatar, back button, settings, mute toggle, popout show) |
+| ChatChannelListComponent | panel | `/chat/popout` | `features/chat/components/chat-channel-list/chat-channel-list.component.ts:21` | all authenticated | source-confirmed (C-02 popout + mobile-chat) | Left-sidebar DM + channel list with search input, section collapse, unread badges |
+| ChatMessageAreaComponent | panel | `/chat/popout` | `features/chat/components/chat-message-area/chat-message-area.component.ts:12` | all authenticated | source-confirmed (C-02 popout + mobile-chat) | Scrollable message history + compose input + file attach; input/output-driven (presentation) |
+| ~~ChatMessageAttachmentComponent~~ | ~~cluster~~ | — | `features/chat/components/chat-message-attachment/chat-message-attachment.component.ts:1` | — | **confirmed unused** — not imported anywhere; removed from denominator |
+| ChatThreadPanelComponent | panel | `/chat/popout` | `features/chat/components/chat-thread-panel/chat-thread-panel.component.ts:9` | all authenticated | source-confirmed (C-02 popout + mobile-chat) | Thread reply side-panel; input/output-driven (presentation); closes on output |
+| ~~ThreadPanelComponent~~ | ~~panel~~ | — | `features/chat/components/thread-panel/thread-panel.component.ts:13` | — | **confirmed unused** — duplicate thread impl (stateful via ChatService injection); not imported anywhere; removed from denominator |
 | ChatPreviewPopupComponent | panel | all authenticated routes | `shared/components/chat-preview-popup/chat-preview-popup.component.ts:1` | all authenticated | empty·populated | Shell-level popup for inline chat previews (always mounted in app.component) |
 | MentionRenderPipe | shared-cmp | `/chat` | `features/chat/pipes/mention-render.pipe.ts:1` | all authenticated | — | Renders @-mentions in message text (pipe, not a component; included for completeness) |
 
