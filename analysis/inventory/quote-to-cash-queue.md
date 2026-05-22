@@ -5,7 +5,9 @@
 > Single writer: ui-scout owns this queue file. Source-cataloger owns quote-to-cash.md.  
 > **Cycle 4 update:** Q2 (create dialogs) fully resolved — all 8 create dialogs observed live. Q1-a (quote detail) and Q1-c (PO detail + receive) resolved. Q7 (role access) partially resolved — route-level access confirmed; capability-level still open. Q3-d (ReceiveDialog) resolved.  
 > **Cycle 5 update:** Q1-b (SO detail), Q1-e (invoice detail), Q1-f (shipment detail), Q1-g (payment detail) all resolved. Q1-i (RecurringOrderDialog) partially resolved — create dialog observed, populated list state blocked by CAP-O2C-RECURRING disabled. Q3-a/b resolved. Q5-b (ShippingRatesDialog) resolved. Q7-e/f resolved. New capability-gate findings: CAP-O2C-RMA, CAP-P2P-RFQ, CAP-O2C-RECURRING all disabled server-side — blocks Q1-d, Q1-h, and populated states for those entities.  
-> **Cycle 6 update:** Q6-a/b/c/d (customer Q2C tabs) resolved — all four tabs populated and source-confirmed. Q4 resolved — EstimateFormDialogComponent dead code confirmed; actual live estimate surface identified (CustomerEstimatesTabComponent). Q5-a status update — TrackingTimeline not rendered even for Shipped status; requires carrier events. Q7-f Manager buttons confirmed (full access). DN-7 resolved — PM redirects to /dashboard confirmed live. Q3-c remains unreachable. DN-9 added (customer tabs broader than Q6 scope).
+> **Cycle 6 update:** Q6-a/b/c/d (customer Q2C tabs) resolved — all four tabs populated and source-confirmed. Q4 resolved — EstimateFormDialogComponent dead code confirmed; actual live estimate surface identified (CustomerEstimatesTabComponent). Q7-f Manager buttons confirmed (full access). DN-7 resolved — PM redirects to /dashboard confirmed live. DN-9 added (customer tabs broader than Q6 scope).  
+> **Cycle 6b update:** Q5-a (TrackingTimeline) RESOLVED — observed live via "Track" button; 2 events captured. Q1-d/Q1-h page-level states documented. Q1-i RecurringOrderDialog confirmed. Q3-c trigger conditions documented from source (terminal). DN-7 PO columns confirmed.  
+> **Final reconciliation (this note):** Queue terminal-only. Catalog discrepancy filed: TrackingTimelineComponent marked "terminal" in catalog but resolved in queue (cycle-6b live observation). Shared components StatusBadgeComponent / ActivityTimelineComponent / DetailSidePanelComponent found in source but not in catalog shared checklist — flagged for cataloger.
 
 ---
 
@@ -121,11 +123,11 @@
 | ~~Q8-a~~ | Quote | POST /api/v1/quotes | Quotes list populated, quote detail panel | **RESOLVED** — QT-00001 in list; detail panel observed (Q1-a) |
 | ~~Q8-b~~ | Sales Order | Confirm SO + advance job to Order Confirmed | SO list populated (projected list), SO detail panel | **RESOLVED (Cycle 5)** — J-1 visible; 8-tab panel observed (Q1-b) |
 | ~~Q8-c~~ | Purchase Order | Pre-existing POs | PO list populated, PO detail, receive dialog | **RESOLVED** — 4 POs in list; detail + receive dialog observed (Q1-c, Q3-d) |
-| Q8-d | RFQ | POST /api/v1/rfqs | RFQ list + detail | **BLOCKED** — CAP-P2P-RFQ disabled |
+| ~~Q8-d~~ | ~~RFQ~~ | ~~POST /api/v1/rfqs~~ | ~~RFQ list + detail~~ | **TERMINAL** — CAP-P2P-RFQ disabled (DN-8); maps to Q1-d |
 | ~~Q8-e~~ | Invoice | POST /api/v1/invoices | Invoice list + detail | **RESOLVED (Cycle 5)** — INV-00001; flat panel observed (Q1-e) |
-| ~~Q8-f~~ | Shipment | POST /api/v1/shipments | Shipment list + detail + tracking timeline | **RESOLVED (Cycle 5)** — SH-00001; flat panel observed (Q1-f); TrackingTimeline requires Shipped status (Q5-a open) |
+| ~~Q8-f~~ | Shipment | POST /api/v1/shipments | Shipment list + detail + tracking timeline | **RESOLVED** — SH-00001; flat panel observed (Q1-f); TrackingTimeline resolved separately (Q5-a, cycle-6b) |
 | ~~Q8-g~~ | Payment | POST /api/v1/payments | Payment list + detail | **RESOLVED (Cycle 5)** — PMT-00001; flat panel observed (Q1-g) |
-| Q8-h | Customer Return | POST /api/v1/customer-returns | Returns list + detail | **BLOCKED** — CAP-O2C-RMA disabled |
+| ~~Q8-h~~ | ~~Customer Return~~ | ~~POST /api/v1/customer-returns~~ | ~~Returns list + detail~~ | **TERMINAL** — CAP-O2C-RMA disabled (DN-8); maps to Q1-h |
 
 ---
 
@@ -177,19 +179,19 @@
 
 ---
 
-## All items resolved or terminally blocked — Cycle 6b complete
+## Terminal-only remainder — queue drained
 
-| item | final state |
-|------|-------------|
-| Q1-d RFQ detail panel | **Terminal**: CAP-P2P-RFQ disabled; page-level state documented; `RfqDetailDialogComponent` unreachable |
-| Q1-h Customer Return detail panel | **Terminal**: CAP-O2C-RMA disabled; page-level state documented; `CustomerReturnDetailDialogComponent` unreachable |
-| Q3-c OffTierPromptDialogComponent | **Terminal**: requires vendor pricing tier config; trigger conditions documented from source |
-| Q5-a TrackingTimelineComponent | **Resolved**: observed live via "Track" button; 2 events captured; component fully inventoried |
-| Q6-a/b/c/d | **Resolved**: all 4 customer Q2C tabs populated and documented |
-| Q4 EstimateFormDialog | **Resolved**: dead code confirmed; actual live surface = CustomerEstimatesTabComponent |
-| Q1-i RecurringOrderDialog | **Resolved**: create dialog observed + documented; list state terminally blocked (CAP-O2C-RECURRING) |
-| DN-7 PM redirect | **Resolved**: confirmed /dashboard redirect; Admin/Manager/OfficeManager PO list columns confirmed |
+The following rows are the only non-resolved entries remaining. All are environment-blocked with fully documented trigger conditions; no further live observation is possible in this env.
+
+| queue-id | component | terminal reason |
+|----------|-----------|-----------------|
+| Q1-d | `RfqDetailDialogComponent` | CAP-P2P-RFQ disabled server-side; RFQ seeding impossible; page-level UI state documented |
+| Q1-h | `CustomerReturnDetailDialogComponent` + `CustomerReturnDetailPanelComponent` | CAP-O2C-RMA disabled server-side; return seeding impossible; page-level UI state documented |
+| Q3-c | `OffTierPromptDialogComponent` | Requires vendor pricing tier config absent from this env; exact trigger conditions documented from source (`po-dialog.component.ts:309-317`) |
+
+> **Note for cataloger:** Q5-a `TrackingTimelineComponent` is **RESOLVED** in this queue (cycle-6b live observation with 2 events). The catalog still marks it "terminal" in the checklist (line 112) and component entry (line 600) — those need updating to reflect the live observation.  
+> **Note for cataloger:** `StatusBadgeComponent`, `ActivityTimelineComponent`, and `DetailSidePanelComponent` appear in Q2C feature source but are absent from the shared-components checklist in the catalog. Verify coverage in inline feature entries or add to checklist.
 
 ---
 
-_Queue skeleton filed: 2026-05-22 · ui-scout cycle 1. Cycle 4: Q2/Q3-d/Q7-route resolved. Cycle 5: Q1-b/e/f/g/i, Q3-a/b, Q5-b, Q7-e/f, Q8-b/e/f/g, DN-8. Cycle 6: Q6-a/b/c/d, Q4, Q7-f Manager, DN-7/9. Cycle 6b: Q5-a (TrackingTimeline live), Q1-d/h/i page-level state, Q3-c source-confirmed terminal, DN-7 PO columns. INVENTORY COMPLETE — all components reached or terminally blocked with documented trigger conditions._
+_Queue skeleton filed: 2026-05-22 · ui-scout cycle 1. Cycle 4: Q2/Q3-d/Q7-route resolved. Cycle 5: Q1-b/e/f/g/i, Q3-a/b, Q5-b, Q7-e/f, Q8-b/e/f/g, DN-8. Cycle 6: Q6-a/b/c/d, Q4, Q7-f Manager, DN-7/9. Cycle 6b: Q5-a (TrackingTimeline live), Q1-d/h/i page-level state, Q3-c source-confirmed terminal. Final reconciliation: queue drained to 3 terminal rows (Q1-d, Q1-h, Q3-c). Catalog discrepancy filed re: TrackingTimeline terminal/resolved mismatch + 3 shared components not in checklist._
