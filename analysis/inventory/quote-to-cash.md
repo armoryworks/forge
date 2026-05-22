@@ -75,7 +75,7 @@
 - [ ] `components/receive-dialog/receive-dialog.component.ts` ← **PO-receiving entry point**
 - [ ] `components/auto-po-panel/auto-po-panel.component.ts`
 - [ ] `components/auto-po-settings-panel/auto-po-settings-panel.component.ts`
-- [ ] `components/auto-po-suggestions/auto-po-suggestions.component.ts`
+- [x] `components/auto-po-suggestions/auto-po-suggestions.component.ts` ← **dead code**: declared but never imported by any component; no entry needed
 - [ ] `components/off-tier-prompt-dialog/off-tier-prompt-dialog.component.ts`
 
 #### purchasing/
@@ -259,7 +259,7 @@
 | component | `app-schedule-timeline` / ScheduleTimelineComponent |
 | type | cluster |
 | route | `/sales-orders` (within SO detail panel, schedule tab) |
-| file | `features/sales-orders/components/schedule-timeline/schedule-timeline.component.ts:1` |
+| file | `features/sales-orders/components/schedule-timeline/schedule-timeline.component.ts:16` |
 | renders-for | Admin, Manager, PM, OfficeManager |
 | states | unconfirmed |
 | purpose | Visual timeline of schedule milestones for an SO |
@@ -274,7 +274,7 @@
 | type | page |
 | route | `/sales-orders/recurring` |
 | file | `features/sales-orders/pages/recurring/recurring-orders.component.ts:30` |
-| renders-for | Admin, Manager (inferred: same as sales-orders route guard minus PM/OfficeManager — **needs scout confirmation**) |
+| renders-for | Admin, Manager, PM, OfficeManager (confirmed: `sales-orders.routes.ts` has no additional guard on `recurring` sub-route; template has no button-level role gate) |
 | states | unconfirmed |
 | purpose | Manage recurring SO templates that the nightly job spins into fresh SalesOrders; Create + Delete only (no Edit by design — delete + recreate pattern) |
 
@@ -386,7 +386,7 @@
 | component | `app-po-dialog` / PoDialogComponent |
 | type | dialog |
 | route | `/purchase-orders/orders` |
-| file | `features/purchase-orders/components/po-dialog/po-dialog.component.ts:~45` |
+| file | `features/purchase-orders/components/po-dialog/po-dialog.component.ts:42` |
 | renders-for | Admin, Manager, OfficeManager |
 | states | unconfirmed |
 | purpose | Create a new PO; vendor + parts autocomplete; incoterm selection; tier-variance check triggers OffTierPromptDialog; draft-aware |
@@ -442,7 +442,7 @@
 | component | `app-off-tier-prompt-dialog` / OffTierPromptDialogComponent |
 | type | dialog |
 | route | `/purchase-orders/orders` (triggered within PoDialogComponent save flow) |
-| file | `features/purchase-orders/components/off-tier-prompt-dialog/off-tier-prompt-dialog.component.ts:~30` |
+| file | `features/purchase-orders/components/off-tier-prompt-dialog/off-tier-prompt-dialog.component.ts:30` |
 | renders-for | Admin, Manager, OfficeManager |
 | states | unconfirmed |
 | purpose | Warn buyer when one or more PO lines are priced off the vendor's tier; per-line choice: accept as one-off exception OR update vendor tier price |
@@ -467,15 +467,7 @@
 
 | field | value |
 |-------|-------|
-| component | `app-auto-po-suggestions` / AutoPoSuggestionsComponent |
-| type | table |
-| route | `/purchase-orders/suggestions` |
-| file | `features/purchase-orders/components/auto-po-suggestions/auto-po-suggestions.component.ts:19` |
-| renders-for | Admin, Manager, OfficeManager |
-| states | unconfirmed |
-| purpose | Filterable table child used within AutoPoPanelComponent; shows suggestion rows with status filter |
-
-**Shared components:** DataTableComponent · SelectComponent · LoadingBlockDirective
+~~`app-auto-po-suggestions` / AutoPoSuggestionsComponent~~ — **dead code**: file exists at `features/purchase-orders/components/auto-po-suggestions/auto-po-suggestions.component.ts:19` but is never imported by `AutoPoPanelComponent`, `PurchaseOrdersComponent`, or any other component. The suggestions tab is rendered entirely within `AutoPoPanelComponent`'s own DataTable. No inventory entry required.
 
 ---
 
@@ -665,7 +657,7 @@
 | states | unconfirmed |
 | purpose | List all payments; method filter; server-side total; accounting boundary context (isStandalone / providerName) |
 
-**Payment methods in source:** Cash · Check · CreditCard · (others unconfirmed — scout should capture full method list)
+**Payment methods (source-confirmed, `payments.component.ts:56-63`):** Cash · Check · CreditCard · BankTransfer · Wire · Other
 
 **Shared components:** PageHeaderComponent · InputComponent · SelectComponent · DataTableComponent · CurrencyDisplayComponent · LoadingBlockDirective
 
@@ -769,18 +761,20 @@
 
 ---
 
-## Open Items / Caveats (Cycle 1)
+## Open Items / Caveats
 
-These items are source-confirmed but require live observation to complete their entries:
+### Source-resolved (Cycle 2)
 
-1. **All `states` fields** — marked `unconfirmed`; scout must observe empty/loading/populated/error for each.
-2. **SoDialogComponent role gate** — queue item Q2-c: confirm Manager vs. PM can both create SOs.
-3. **RecurringOrdersComponent role gate** — only Admin/Manager expected but not confirmed in source (guard is inherited from `/sales-orders` parent route which includes PM+OfficeManager).
-4. **OffTierPromptDialog exact line** — `po-dialog.component.ts:~45` and `off-tier-prompt-dialog.component.ts:~30` marked approximate; confirm with next read.
-5. **ScheduleTimelineComponent line** — `schedule-timeline.component.ts:1` (file confirmed; exact @Component line not yet read).
-6. **AutoPoSuggestionsComponent** — appears to be a separate component alongside AutoPoPanelComponent on the suggestions tab; confirm whether it's nested within AutoPoPanelComponent or rendered separately in PurchaseOrdersComponent template.
-7. **Payment method full list** — source shows Cash/Check/CreditCard; scout should capture all options rendered in filter select.
-8. **Queue items Q1–Q8** remain open — all detail dialogs/panels, create dialogs, PO-specific panels, estimate flow, and SO tabs need live observation.
+- ~~**Approximate line numbers**~~ — PoDialogComponent `:42`, OffTierPromptDialogComponent `:30`, ScheduleTimelineComponent `:16` all confirmed exact.
+- ~~**SoDialogComponent role gate**~~ — template has no `*appHasRole`/`*appHasCapability` on the create button; gate is the route guard only: Admin, Manager, PM, OfficeManager. Confirmed.
+- ~~**RecurringOrders role gate**~~ — no additional guard in `sales-orders.routes.ts`; template no button-level gating. Confirmed: Admin, Manager, PM, OfficeManager.
+- ~~**Payment method full list**~~ — source-confirmed in `payments.component.ts:56-63`: Cash · Check · CreditCard · BankTransfer · Wire · Other.
+- ~~**AutoPoSuggestionsComponent nesting**~~ — confirmed dead code; not imported anywhere; no entry needed.
+
+### Scout-gated (need live observation)
+
+1. **All `states` fields** — marked `unconfirmed`; scout must observe empty/loading/populated/error for each component.
+2. **Queue items Q1–Q8** — all detail dialogs/panels, create dialogs, PO-specific panels, estimate flow, and SO detail tabs require seeded records and live navigation.
 
 ---
 
