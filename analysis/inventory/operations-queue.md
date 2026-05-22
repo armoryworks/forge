@@ -119,4 +119,49 @@ _Format: ID · area · what to sweep · trigger/note · status_
 
 ---
 
-_Updated: 2026-05-22 · 3 DONE from source · 54 needs-live · 0 DN-8 in operations scope_
+## Live sweep cycle A/B/D results — 2026-05-22 ui-scout update
+
+Items confirmed live by sweeps A (kanban/backlog/planning/scheduling), B (shop-floor/worker/time-tracking), and D (quality):
+
+| Queue ID | status after sweep | evidence |
+|----------|-------------------|----------|
+| Q-KB-01 | **DONE** | Kanban board: J-1 in ORDER CONFIRMED, 10 columns, 3 track-types confirmed |
+| Q-KB-02 | **DONE** | Board + team views both observed; J-1 card rendered |
+| Q-KB-06 | **DONE** | JobDialog create confirmed: title/desc/track-type/customer/assignee/priority/due-date; CANCEL + CREATE JOB buttons |
+| Q-KB-10 | **DONE** | Board/team toggle confirmed (view_column / people buttons) |
+| Q-BL-01 | **PARTIAL** | Table view confirmed with J-1; card-grid view not triggered — remains OPEN |
+| Q-PL-01 | **DONE** | Planning loads (no planning-blocked error → CAP-PLAN-MRP not explicitly disabled in this env; cycle board empty not capability-blocked) |
+| Q-PL-02 | **DONE** | CycleDialog observed: name/start-date/end-date/goals fields, CANCEL + CREATE buttons |
+| Q-SC-01 through Q-SC-05 | **DONE** | All 5 scheduling tabs reached with correct empty states; KPI chips 0/0/0 |
+| Q-SF-01 | **PARTIAL** | Unpaired setup form fully observed; paired main display remains OPEN (team-list API returned no teams — ACTIVATE TERMINAL could not complete) |
+| Q-SF-02 | **DONE** | Both kiosk-setup phases (admin-login + configure-terminal) confirmed live |
+| Q-SF-04 | **DONE** | /scan route confirmed: InventoryScan idle state with scan count=0 and barcode prompt |
+| Q-SF-05 | **DONE** | /scan-log confirmed: ScanDailyLog with date/action-type filters, empty state |
+| Q-QL-01 | **PARTIAL** | Inspections tab + NEW INSPECTION button confirmed; populated/filter state OPEN |
+| Q-QL-02 | **PARTIAL** | Lots tab + NEW LOT button confirmed; populated/traceability OPEN |
+| Q-QL-03 | **PARTIAL** | SPC-charts tab + NEW CHARACTERISTIC confirmed; chart detail OPEN |
+| Q-QL-04 | **PARTIAL** | SPC-data tab confirmed with NEW CHARACTERISTIC button |
+| Q-QL-05 | **PARTIAL** | SPC-ooc tab confirmed: empty, no create button (correct — OOC is computed) |
+| Q-QL-06 | **PARTIAL** | NCRs tab + NEW NCR button confirmed; dialog fields OPEN |
+| Q-QL-07 | **PARTIAL** | CAPAs tab + NEW CAPA button confirmed; dialog fields OPEN |
+| Q-QL-08 | **PARTIAL** | ECOs tab + NEW ECO button confirmed; dialog fields OPEN |
+| Q-QL-09 | **PARTIAL** | Gages tab + NEW GAGE button confirmed; dialog fields OPEN |
+| Q-OE-01 | **DONE** | OEE empty state confirmed: 0.0% AVG OEE, 0/0 WORLD CLASS, date-range presets |
+| Q-TT-01 | **DONE** | Time-tracking empty state confirmed; date-from/to filters, START TIMER + MANUAL ENTRY buttons |
+| Q-TT-02 | **DONE** | Add-entry dialog confirmed: date/category/hours/minutes/notes/CANCEL/LOG ENTRY |
+
+Items still OPEN after sweeps (requires data seeding or paired kiosk):
+- Q-SF-01 paired state, Q-SF-02..14 scan flows, Q-SF-03 clock paired — need terminal pairing + a team
+- Q-KB-03..09 job detail panel, job edit, cover-photo, dispose — need job click
+- Q-PL-03 cycle board populated — need cycle created
+- Q-BL-01 card-grid view — need toggle click
+- Q-QL-02..09 populated states + create dialogs — need data or dialog trigger
+- Q-MR-01..08 MRP all tabs and dialogs — sweep D in progress
+- Q-AS-01..04 assets — sweep D in progress
+- Q-MN-01..02 maintenance — sweep D in progress
+- Q-TT-03..04 timer running/stop — need timer started
+- Q-OE-02..03 OEE work-center cards — need work centers
+
+---
+
+_Updated: 2026-05-22 · 3 DONE from source · 54 needs-live → 24 DONE/PARTIAL from live sweeps · ~30 still open_
