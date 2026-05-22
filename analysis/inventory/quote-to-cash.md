@@ -3,7 +3,7 @@
 > **Phase:** quote-to-cash · **Method:** observe-and-record (no code changes)
 > **Single writer:** source-cataloger owns this file; scout owns quote-to-cash-queue.md only
 > **Source on disk:** HEAD e9b7802 (file:line mappings from source)
-> **Last updated:** Cycle 6 — dequeue Q1-b/e/f/g/i, Q3-a/b, Q5-b, terminal Q1-d/h; DN-6/7/8 added; 14 checklist items ticked
+> **Last updated:** Cycle 7 — dequeue Q6-a/b/c/d; close Q4/Q3-c/Q5-a/DN-7; terminal closures; Segment 9 added; checklist COMPLETE
 
 ---
 
@@ -21,7 +21,7 @@
 
 **DN-6 — SO detail panel field selectors not found by Playwright:** Tab content DOM uses plain `<td>` or custom layout elements rather than `.field-label`/`dt`/`.prop-label` selectors; screenshots captured at `q2c-cycle5/so-detail-tab*.png`. Full field inventory requires source read of `sales-order-detail-panel.component.html`.
 
-**DN-7 — PM on `/purchase-orders/orders` renders job board:** PM navigates to `/purchase-orders/orders` but sees JOB BOARD content (production board with "Create your first job", focus mode, board view controls) rather than the PO list. Route guard allows access (PM passes live — see DN-4), but component or route behavior serves job-board context to PM. Source read needed to confirm mechanism.
+**DN-7 — PM on `/purchase-orders` blocked by roleGuard (source-confirmed):** `app.routes.ts:163` gates `/purchase-orders` as `roleGuard('Admin','Manager','OfficeManager')` — PM is not listed. PM is redirected to `/dashboard`. The Cycle 4/5 live observation of "PM accessible + job-board content" was an artifact of `pm@forge.local` carrying multiple server roles (see DN-4). PO list entry `renders-for` correctly excludes PM. Gap closed.
 
 **DN-8 — Three capabilities disabled server-side:** `CAP-O2C-RMA` (customer returns), `CAP-P2P-RFQ` (purchasing/RFQs), and `CAP-O2C-RECURRING` (recurring orders) are all disabled in this installation. The UI renders pages and dialogs normally (no "capability disabled" message shown in UI), but all API mutations return `{"code":"capability-disabled","capability":"<CAP>"}`. `RecurringOrderDialogComponent` create dialog IS accessible and was observed — only API seeding and list population are blocked.
 
@@ -96,7 +96,7 @@
 - [x] `components/auto-po-panel/auto-po-panel.component.ts`
 - [x] `components/auto-po-settings-panel/auto-po-settings-panel.component.ts`
 - [x] `components/auto-po-suggestions/auto-po-suggestions.component.ts` ← **dead code**: declared but never imported by any component; no entry needed
-- [ ] `components/off-tier-prompt-dialog/off-tier-prompt-dialog.component.ts`
+- [x] `components/off-tier-prompt-dialog/off-tier-prompt-dialog.component.ts` ← **terminal: requires vendor pricing-tier config, untriggerable in this env**
 
 #### purchasing/
 - [x] `purchasing.component.ts` (PurchasingComponent)
@@ -109,7 +109,7 @@
 - [x] `components/shipment-dialog/shipment-dialog.component.ts`
 - [x] `components/shipment-detail-dialog/shipment-detail-dialog.component.ts`
 - [x] `components/shipment-detail-panel/shipment-detail-panel.component.ts`
-- [ ] `components/tracking-timeline/tracking-timeline.component.ts`
+- [x] `components/tracking-timeline/tracking-timeline.component.ts` ← **terminal: requires carrier webhook integration; status progression alone insufficient**
 - [x] `components/shipping-rates-dialog/shipping-rates-dialog.component.ts`
 
 #### invoices/
@@ -234,7 +234,7 @@
 | route | `/quotes` |
 | file | `features/quotes/components/estimate-form-dialog/estimate-form-dialog.component.ts:86` |
 | renders-for | Admin, Manager, PM, OfficeManager (source: same route guard as quotes) |
-| states | unreached (no trigger found in live navigation — see DN-3) |
+| states | **dead code** — zero callers in all `.ts` files (DN-3); no live trigger exists on `/quotes` page or elsewhere; real live estimate-create surface is `CustomerEstimatesTabComponent` at `/customers/:id/estimates` (Segment 9) |
 | purpose | Cost-estimating calculator: materials (part + qty + drop-factor), operations (work-center + setup/run minutes + burden), NRE charges; computes unit cost + quote price; pre-fill support from part detail or quote line context |
 
 **Shared components:** DialogComponent · InputComponent · SelectComponent · CurrencyDisplayComponent · ValidationButtonComponent
@@ -324,7 +324,7 @@
 | route | `/sales-orders/recurring` |
 | file | `features/sales-orders/pages/recurring/recurring-orders.component.ts:30` |
 | renders-for | Admin, Manager, PM, OfficeManager (confirmed: `sales-orders.routes.ts` has no additional guard on `recurring` sub-route; template has no button-level role gate) |
-| states | empty (observed live — 0 rows, NEW RECURRING TEMPLATE button visible) |
+| states | empty (observed live — 0 rows, NEW RECURRING TEMPLATE button visible); populated list state: **terminal** — CAP-O2C-RECURRING disabled server-side; recurring order templates cannot be created via API (see DN-8) |
 | purpose | Manage recurring SO templates that the nightly job spins into fresh SalesOrders; Create + Delete only (no Edit by design — delete + recreate pattern) |
 
 **Shared components:** PageLayoutComponent · ToolbarComponent · DataTableComponent · ConfirmDialogComponent
@@ -493,7 +493,7 @@
 | route | `/purchase-orders/orders` (triggered within PoDialogComponent save flow) |
 | file | `features/purchase-orders/components/off-tier-prompt-dialog/off-tier-prompt-dialog.component.ts:30` |
 | renders-for | Admin, Manager, OfficeManager |
-| states | unreached (requires off-tier pricing trigger in PO create flow) |
+| states | **terminal** — UI renders; requires vendor pricing-tier config not present in this env; off-tier PO line condition untriggerable; no live populated state observed |
 | purpose | Warn buyer when one or more PO lines are priced off the vendor's tier; per-line choice: accept as one-off exception OR update vendor tier price |
 
 **Shared components:** DialogComponent · CurrencyDisplayComponent
@@ -597,7 +597,7 @@
 | route | `/shipments` (within shipment detail panel) |
 | file | `features/shipments/components/tracking-timeline/tracking-timeline.component.ts:7` |
 | renders-for | Admin, Manager, OfficeManager |
-| states | unreached (within shipment detail panel) |
+| states | **terminal** — UI renders; absent even on Shipped status; requires carrier webhook integration (inbound tracking events); status progression alone insufficient; no live populated state observed |
 | purpose | Visual timeline of carrier tracking events for a shipment |
 
 ---
@@ -808,6 +808,84 @@
 
 ---
 
+## Segment 9: Customer Detail — Q2C Cross-Region Surface
+
+> **Ownership note:** `CustomerDetailComponent` and its tab components live in `features/customers/` — owned by the Customers/Master-Data region. This segment catalogs only the 4 Q2C-facing tabs that surface Q2C entities (Estimates, Quotes, Orders, Invoices). The remaining 7 tabs (Overview, Contacts, Addresses, Jobs, Interactions, Pricing, Activity) belong to the master-data inventory.
+
+### `/customers/:id/:tab` — CustomerDetailComponent
+
+| field | value |
+|-------|-------|
+| component | `app-customer-detail` / CustomerDetailComponent |
+| type | page |
+| route | `/customers/:id/:tab` |
+| file | `features/customers/pages/customer-detail/customer-detail.component.ts:56` |
+| renders-for | Admin, Manager, PM, OfficeManager (`app.routes.ts:99`) |
+| states | populated (customer 1 observed; 11 tabs: overview \| contacts \| addresses \| estimates \| quotes \| orders \| jobs \| invoices \| interactions \| pricing \| activity; contacts/addresses/interactions tab-capability-gated by CAP-MD-CUSTOMER-CONTACTS/ADDRESSES/INTERACTIONS) |
+| purpose | Customer detail shell; resolver-driven tab layout keyed on customer lifecycle bucket (Active/Prospect/Archived); Identity first, Activity last |
+
+---
+
+| field | value |
+|-------|-------|
+| component | `app-customer-estimates-tab` / CustomerEstimatesTabComponent |
+| type | tab |
+| route | `/customers/:id/estimates` |
+| file | `features/customers/pages/customer-detail/tabs/customer-estimates-tab.component.ts:34` |
+| renders-for | Admin, Manager, PM, OfficeManager |
+| states | populated (1 estimate observed live — Title \| Estimated Amount \| Status \| Valid Until \| Created) |
+| purpose | Simple dollar-amount estimates for this customer (NOT the compute-calculator `EstimateFormDialog`); inline create/edit dialog (Title, Description, Estimated Amount, Valid Until, Notes, Status); Delete action; **Convert-to-Quote** action (ConfirmDialog → `estimateService.convertToQuote()` → creates QT record) |
+
+**Estimate statuses (source):** Draft · Sent · Accepted · Declined · Expired · ConvertedToQuote
+
+**Inline estimate dialog** — rendered within this component via `showDialog` signal (no separate dialog class). Fields: Title\* | Description | Estimated Amount\* | Valid Until | Notes | Status. Titles: "NEW ESTIMATE" (create) / "EDIT ESTIMATE" (edit).
+
+**Shared components:** DataTableComponent · ColumnCellDirective · InputComponent · CurrencyInputComponent · CurrencyDisplayComponent · SelectComponent · TextareaComponent · DatepickerComponent · DialogComponent · ValidationButtonComponent · ConfirmDialogComponent
+
+---
+
+| field | value |
+|-------|-------|
+| component | `app-customer-quotes-tab` / CustomerQuotesTabComponent |
+| type | tab |
+| route | `/customers/:id/quotes` |
+| file | `features/customers/pages/customer-detail/tabs/customer-quotes-tab.component.ts:23` |
+| renders-for | Admin, Manager, PM, OfficeManager |
+| states | populated (QT-00001 observed live — Quote Number \| Status \| Lines \| Total \| Expires \| Created) |
+| purpose | Read-only list of quotes for this customer; row-click navigates to `/quotes?id={id}` (preselects detail dialog on the Quotes list page) |
+
+**Shared components:** DataTableComponent · ColumnCellDirective · CurrencyDisplayComponent
+
+---
+
+| field | value |
+|-------|-------|
+| component | `app-customer-orders-tab` / CustomerOrdersTabComponent |
+| type | tab |
+| route | `/customers/:id/orders` |
+| file | `features/customers/pages/customer-detail/tabs/customer-orders-tab.component.ts:23` |
+| renders-for | Admin, Manager, PM, OfficeManager |
+| states | populated (SO-00001 / J-1 observed live — Order Number \| Status \| Lines \| Total \| Req Date \| Created) |
+| purpose | Read-only list of sales orders for this customer; row-click navigates to `/sales-orders?id={id}` |
+
+**Shared components:** DataTableComponent · ColumnCellDirective · CurrencyDisplayComponent
+
+---
+
+| field | value |
+|-------|-------|
+| component | `app-customer-invoices-tab` / CustomerInvoicesTabComponent |
+| type | tab |
+| route | `/customers/:id/invoices` |
+| file | `features/customers/pages/customer-detail/tabs/customer-invoices-tab.component.ts:24` |
+| renders-for | Admin, Manager, PM, OfficeManager |
+| states | populated (INV-00001 Draft observed live — Invoice Number \| Status \| Total \| Due Date \| Created) |
+| purpose | Read-only list of invoices for this customer; row-click navigates to `/invoices?id={id}` |
+
+**Shared components:** DataTableComponent · ColumnCellDirective · CurrencyDisplayComponent
+
+---
+
 ---
 
 ## Role Access Matrix (Live — Cycle 4)
@@ -832,7 +910,7 @@
 **Notes:**
 - PM column shows ✓ for routes where source `roleGuard` does NOT include PM (`/purchasing`, `/purchase-orders/*`, `/shipments`, `/invoices`, `/payments`). This is live-observed behaviour, likely caused by `pm@forge.local` having multiple server roles. See DN-4. Catalog `renders-for` fields use source-authoritative lists (PM excluded from those routes).
 - `/purchase-orders/settings`: route guard allows Admin/Manager/OfficeManager (not PM per source). Within-page content guarded by `isAdmin` — Admin sees 4 fields, Manager/OfficeManager see 2 (Enable Auto-PO + Send Chat Notifications hidden; confirmed Cycle 5 Q7-e).
-- Capability-level differences (OM/Mgr/PM create buttons): OfficeManager has full create access; PM has New Quote + New Order only; confirmed Cycle 5 Q7-f.
+- Capability-level differences — create button visibility: OfficeManager = full access (New Quote | New Order | New PO | New Invoice | Uninvoiced Jobs | New Payment); Manager ≡ OfficeManager (same full set confirmed Cycle 7 Q7-f); PM = New Quote + New Order only.
 
 ---
 
@@ -914,22 +992,20 @@ All create dialogs show validation badge `▲{n}` between Cancel and Submit. Sub
 - ~~**Q1-d RfqDetail**~~ — Cycle 6: TERMINAL — CAP-P2P-RFQ disabled (DN-8).
 - ~~**Q1-h CustomerReturnDetail (dialog/panel)**~~ — Cycle 6: TERMINAL — CAP-O2C-RMA disabled (DN-8).
 - ~~**DN-6/7/8**~~ — Cycle 6: added to Architectural Data Notes.
+- ~~**Q6-a–d (Customer Detail Q2C tabs)**~~ — Cycle 7: all 4 tabs populated; Segment 9 added; inline estimate dialog + Convert-to-Quote catalogued.
+- ~~**Q4 EstimateFormDialog closure**~~ — Cycle 7: confirmed dead code; real live surface is CustomerEstimatesTabComponent.
+- ~~**Q7-f Manager create access**~~ — Cycle 7: Manager ≡ OfficeManager (full create access); role matrix updated.
+- ~~**DN-7 PM/PO gap**~~ — Cycle 7: confirmed source-authoritative: PM blocked by roleGuard; earlier job-board observation was multi-role artifact (DN-4).
+- ~~**Q3-c OffTierPromptDialog**~~ — Cycle 7: TERMINAL — requires vendor pricing-tier config; untriggerable in this env.
+- ~~**Q5-a TrackingTimeline**~~ — Cycle 7: TERMINAL — requires carrier webhook integration; status progression alone insufficient.
+- ~~**Q1-i recurring list populated state**~~ — Cycle 7: TERMINAL — CAP-O2C-RECURRING disabled (DN-8).
 
-### Still open (gating set — queue items)
+### Still open
 
-| queue-id | component | blocker |
-|----------|-----------|---------|
-| Q5-a | TrackingTimelineComponent | SH-00001 at Pending — requires Mark Shipped or carrier tracking event |
-| Q3-c | OffTierPromptDialogComponent | off-tier pricing trigger in PO create flow — untriggerable in current env |
-| Q6-b | Customer quotes tab (`/customers/1/quotes`) | READY — QT-00001 exists for customer 1 |
-| Q6-c | Customer orders tab (`/customers/1/orders`) | READY — SO-00001/J-1 exists for customer 1 |
-| Q6-d | Customer invoices tab (`/customers/1/invoices`) | READY — INV-00001 exists for customer 1 |
-| Q6-a | Customer estimates tab (`/customers/1/estimates`) | EstimateFormDialog unwired — no estimate seeded |
-| Q4-a,b | EstimateFormDialogComponent (full populated form) | zero callers in source — dead code (DN-3); HOLD per orchestrator |
-| Q1-d | RfqDetailDialogComponent | TERMINAL — CAP-P2P-RFQ disabled (DN-8) |
-| Q1-h | CustomerReturnDetailDialog/Panel | TERMINAL — CAP-O2C-RMA disabled (DN-8) |
-| DN-7 | PM on `/purchase-orders/orders` job-board behavior | source read needed to confirm route/component mechanism |
+**None.** All checklist items are ticked. Terminal closures written for Q1-d, Q1-h, Q1-i (list), Q3-c, Q5-a. Q4 closed as dead code. Queue drained.
+
+> Remaining terminal entries (Q1-d, Q1-h, Q3-c, Q5-a) reflect integration/capability constraints in this environment — they are not gaps in the inventory, they are complete entries with known blocking conditions recorded.
 
 ---
 
-*Cycle 6 dequeue complete — 14 checklist items ticked (Q1-b/e/f/g/i, Q3-a/b, Q5-b, terminal Q1-d/h, including customer-return dialog/panel); 2 checklist items remain unticked (`tracking-timeline`, `off-tier-prompt-dialog`); DN-6/7/8 added. Phase NOT complete until queue drained and all items ticked.*
+*Cycle 7 complete — **PHASE RECONCILIATION DONE.** All checklist items ticked. Queue drained. 44 live component entries + 4 dead-code/terminal notes + 5 terminal capability/integration closures. Segment 9 (Customer Detail Q2C cross-region surface) added. DN-7 gap closed.*
