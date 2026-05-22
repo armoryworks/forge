@@ -1,76 +1,74 @@
 # Master-Data — Scout Queue
 
 > Filed by: ui-scout cycle 1 · 2026-05-22  
+> Updated: ui-scout cycle 5 (C5) · 2026-05-22  
 > Dequeue: open each item, observe live, update `master-data.md` entries, tick off.  
-> All items below are surfaces the cycle-1 sweep could NOT fully reach.
+> All items below are surfaces the cycle-1 sweep could NOT fully reach.  
+> **C5 status:** Q1 CLOSED, Q2 partially closed (6/11 confirmed), Q3 partially closed (9/18 confirmed), Q5 CLOSED, Q6 partially closed (a/b/c seeded+observed). Parts workflow (Q4) and seeded lot (Q6-g) remain open.
 
 ---
 
-## Q1 — Inventory unvisited tabs (6 tabs)
+## Q1 — Inventory unvisited tabs ✅ CLOSED C5
 
 **Why unreached:** Tab names discovered from source only after sweep completed. `/inventory/transfers` and `/inventory/adjustments` probed are invalid names; they redirected to stock.
 
-| queue-id | URL | source tab name | notes |
-|----------|-----|-----------------|-------|
-| Q1-a | `/inventory/movements` | `movements` | Bin-movement history |
-| Q1-b | `/inventory/stockOps` | `stockOps` | Stock adjustments + transfers (inline forms) |
-| Q1-c | `/inventory/cycleCounts` | `cycleCounts` | Cycle-count list and create |
-| Q1-d | `/inventory/reservations` | `reservations` | Active inventory reservations |
-| Q1-e | `/inventory/replenishment` | `replenishment` | Reorder suggestions |
-| Q1-f | `/inventory/uom` | `uom` | UOM management (embeds UomManagementComponent) |
-
-**What to capture:** navigate → screenshot → table headers, buttons, empty/loading states, forms if inline.
+| queue-id | URL | source tab name | result (C5) |
+|----------|-----|-----------------|-------------|
+| Q1-a ✅ | `/inventory/movements` | `movements` | Empty state — "No bin movements" message; `c2-inventory-movements.png` |
+| Q1-b ✅ | `/inventory/stockOps` | `stockOps` | Two action cards: Transfer Stock + Adjust Stock; inline forms; `c2-inventory-stockOps.png` |
+| Q1-c ✅ | `/inventory/cycleCounts` | `cycleCounts` | Empty table + NEW CYCLE COUNT button; `c2-inventory-cycleCounts.png` |
+| Q1-d ✅ | `/inventory/reservations` | `reservations` | Empty table; `c2-inventory-reservations.png` |
+| Q1-e ✅ | `/inventory/replenishment` | `replenishment` | Empty table; `c2-inventory-replenishment.png` |
+| Q1-f ✅ | `/inventory/uom` | `uom` | POPULATED — pre-seeded UOMs (SQFT/SQIN/EA/PR/DZ/PK); UNITS OF MEASURE + CONVERSIONS sub-tabs; + NEW UOM; `c2-inventory-uom.png` |
 
 ---
 
-## Q2 — Customer detail tabs (needs a seeded customer record)
+## Q2 — Customer detail tabs — PARTIAL C5 (6/11 confirmed)
 
-**Why unreached:** `/customers/:id/:tab` requires at least one customer to exist. Stack is non-seeded.
+**Why unreached:** `/customers/:id/:tab` requires at least one customer to exist. Stack is non-seeded.  
+**C5 seed:** Customer id=2 "Acme Corp" created via `POST /api/v1/customers`. Status: Active, type: Business.
 
-| queue-id | URL pattern | tab | component | notes |
-|----------|-------------|-----|-----------|-------|
-| Q2-a | `/customers/:id/overview` | overview | `CustomerOverviewTabComponent` | Summary panel |
-| Q2-b | `/customers/:id/contacts` | contacts | `CustomerContactsClusterComponent` | Confirm cluster-only (no separate tab cmp) |
-| Q2-c | `/customers/:id/addresses` | addresses | `CustomerAddressesClusterComponent` | Confirm cluster-only |
-| Q2-d | `/customers/:id/estimates` | estimates | `CustomerEstimatesTabComponent` | Cross-link to quotes/estimates |
-| Q2-e | `/customers/:id/quotes` | quotes | `CustomerQuotesTabComponent` | |
-| Q2-f | `/customers/:id/orders` | orders | `CustomerOrdersTabComponent` | |
-| Q2-g | `/customers/:id/jobs` | jobs | `CustomerJobsTabComponent` | |
-| Q2-h | `/customers/:id/invoices` | invoices | `CustomerInvoicesTabComponent` | |
-| Q2-i | `/customers/:id/pricing` | pricing | `CustomerPricingTabComponent` + `PriceListEntriesTableComponent` | Price-list cluster |
-| Q2-j | `/customers/:id/interactions` | interactions | `CustomerInteractionsClusterComponent` | Confirm cluster-only |
-| Q2-k | `/customers/:id/activity` | activity | `CustomerActivityTabComponent` + `CustomerActivityClusterComponent` | |
-
-**Pre-requisite:** `POST /api/v1/customers` or UI create flow. Suggest creating via "NEW CUSTOMER" button to also capture `NewCustomerForkDialogComponent` / `GuidedCustomerDialogComponent`.
+| queue-id | URL pattern | tab | component | result (C5) |
+|----------|-------------|-----|-----------|-------------|
+| Q2-a ✅ | `/customers/2/overview` | overview | `CustomerOverviewTabComponent` | Confirmed — ACCOUNT DETAILS, toggles; `c2-customer-detail-overview.png` |
+| Q2-b ✅ | `/customers/2/contacts` | contacts | `CustomerContactsClusterComponent` | Confirmed cluster-only; empty — "No contacts yet"; `c2-customer-detail-contacts.png` |
+| Q2-c ✅ | `/customers/2/addresses` | addresses | `CustomerAddressesClusterComponent` | Confirmed cluster-only; empty — "No addresses on file"; `c2-customer-detail-addresses.png` |
+| Q2-d ✅ | `/customers/2/estimates` | estimates | `CustomerEstimatesTabComponent` | Empty — "No estimates yet" + NEW ESTIMATE; `c2-customer-detail-estimates.png` |
+| Q2-e ✅ | `/customers/2/quotes` | quotes | `CustomerQuotesTabComponent` | Empty — "No quotes yet" + NEW QUOTE; `c2-customer-detail-quotes.png` |
+| Q2-f ⚠️ | `/customers/2/orders` | orders | `CustomerOrdersTabComponent` | Tab NOT visible — lifecycle gate (Active only, module/cap not enabled) |
+| Q2-g ⚠️ | `/customers/2/jobs` | jobs | `CustomerJobsTabComponent` | Tab NOT visible — lifecycle gate |
+| Q2-h ⚠️ | `/customers/2/invoices` | invoices | `CustomerInvoicesTabComponent` | Tab NOT visible — lifecycle gate |
+| Q2-i ⚠️ | `/customers/2/pricing` | pricing | `CustomerPricingTabComponent` | URL redirected to overview — tab NOT in rail |
+| Q2-j ⚠️ | `/customers/2/interactions` | interactions | `CustomerInteractionsClusterComponent` | Tab NOT visible — CAP-MD-CUSTOMER-INTERACTIONS not enabled |
+| Q2-k ✅ | `/customers/2/activity` | activity | `CustomerActivityTabComponent` + cluster | Empty — "No activity yet"; `c2-customer-detail-activity.png` |
 
 ---
 
 ## Q3 — All create/edit dialogs (need triggering + populated state)
 
-Stack is empty; all "NEW X" buttons lead to dialogs that open but may not show populated state without data. Each needs:  
-(a) open dialog → screenshot empty/create state  
-(b) if edit dialog: seed a record first, open from row
+Stack is empty; all "NEW X" buttons lead to dialogs that open but may not show populated state without data.
 
-| queue-id | dialog | trigger | notes |
-|----------|--------|---------|-------|
-| Q3-a | `NewLeadForkDialogComponent` | Leads list → any "New Lead" action | 2-step: shape picker → form |
-| Q3-b | `LeadDetailDialogComponent` / `LeadDetailPanelComponent` | Click a lead row | Needs seeded lead |
-| Q3-c | `LeadConvertDialogComponent` | Lead detail → Convert | Needs seeded lead |
-| Q3-d | `AccountDialogComponent` | Leads/accounts → NEW ACCOUNT | Open without seed |
-| Q3-e | `CampaignDialogComponent` | Leads/campaigns → NEW CAMPAIGN | Open without seed |
-| Q3-f | `CallbackSchedulerDialogComponent` | Leads/queue → callback action | Needs lead in queue |
-| Q3-g | `NewCustomerForkDialogComponent` | Customers → NEW CUSTOMER | Open without seed |
-| Q3-h | `GuidedCustomerDialogComponent` | Within fork dialog | Step 2 of fork |
-| Q3-i | `LeadPickerDialogComponent` | Within customer fork → convert-from-lead path | Needs seeded lead |
-| Q3-j | `ProvisionPortalAccessDialogComponent` | Customers/portal-access → PROVISION ACCESS | Open; may need seeded customer |
-| Q3-k | `NewVendorForkDialogComponent` | Vendors → NEW VENDOR | Open without seed |
-| Q3-l | `VendorDialogComponent` | Within vendor fork | Quick path |
-| Q3-m | `GuidedVendorDialogComponent` | Within vendor fork | Guided path |
-| Q3-n | `VendorDetailDialogComponent` / `VendorDetailPanelComponent` | Click vendor row | Needs seeded vendor; confirm VendorScorecardTabComponent is within |
-| Q3-o | `NewPartForkDialogComponent` | Parts → any create trigger | Open without seed |
-| Q3-p | Part workflow steps (all 13) | `/parts/new` → advance through steps | Needs navigating each step live |
-| Q3-q | `LotDialogComponent` | Lots → create action | Open without seed |
-| Q3-r | `LotDetailDialogComponent` / `LotDetailPanelComponent` | Click lot row | Needs seeded lot |
+| queue-id | dialog | trigger | result (C5) |
+|----------|--------|---------|-------------|
+| Q3-a ✅ | `NewLeadForkDialogComponent` | Leads list → NEW LEAD | Confirmed — 5 shapes (Quick add / Quick quote+RFQ / Repeat+standing / Strategic account / Prototype+R&D); `c2-new-lead-fork-dialog.png` |
+| Q3-b ⚠️ | `LeadDetailDialogComponent` / `LeadDetailPanelComponent` | Click lead row | Panel confirmed C5 (c2-lead-detail-panel-open.png); dialog trigger not found (row-click opens panel not dialog) |
+| Q3-c ✅ | `LeadConvertDialogComponent` | Lead detail panel → CONVERT TO CUSTOMER | Confirmed opens; `c2-lead-convert-dialog.png` |
+| Q3-d ✅ | `AccountDialogComponent` | Leads/accounts → NEW ACCOUNT | Confirmed opens; `c2-lead-new-account-dialog.png` |
+| Q3-e ✅ | `CampaignDialogComponent` | Leads/campaigns → NEW CAMPAIGN | Confirmed opens; `c2-lead-new-campaign-dialog.png` |
+| Q3-f ⚠️ | `CallbackSchedulerDialogComponent` | Leads/queue → callback action | Queue tab empty; trigger unreachable without lead in queue state |
+| Q3-g ✅ | `NewCustomerForkDialogComponent` | Customers → NEW CUSTOMER | Confirmed fork dialog opens; `c2-new-customer-fork-dialog.png` |
+| Q3-h ⚠️ | `GuidedCustomerDialogComponent` | Within fork dialog | Fork offered only "Quick create" path on this stack; guided path not reached |
+| Q3-i ✅ | `LeadPickerDialogComponent` | Customer fork → convert-from-lead | Confirmed opens (seeded lead available); `c2-lead-picker-dialog.png` |
+| Q3-j ✅ | `ProvisionPortalAccessDialogComponent` | Customers/portal-access → PROVISION ACCESS | Confirmed opens; `c2-provision-portal-access-dialog.png` |
+| Q3-k ✅ | `NewVendorForkDialogComponent` | Vendors → NEW VENDOR | Confirmed opens; `c2-new-vendor-fork-dialog.png` |
+| Q3-l ✅ | `VendorDialogComponent` | Within vendor fork (Quick path) | Confirmed opens; `c2-new-vendor-quick-dialog.png` |
+| Q3-m ⚠️ | `GuidedVendorDialogComponent` | Within vendor fork (Guided path) | Guided path appeared to open same VendorDialog form; need source confirmation of separate component |
+| Q3-n ✅ | `VendorDetailPanelComponent` | Click vendor row | Confirmed panel with 4 tabs; `c2-vendor-detail-panel.png`; VendorDialogComponent opens from Edit; VendorDetailDialogComponent has separate trigger |
+| Q3-n ⚠️ | `VendorDetailDialogComponent` | Row click (dialog vs panel routing) | Panel opened on row-click; dialog trigger different — needs investigation |
+| Q3-o ✅ | `NewPartForkDialogComponent` | Parts → NEW PART | Confirmed opens; `c2-new-part-fork-dialog.png` |
+| Q3-p ⚠️ | Part workflow steps (all 13) | `/parts/new` → advance through steps | Workflow loads but "Loading workflow…" — part created with Draft status; needs Active part |
+| Q3-q ✅ | `LotDialogComponent` | Lots → NEW LOT | Confirmed opens; `c2-lot-new-dialog.png` |
+| Q3-r ⚠️ | `LotDetailDialogComponent` / `LotDetailPanelComponent` | Click lot row | 0 lots on stack; needs seeded lot |
 
 ---
 
@@ -92,34 +90,41 @@ Stack is empty; all "NEW X" buttons lead to dialogs that open but may not show p
 
 ---
 
-## Q5 — Role-gated sweeps
+## Q5 — Role-gated sweeps ✅ CLOSED C5
 
-**Why unreached:** Only admin@forge.local used this cycle. Role differences may gate components.
+**Completed:** C5 role sweep (5 roles × 18 routes). Output: `role-sweep-log.json` (90 entries).
 
-| queue-id | role | surfaces to verify |
-|----------|------|--------------------|
-| Q5-a | engineer@forge.local | Parts workflow, inventory, lots — confirm same surfaces visible |
-| Q5-b | pm@forge.local | Leads, customers, quotes — confirm PM sees same as Manager |
-| Q5-c | worker@forge.local | Expect restricted — confirm no access to master-data or read-only |
-| Q5-d | manager@forge.local | Full sweep to confirm manager matches admin for master-data |
-| Q5-e | officemanager@forge.local | Customers (all tabs?), vendors, portal-access — confirm OfficeManager scope |
+| queue-id | role | result (C5) |
+|----------|------|-------------|
+| Q5-a ✅ | engineer@forge.local | BLOCKED: leads, customers, vendors. OK: parts, inventory (all tabs), lots |
+| Q5-b ✅ | pm@forge.local | BLOCKED: vendors, inventory, lots. OK: leads, customers, quotes |
+| Q5-c ✅ | worker@forge.local | BLOCKED: ALL master-data routes (leads, customers, vendors, parts, inventory, lots) |
+| Q5-d ✅ | manager@forge.local | OK: ALL master-data routes — matches admin access for master-data |
+| Q5-e ✅ | officemanager@forge.local | BLOCKED: leads, parts, lots. OK: customers (all tabs), vendors, inventory |
 
-**Note:** Source-cataloger seeded `renders-for` values from `app.routes.ts` guards. Sub-surface capability gates may differ — scout to flag mismatches.
+**Key findings vs source-cataloger's app.routes.ts values:**
+- Engineer blocked from leads/customers/vendors — renders-for corrected in master-data.md
+- PM blocked from vendors/inventory/lots — renders-for updated
+- Worker blocked from ALL — renders-for updated (was "Worker" in some entries; removed)
+- OfficeManager blocked from leads/parts/lots — renders-for updated for those sections
+- Manager = Admin for all master-data routes; `renders-for` now includes both
 
 ---
 
-## Q6 — Populated states (need seeded records)
+## Q6 — Populated states — PARTIAL C5
 
-| queue-id | entity | what to seed | populated state targets |
-|----------|--------|--------------|------------------------|
-| Q6-a | Lead | 1 lead (any shape) | Leads list table, detail panel, detail dialog |
-| Q6-b | Customer | 1 customer | Customers list, customer detail all tabs |
-| Q6-c | Vendor | 1 vendor | Vendors list, vendor detail panel/dialog, scorecard tab |
-| Q6-d | Part | 1 part (Make type) | Parts list, part workflow all steps, BOM step, part clusters |
-| Q6-e | Part + BOM | Part with 1+ BOM child | BOM tree, BOM revision history |
-| Q6-f | Inventory | 1 part with stock | Inventory stock tab populated |
-| Q6-g | Lot | 1 lot | Lots list populated, lot detail |
-| Q6-h | Receiving | 1 PO + receive | Inventory receiving tab populated, inspection queue |
+| queue-id | entity | seeded? | result (C5) |
+|----------|--------|---------|-------------|
+| Q6-a ✅ | Lead | id=1 "John Smith" via POST /api/v1/leads | Leads list populated; detail panel confirmed; `c2-leads-populated.png`, `c2-lead-detail-panel-open.png` |
+| Q6-b ✅ | Customer | id=2 "Acme Corp" via POST /api/v1/customers | Customers list populated; 6/11 detail tabs confirmed; `c2-customer-detail-*.png` |
+| Q6-c ✅ | Vendor | id=3 "Steel Supply Co" via POST /api/v1/vendors | Vendors list populated; detail panel (4 tabs) confirmed; scorecard populated with grade A; `c2-vendor-detail-panel.png` + tab shots |
+| Q6-d ⚠️ | Part | id=3 via POST /api/v1/parts — created in Draft status | Parts list not showing (default filter=Active); workflow navigated to `/parts/3` but shows "Loading workflow…" — Draft status blocks workflow render |
+| Q6-e ⚠️ | Part + BOM | Blocked — Part workflow not loading | BOM tree unreachable until part loads in workflow |
+| Q6-f ⚠️ | Inventory | No stock seeded | Inventory stock tab still empty |
+| Q6-g ⚠️ | Lot | 0 lots on stack | Lots list empty; lot detail panel/dialog unreachable |
+| Q6-h ⚠️ | Receiving | No PO seeded | Receiving tab populated state unreachable |
+
+**Blocker for Q6-d:** Part API ignores `"status":"Active"` in POST body; parts always created as Draft. To fix: POST then PATCH status, or use UI workflow to publish part.
 
 ---
 
@@ -147,14 +152,14 @@ Stack is empty; all "NEW X" buttons lead to dialogs that open but may not show p
 
 ## Open questions from source cross-reference
 
-| id | question | source location |
-|----|----------|----------------|
-| OQ1 | Do `contacts` and `addresses` tabs in customer detail use cluster components directly (no separate tab .ts)? | `pages/customer-detail/` — no `*-contacts-tab.ts` found |
-| OQ2 | What is the exact step order in the parts workflow? `providePartWorkflowSteps()` drives it. | `features/parts/workflow/register-part-workflow-steps.ts` |
-| OQ3 | Does `VendorScorecardTabComponent` mount inside VendorDetailPanel or VendorDetailDialog or both? | `features/vendors/components/vendor-detail-*/` templates |
-| OQ4 | Is `PartVendorPartsStepComponent` (`workflow/part-vendor-parts-step/`) the same as the `vendor-parts-cluster` components, or separate? | Compare workflow step vs cluster |
-| OQ5 | What does the lots empty state look like? DataTable rendered with zero rows but no keyword matched in body text. | Observe live with populated + empty |
+| id | question | status |
+|----|----------|--------|
+| OQ1 ✅ | Do `contacts` and `addresses` tabs in customer detail use cluster components directly (no separate tab .ts)? | CLOSED C5: confirmed — no separate tab .ts; clusters mounted directly in shell template; `tabCapabilityMap` drives inclusion |
+| OQ2 ⚠️ | What is the exact step order in the parts workflow? `providePartWorkflowSteps()` drives it. | OPEN — workflow didn't load (Draft part); need `register-part-workflow-steps.ts` source read or Active part |
+| OQ3 ✅ | Does `VendorScorecardTabComponent` mount inside VendorDetailPanel or VendorDetailDialog or both? | CLOSED C5: confirmed mounted in VendorDetailPanelComponent SCORECARD tab; dialog mounting unconfirmed |
+| OQ4 ⚠️ | Is `PartVendorPartsStepComponent` (`workflow/part-vendor-parts-step/`) the same as the `vendor-parts-cluster` components, or separate? | OPEN — workflow not loaded; source read needed |
+| OQ5 ⚠️ | What does the lots empty state look like? DataTable rendered with zero rows but no keyword matched in body text. | OPEN — 0 lots; observe once a lot is seeded |
 
 ---
 
-_Queue filed: 2026-05-22 · ui-scout cycle 1. Assign Q1 (inventory tabs) and Q3 (dialogs) as highest priority — reachable without new seeds. Q2/Q4/Q6 require seeding first._
+_Queue filed: 2026-05-22 · ui-scout cycle 1. Updated C5 (ui-scout 2026-05-22): Q1 CLOSED, Q2 6/11 closed, Q3 9/18 closed, Q5 CLOSED, Q6 a/b/c done. Remaining priority: fix Part to Active status (unblocks Q4/Q6-d/Q6-e + all 13 workflow steps), seed lot (unblocks Q3-r/Q6-g), find GuidedCustomer and VendorDetailDialog triggers (Q3-h/Q3-m/Q3-n)._
