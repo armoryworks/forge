@@ -7,6 +7,12 @@
 
 ---
 
+## Cross-links
+
+- **PO-Receiving (purchase-orders side):** The `ReceiveDialogComponent` launched from a PO detail panel is inventoried in [`quote-to-cash.md`](quote-to-cash.md) (Segment 4). This doc's `/inventory/receiving` entry covers the inventory-tab view only.
+
+---
+
 ## Schema
 
 | field | content |
