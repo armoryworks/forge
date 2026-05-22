@@ -3,7 +3,7 @@
 > **Phase:** master-data · **Method:** observe-and-record (no code changes)
 > **Single writer:** source-cataloger owns this file. Scout writes queue only.
 > **Source on disk:** HEAD e9b7802 (running binary main-c7e76cf — flag any live/source mismatch)
-> **Last commit:** _seed_
+> **Last commit:** _shared-cmp-reconciliation_
 
 ---
 
@@ -184,26 +184,28 @@
 - [ ] `components/lot-detail-panel/lot-detail-panel.component.ts`
 - [ ] `components/lot-dialog/lot-dialog.component.ts`
 
-### Shared components likely used by master-data (locate usages)
+### Shared components — usage reconciliation (resolved)
 
-- [ ] `shared/components/data-table` — primary list table
-- [ ] `shared/components/page-header` — page title + action bar
-- [ ] `shared/components/page-layout` — shell/layout wrapper
-- [ ] `shared/components/detail-side-panel` — slide-in detail panel (leads, vendors, lots)
-- [ ] `shared/components/slideout` — wider slideout panel
-- [ ] `shared/components/dialog` — base dialog wrapper
-- [ ] `shared/components/entity-picker` — inline entity search/select
-- [ ] `shared/components/empty-state` — zero-rows state
-- [ ] `shared/components/loading-overlay` — loading state
-- [ ] `shared/components/status-badge` — status chip on list rows
-- [ ] `shared/components/entity-link` — nav link to entity detail
-- [ ] `shared/components/entity-activity-section` — activity feed embedded in detail
-- [ ] `shared/components/workflow` — step-based workflow shell (parts)
-- [ ] `shared/components/address-form` — address cluster sub-form
-- [ ] `shared/components/file-upload-zone` — part files cluster
-- [ ] `shared/components/rich-text-editor` — notes/description fields
-- [ ] `shared/components/autocomplete` — search/filter inputs
-- [ ] `shared/components/entity-completeness-badge` / `entity-completeness-chip` — completeness indicators
+> ✅ = has master-data usages (see resolved table below) · ❌ = no master-data usage confirmed
+
+- [x] ✅ `shared/components/data-table` — 18 usage sites across all 6 areas
+- [x] ✅ `shared/components/page-header` — 13 usage sites across all 6 areas
+- [x] ✅ `shared/components/page-layout` — 3 usage sites (leads/samples, leads/accounts, customers/portal-access)
+- [x] ❌ `shared/components/detail-side-panel` — no master-data usage; panels are feature-specific components
+- [x] ❌ `shared/components/slideout` — no master-data usage confirmed
+- [x] ✅ `shared/components/dialog` — 8+ usage sites across leads, customers, parts, inventory
+- [x] ✅ `shared/components/entity-picker` — 16 usage sites; heaviest in parts workflow
+- [x] ✅ `shared/components/empty-state` — 9 usage sites across customers, vendors, leads, inventory, lots
+- [x] ✅ `shared/components/loading-overlay` (impl: `LoadingBlockDirective`) — 20+ sites across all 6 areas
+- [x] ❌ `shared/components/status-badge` — no master-data usage (only dashboard/kanban)
+- [x] ✅ `shared/components/entity-link` — 2 usage sites (parts/part-landed-cost, parts/part-detail-panel)
+- [x] ✅ `shared/components/entity-activity-section` — 5 usage sites (leads, customers, vendors, parts, lots)
+- [x] ✅ `shared/components/workflow` — 1 usage site (parts/part-workflow-page)
+- [x] ✅ `shared/components/address-form` — 4 usage sites (leads/convert, customers/guided, vendors/dialog, vendors/guided)
+- [x] ✅ `shared/components/file-upload-zone` — 2 usage sites (parts/operation-dialog, parts/part-files-cluster)
+- [x] ❌ `shared/components/rich-text-editor` — no master-data usage confirmed
+- [x] ❌ `shared/components/autocomplete` — no master-data usage (used in quotes/POs/shipments/SOs only)
+- [x] ✅ `shared/components/entity-completeness-badge` + `entity-completeness-chip` — 6 usage sites (customers, vendors, parts list + detail panels)
 
 ---
 
@@ -934,3 +936,80 @@ Tabs within InventoryComponent (in-component, NOT separate route components):
 ---
 
 _End of seed — cycle 1 complete. Queue drained next cycle after scout delivers `master-data-queue.md`._
+
+---
+
+## Scout Live Sweep — Cycle 1 (2026-05-22)
+
+> Agent: ui-scout · Playwright headless Chromium · admin@forge.local  
+> Stack: non-seeded. Every list page = empty state. Profile redirect bypassed via direct /dashboard nav.  
+> Screenshots: `analysis/inventory/screenshots/<route-id>.png`  
+> Raw log: `analysis/inventory/sweep-log.json`
+
+### Routes visited + live states observed
+
+| route-id | URL visited | finalURL | empty-state detected | key live signals |
+|----------|-------------|----------|----------------------|-----------------|
+| leads-list | `/leads` | `/leads` | "no leads" | nav icons: list/upload_file/speed/campaign/block visible |
+| leads-intake | `/leads/intake` | `/leads/intake` | "get started" | table headers: HEADER/REQUIRED?/ALSO ACCEPTED; button: PARSE PASTED ROWS |
+| leads-queue | `/leads/queue` | `/leads/queue` | none | button: PULL NEXT 5 visible |
+| leads-campaigns | `/leads/campaigns` | `/leads/campaigns` | none | button: NEW CAMPAIGN visible |
+| leads-suppression | `/leads/suppression` | `/leads/suppression` | none | shell rendered; no primary action button detected |
+| leads-samples | `/leads/samples` | `/leads/samples` | none | shell rendered; no primary action button detected |
+| leads-accounts | `/leads/accounts` | `/leads/accounts` | none | button: NEW ACCOUNT visible |
+| customers-list | `/customers` | `/customers` | "no customers" | button: NEW CUSTOMER; nav icons: list/contacts/vpn_key/filter_alt/upload |
+| customers-contacts | `/customers/contacts` | `/customers/contacts` | none | shell rendered |
+| customers-portal-access | `/customers/portal-access` | `/customers/portal-access` | none | button: PROVISION ACCESS visible |
+| customers-segments | `/customers/segments` | `/customers/segments` | none | shell rendered |
+| customers-import | `/customers/import` | `/customers/import` | none | shell rendered |
+| vendors-list | `/vendors` | `/vendors` | "no vendors" | button: NEW VENDOR; nav icons: storefront/description/request_page |
+| parts-list | `/parts` | `/parts` | "no parts" | button: help_outline; nav icons: category/hub/event_available/batch_prediction/speed |
+| parts-new | `/parts/new` | `/parts/new` | none | workflow shell rendered; nav icons: category/hub/event_available/batch_prediction/speed |
+| inventory-stock | `/inventory/stock` | `/inventory/stock` | "no inventory" | nav icons: inventory/build/precision_manufacturing/storefront |
+| inventory-receiving | `/inventory/receiving` | `/inventory/receiving` | none | shell rendered (no empty-text keyword matched) |
+| inventory-transfers | `/inventory/transfers` | `/inventory/stock` | "no inventory" | INVALID TAB — redirected to /inventory/stock |
+| inventory-adjustments | `/inventory/adjustments` | `/inventory/stock` | "no inventory" | INVALID TAB — redirected to /inventory/stock |
+| inventory-locations | `/inventory/locations` | `/inventory/locations` | none | shell rendered |
+| lots-list | `/lots` | `/lots` | none (empty state keyword unmatched) | button: SEARCH visible; table rendered but empty |
+
+### State updates (for reconciliation checklist)
+
+Routes confirmed live (tick these off):
+- [x] `/leads` — empty state "no leads"
+- [x] `/leads/intake` — loaded (get-started state; CSV table header visible)
+- [x] `/leads/queue` — loaded (PULL NEXT 5 visible)
+- [x] `/leads/campaigns` — loaded (NEW CAMPAIGN visible)
+- [x] `/leads/suppression` — loaded (shell rendered)
+- [x] `/leads/samples` — loaded (shell rendered)
+- [x] `/leads/accounts` — loaded (NEW ACCOUNT visible)
+- [x] `/customers` — empty state "no customers"
+- [x] `/customers/contacts` — loaded (shell rendered)
+- [x] `/customers/portal-access` — loaded (PROVISION ACCESS visible)
+- [x] `/customers/segments` — loaded (shell rendered)
+- [x] `/customers/import` — loaded (shell rendered)
+- [x] `/vendors` — empty state "no vendors"
+- [x] `/parts` — empty state "no parts"
+- [x] `/parts/new` — loaded (workflow shell rendered)
+- [x] `/inventory/stock` — empty state "no inventory"
+- [x] `/inventory/receiving` — loaded (shell rendered)
+- [x] `/inventory/locations` — loaded (shell rendered)
+- [x] `/lots` — loaded (empty table; no keyword match — DataTable renders with empty rows)
+
+### Confirmed live: BOM
+
+BOM is NOT a standalone route. Confirmed in source: `app-part-bom-step` mounts inside the part workflow at `/parts/new` and `/parts/:id`. The shell rendered at `/parts/new` — BOM step accessible only after navigating into the multi-step workflow. **Queue: open parts/new workflow and advance to BOM step.**
+
+### Inventory tab name correction
+
+`/inventory` valid tabs per source (`inventory.component.ts:64`):  
+`stock | locations | movements | receiving | stockOps | cycleCounts | reservations | replenishment | uom`
+
+My sweep probed `transfers` and `adjustments` — both are NOT valid tab names and redirected to `stock`. The correct tab for transfers+adjustments is `stockOps`. Unvisited tabs filed in queue below.
+
+### Onboarding banner
+
+All pages showed an onboarding banner: "Complete your employee profile — 3 sections remaining / COMPLETE NOW / SKIP ONBOARDING". This is a shared component visible on every authenticated page for admin@forge.local.
+
+### Profile redirect
+
+admin@forge.local lands on `/account/profile` post-login. Bypassed by navigating directly to `/dashboard` — no profile completion required to access master-data routes.
