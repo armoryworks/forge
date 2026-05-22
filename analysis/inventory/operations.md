@@ -39,7 +39,7 @@ _Cross-link: Customer Returns → see [quote-to-cash.md §Segment 8](./quote-to-
 |-----------|------|---------|
 | `app-avatar` | `shared/components/avatar/` | K-03 (job-card) |
 | `app-barcode-info` | `shared/components/barcode-info/` | K-04 (job-detail-panel) |
-| `app-barcode-scan-input` | `shared/components/barcode-scan-input/` | SF-20 (clock), SF-21 (inventory-scan) |
+| `app-barcode-scan-input` | `shared/components/barcode-scan-input/` | SF-13 (scan-move-flow), SF-14 (scan-receive-flow), SF-20 (clock), SF-21 (inventory-scan) |
 | `app-confirm-dialog` | `shared/components/confirm-dialog/` | TT-01 (delete entry), K-01 (delete job) |
 | `app-data-table` | `shared/components/data-table/` | B-01, Q-08–Q-11 (list tabs), A-01, MN-01 |
 | `app-date-range-picker` | `shared/components/date-range-picker/` | OE-01, TT-01 |
@@ -51,11 +51,11 @@ _Cross-link: Customer Returns → see [quote-to-cash.md §Segment 8](./quote-to-
 | `app-entity-picker` | `shared/components/entity-picker/` | K-06 (customer/assignee), Q-02a (job/lot), M-09 (parts), A-04 (location) |
 | `app-file-upload-zone` | `shared/components/file-upload-zone/` | K-10 (cover-photo-upload-dialog) |
 | `app-input` | `shared/components/input/` | K-06, P-03, SF-02, TT-02, M-08–M-10 (form text fields) |
-| `app-kanban-column-header` | `shared/components/kanban-column-header/` | K-02 (board-column header) |
+| ~~`app-kanban-column-header`~~ | `shared/components/kanban-column-header/` | **unused** — exists in shared/ but imported by no operations feature |
 | `app-kpi-chip` | `shared/components/kpi-chip/` | S-01 (KPI strip), OE-01 (KPI strip), M-02 (dashboard KPIs) |
 | `app-page-header` | `shared/components/page-header/` | all page components (title + action buttons) |
 | `app-page-layout` | `shared/components/page-layout/` | all page components (sidebar + content slot) |
-| `app-quick-action-panel` | `shared/components/quick-action-panel/` | K-04 (job actions), A-02 (asset actions) |
+| `app-quick-action-panel` | `shared/components/quick-action-panel/` | SF-07 (scan-action-overlay — action-type buttons) |
 | `app-select` | `shared/components/select/` | SF-02 (team select), S-03 (work-center), K-06 (track-type/priority), Q-02a (status) |
 | `app-status-timeline` | `shared/components/status-timeline/` | K-04 (job-detail-panel status history) |
 | `app-textarea` | `shared/components/textarea/` | TT-02 (notes), MN-02 (resolution notes), P-03 (cycle goals) |
@@ -125,7 +125,7 @@ _Cross-link: Customer Returns → see [quote-to-cash.md §Segment 8](./quote-to-
 
 ## Reconciliation Denominator
 
-_Source tree glob 2026-05-22 — authoritative file count from `forge-ui/src/app/features/` (operations areas only). **64 feature component files** across 12 areas + **27 shared component files** imported by those features = **91 checklist items total**._
+_Source tree glob 2026-05-22 — authoritative file count from `forge-ui/src/app/features/` (operations areas only). **64 feature component files** across 12 areas + **26 shared component files** imported by those features = **90 checklist items total**. (Note: `kanban-column-header` exists in shared/ but is confirmed unused — removed from count.)_
 
 _Status: **catalogued** = source line confirmed + live states observed; **needs-live** = source confirmed, live sweep not yet reached; **not-yet-located** = source gap (none found — zero gaps)._
 
@@ -216,11 +216,10 @@ _Status: **catalogued** = source line confirmed + live states observed; **needs-
 | `app-entity-picker` | `shared/components/entity-picker/` | K-06 (customer/assignee), Q-02a, A-04 | needs-live |
 | `app-file-upload-zone` | `shared/components/file-upload-zone/` | K-10 (cover-photo-upload-dialog) | needs-live |
 | `app-input` | `shared/components/input/` | K-06, P-03, SF-02, TT-02 (form fields) | catalogued |
-| `app-kanban-column-header` | `shared/components/kanban-column-header/` | K-02 (board-column header) | catalogued |
 | `app-kpi-chip` | `shared/components/kpi-chip/` | S-01 (KPIs), OE-01 (KPIs), M-02 (dashboard) | catalogued |
 | `app-page-header` | `shared/components/page-header/` | all page components | catalogued |
 | `app-page-layout` | `shared/components/page-layout/` | all page components | catalogued |
-| `app-quick-action-panel` | `shared/components/quick-action-panel/` | K-04 (job actions), A-02 (asset actions) | needs-live |
+| `app-quick-action-panel` | `shared/components/quick-action-panel/` | SF-07 (scan-action-overlay) | needs-live |
 | `app-select` | `shared/components/select/` | SF-02 (team), S-03 (work-center), K-06, Q-02a | catalogued |
 | `app-status-timeline` | `shared/components/status-timeline/` | K-04 (job-detail-panel) | needs-live |
 | `app-textarea` | `shared/components/textarea/` | TT-02 (notes), MN-02 (resolution notes) | catalogued |
@@ -236,11 +235,11 @@ _Status: **catalogued** = source line confirmed + live states observed; **needs-
 |--------|--------------|-------------------|-------|
 | catalogued (all states confirmed) | 13 | 16 | 29 |
 | partial (reached; some states queued) | 7 | 0 | 7 |
-| needs-live (not yet reached) | 44 | 11 | 55 |
+| needs-live (not yet reached) | 44 | 10 | 54 |
 | **not-yet-located** | **0** | **0** | **0** |
-| **total** | **64** | **27** | **91** |
+| **total** | **64** | **26** | **90** |
 
-> **Zero not-yet-located.** Every component file in the source tree maps to an inventory entry. Remaining work: 55 items across 44 feature files + 11 shared components awaiting live-sweep confirmation.
+> **Zero not-yet-located.** Every component file in the source tree maps to an inventory entry. `kanban-column-header` confirmed unused (not imported by any operations feature). Remaining work: 54 items across 44 feature files + 10 shared components awaiting live-sweep confirmation.
 
 ---
 
@@ -254,17 +253,17 @@ Schema: component · type · route · file `path:line` · renders-for · states 
 
 | # | component | type | route | file | renders-for | states | purpose |
 |---|-----------|------|-------|------|-------------|--------|---------|
-| K-01 | `app-kanban` / KanbanComponent | page | `/kanban` | `features/kanban/kanban.component.ts:42` | all authenticated | empty(J-1 in ORDER CONFIRMED) · populated(3 track-types, 10 cols) · board-view · team-view | Job board — board/team view toggle, drag-drop columns, job list |
+| K-01 | `app-kanban` / KanbanComponent | page | `/kanban` | `features/kanban/kanban.component.ts:40` | all authenticated | empty(J-1 in ORDER CONFIRMED) · populated(3 track-types, 10 cols) · board-view · team-view | Job board — board/team view toggle, drag-drop columns, job list |
 | K-02 | `app-board-column` / BoardColumnComponent | cluster | `/kanban` | `features/kanban/components/board-column.component.ts:9` | all authenticated | empty(per col) · populated(J-1) | Single stage column; renders job cards; WIP-limit indicator |
-| K-03 | `app-job-card` / JobCardComponent | cluster | `/kanban` | `features/kanban/components/job-card.component.ts:12` | all authenticated | populated(J-1 "Test widget") | Compact job card with priority dot, avatar, hold badge |
+| K-03 | `app-job-card` / JobCardComponent | cluster | `/kanban` | `features/kanban/components/job-card.component.ts:11` | all authenticated | populated(J-1 "Test widget") | Compact job card with priority dot, avatar, hold badge |
 | K-04 | `app-job-detail-panel` / JobDetailPanelComponent | panel | `/kanban` (slide-out) | `features/kanban/components/job-detail-panel.component.ts:43` | all authenticated | **unreached — QUEUE OPS-Q-004** | Full job detail: fields, subtasks, links, BOM, files, activity; hosts Cost + OpTime tabs |
-| K-05 | `app-job-detail-dialog` / JobDetailDialogComponent | dialog | `/kanban` | `features/kanban/components/job-detail-dialog.component.ts:20` | all authenticated | **unreached — QUEUE OPS-Q-004** | Dialog wrapper around JobDetailPanelComponent (same content, modal variant) |
-| K-06 | `app-job-dialog` / JobDialogComponent (create) | form | `/kanban` | `features/kanban/components/job-dialog.component.ts:27` | all authenticated · CAP-MFG-WO-RELEASE gates button | form-populated(title/desc/track-type/customer/assignee/priority/due-date) | Create new job |
-| K-07 | `app-job-dialog` / JobDialogComponent (edit) | form | `/kanban` | `features/kanban/components/job-dialog.component.ts:27` | all authenticated | **unreached** — queue OPS-Q-004 | Edit existing job metadata |
-| K-08 | `app-job-cost-tab` / JobCostTabComponent | tab | `/kanban` (inside K-04) | `features/kanban/components/job-cost-tab.component.ts:15` | all authenticated | needs-live — trigger: Cost tab inside K-04 job-detail-panel · **QUEUE OPS-Q-004** | Job cost summary + material-issues table within detail panel |
-| K-09 | `app-operation-time-tab` / OperationTimeTabComponent | tab | `/kanban` (inside K-04) | `features/kanban/components/operation-time-tab.component.ts:14` | all authenticated | needs-live — trigger: Operation Time tab inside K-04 · **QUEUE OPS-Q-004** | Est vs actual setup/run minutes per operation sequence |
-| K-10 | `app-cover-photo-upload-dialog` / CoverPhotoUploadDialogComponent | dialog | `/kanban` (from K-04) | `features/kanban/components/cover-photo-upload-dialog.component.ts:18` | all authenticated | needs-live — trigger: action menu in job-detail-panel · **QUEUE OPS-Q-004** | Upload/view cover photo for a job |
-| K-11 | `app-dispose-job-dialog` / DisposeJobDialogComponent | dialog | `/kanban` (from K-04) | `features/kanban/components/dispose-job-dialog.component.ts:24` | all authenticated | needs-live — trigger: action menu in job-detail-panel · **QUEUE OPS-Q-004** | Mark job as disposed (scrapped / cancelled / other) with reason |
+| K-05 | `app-job-detail-dialog` / JobDetailDialogComponent | dialog | `/kanban` | `features/kanban/components/job-detail-dialog.component.ts:19` | all authenticated | **unreached — QUEUE OPS-Q-004** | Dialog wrapper around JobDetailPanelComponent (same content, modal variant) |
+| K-06 | `app-job-dialog` / JobDialogComponent (create) | form | `/kanban` | `features/kanban/components/job-dialog.component.ts:26` | all authenticated · CAP-MFG-WO-RELEASE gates button | form-populated(title/desc/track-type/customer/assignee/priority/due-date) | Create new job |
+| K-07 | `app-job-dialog` / JobDialogComponent (edit) | form | `/kanban` | `features/kanban/components/job-dialog.component.ts:26` | all authenticated | **unreached** — queue OPS-Q-004 | Edit existing job metadata |
+| K-08 | `app-job-cost-tab` / JobCostTabComponent | tab | `/kanban` (inside K-04) | `features/kanban/components/job-cost-tab.component.ts:14` | all authenticated | needs-live — trigger: Cost tab inside K-04 job-detail-panel · **QUEUE OPS-Q-004** | Job cost summary + material-issues table within detail panel |
+| K-09 | `app-operation-time-tab` / OperationTimeTabComponent | tab | `/kanban` (inside K-04) | `features/kanban/components/operation-time-tab.component.ts:12` | all authenticated | needs-live — trigger: Operation Time tab inside K-04 · **QUEUE OPS-Q-004** | Est vs actual setup/run minutes per operation sequence |
+| K-10 | `app-cover-photo-upload-dialog` / CoverPhotoUploadDialogComponent | dialog | `/kanban` (from K-04) | `features/kanban/components/cover-photo-upload-dialog.component.ts:17` | all authenticated | needs-live — trigger: action menu in job-detail-panel · **QUEUE OPS-Q-004** | Upload/view cover photo for a job |
+| K-11 | `app-dispose-job-dialog` / DisposeJobDialogComponent | dialog | `/kanban` (from K-04) | `features/kanban/components/dispose-job-dialog.component.ts:23` | all authenticated | needs-live — trigger: action menu in job-detail-panel · **QUEUE OPS-Q-004** | Mark job as disposed (scrapped / cancelled / other) with reason |
 | K-12 | KanbanService | service | `/kanban` | `features/kanban/services/kanban.service.ts:1` | n/a | n/a | Primary kanban data service (board, jobs, CRUD, BOM, files, parts) |
 | K-13 | JobCostService | service | `/kanban` | `features/kanban/services/job-cost.service.ts:1` | n/a | n/a | Job cost summary + operation-time data |
 
@@ -275,7 +274,7 @@ Schema: component · type · route · file `path:line` · renders-for · states 
 | # | component | type | route | file | renders-for | states | purpose |
 |---|-----------|------|-------|------|-------------|--------|---------|
 | B-01 | `app-backlog` / BacklogComponent | page | `/backlog` | `features/backlog/backlog.component.ts:41` | all authenticated | populated(J-1 in table) · filters(track/priority/assignee) · table-view · NEW JOB button | Unscheduled job queue — table + card-grid view modes, search/filter, open job detail |
-| B-02 | `app-backlog-card-grid` / BacklogCardGridComponent | cluster | `/backlog` | `features/backlog/components/backlog-card-grid/backlog-card-grid.component.ts:7` | all authenticated | **unreached — QUEUE OPS-Q-015** | Card-grid layout for backlog jobs (alternative to table view) |
+| B-02 | `app-backlog-card-grid` / BacklogCardGridComponent | cluster | `/backlog` | `features/backlog/components/backlog-card-grid/backlog-card-grid.component.ts:6` | all authenticated | **unreached — QUEUE OPS-Q-015** | Card-grid layout for backlog jobs (alternative to table view) |
 | B-03 | BacklogService | service | `/backlog` | `features/backlog/services/backlog.service.ts:1` | n/a | n/a | Backlog job list data |
 
 > BacklogComponent re-uses `JobDetailDialogComponent` (K-05) and `JobDialogComponent` (K-06/07) from kanban.
@@ -286,9 +285,9 @@ Schema: component · type · route · file `path:line` · renders-for · states 
 
 | # | component | type | route | file | renders-for | states | purpose |
 |---|-----------|------|-------|------|-------------|--------|---------|
-| P-01 | `app-planning` / PlanningComponent | page | `/planning` | `features/planning/planning.component.ts:32` | Admin · Manager · PM | empty-cycle-state ("No planning cycle selected — CREATE FIRST CYCLE") · backlog-panel-with-J-1 · NEW CYCLE button | Planning-cycle management: cycle selector, backlog drag-onto-cycle board |
+| P-01 | `app-planning` / PlanningComponent | page | `/planning` | `features/planning/planning.component.ts:33` | Admin · Manager · PM | empty-cycle-state ("No planning cycle selected — CREATE FIRST CYCLE") · backlog-panel-with-J-1 · NEW CYCLE button | Planning-cycle management: cycle selector, backlog drag-onto-cycle board |
 | P-02 | `app-cycle-board` / CycleBoardComponent | panel | `/planning` (embedded) | `features/planning/components/cycle-board/cycle-board.component.ts:12` | Admin · Manager · PM | **unreached — QUEUE OPS-Q-013** | Cycle entry board: progress bar, days-remaining, drag-to-reorder entries |
-| P-03 | `app-cycle-dialog` / CycleDialogComponent | form | `/planning` | `features/planning/components/cycle-dialog/cycle-dialog.component.ts:16` | Admin · Manager · PM | form-populated(cycle name/start date/end date/goals/CANCEL/CREATE) | Create / edit planning cycle |
+| P-03 | `app-cycle-dialog` / CycleDialogComponent | form | `/planning` | `features/planning/components/cycle-dialog/cycle-dialog.component.ts:18` | Admin · Manager · PM | form-populated(cycle name/start date/end date/goals/CANCEL/CREATE) | Create / edit planning cycle |
 | P-04 | CAP-PLAN-MRP disabled state | state | `/planning` | `features/planning/planning.component.ts:62` + `planning.service.ts:11` | Admin · Manager · PM | DN-8: capability gate | Board renders empty with capability-disabled banner when CAP-PLAN-MRP is off |
 | P-05 | PlanningService | service | `/planning` | `features/planning/services/planning.service.ts:13` | n/a | n/a | Cycle CRUD + entry management; pre-checks CAP-PLAN-MRP (`planning.service.ts:56`) |
 
@@ -302,7 +301,7 @@ Tabs (from `scheduling.component.ts:29`): `gantt` · `dispatch` · `work-centers
 
 | # | component | type | route | file | renders-for | states | purpose |
 |---|-----------|------|-------|------|-------------|--------|---------|
-| S-01 | `app-scheduling` / SchedulingComponent | page | `/scheduling/:tab` | `features/scheduling/scheduling.component.ts:32` | Admin · Manager | live: all 5 tabs reached · KPI chips (0 scheduled ops, 0 in progress, 0 work centers) | Tab host for all scheduling views |
+| S-01 | `app-scheduling` / SchedulingComponent | page | `/scheduling/:tab` | `features/scheduling/scheduling.component.ts:35` | Admin · Manager | live: all 5 tabs reached · KPI chips (0 scheduled ops, 0 in progress, 0 work centers) | Tab host for all scheduling views |
 | S-02 | Gantt tab | tab | `/scheduling/gantt` | `features/scheduling/scheduling.component.ts:29` | Admin · Manager | empty("No operations") · RUN SCHEDULER button | Gantt schedule of operations |
 | S-03 | Dispatch tab | tab | `/scheduling/dispatch` | `features/scheduling/scheduling.component.ts:29` | Admin · Manager | empty("No dispatch items") · work-center select + LOAD button | Dispatch list — work released to floor |
 | S-04 | Work-centers tab | tab | `/scheduling/work-centers` | `features/scheduling/scheduling.component.ts:29` | Admin · Manager | empty("No work centers defined") | Work-center definitions for scheduling |
@@ -323,7 +322,7 @@ Route is under `/display/` path with **no auth guard** — public kiosk terminal
 | # | component | type | route | file | renders-for | states | purpose |
 |---|-----------|------|-------|------|-------------|--------|---------|
 | SF-01 | `app-shop-floor-display` / ShopFloorDisplayComponent | page | `/display/shop-floor` | `features/shop-floor/shop-floor-display.component.ts:52` | all (public) | unpaired-setup-form(live) · paired-main-display(**QUEUE OPS-Q-001**) | Main kiosk display: phases = main/pin/actions/job-select/receiving/shipping |
-| SF-02 | `app-kiosk-setup` / KioskSetupComponent | panel | `/display/shop-floor` (phase=setup) | `features/shop-floor/components/kiosk-setup/kiosk-setup.component.ts:16` | all (public) | admin-login-form(live: email/password/SIGN-IN-AS-ADMIN) · configure-terminal(live: terminal-name/team-select/CREATE-NEW-TEAM/ACTIVATE-TERMINAL) | Admin-login + team/terminal config before kiosk goes live |
+| SF-02 | `app-kiosk-setup` / KioskSetupComponent | panel | `/display/shop-floor` (phase=setup) | `features/shop-floor/components/kiosk-setup/kiosk-setup.component.ts:15` | all (public) | admin-login-form(live: email/password/SIGN-IN-AS-ADMIN) · configure-terminal(live: terminal-name/team-select/CREATE-NEW-TEAM/ACTIVATE-TERMINAL) | Admin-login + team/terminal config before kiosk goes live |
 | SF-03 | `app-kiosk-search-bar` / KioskSearchBarComponent | cluster | `/display/shop-floor` | `features/shop-floor/components/kiosk-search-bar/kiosk-search-bar.component.ts:12` | all (public) | **QUEUE OPS-Q-001** (paired state only) | Worker search/lookup bar on kiosk main screen |
 | SF-04 | `app-kiosk-session-bar` / KioskSessionBarComponent | cluster | `/display/shop-floor` | `features/shop-floor/components/kiosk-session-bar/kiosk-session-bar.component.ts:9` | all (public) | **QUEUE OPS-Q-001** (paired state only) | Logged-in worker session info bar |
 | SF-05 | `app-numeric-keypad` / NumericKeypadComponent | cluster | `/display/shop-floor` | `features/shop-floor/components/numeric-keypad/numeric-keypad.component.ts:20` | all (public) | **QUEUE OPS-Q-001** (paired state only) | Touch-friendly numeric entry (PIN, quantities) |
@@ -353,7 +352,7 @@ Route is under `/display/` path with **no auth guard** — public kiosk terminal
 
 | # | component | type | route | file | renders-for | states | purpose |
 |---|-----------|------|-------|------|-------------|--------|---------|
-| SF-20 | `app-shop-floor-clock` / ShopFloorClockComponent | page | `/display/shop-floor/clock` | `features/shop-floor/clock/shop-floor-clock.component.ts:29` | all (public) | redirects-to-setup-when-unpaired · **QUEUE OPS-Q-002** | Dedicated clock-in/out kiosk; phases: setup/dashboard/identifying/pin/job-scanned/manual-login/clock |
+| SF-20 | `app-shop-floor-clock` / ShopFloorClockComponent | page | `/display/shop-floor/clock` | `features/shop-floor/clock/shop-floor-clock.component.ts:28` | all (public) | redirects-to-setup-when-unpaired · **QUEUE OPS-Q-002** | Dedicated clock-in/out kiosk; phases: setup/dashboard/identifying/pin/job-scanned/manual-login/clock |
 | SF-21 | `app-inventory-scan` / InventoryScanComponent | page | `/display/shop-floor/scan` | `features/shop-floor/scan/inventory-scan.component.ts:12` | all (public) | empty(idle scan prompt — "0 SCANNED · Scan a part barcode to begin") | Standalone barcode-scan terminal for inventory transactions |
 | SF-22 | `app-scan-daily-log` / ScanDailyLogComponent | page | `/display/shop-floor/scan-log` (also embedded in SF-01) | `features/shop-floor/components/scan-daily-log/scan-daily-log.component.ts:27` | all (public) | empty("No scan activity for this date") · date/action-type filters | Daily scan activity log — shown inline on main display and at /scan-log route |
 
@@ -471,8 +470,8 @@ Tabs (from `mrp.component.ts:55`): `dashboard` · `planned-orders` · `exception
 
 | # | component | type | route | file | renders-for | states | purpose |
 |---|-----------|------|-------|------|-------------|--------|---------|
-| W-01 | `app-worker` / WorkerComponent | page | `/worker` | `features/worker/worker.component.ts:18` | all authenticated | populated(task cards for Worker Sam) · empty-state("No tasks assigned") · loading | Worker task list; sorted by overdue → due-date → priority |
-| W-02 | Task card | cluster | `/worker` | `features/worker/worker.component.ts:18` (inline template) | all authenticated | normal · overdue(red) · with-subtask-progress-bar | Per-job task card: job number, priority chip, title, stage chip, customer, due date, subtask progress bar; click navigates to `/kanban?job=<id>` |
+| W-01 | `app-worker` / WorkerComponent | page | `/worker` | `features/worker/worker.component.ts:13` | all authenticated | populated(task cards for Worker Sam) · empty-state("No tasks assigned") · loading | Worker task list; sorted by overdue → due-date → priority |
+| W-02 | Task card | cluster | `/worker` | `features/worker/worker.component.ts:13` (inline template) | all authenticated | normal · overdue(red) · with-subtask-progress-bar | Per-job task card: job number, priority chip, title, stage chip, customer, due date, subtask progress bar; click navigates to `/kanban?job=<id>` |
 | W-03 | WorkerService | service | `/worker` | `features/worker/services/worker.service.ts:1` | n/a | n/a | Fetch tasks assigned to current user |
 
 > Sidebar for ProductionWorker role is minimal (no sub-nav groups): Home, dashboard, groups, insights, engineering icons only — no sales/production/admin groups.
