@@ -1,0 +1,55 @@
+{
+  "vendorSeed": {
+    "status": 201,
+    "id": 4
+  },
+  "scorecardEmpty": {
+    "bodyText": "Skip to main content\nHOME\nchevron_right\nPURCHASING\nchevron_right\nVENDORS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\nstorefront\ndescription\nrequest_page\nstorefront\nsettings\nVENDORS\nManage suppliers and vendor relationships\nadd\nNEW VENDOR\nSearch\nStatus\nCOMPANY NAME\nmore_vert\n\t\nCONTACT\nmore_vert\n\t\nEMAIL\nmore_vert\n\t\nPHONE\nmore_vert\n\t\nACTIVE\nmore_vert\n\t\nPOS\nmore_vert\n\t\nCREATED\nmore_vert\n\t\ndownload\ngrid_on\nsettings\n\nGlobal Supply Co\t—\tsupply@global.com\t555-200-0002",
+    "hasScorecardTab": true,
+    "hasEmptyState": false,
+    "appComps": [
+      "app-root",
+      "app-header",
+      "app-chat",
+      "app-ai-help-panel",
+      "app-training-context-panel",
+      "app-connection-banner",
+      "app-announcement-overlay",
+      "app-onboarding-banner",
+      "app-sidebar",
+      "app-vendors",
+      "app-page-header",
+      "app-input",
+      "app-select",
+      "app-data-table",
+      "app-entity-completeness-badge",
+      "app-offline-banner",
+      "app-loading-overlay",
+      "app-toast-container",
+      "app-keyboard-shortcuts-help",
+      "app-chat-preview-popup"
+    ]
+  },
+  "lotExisting": 1,
+  "lotsState": {
+    "bodyText": "Skip to main content\nHOME\nchevron_right\nPRODUCTION\nchevron_right\nPRODUCTION LOTS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\ncategory\nhub\nevent_available\nbatch_prediction\nspeed\nstorefront\nsettings\nPRODUCTION LOTS\nTrack production lot traceability\nSearch lot number or part\nsearch\nSEARCH\nadd\nNEW LOT\nLOT NUMBER\nmore_vert\n\t\nPART NUMBER\nmore_vert\n\t\nDESCRIPTION\nmore_vert\n\t\nQUANTITY\nmore_vert\n\t\nJOB\nmore_vert\n\t\nSUPPLIER LOT\nmore_vert\n\t\nEXPIRES\nmore_vert\n\t\nCREATED\nmore_vert\n\t\ndownload\ngrid_on\nsettings\n\nLOT-20260522-001\tPRT-00001\tTest widget\t50\t—\tSUP-LOT-001\t\t05/22/20",
+    "rowCount": 0,
+    "appComps": [
+      "app-root",
+      "app-header",
+      "app-chat",
+      "app-ai-help-panel",
+      "app-training-context-panel",
+      "app-connection-banner",
+      "app-announcement-overlay",
+      "app-onboarding-banner",
+      "app-sidebar",
+      "app-lots",
+      "app-page-header",
+      "app-input",
+      "app-data-table",
+      "app-offline-banner",
+      "app-loading-overlay"
+    ]
+  }
+}
