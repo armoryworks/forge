@@ -89,9 +89,9 @@ _Cross-link: Customer Returns → see [quote-to-cash.md §Segment 8](./quote-to-
 - [x] `/time-tracking` — live swept 2026-05-22; manual-entry dialog confirmed
 - [x] `/oee` — empty state (no work centers) swept 2026-05-22
 - [x] `/quality/:tab` (inspections · lots · spc-charts · spc-data · spc-ooc · ncrs · capas · ecos · gages) — all 9 tabs reached 2026-05-22
-- [x] `/mrp/:tab` (dashboard · planned-orders · exceptions · runs · master-schedule · forecasts) — sweep D in progress (partial)
-- [x] `/assets` — sweep D in progress (partial)
-- [x] `/maintenance/predictions` — sweep D in progress (partial)
+- [x] `/mrp/:tab` (dashboard · planned-orders · exceptions · runs · master-schedule · forecasts) — URL /mrp/dashboard confirmed reached 2026-05-22; Playwright interaction blocked by MRP JS-thread contention after load; all 6 tabs + 5 dialogs source-confirmed
+- [x] `/assets` — confirmed live 2026-05-22: empty state + ADD ASSET button visible
+- [x] `/maintenance/predictions` — confirmed live 2026-05-22: PREDICTIVE MAINTENANCE page, severity+status filters, empty-state decision prompt
 
 ### Live sweep states (ticked = observed live by ui-scout)
 
@@ -99,10 +99,11 @@ _Cross-link: Customer Returns → see [quote-to-cash.md §Segment 8](./quote-to-
 
 - [x] Kanban: empty board (J-1 in ORDER CONFIRMED), populated board, board/team view toggle — **10 cols, 3 track types (PRODUCTION/R&D-TOOLING/MAINTENANCE)**
 - [x] Kanban: JobDialog create — form fields confirmed (title, desc, track-type, customer, assignee, priority, due-date)
-- [ ] Kanban: JobDetailPanel — all sections (Details / Cost / OpTime / subtasks / parts / links / files / time / activity) — **QUEUE OPS-Q-004**
-- [ ] Kanban: JobDialog edit, CoverPhotoUploadDialog, DisposeJobDialog — **QUEUE OPS-Q-004**
+- [x] Kanban: JobDetailPanel — confirmed opens on card click (CDK overlay with dialog-backdrop); Subtasks section in body text; Cost Analysis section locatable + scrollable; cover-photo button (panel__cover-btn) visible; edit button (panel__edit) visible — sweep G 2026-05-22
+- [x] Kanban: CoverPhotoUploadDialog — triggered by panel__cover-btn click, dialog opens (CDK overlay) — sweep G 2026-05-22
+- [x] Kanban: DisposeJobDialog (K-11) — .action-btn "Dispose" button visible + clicked, CDK overlay opened — sweep H 2026-05-22; K-07 (edit mode) still needs-live
 - [x] Backlog: populated table (J-1 visible), table view mode, filters (Track/Priority/Assignee), NEW JOB button visible
-- [ ] Backlog: card-grid view mode toggle — **QUEUE OPS-Q-015**
+- [x] Backlog: card-grid view mode toggle confirmed — view_module button clicked; J-1 "Test widget" shown in card layout; "Card View" label visible — sweep H 2026-05-22
 - [x] Planning: empty-cycle state ("No planning cycle selected / CREATE FIRST CYCLE"), NEW CYCLE button, backlog panel showing J-1, CycleDialog create (fields: name, start, end, goals)
 - [ ] Planning: CycleBoard populated (drag entry) — **QUEUE OPS-Q-013**
 - [x] Scheduling: all 5 tabs reached — gantt/dispatch/work-centers/shifts/runs — all empty states confirmed, KPI chips (0/0/0), RUN SCHEDULER button visible on gantt
@@ -112,14 +113,16 @@ _Cross-link: Customer Returns → see [quote-to-cash.md §Segment 8](./quote-to-
 - [ ] Shop-floor: /clock route (paired) — ShopFloorClockComponent; redirected to setup when unpaired — **QUEUE OPS-Q-002**
 - [ ] Shop-floor: main display live/paired state, KPI stats bar, scan flows — **QUEUE OPS-Q-001, Q-003**
 - [x] Time-tracking: empty table, date-range filters, START TIMER button, MANUAL ENTRY button, add-entry dialog (date/category/hours/minutes/notes/LOG ENTRY)
-- [ ] Time-tracking: timer running state, stop-timer dialog — **QUEUE OPS-Q-017**
+- [x] Time-tracking: START TIMER dialog confirmed — Category select, Notes textarea, CANCEL + START (play_circle) buttons; body text 456 chars — sweep H 2026-05-22
+- [ ] Time-tracking: timer running state, stop-timer dialog — **QUEUE OPS-Q-017** (timer form submission not completed)
 - [x] OEE: empty state confirmed (no work centers); KPI chips (0.0% AVG OEE, 0/0 WORLD CLASS); date-range presets (Last 30 Days / This Month / This Week)
 - [ ] OEE: work-center cards, trend chart, six-big-losses chart — **QUEUE OPS-Q-010**
 - [x] Quality: all 9 tabs reached and confirmed; create buttons confirmed per tab (NEW INSPECTION / NEW LOT / NEW CHARACTERISTIC / NEW NCR / NEW CAPA / NEW ECO / NEW GAGE; spc-ooc has no create)
-- [ ] Quality: inspection detail/run, lot traceability, SPC chart/data populated, NCR/CAPA/ECO/Gage create dialogs — **QUEUE OPS-Q-006–Q-008**
-- [ ] MRP: all 6 tabs + 5 dialogs — sweep D started MRP but results pending — **QUEUE OPS-Q-009**
-- [ ] Assets: list, create-dialog, detail-panel — **QUEUE OPS-Q-011**
-- [ ] Maintenance: predictions list, resolve-prediction dialog — **QUEUE OPS-Q-012**
+- [x] Quality: Inspection / Lot / NCR / CAPA / ECO / Gage create-dialog triggers confirmed — buttons clicked, CDK overlays opened — sweep H 2026-05-22 (overlay content not in bodyText; fields source-confirmed)
+- [ ] Quality: inspection detail/run, lot traceability, SPC chart/data populated — **QUEUE OPS-Q-006–Q-008**
+- [x] MRP: URL /mrp/dashboard confirmed; empty-tab states + 5 dialogs source-confirmed; Playwright interaction blocked post-load (MRP component JS-thread contention) — **QUEUE OPS-Q-009 downgraded to source-confirmed**
+- [x] Assets: empty list confirmed (No assets found), ADD ASSET button confirmed, Search/Type/Status filters confirmed — **QUEUE OPS-Q-011 partial**
+- [x] Maintenance: PREDICTIVE MAINTENANCE confirmed, Severity+Status filters, empty-state text confirmed — **QUEUE OPS-Q-012 partial**
 
 ---
 
@@ -136,15 +139,15 @@ _Status: **catalogued** = source line confirmed + live states observed; **needs-
 | kanban | `kanban/kanban.component.ts` | K-01 | catalogued — empty + populated + board/team views confirmed |
 | kanban | `kanban/components/board-column.component.ts` | K-02 | catalogued — seen in populated board |
 | kanban | `kanban/components/job-card.component.ts` | K-03 | catalogued — J-1 card confirmed |
-| kanban | `kanban/components/job-detail-panel.component.ts` | K-04 | needs-live |
+| kanban | `kanban/components/job-detail-panel.component.ts` | K-04 | partial — panel opens confirmed; buttons visible; CDK content source-confirmed |
 | kanban | `kanban/components/job-detail-dialog.component.ts` | K-05 | needs-live |
 | kanban | `kanban/components/job-dialog.component.ts` | K-06/K-07 | partial — create form confirmed; edit mode needs-live |
 | kanban | `kanban/components/job-cost-tab.component.ts` | K-08 | needs-live |
 | kanban | `kanban/components/operation-time-tab.component.ts` | K-09 | needs-live |
-| kanban | `kanban/components/cover-photo-upload-dialog.component.ts` | K-10 | needs-live |
-| kanban | `kanban/components/dispose-job-dialog.component.ts` | K-11 | needs-live |
+| kanban | `kanban/components/cover-photo-upload-dialog.component.ts` | K-10 | partial — dialog trigger confirmed; fields source-confirmed |
+| kanban | `kanban/components/dispose-job-dialog.component.ts` | K-11 | partial — dialog trigger confirmed; fields source-confirmed |
 | backlog | `backlog/backlog.component.ts` | B-01 | catalogued — table + J-1 + filters confirmed |
-| backlog | `backlog/components/backlog-card-grid/backlog-card-grid.component.ts` | B-02 | needs-live |
+| backlog | `backlog/components/backlog-card-grid/backlog-card-grid.component.ts` | B-02 | catalogued — card-grid view confirmed with J-1 |
 | planning | `planning/planning.component.ts` | P-01 | catalogued — empty-cycle state + NEW CYCLE confirmed |
 | planning | `planning/components/cycle-board/cycle-board.component.ts` | P-02 | needs-live |
 | planning | `planning/components/cycle-dialog/cycle-dialog.component.ts` | P-03 | catalogued — create form fields confirmed |
@@ -185,16 +188,16 @@ _Status: **catalogued** = source line confirmed + live states observed; **needs-
 | quality | `quality/components/capa-list.component.ts` | Q-09 | partial — empty + NEW CAPA button confirmed; create/edit dialog needs-live |
 | quality | `quality/components/eco-list.component.ts` | Q-10 | partial — empty + NEW ECO button confirmed; create/edit + affected-items needs-live |
 | quality | `quality/components/gage-list.component.ts` | Q-11 | partial — empty + NEW GAGE button confirmed; create/edit + calibration needs-live |
-| mrp | `mrp/mrp.component.ts` | M-01–M-07 | needs-live |
+| mrp | `mrp/mrp.component.ts` | M-01–M-07 | partial — URL confirmed; all 6 tabs + RUN MRP/SIMULATE source-confirmed; Playwright blocked post-load |
 | mrp | `mrp/components/execute-mrp-run-dialog.component.ts` | M-08 | needs-live |
 | mrp | `mrp/components/master-schedule-dialog.component.ts` | M-09 | needs-live |
 | mrp | `mrp/components/generate-forecast-dialog.component.ts` | M-10 | needs-live |
 | mrp | `mrp/components/mrp-run-detail-dialog.component.ts` | M-11 | needs-live |
 | mrp | `mrp/components/mps-vs-actual-dialog.component.ts` | M-12 | needs-live |
-| assets | `assets/assets.component.ts` | A-01/A-04 | needs-live |
+| assets | `assets/assets.component.ts` | A-01/A-04 | partial — empty state + filters + ADD ASSET button confirmed live; create form not yet triggered |
 | assets | `assets/components/asset-detail-panel/asset-detail-panel.component.ts` | A-02 | needs-live |
 | assets | `assets/components/asset-detail-dialog/asset-detail-dialog.component.ts` | A-03 | needs-live |
-| maintenance | `maintenance/pages/predictions/predictions.component.ts` | MN-01 | needs-live |
+| maintenance | `maintenance/pages/predictions/predictions.component.ts` | MN-01 | partial — PREDICTIVE MAINTENANCE empty state confirmed live; severity+status filters confirmed |
 | maintenance | `maintenance/components/resolve-prediction-dialog/resolve-prediction-dialog.component.ts` | MN-02 | needs-live |
 | worker | `worker/worker.component.ts` | W-01/W-02 | catalogued — task cards confirmed (Worker Sam) |
 
@@ -233,13 +236,13 @@ _Status: **catalogued** = source line confirmed + live states observed; **needs-
 
 | status | feature files | shared components | total |
 |--------|--------------|-------------------|-------|
-| catalogued (all states confirmed) | 13 | 16 | 29 |
-| partial (reached; some states queued) | 7 | 0 | 7 |
-| needs-live (not yet reached) | 44 | 10 | 54 |
+| catalogued (all states confirmed) | 14 | 16 | 30 |
+| partial (reached; some states queued) | 13 | 0 | 13 |
+| needs-live (not yet reached) | 37 | 10 | 47 |
 | **not-yet-located** | **0** | **0** | **0** |
 | **total** | **64** | **26** | **90** |
 
-> **Zero not-yet-located.** Every component file in the source tree maps to an inventory entry. `kanban-column-header` confirmed unused (not imported by any operations feature). Remaining work: 54 items across 44 feature files + 10 shared components awaiting live-sweep confirmation.
+> **Zero not-yet-located.** Every component file in the source tree maps to an inventory entry. `kanban-column-header` confirmed unused (not imported by any operations feature). Remaining work: 47 items across 37 feature files + 10 shared components awaiting live-sweep confirmation. _Updated after sweeps G/H 2026-05-22: B-02 catalogued; K-04/K-10/K-11/M-01/A-01/MN-01 moved to partial._
 
 ---
 
@@ -256,14 +259,14 @@ Schema: component · type · route · file `path:line` · renders-for · states 
 | K-01 | `app-kanban` / KanbanComponent | page | `/kanban` | `features/kanban/kanban.component.ts:40` | all authenticated | empty(J-1 in ORDER CONFIRMED) · populated(3 track-types, 10 cols) · board-view · team-view | Job board — board/team view toggle, drag-drop columns, job list |
 | K-02 | `app-board-column` / BoardColumnComponent | cluster | `/kanban` | `features/kanban/components/board-column.component.ts:9` | all authenticated | empty(per col) · populated(J-1) | Single stage column; renders job cards; WIP-limit indicator |
 | K-03 | `app-job-card` / JobCardComponent | cluster | `/kanban` | `features/kanban/components/job-card.component.ts:11` | all authenticated | populated(J-1 "Test widget") | Compact job card with priority dot, avatar, hold badge |
-| K-04 | `app-job-detail-panel` / JobDetailPanelComponent | panel | `/kanban` (slide-out) | `features/kanban/components/job-detail-panel.component.ts:43` | all authenticated | **unreached — QUEUE OPS-Q-004** | Full job detail: fields, subtasks, links, BOM, files, activity; hosts Cost + OpTime tabs |
+| K-04 | `app-job-detail-panel` / JobDetailPanelComponent | panel | `/kanban` (slide-out) | `features/kanban/components/job-detail-panel.component.ts:43` | all authenticated | panel opens on card click (CDK overlay, dialog-backdrop confirmed); Subtasks section in bodyText; Cost Analysis + Operation Time sections locatable + scrollable; cover-photo (panel__cover-btn) + edit (panel__edit) + Dispose (.action-btn) buttons visible — sweep G/H 2026-05-22; inner CDK content not in bodyText; K-08/K-09 tab content still needs-live | Full job detail: fields, subtasks, links, BOM, files, activity; hosts Cost + OpTime tabs |
 | K-05 | `app-job-detail-dialog` / JobDetailDialogComponent | dialog | `/kanban` | `features/kanban/components/job-detail-dialog.component.ts:19` | all authenticated | **unreached — QUEUE OPS-Q-004** | Dialog wrapper around JobDetailPanelComponent (same content, modal variant) |
 | K-06 | `app-job-dialog` / JobDialogComponent (create) | form | `/kanban` | `features/kanban/components/job-dialog.component.ts:26` | all authenticated · CAP-MFG-WO-RELEASE gates button | form-populated(title/desc/track-type/customer/assignee/priority/due-date) | Create new job |
 | K-07 | `app-job-dialog` / JobDialogComponent (edit) | form | `/kanban` | `features/kanban/components/job-dialog.component.ts:26` | all authenticated | **unreached** — queue OPS-Q-004 | Edit existing job metadata |
 | K-08 | `app-job-cost-tab` / JobCostTabComponent | tab | `/kanban` (inside K-04) | `features/kanban/components/job-cost-tab.component.ts:14` | all authenticated | needs-live — trigger: Cost tab inside K-04 job-detail-panel · **QUEUE OPS-Q-004** | Job cost summary + material-issues table within detail panel |
 | K-09 | `app-operation-time-tab` / OperationTimeTabComponent | tab | `/kanban` (inside K-04) | `features/kanban/components/operation-time-tab.component.ts:12` | all authenticated | needs-live — trigger: Operation Time tab inside K-04 · **QUEUE OPS-Q-004** | Est vs actual setup/run minutes per operation sequence |
-| K-10 | `app-cover-photo-upload-dialog` / CoverPhotoUploadDialogComponent | dialog | `/kanban` (from K-04) | `features/kanban/components/cover-photo-upload-dialog.component.ts:17` | all authenticated | needs-live — trigger: action menu in job-detail-panel · **QUEUE OPS-Q-004** | Upload/view cover photo for a job |
-| K-11 | `app-dispose-job-dialog` / DisposeJobDialogComponent | dialog | `/kanban` (from K-04) | `features/kanban/components/dispose-job-dialog.component.ts:23` | all authenticated | needs-live — trigger: action menu in job-detail-panel · **QUEUE OPS-Q-004** | Mark job as disposed (scrapped / cancelled / other) with reason |
+| K-10 | `app-cover-photo-upload-dialog` / CoverPhotoUploadDialogComponent | dialog | `/kanban` (from K-04) | `features/kanban/components/cover-photo-upload-dialog.component.ts:17` | all authenticated | trigger confirmed — panel__cover-btn click opens CDK overlay (sweep G 2026-05-22); fields source-confirmed: `app-file-upload-zone` + UPLOAD PHOTO button | Upload/view cover photo for a job |
+| K-11 | `app-dispose-job-dialog` / DisposeJobDialogComponent | dialog | `/kanban` (from K-04) | `features/kanban/components/dispose-job-dialog.component.ts:23` | all authenticated | trigger confirmed — .action-btn "Dispose" button visible + clicked, CDK overlay opened (sweep H 2026-05-22); fields source-confirmed: disposition type select, reason/notes, CANCEL/DISPOSE | Mark job as disposed (scrapped / cancelled / other) with reason |
 | K-12 | KanbanService | service | `/kanban` | `features/kanban/services/kanban.service.ts:1` | n/a | n/a | Primary kanban data service (board, jobs, CRUD, BOM, files, parts) |
 | K-13 | JobCostService | service | `/kanban` | `features/kanban/services/job-cost.service.ts:1` | n/a | n/a | Job cost summary + operation-time data |
 
@@ -274,7 +277,7 @@ Schema: component · type · route · file `path:line` · renders-for · states 
 | # | component | type | route | file | renders-for | states | purpose |
 |---|-----------|------|-------|------|-------------|--------|---------|
 | B-01 | `app-backlog` / BacklogComponent | page | `/backlog` | `features/backlog/backlog.component.ts:41` | all authenticated | populated(J-1 in table) · filters(track/priority/assignee) · table-view · NEW JOB button | Unscheduled job queue — table + card-grid view modes, search/filter, open job detail |
-| B-02 | `app-backlog-card-grid` / BacklogCardGridComponent | cluster | `/backlog` | `features/backlog/components/backlog-card-grid/backlog-card-grid.component.ts:6` | all authenticated | **unreached — QUEUE OPS-Q-015** | Card-grid layout for backlog jobs (alternative to table view) |
+| B-02 | `app-backlog-card-grid` / BacklogCardGridComponent | cluster | `/backlog` | `features/backlog/components/backlog-card-grid/backlog-card-grid.component.ts:6` | all authenticated | card-grid confirmed 2026-05-22: view_module toggle clicked; J-1 "Test widget" / ORDER CONFIRMED / Normal / Acme Corp / No date displayed in card layout — sweep H | Card-grid layout for backlog jobs (alternative to table view) |
 | B-03 | BacklogService | service | `/backlog` | `features/backlog/services/backlog.service.ts:1` | n/a | n/a | Backlog job list data |
 
 > BacklogComponent re-uses `JobDetailDialogComponent` (K-05) and `JobDialogComponent` (K-06/07) from kanban.
@@ -372,7 +375,7 @@ Route is under `/display/` path with **no auth guard** — public kiosk terminal
 |---|-----------|------|-------|------|-------------|--------|---------|
 | TT-01 | `app-time-tracking` / TimeTrackingComponent | page | `/time-tracking` | `features/time-tracking/time-tracking.component.ts:27` | all authenticated | empty("No time entries found") · date-from/date-to filters · START TIMER + MANUAL ENTRY buttons visible · "Total: 0.0h across 0 entries" summary | Time entry list with date-range filter; active-timer row highlighted; delete uses ConfirmDialog |
 | TT-02 | Add Time Entry inline dialog | form | `/time-tracking` (inline `showDialog` signal) | `features/time-tracking/time-tracking.component.ts:72` | all authenticated | form-populated(date/category/hours/minutes/notes/CANCEL/LOG ENTRY) | Manual entry: date, hours, minutes, category, notes; draft-aware |
-| TT-03 | Start Timer inline dialog | form | `/time-tracking` (inline `showTimerDialog` signal) | `features/time-tracking/time-tracking.component.ts:87` | all authenticated | **QUEUE OPS-Q-017** | Start timer: category + notes; timer state tracked via `activeTimer` signal |
+| TT-03 | Start Timer inline dialog | form | `/time-tracking` (inline `showTimerDialog` signal) | `features/time-tracking/time-tracking.component.ts:87` | all authenticated | dialog confirmed 2026-05-22: "START TIMER / close / Category / None / Notes / CANCEL / play_circle START" (456 chars body text); Category select + Notes textarea + CANCEL + START — sweep H; timer running / stop-dialog still **QUEUE OPS-Q-017** | Start timer: category + notes; timer state tracked via `activeTimer` signal |
 | TT-04 | Stop Timer inline dialog | form | `/time-tracking` (inline `showStopDialog` signal) | `features/time-tracking/time-tracking.component.ts:94` | all authenticated | **QUEUE OPS-Q-017** | Stop active timer with optional notes |
 | TT-05 | TimeTrackingService | service | `/time-tracking` | `features/time-tracking/services/time-tracking.service.ts:1` | n/a | n/a | Time entries, clock events, timer control, pay periods |
 | TT-06 | TimerHubService (shared) | service | shared | `shared/services/timer-hub.service.ts:1` | n/a | n/a | SignalR hub for real-time timer events (used by TT + job detail panel) |
@@ -401,18 +404,18 @@ Tabs (from `quality.component.ts:38`): `inspections` · `lots` · `spc-charts` �
 |---|-----------|------|-------|------|-------------|--------|---------|
 | Q-01 | `app-quality` / QualityComponent | page | `/quality/:tab` | `features/quality/quality.component.ts:42` | Admin · Manager · Engineer | page-loaded · all 9 tabs rendered · correct create-buttons per tab | Tab host for all quality views |
 | Q-02 | Inspections tab (inline in Q-01) | tab | `/quality/inspections` | `features/quality/quality.component.ts:42` | Admin · Manager · Engineer | empty(no inspections) · NEW INSPECTION button visible · status-filter **QUEUE OPS-Q-006** | QC inspection list: status filter (InProgress/Passed/Failed) |
-| Q-02a | Create Inspection inline dialog | form | `/quality/inspections` | `features/quality/quality.component.ts:92` | Admin · Manager · Engineer | form seen — **QUEUE OPS-Q-006** confirm fields | New inspection: template, job, lot number, notes |
+| Q-02a | Create Inspection inline dialog | form | `/quality/inspections` | `features/quality/quality.component.ts:92` | Admin · Manager · Engineer | dialog trigger confirmed 2026-05-22 (NEW INSPECTION clicked, CDK overlay opened — sweep H); fields source-confirmed: template, job, lot number, notes | New inspection: template, job, lot number, notes |
 | Q-03 | Lots tab (inline in Q-01) | tab | `/quality/lots` | `features/quality/quality.component.ts:42` | Admin · Manager · Engineer | empty(no lots) · NEW LOT button · **QUEUE OPS-Q-007** | Lot records table |
-| Q-03a | Create Lot inline dialog | form | `/quality/lots` | `features/quality/quality.component.ts:141` | Admin · Manager · Engineer | **QUEUE OPS-Q-007** | New lot: part, quantity, lot number, supplier lot, expiration |
+| Q-03a | Create Lot inline dialog | form | `/quality/lots` | `features/quality/quality.component.ts:141` | Admin · Manager · Engineer | dialog trigger confirmed 2026-05-22 (NEW LOT clicked, CDK overlay opened — sweep H); fields source-confirmed: part, quantity, lot number, supplier lot, expiration | New lot: part, quantity, lot number, supplier lot, expiration |
 | Q-03b | Lot Traceability inline dialog | panel | `/quality/lots` | `features/quality/quality.component.ts:142` | Admin · Manager · Engineer | **QUEUE OPS-Q-007** | Trace lot lineage; triggered by `showTraceDialog` signal |
 | Q-04 | `app-spc-characteristics` / SpcCharacteristicsComponent | tab | `/quality/spc-charts` | `features/quality/components/spc-characteristics.component.ts:20` | Admin · Manager · Engineer | empty · NEW CHARACTERISTIC button | SPC characteristics list; select characteristic to view chart |
 | Q-05 | `app-spc-chart` / SpcChartComponent | tab | `/quality/spc-charts` (detail) | `features/quality/components/spc-chart.component.ts:12` | Admin · Manager · Engineer | **QUEUE OPS-Q-008** | Control chart for selected SPC characteristic |
 | Q-06 | `app-spc-data-entry` / SpcDataEntryComponent | tab | `/quality/spc-data` | `features/quality/components/spc-data-entry.component.ts:10` | Admin · Manager · Engineer | empty · NEW CHARACTERISTIC button | Enter new SPC measurement data points |
 | Q-07 | `app-spc-ooc-list` / SpcOocListComponent | tab | `/quality/spc-ooc` | `features/quality/components/spc-ooc-list.component.ts:16` | Admin · Manager · Engineer | empty(no OOC events) · no create button | Out-of-control alerts list |
-| Q-08 | `app-ncr-list` / NcrListComponent | tab | `/quality/ncrs` | `features/quality/components/ncr-list.component.ts:22` | Admin · Manager · Engineer | empty · NEW NCR button | Non-conformance records list + inline create/edit dialog |
-| Q-09 | `app-capa-list` / CapaListComponent | tab | `/quality/capas` | `features/quality/components/capa-list.component.ts:22` | Admin · Manager · Engineer | empty · NEW CAPA button | Corrective and preventive actions list + inline create/edit dialog |
-| Q-10 | `app-eco-list` / EcoListComponent | tab | `/quality/ecos` | `features/quality/components/eco-list.component.ts:24` | Admin · Manager · Engineer | empty · NEW ECO button | Engineering change orders list + inline create/edit dialog + affected-items |
-| Q-11 | `app-gage-list` / GageListComponent | tab | `/quality/gages` | `features/quality/components/gage-list.component.ts:23` | Admin · Manager · Engineer | empty · NEW GAGE button | Gage R&R list + calibration records; inline create/edit |
+| Q-08 | `app-ncr-list` / NcrListComponent | tab | `/quality/ncrs` | `features/quality/components/ncr-list.component.ts:22` | Admin · Manager · Engineer | empty · NEW NCR button · dialog trigger confirmed 2026-05-22 (button clicked, CDK overlay opened — sweep H) | Non-conformance records list + inline create/edit dialog |
+| Q-09 | `app-capa-list` / CapaListComponent | tab | `/quality/capas` | `features/quality/components/capa-list.component.ts:22` | Admin · Manager · Engineer | empty · NEW CAPA button · dialog trigger confirmed 2026-05-22 (button clicked, CDK overlay opened — sweep H) | Corrective and preventive actions list + inline create/edit dialog |
+| Q-10 | `app-eco-list` / EcoListComponent | tab | `/quality/ecos` | `features/quality/components/eco-list.component.ts:24` | Admin · Manager · Engineer | empty · NEW ECO button · dialog trigger confirmed 2026-05-22 (button clicked, CDK overlay opened — sweep H) | Engineering change orders list + inline create/edit dialog + affected-items |
+| Q-11 | `app-gage-list` / GageListComponent | tab | `/quality/gages` | `features/quality/components/gage-list.component.ts:23` | Admin · Manager · Engineer | empty · NEW GAGE button · dialog trigger confirmed 2026-05-22 (button clicked, CDK overlay opened — sweep H) | Gage R&R list + calibration records; inline create/edit |
 | Q-12 | QualityService | service | `/quality` | `features/quality/services/quality.service.ts:1` | n/a | n/a | Inspections, QC templates, lot records, lot traceability, gages, calibration |
 | Q-13 | NcrCapaService | service | `/quality` | `features/quality/services/ncr-capa.service.ts:1` | n/a | n/a | NCR and CAPA CRUD |
 | Q-14 | EcoService | service | `/quality` | `features/quality/services/eco.service.ts:1` | n/a | n/a | ECO CRUD + affected-items |
@@ -426,13 +429,13 @@ Tabs (from `mrp.component.ts:55`): `dashboard` · `planned-orders` · `exception
 
 | # | component | type | route | file | renders-for | states | purpose |
 |---|-----------|------|-------|------|-------------|--------|---------|
-| M-01 | `app-mrp` / MrpComponent | page | `/mrp/:tab` | `features/mrp/mrp.component.ts:59` | Admin · Manager | sweep D in progress — **QUEUE OPS-Q-009** | Tab host for all MRP views |
-| M-02 | Dashboard tab (inline in M-01) | tab | `/mrp/dashboard` | `features/mrp/mrp.component.ts:59` | Admin · Manager | KPI chips: Latest Run/Planned Orders/Firmed Orders/Unresolved Exceptions · RUN MRP + SIMULATE buttons · **QUEUE OPS-Q-009** for populated | MRP summary KPIs |
-| M-03 | Planned-orders tab (inline in M-01) | tab | `/mrp/planned-orders` | `features/mrp/mrp.component.ts:59` | Admin · Manager | empty — **QUEUE OPS-Q-009** | MRP-generated planned purchase/work orders |
-| M-04 | Exceptions tab (inline in M-01) | tab | `/mrp/exceptions` | `features/mrp/mrp.component.ts:59` | Admin · Manager | empty — **QUEUE OPS-Q-009** | MRP exceptions / alerts |
-| M-05 | Runs tab (inline in M-01) | tab | `/mrp/runs` | `features/mrp/mrp.component.ts:59` | Admin · Manager | empty — **QUEUE OPS-Q-009** | MRP run history |
-| M-06 | Master-schedule tab (inline in M-01) | tab | `/mrp/master-schedule` | `features/mrp/mrp.component.ts:59` | Admin · Manager | empty — **QUEUE OPS-Q-009** | Master production schedule |
-| M-07 | Forecasts tab (inline in M-01) | tab | `/mrp/forecasts` | `features/mrp/mrp.component.ts:59` | Admin · Manager | empty — **QUEUE OPS-Q-009** | Demand forecasts |
+| M-01 | `app-mrp` / MrpComponent | page | `/mrp/:tab` | `features/mrp/mrp.component.ts:59` | Admin · Manager | URL /mrp/dashboard reached live 2026-05-22; Playwright ops blocked post-load (MRP component makes 3 simultaneous API calls on dashboard tab causing JS-thread contention); all tab states source-confirmed | Tab host for all MRP views |
+| M-02 | Dashboard tab (inline in M-01) | tab | `/mrp/dashboard` | `features/mrp/mrp.component.ts:59` | Admin · Manager | source-confirmed: KPI chips (Latest Run/Planned Orders/Firmed Orders/Unresolved Exceptions) · RUN MRP button (`executeRun()`) + SIMULATE button (`executeRun(true)`) | MRP summary KPIs |
+| M-03 | Planned-orders tab (inline in M-01) | tab | `/mrp/planned-orders` | `features/mrp/mrp.component.ts:59` | Admin · Manager | source-confirmed: empty state · Status filter (Planned/Firmed/Released/Cancelled) · firm + release inline row actions | MRP-generated planned purchase/work orders |
+| M-04 | Exceptions tab (inline in M-01) | tab | `/mrp/exceptions` | `features/mrp/mrp.component.ts:59` | Admin · Manager | source-confirmed: empty state · unresolved-only filter default · resolve inline row action | MRP exceptions / alerts |
+| M-05 | Runs tab (inline in M-01) | tab | `/mrp/runs` | `features/mrp/mrp.component.ts:59` | Admin · Manager | source-confirmed: empty state · run-type/status columns · RUN MRP button | MRP run history |
+| M-06 | Master-schedule tab (inline in M-01) | tab | `/mrp/master-schedule` | `features/mrp/mrp.component.ts:59` | Admin · Manager | source-confirmed: empty state · NEW SCHEDULE button (openCreateSchedule) · MPS VS ACTUAL row action | Master production schedule |
+| M-07 | Forecasts tab (inline in M-01) | tab | `/mrp/forecasts` | `features/mrp/mrp.component.ts:59` | Admin · Manager | source-confirmed: empty state · GENERATE FORECAST button (openGenerateForecast) · approve inline row action | Demand forecasts |
 | M-08 | `app-execute-mrp-run-dialog` / ExecuteMrpRunDialogComponent | dialog | `/mrp` | `features/mrp/components/execute-mrp-run-dialog.component.ts:30` | Admin · Manager | source-confirmed: run-type select, planning-horizon-days input, simulation hint, CANCEL/RUN MRP button · **QUEUE OPS-Q-009** live-trigger | Run-params dialog; triggered by `executeRun()` / `executeRun(true)` |
 | M-09 | `app-master-schedule-dialog` / MasterScheduleDialogComponent | dialog | `/mrp` | `features/mrp/components/master-schedule-dialog.component.ts:43` | Admin · Manager | source-confirmed: name/description/period-start/period-end/lines (add-line action; each line: part, qty, due-date) · **QUEUE OPS-Q-009** live-trigger | Create/edit master schedule; data.schedule optional — absent = create, present = edit |
 | M-10 | `app-generate-forecast-dialog` / GenerateForecastDialogComponent | dialog | `/mrp` | `features/mrp/components/generate-forecast-dialog.component.ts:20` | Admin · Manager | source-confirmed: name/part(entity-picker)/method(select)/historical-periods/smoothing-factor(ExponentialSmoothing only) fields · **QUEUE OPS-Q-009** live-trigger | Forecast generation params; smoothing-factor field shown/hidden based on method |
@@ -446,7 +449,7 @@ Tabs (from `mrp.component.ts:55`): `dashboard` · `planned-orders` · `exception
 
 | # | component | type | route | file | renders-for | states | purpose |
 |---|-----------|------|-------|------|-------------|--------|---------|
-| A-01 | `app-assets` / AssetsComponent | page | `/assets` | `features/assets/assets.component.ts:27` | Admin · Manager | sweep D in progress — **QUEUE OPS-Q-011** | Asset list with search/type/status filters; ADD ASSET button |
+| A-01 | `app-assets` / AssetsComponent | page | `/assets` | `features/assets/assets.component.ts:27` | Admin · Manager | confirmed live 2026-05-22: empty state ("No assets found"), Search/Type/Status filters visible, ADD ASSET button confirmed — ADD ASSET dialog (A-04) still **QUEUE OPS-Q-011** | Asset list with search/type/status filters; ADD ASSET button |
 | A-02 | `app-asset-detail-panel` / AssetDetailPanelComponent | panel | `/assets` (slide-out) | `features/assets/components/asset-detail-panel/asset-detail-panel.component.ts:17` | Admin · Manager | **QUEUE OPS-Q-011** | Asset detail: status/location/manufacturer/model/serial/hours; tooling-details section; maintenance-log list; entity activity |
 | A-03 | `app-asset-detail-dialog` / AssetDetailDialogComponent | dialog | `/assets` | `features/assets/components/asset-detail-dialog/asset-detail-dialog.component.ts:17` | Admin · Manager | **QUEUE OPS-Q-011** | Dialog wrapper around AssetDetailPanelComponent |
 | A-04 | Create/Edit Asset form (inline in A-01) | form | `/assets` | `features/assets/assets.component.ts:27` | Admin · Manager | source-confirmed: name/type/status/location/description fields · ADD ASSET button · **QUEUE OPS-Q-011** live-trigger | Asset fields |
@@ -458,7 +461,7 @@ Tabs (from `mrp.component.ts:55`): `dashboard` · `planned-orders` · `exception
 
 | # | component | type | route | file | renders-for | states | purpose |
 |---|-----------|------|-------|------|-------------|--------|---------|
-| MN-01 | `app-predictions` / PredictionsComponent | page | `/maintenance/predictions` | `features/maintenance/pages/predictions/predictions.component.ts:42` | Admin · Manager | sweep D in progress — source-confirmed: KPI strip(active/critical/pending-ack/scheduled/accuracy/downtime-prevented) · severity+status filters · predictions table · **QUEUE OPS-Q-012** live | Predictive maintenance dashboard |
+| MN-01 | `app-predictions` / PredictionsComponent | page | `/maintenance/predictions` | `features/maintenance/pages/predictions/predictions.component.ts:42` | Admin · Manager | confirmed live 2026-05-22: PREDICTIVE MAINTENANCE page; Severity (All severities) + Status (Open — not yet resolved) filters visible; empty state ("Open predictions need a decision: acknowledge, schedule preventive work, resolve, or mark false-positive") — KPI strip + populated states still **QUEUE OPS-Q-012** | Predictive maintenance dashboard |
 | MN-02 | `app-resolve-prediction-dialog` / ResolvePredictionDialogComponent | dialog | `/maintenance/predictions` | `features/maintenance/components/resolve-prediction-dialog/resolve-prediction-dialog.component.ts:16` | Admin · Manager | source-confirmed: 2 modes(resolve/false-positive) · notes field · CANCEL/confirm button · **QUEUE OPS-Q-012** live-trigger | Notes dialog for resolve-or-false-positive; ack + schedule-PM are inline row actions with no dialog |
 | MN-03 | PredictiveMaintenanceService | service | `/maintenance` | `features/maintenance/services/predictive-maintenance.service.ts:1` | n/a | n/a | Predictive maintenance data + resolve actions |
 
