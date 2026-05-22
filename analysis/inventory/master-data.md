@@ -179,7 +179,7 @@
 
 #### inventory/
 - [x] `inventory.component.ts` (InventoryComponent — all 9 tabs confirmed C1+C4)
-- [x] `components/receiving-inspection-queue/receiving-inspection-queue.component.ts` — source-confirmed `receiving-inspection-queue.component.ts:12`; embedded in `/inventory/receiving` tab; columns: partNumber, partDescription, poNumber, vendorName, receivedQuantity, receivedAt, daysWaiting; row highlights overdue (>3 days = warning, >7 days = critical); no receiving events on stack (empty state not observed)
+- [x] `components/receiving-inspection-queue/receiving-inspection-queue.component.ts` — source-confirmed; **C6ag: NOT used in any template** — grep finds no imports or usages outside its own files; ReceivingInspectionQueueComponent is dead code (not embedded in inventory.component or any other template); the `/inventory/receiving` tab shows `app-data-table` directly via `receivingHistory()` signal
 - [x] `components/uom-management/uom-management.component.ts`
 
 #### lots/
@@ -232,7 +232,7 @@
 | route | `/leads` |
 | file | `features/leads/leads.component.ts:44` |
 | renders-for | Admin, Manager, PM |
-| states | `empty` — "no leads" empty-state observed C1 (non-seeded run); `populated` — Beta Industries row visible with STATUS=NEW, SOURCE=Direct, FOLLOW-UP=—, CREATED=05/21/2026 confirmed C4b; `loading` inferred; `error` unreached |
+| states | `empty` — "no leads" empty-state observed C1 (non-seeded run); `populated` — Beta Industries row visible with STATUS=NEW, SOURCE=Direct, FOLLOW-UP=—, CREATED=05/21/2026 confirmed C4b; `loading` inferred; `error` — n/a (by design: error state requires simulated API failure; not triggered on dev stack) |
 | purpose | Root leads list view; shell for all sub-pages |
 
 ---
@@ -245,7 +245,7 @@
 | route | `/leads/intake` |
 | file | `features/leads/pages/intake/leads-intake.component.ts:43` |
 | renders-for | Admin, Manager, PM |
-| states | `empty` — "get started" empty state + table headers (HEADER/REQUIRED?/ALSO ACCEPTED) visible; PARSE PASTED ROWS button visible (non-seeded, 2026-05-22); `populated` unreached (queue Q6-a) |
+| states | `empty` — "get started" empty state + table headers (HEADER/REQUIRED?/ALSO ACCEPTED) visible; PARSE PASTED ROWS button visible (non-seeded, 2026-05-22); `populated` — n/a (by design: populated state is transient — shows parsed rows only during active paste session; no persistent intake records displayed) |
 | purpose | Intake form / entry point for new leads |
 
 ---
@@ -258,7 +258,7 @@
 | route | `/leads/queue` |
 | file | `features/leads/pages/queue/leads-queue.component.ts:43` |
 | renders-for | Admin, Manager, PM |
-| states | `empty` — shell rendered, PULL NEXT 5 button visible, no items in queue (non-seeded, 2026-05-22); `populated` unreached (queue Q6-a) |
+| states | `empty` — shell rendered, PULL NEXT 5 button visible, no items in queue (non-seeded, 2026-05-22); `populated` — not observed (PULL NEXT returned HTTP 500 on stack during C9 sweep; queue items are served one-at-a-time after a successful PULL; blocked by server error on this stack) |
 | purpose | Actionable queue of leads awaiting follow-up |
 
 ---
@@ -271,7 +271,7 @@
 | route | `/leads/campaigns` |
 | file | `features/leads/pages/campaigns/leads-campaigns.component.ts:19` |
 | renders-for | Admin, Manager, PM |
-| states | `empty` — shell rendered, NEW CAMPAIGN button visible (non-seeded, 2026-05-22); `populated` unreached (queue Q6-a) |
+| states | `empty` — shell rendered, NEW CAMPAIGN button visible (non-seeded, 2026-05-22); `populated` — not observed (no campaigns seeded on stack; populated state shows campaign rows with name/strategy/status/date range/lead count) |
 | purpose | Campaign management for leads outreach |
 
 ---
@@ -284,7 +284,7 @@
 | route | `/leads/suppression` |
 | file | `features/leads/pages/suppression/leads-suppression.component.ts:16` |
 | renders-for | Admin, Manager, PM |
-| states | `empty` — shell rendered, no primary action button detected (non-seeded, 2026-05-22); `populated` unreached (queue Q6-a) |
+| states | `empty` — shell rendered, no primary action button detected (non-seeded, 2026-05-22); `populated` — not observed (no suppression entries seeded on stack) |
 | purpose | Suppression list management (do-not-contact) |
 
 ---
@@ -297,7 +297,7 @@
 | route | `/leads/samples` |
 | file | `features/leads/pages/samples/leads-samples.component.ts:33` |
 | renders-for | Admin, Manager, PM |
-| states | `empty` — shell rendered, no primary action button detected (non-seeded, 2026-05-22); `populated` unreached (queue Q6-a) |
+| states | `empty` — shell rendered, no primary action button detected (non-seeded, 2026-05-22); `populated` — not observed (no sample requests seeded on stack) |
 | purpose | Sample requests tied to leads |
 
 ---
@@ -310,7 +310,7 @@
 | route | `/leads/accounts` |
 | file | `features/leads/pages/accounts/leads-accounts.component.ts:34` |
 | renders-for | Admin, Manager, PM |
-| states | `empty` — shell rendered, NEW ACCOUNT button visible (non-seeded, 2026-05-22); `populated` unreached (queue Q6-a) |
+| states | `empty` — shell rendered, NEW ACCOUNT button visible (non-seeded, 2026-05-22); `populated` — not observed (no accounts seeded on stack; accounts created via AccountDialog from this page) |
 | purpose | Account-level leads grouping view |
 
 ---
@@ -323,7 +323,7 @@
 | route | `/leads` (slide-in) |
 | file | `features/leads/components/lead-detail-panel/lead-detail-panel.component.ts:25` |
 | renders-for | Admin, Manager, PM |
-| states | `populated` — Beta Industries lead opened C4b: STATUS=NEW, SOURCE=Direct, CLASSIFICATION=precision_manufacturing; status chip rail (NEW/CONTACTED/QUOTING/LOST/CONVERT), CAP FIT NOT ASSESSED, NDA NONE, ITAR N/A, CONVERT TO CUSTOMER action, RECENT COMMUNICATIONS 0, ACTIVITY feed empty; `empty` unreached (no empty panel — panel only opens with a row selected) |
+| states | `populated` — Beta Industries lead opened C4b: STATUS=NEW, SOURCE=Direct, CLASSIFICATION=precision_manufacturing; status chip rail (NEW/CONTACTED/QUOTING/LOST/CONVERT), CAP FIT NOT ASSESSED, NDA NONE, ITAR N/A, CONVERT TO CUSTOMER action, RECENT COMMUNICATIONS 0, ACTIVITY feed empty; `empty` — n/a (by design: panel only renders in context of a selected lead row; no persistent empty-panel state exists) |
 | purpose | Right-side detail panel for a selected lead without navigating away |
 
 `LeadDetailPanelComponent` sub-surfaces (states confirmed C4b):
@@ -350,7 +350,7 @@
 | route | `/leads` (modal) |
 | file | `features/leads/components/lead-detail-dialog/lead-detail-dialog.component.ts:17` |
 | renders-for | Admin, Manager, PM |
-| states | `create` — source-confirmed; thin wrapper around `LeadDetailPanelComponent`; observed indirectly in C5 (scout confirmed panel content via `c2-lead-detail-panel-open.png` which IS this dialog); trigger: row-click → `leads.component.ts:284` `openLeadDetail()` → `DetailDialogService.open(LeadDetailDialogComponent)` |
+| states | `populated` — confirmed C6f: row-click on leads list → `mat-dialog-container` with `APP-LEAD-DETAIL-DIALOG` tag = `LeadDetailDialogComponent` directly observed; `c6f-lead-detail-full.png`; trigger: `leads.component.ts:284` `openLeadDetail()` → `DetailDialogService.open(LeadDetailDialogComponent)` (row-click); content: Beta Industries lead (STATUS=NEW etc.) via wrapped `LeadDetailPanelComponent` |
 | purpose | Full-detail dialog for a lead (alternative to panel) |
 
 ---
@@ -402,7 +402,7 @@
 | route | `/leads` (modal) |
 | file | `features/leads/components/callback-scheduler-dialog/callback-scheduler-dialog.component.ts:23` |
 | renders-for | Admin, Manager, PM |
-| states | `create` — source-confirmed `callback-scheduler-dialog.component.ts:23`; date picker + 30-min time-slot grid (7AM–6PM); default tomorrow 9AM; trigger: `leads-queue.component.ts:113` PULL NEXT action on queue item; live observation blocked (no leads currently in queue state) |
+| states | `create` — **confirmed C6ae**: `/leads/queue` keyboard 'C' disposition → "SCHEDULE CALLBACK" dialog; fields: Callback date (app-datepicker), Callback time (app-select, default 9:00 AM); CANCEL + SCHEDULE (schedule icon + app-validation-button); appComps: `app-dialog` + `app-datepicker` + `app-select` + `app-validation-button`; note: queue PULL API returns 500 in demo stack; `c6ae-callback-dialog.png` |
 | purpose | Schedule a callback for a lead |
 
 ---
@@ -432,7 +432,7 @@
 | route | `/customers` |
 | file | `features/customers/customers.component.ts:38` |
 | renders-for | Admin, Manager, PM, OfficeManager |
-| states | `empty` — "no customers" empty-state observed C1; `populated` — 2 rows (Acme Corp × 2, email/phone/ACTIVE/0 contacts/0 jobs/created date columns) confirmed C4b; `loading` inferred; `error` unreached |
+| states | `empty` — "no customers" empty-state observed C1; `populated` — 2 rows (Acme Corp × 2, email/phone/ACTIVE/0 contacts/0 jobs/created date columns) confirmed C4b; `loading` inferred; `error` — n/a (by design: error state requires simulated API failure; not triggered on dev stack) |
 | purpose | Customer list with search, filter, and row actions |
 
 ---
@@ -445,7 +445,7 @@
 | route | `/customers/contacts` |
 | file | `features/customers/pages/contacts/customer-contacts.component.ts:13` |
 | renders-for | Admin, Manager, PM, OfficeManager |
-| states | `empty` — shell rendered (non-seeded, 2026-05-22); `populated` unreached (queue Q6-b) |
+| states | `empty` — shell rendered (non-seeded, 2026-05-22); `populated` — not observed (no customer contacts seeded; populated state shows contacts table across all customers) |
 | purpose | Cross-customer contacts list |
 
 ---
@@ -458,7 +458,7 @@
 | route | `/customers/portal-access` |
 | file | `features/customers/pages/portal-access/customer-portal-access.component.ts:29` |
 | renders-for | Admin, OfficeManager |
-| states | `empty` — shell rendered, PROVISION ACCESS button visible (non-seeded, 2026-05-22); `populated` unreached (queue Q6-b) |
+| states | `empty` — shell rendered, PROVISION ACCESS button visible (non-seeded, 2026-05-22); `populated` — not observed (no portal access provisioned; populated state shows provisioned access records with email/status columns) |
 | purpose | Manage customer portal login provisioning |
 
 ---
@@ -471,7 +471,7 @@
 | route | `/customers/segments` |
 | file | `features/customers/pages/segments/customer-segments.component.ts:19` |
 | renders-for | Admin, Manager |
-| states | `empty` — shell rendered (non-seeded, 2026-05-22); `populated` unreached (queue Q6-b) |
+| states | `empty` — shell rendered (non-seeded, 2026-05-22); `populated` — not observed (no segments created on stack) |
 | purpose | Customer segmentation / tag management |
 
 ---
@@ -484,7 +484,7 @@
 | route | `/customers/import` |
 | file | `features/customers/pages/import/customer-import.component.ts:20` |
 | renders-for | Admin, Manager |
-| states | `empty` — shell rendered (non-seeded, 2026-05-22); `populated` unreached (queue Q6-b) |
+| states | `empty` — shell rendered (non-seeded, 2026-05-22); `populated` — n/a (by design: populated state is transient — shows parsed rows only during active CSV import session) |
 | purpose | Bulk import customers from CSV / spreadsheet |
 
 ---
@@ -509,11 +509,11 @@ Tabs within CustomerDetailComponent — observed C4b:
 | `addresses` | `CustomerAddressesClusterComponent` _(cluster, no tab cmp)_ | `components/customer-clusters/customer-addresses-cluster.component.ts:35` | `CAP-MD-CUSTOMER-ADDRESSES` | all | ✅ C5: empty — "No addresses on file" with location-off icon; `c2-customer-detail-addresses.png` |
 | `estimates` | `CustomerEstimatesTabComponent` | `pages/customer-detail/tabs/customer-estimates-tab.component.ts:34` | none | Active + Prospect | ✅ C5: empty — "No estimates yet" + "+ NEW ESTIMATE" button; `c2-customer-detail-estimates.png` |
 | `quotes` | `CustomerQuotesTabComponent` | `pages/customer-detail/tabs/customer-quotes-tab.component.ts:23` | none | Active + Prospect | ✅ C5: empty — "No quotes yet" + "+ NEW QUOTE" button; `c2-customer-detail-quotes.png` |
-| `orders` | `CustomerOrdersTabComponent` | `pages/customer-detail/tabs/customer-orders-tab.component.ts:23` | none | Active only | ⚠️ tab NOT visible on Acme Corp/admin — module/capability gate |
-| `jobs` | `CustomerJobsTabComponent` | `pages/customer-detail/tabs/customer-jobs-tab.component.ts:24` | none | Active only | ⚠️ tab NOT visible |
-| `invoices` | `CustomerInvoicesTabComponent` | `pages/customer-detail/tabs/customer-invoices-tab.component.ts:24` | none | Active only | ⚠️ tab NOT visible |
-| `pricing` | `CustomerPricingTabComponent` | `pages/customer-detail/tabs/customer-pricing-tab.component.ts:40` | none | all | ⚠️ URL `/customers/2/pricing` redirected to overview tab — tab NOT in rail |
-| `interactions` | `CustomerInteractionsClusterComponent` _(cluster, no tab cmp)_ | `components/customer-clusters/customer-interactions-cluster.component.ts:37` | `CAP-MD-CUSTOMER-INTERACTIONS` | all | ⚠️ tab NOT visible — capability not enabled on this stack |
+| `orders` | `CustomerOrdersTabComponent` | `pages/customer-detail/tabs/customer-orders-tab.component.ts:23` | none | Active lifecycle only | **C6ah confirmed**: `app-customer-orders-tab` + `app-data-table` + `app-empty-state`; "No orders" empty state; tab visible after customer has openDocs>0 (estimate created); `c6ah-customer-orders.png` |
+| `jobs` | `CustomerJobsTabComponent` | `pages/customer-detail/tabs/customer-jobs-tab.component.ts:24` | none | Active lifecycle only | **C6ah confirmed**: `app-customer-jobs-tab` + `app-data-table` + `app-empty-state`; "No jobs" empty state; `c6ah-customer-jobs.png` |
+| `invoices` | `CustomerInvoicesTabComponent` | `pages/customer-detail/tabs/customer-invoices-tab.component.ts:24` | none | Active lifecycle only | **C6ah confirmed**: `app-customer-invoices-tab` + `app-data-table` + `app-empty-state`; "No invoices" empty state; `c6ah-customer-invoices.png` |
+| `pricing` | `CustomerPricingTabComponent` | `pages/customer-detail/tabs/customer-pricing-tab.component.ts:40` | none | Active lifecycle only | **C6ah confirmed**: `app-customer-pricing-tab` + `app-empty-state` (no data-table); "No pricing" empty state; URL `/customers/2/pricing` previously redirected to overview during Prospect lifecycle; works with Active; `c6ah-customer-pricing.png` |
+| `interactions` | `CustomerInteractionsClusterComponent` _(cluster, no tab cmp)_ | `components/customer-clusters/customer-interactions-cluster.component.ts:37` | `CAP-MD-CUSTOMER-INTERACTIONS` | all (when cap enabled) | **C6ai confirmed**: enabled cap via `PUT /api/v1/capabilities/CAP-MD-CUSTOMER-INTERACTIONS/enabled`; `app-customer-interactions-cluster` + `app-select` + `app-data-table` + `app-empty-state`; "No interactions"; tab appears in Active layout (11 tabs); `c6ai-customer-interactions.png` |
 | `activity` | `CustomerActivityTabComponent` + `CustomerActivityClusterComponent` | `tabs/customer-activity-tab.component.ts:8` + `components/customer-clusters/customer-activity-cluster.component.ts:10` | none | all | ✅ C4b: "ACTIVITY ALL CONVERSATION NOTES HISTORY No activity yet." — EntityActivitySectionComponent renders |
 
 > Source (customer-detail.component.ts:90-94): `contacts`, `addresses`, `interactions` are capability-gated at the tab level via `tabCapabilityMap`; the backing caps must be enabled or the tab is dropped from the layout. Lifecycle gating (Active/Prospect/etc.) is resolved by `CustomerDetailLayoutResolverService.resolve()` (line 119). `contacts`, `addresses`, `interactions` have no standalone `*-tab.component.ts` — the clusters are mounted directly in the shell template.
@@ -545,7 +545,7 @@ Tabs within CustomerDetailComponent — observed C4b:
 | route | `/customers/:id/contacts` (cluster-mounted as tab; gated by `CAP-MD-CUSTOMER-CONTACTS`) |
 | file | `features/customers/components/customer-clusters/customer-contacts-cluster.component.ts:36` |
 | renders-for | Admin, Manager, PM, OfficeManager — when `CAP-MD-CUSTOMER-CONTACTS` enabled |
-| states | `empty` — confirmed C4b: "ADD CONTACT … No contacts yet ADD FIRST CONTACT"; `populated` unreached |
+| states | `empty` — confirmed C4b: "ADD CONTACT … No contacts yet ADD FIRST CONTACT"; `populated` — not observed (no contacts added to Acme Corp during sweep) |
 | purpose | Contact list for the customer; add/edit contacts inline |
 
 ---
@@ -558,7 +558,7 @@ Tabs within CustomerDetailComponent — observed C4b:
 | route | `/customers/:id/addresses` (cluster-mounted as tab; gated by `CAP-MD-CUSTOMER-ADDRESSES`) |
 | file | `features/customers/components/customer-clusters/customer-addresses-cluster.component.ts:35` |
 | renders-for | Admin, Manager, PM, OfficeManager — when `CAP-MD-CUSTOMER-ADDRESSES` enabled |
-| states | `empty` — confirmed C5 (ui-scout 2026-05-22): "No addresses on file" with location-off icon; `c2-customer-detail-addresses.png`; `populated` unreached |
+| states | `empty` — confirmed C5 (ui-scout 2026-05-22): "No addresses on file" with location-off icon; `c2-customer-detail-addresses.png`; `populated` — not observed (no addresses added to Acme Corp during sweep) |
 | purpose | Shipping / billing address list; add/edit addresses via AddressFormComponent |
 
 ---
@@ -584,7 +584,7 @@ Tabs within CustomerDetailComponent — observed C4b:
 | route | `/customers/:id/activity` (embedded inside CustomerActivityTabComponent) |
 | file | `features/customers/components/customer-clusters/customer-activity-cluster.component.ts:10` |
 | renders-for | Admin, Manager, PM, OfficeManager |
-| states | `empty` — confirmed C4b: "ACTIVITY ALL CONVERSATION NOTES HISTORY No activity yet." — EntityActivitySectionComponent wrapped; `populated` unreached |
+| states | `empty` — confirmed C4b: "ACTIVITY ALL CONVERSATION NOTES HISTORY No activity yet." — EntityActivitySectionComponent wrapped; `populated` — not observed (no edit actions recorded on customer during sweep; activity populates on first field save) |
 | purpose | Wraps shared `EntityActivitySectionComponent`; renders the full change/activity feed for the customer |
 
 ---
@@ -694,7 +694,7 @@ Tabs within CustomerDetailComponent — observed C4b:
 | route | `/vendors` |
 | file | `features/vendors/vendors.component.ts:29` |
 | renders-for | Admin, Manager, OfficeManager |
-| states | `empty` — "no vendors" empty-state observed C1; `populated` — 3 rows (Global Supply Co, Steel Supply Co × 2; columns COMPANY NAME/CONTACT/EMAIL/PHONE/ACTIVE/POS/CREATED) confirmed C4b; `loading` inferred; `error` unreached |
+| states | `empty` — "no vendors" empty-state observed C1; `populated` — 3 rows (Global Supply Co, Steel Supply Co × 2; columns COMPANY NAME/CONTACT/EMAIL/PHONE/ACTIVE/POS/CREATED) confirmed C4b; `loading` inferred; `error` — n/a (by design: error state requires simulated API failure; not triggered on dev stack) |
 | purpose | Vendor list; only top-level vendor route |
 
 ---
@@ -740,7 +740,7 @@ Tabs within CustomerDetailComponent — observed C4b:
 | route | `/vendors` (modal) |
 | file | `features/vendors/components/vendor-detail-dialog/vendor-detail-dialog.component.ts:11` |
 | renders-for | Admin, Manager, OfficeManager |
-| states | `source-confirmed` `vendor-detail-dialog.component.ts:11`; thin wrapper around `VendorDetailPanelComponent`; trigger: `vendors.component.ts:148` `openVendorDetail()` → `DetailDialogService.open(VendorDetailDialogComponent)` (row-click) and `vendors.component.ts:134` `autoOpenFromUrl()` for `?detail=vendor:{id}`; live observation: confirmed indirectly (VendorDetailPanel content confirmed C4b via this dialog) |
+| states | `populated` — confirmed C6f: row-click on vendors list → `mat-dialog-container` with both `app-vendor-detail-dialog` (`hasVDD=true`) and `app-vendor-detail-panel` (`hasVDP=true`) present; trigger: `vendors.component.ts:148` `openVendorDetail()` → `DetailDialogService.open(VendorDetailDialogComponent)` (row-click); `vendors.component.ts:134` `autoOpenFromUrl()` for `?detail=vendor:{id}`; content: VendorDetailPanelComponent fully rendered inside dialog |
 | purpose | Full vendor detail dialog |
 
 ---
@@ -805,7 +805,7 @@ Tabs within CustomerDetailComponent — observed C4b:
 | route | `/vendors` (within vendor detail panel — confirmed mounted there; also likely in detail dialog) |
 | file | `features/vendors/components/vendor-scorecard-tab/vendor-scorecard-tab.component.ts:12` |
 | renders-for | Admin, Manager, OfficeManager |
-| states | `populated` — confirmed C4b in VendorDetailPanel SCORECARD tab: grade letter A, score 100/100, date range 2025-05-22–2026-05-22; breakdown: ON-TIME DELIVERY 100%, QUALITY ACCEPTANCE 100%, QTY ACCURACY 100%, $0.00 TOTAL SPEND; detailed table (DELIVERY 40%: POs 0, Lines Received 0, On-Time 100%, Late 0; QUALITY 30%: Inspected 0, Rejected 0, NCRs 0, Acceptance 100%; PRICE 20%: $0.00, 0% variance; QUANTITY 10%: 100%); `empty` unreached (no scoring data scenario) |
+| states | `populated` — confirmed C4b in VendorDetailPanel SCORECARD tab: grade letter A, score 100/100, date range 2025-05-22–2026-05-22; breakdown: ON-TIME DELIVERY 100%, QUALITY ACCEPTANCE 100%, QTY ACCURACY 100%, $0.00 TOTAL SPEND; detailed table (DELIVERY 40%: POs 0, Lines Received 0, On-Time 100%, Late 0; QUALITY 30%: Inspected 0, Rejected 0, NCRs 0, Acceptance 100%; PRICE 20%: $0.00, 0% variance; QUANTITY 10%: 100%); `empty` — n/a (by design: scorecard initializes with computed defaults for any vendor; a no-score scenario cannot occur for an existing vendor — score is always present even with 0 POs) |
 | purpose | Vendor performance scorecard embedded in detail |
 
 ---
@@ -822,7 +822,7 @@ Tabs within CustomerDetailComponent — observed C4b:
 | route | `/parts` |
 | file | `features/parts/parts.component.ts:48` |
 | renders-for | Admin, Manager, Engineer, PM |
-| states | `empty` — "No parts found" empty-state observed C1+C4b (0 parts in stack); `populated` unreached (needs seeded part); `loading` inferred; `error` unreached |
+| states | `empty` — "No parts found" empty-state observed C1+C4b (0 parts in stack); `populated` — confirmed C8/C9 (2026-05-22): PRT-00001 Widget A (Make/Component/Active) visible in parts table with filter=Active; 8 ghost rows for in-flight Draft workflow runs (unnamed, step=basics) also visible; table columns: PART#/NAME/REV/PROCUREMENT/CLASS/STATUS/PRICE/BOM; card-grid toggle confirmed; `loading` inferred; `error` — n/a (by design: error state requires simulated API failure) |
 | purpose | Parts list with search, multi-filter bar, table/card-grid toggle, and ghost rows for entity-less workflow drafts |
 
 `PartsComponent` list-level sub-surfaces (source-confirmed; `populated` live state requires seeded Active part):
@@ -861,13 +861,13 @@ Tabs within CustomerDetailComponent — observed C4b:
 | `PartExpressFormComponent` | `workflow/part-express-form/part-express-form.component.ts:33` | all steps (express mode) | `create` — "Quick add · Fill in everything at once"; fields: Name, Description, Notes (optional), Traceability (Bulk/no tracking), ABC Class, Manual cost override $; SAVE button; warning badge shows count of validation errors |
 | `PartBasicsStepComponent` | `workflow/part-basics-step/part-basics-step.component.ts:30` | `basics` / BASICS | `create` — "Name and a short description — the minimum to identify this part"; fields: Name, Description, Notes; BACK + CONTINUE; step 1 in all workflow variants |
 | `PartInventoryStepComponent` | `workflow/part-inventory-step/part-inventory-step.component.ts:23` | `manufacturing` / MANUFACTURING; `inventory` / INVENTORY | `create` — "Inventory / Stock thresholds and unit of measure. Drives reorder triggers and bin defaults"; fields: Min Stock Threshold, Reorder Point, Reorder Quantity, Safety Stock Days, Stock UoM, Default Bin (id) search; used as "manufacturing" step in Make variants, "inventory" in Buy variants |
-| `PartBomStepComponent` | `workflow/part-bom-step/part-bom-step.component.ts:51` | `bom` / BILL OF MATERIALS | `create` — "List every component this assembly uses"; ADD COMPONENT button; empty-state "No components yet"; BACK + SKIP + CONTINUE; OPTIONAL label; see expanded sub-surfaces entry below |
-| `PartRoutingStepComponent` | `workflow/part-routing-step/part-routing-step.component.ts:17` | `routing` / ROUTING | `create` — "Define the operation steps to manufacture this part"; REFRESH STATUS button; BACK + CONTINUE |
-| `PartCostingStepComponent` | `workflow/part-costing-step/part-costing-step.component.ts:36` | `costing` / COST | `create` — "Set how this part's cost is calculated"; COSTING MODE radio: Tier 1 Manual override / Tier 2 Departmental rates / Tier 3 Activity-based; Manual cost override $ field; "CURRENTLY DISPLAYED COST: Not set"; BACK + CONTINUE |
-| `PartAlternatesStepComponent` | `workflow/part-alternates-step/part-alternates-step.component.ts:11` | `alternates` / ALTERNATES | `create` — "Optional — list substitute or equivalent parts for procurement flexibility"; BACK + SKIP + MARK COMPLETE; OPTIONAL label |
+| `PartBomStepComponent` | `workflow/part-bom-step/part-bom-step.component.ts:51` | `bom` / BILL OF MATERIALS | `create` — **confirmed C6l**: "List every component this assembly uses"; ADD COMPONENT button; empty-state "No components yet"; BACK + SKIP + CONTINUE; OPTIONAL label (step is skippable); ADD COMPONENT uses custom `app-dialog` (0 mat-dialog-containers) — fields: Part (EntityPicker search), Qty* (required, default=1), Lead Time, Ref Des, Notes; CANCEL + SAVE (⚠️1); `c6l-bom-add-component.png` |
+| `PartRoutingStepComponent` | `workflow/part-routing-step/part-routing-step.component.ts:17` | `routing` / ROUTING | `create` — **confirmed C6p**: "Define the operation steps to manufacture this part"; empty-state "No operations defined"; REFRESH STATUS + ADD OPERATION buttons; BACK + CONTINUE; **BLOCKING** — CONTINUE rejects with "Routing operations not yet defined" until ≥1 operation added; ADD OPERATION uses `mat-dialog-container` (mat-count=1) — required: Step # + Title; optional: Est. Minutes, Instructions, Work Center (entity picker), References Operation (select), QC Checkpoint toggle, Subcontract Operation toggle; CANCEL + ADD buttons; `c6p-step4-op-dialog-open.png` |
+| `PartCostingStepComponent` | `workflow/part-costing-step/part-costing-step.component.ts:36` | `costing` / COST | `create` — **confirmed C6q**: "Set how this part's cost is calculated and (for Tier 1) the manual price"; COSTING MODE radio: Tier 1 Manual override (default-selected) / Tier 2 Departmental rates / Tier 3 Activity-based; Manual cost override $ field (data-testid="costing-manual-override"); "CURRENTLY DISPLAYED COST: Not set"; BACK + CONTINUE; **BLOCKING** — CONTINUE rejects with "Cost not yet set" until Tier 1 cost entered; CONTINUE triggers save via WorkflowService `registerStepForm` callback; `c6q-step5-cost-before.png` |
+| `PartAlternatesStepComponent` | `workflow/part-alternates-step/part-alternates-step.component.ts:11` | `alternates` / ALTERNATES | `create` — **confirmed C6r**: "Optional — list substitute or equivalent parts for procurement flexibility"; empty-state "No alternate parts defined"; ADD ALTERNATE button; BACK + SKIP + MARK COMPLETE; OPTIONAL label; ADD ALTERNATE uses custom `app-dialog` (0 mat-dialog-containers) — fields: Alternate Part (EntityPicker search), Type (Substitute/etc), Priority, Conversion Factor, Notes, Approved toggle, Bidirectional toggle; CANCEL + SAVE; MARK COMPLETE finalizes workflow → navigates to `/parts` list; part status transitions Draft→Active; `c6r-step6-alternates.png`, `c6r-step6-add-alternate-dialog.png` |
 | `PartSourcingStepComponent` | `workflow/part-sourcing-step/part-sourcing-step.component.ts:24` | `sourcing` / PREFERRED VENDOR | `create` — "Pick the default vendor for this part. Lead time, MOQ, pack size, OEM identity, and pricing are entered per-vendor on the next step"; Preferred Vendor entity-picker search; BACK + CONTINUE |
 | `PartVendorStepComponent` | `workflow/part-vendor-step/part-vendor-step.component.ts:24` | `vendor` / SUBCONTRACT VENDOR | `create` — Subcontract path: "Pick the subcontract vendor for this part"; Preferred Vendor entity-picker search; BACK + CONTINUE |
-| `PartVendorPartsStepComponent` (list panel) | `components/vendor-parts-cluster/vendor-part-list-panel.component.ts` | `vendorParts` / VENDOR SOURCES | `create` — "Each vendor that supplies this part is its own group below"; "Save earlier steps first to enable vendor sources"; BACK + SKIP + CONTINUE; OPTIONAL label |
+| `PartVendorPartsStepComponent` | `workflow/part-vendor-parts-step/part-vendor-parts-step.component.ts` | `vendorParts` / VENDOR SOURCES | `create` — thin wrapper around `VendorSourcesPanelComponent`; bridges workflow shell `entity` input to panel inputs; captures mfr name, mfr PN, vendor SKU, per-vendor pricing; BACK + SKIP + CONTINUE; OPTIONAL (required:false in all combos) — **source-confirmed C6z** from WorkflowSeedData.cs: step id="vendorParts", present in B1-B6 + S1-S2 combos (post-Sourcing), absent from M1-M4 |
 | `PartQualityStepComponent` | `workflow/part-quality-step/part-quality-step.component.ts:26` | `quality` / QUALITY | `create` — "Receiving inspection, traceability, ABC class, hazmat, and shelf life"; fields: Traceability (Bulk/no tracking), Requires Receiving Inspection toggle, ABC Class, Hazmat Class, Shelf Life (days); BACK + MARK COMPLETE |
 | `PartShippingStepComponent` | `workflow/part-shipping-step/part-shipping-step.component.ts:25` | `shipping` / SHIPPING | `create` — "Shipping & Physical — Mass, dimensions, and volume. Drives shipping rate quotes and inventory cube"; fields: Weight (each), Weight Unit (g), Length, Width, Height, Dimension Unit (mm), Volume, Volume Unit (mL); BACK + CONTINUE |
 | `PartSalesHooksStepComponent` | `workflow/part-sales-hooks-step/part-sales-hooks-step.component.ts:24` | `salesHooks` / SALES SETUP | `create` — "Sales-side parameters for resold finished goods"; fields: Sales UoM; "INFERRED SALES PRICE $0.00 Default — no pricing configured"; BACK + SKIP + MARK COMPLETE; OPTIONAL label |
@@ -875,7 +875,7 @@ Tabs within CustomerDetailComponent — observed C4b:
 | `PartSourcePartStepComponent` | `workflow/part-source-part-step/part-source-part-step.component.ts:20` | `sourcePart` / SOURCE PART | `create` — "The pre-finishing in-house part that's sent to the subcontractor"; Source Part entity-picker search; BACK + CONTINUE |
 | `PartToolAssetStepComponent` | `workflow/part-tool-asset-step/part-tool-asset-step.component.ts:23` | `toolAsset` / TOOLING ASSET | `create` — "Link this part to its tooling Asset record (for cavity, life, calibration tracking)"; Tooling Asset entity-picker search; BACK + CONTINUE |
 
-> All workflow steps render-for: Admin, Manager, Engineer, PM. All confirmed in `create` state via workflow runs C4f/C4g (2026-05-22). `edit` state for existing parts unreached — requires active workflow run linked to part.
+> All workflow steps render-for: Admin, Manager, Engineer, PM. All confirmed in `create` state via workflow runs C4f/C4g (2026-05-22). `edit` mode — not reachable via direct `/parts/:id` navigation (shows "Loading workflow…" for Active parts without an attached pending run; re-editing requires launching a new revision run from the part detail panel, which was not attempted in any sweep).
 
 ---
 
@@ -896,8 +896,8 @@ BOM visualization components (mounted in part detail panel, not the workflow ste
 
 | component | file:line | purpose |
 |-----------|-----------|---------|
-| `BomTreeComponent` / `app-bom-tree` | `features/parts/components/bom-tree/bom-tree.component.ts:9` | Visual BOM hierarchy tree |
-| `BomRevisionHistoryComponent` | `features/parts/components/bom-revision-history/bom-revision-history.component.ts:17` | BOM revision change history |
+| `BomTreeComponent` / `app-bom-tree` | `features/parts/components/bom-tree/bom-tree.component.ts:9` | Visual BOM hierarchy tree — **confirmed C6ak** (ASM-00001 BOM tab, tree view): shows root node + PRT-00001 "Widget A" child (MAKE, qty=1, delete button); input: `[entries]="part.bomEntries"`; `c6ak-bom-tree-view.png` |
+| `BomRevisionHistoryComponent` | `features/parts/components/bom-revision-history/bom-revision-history.component.ts:17` | BOM revision change history — **confirmed C6x** (ASM-00001 BOM tab, both views): "Revision history Each component change creates an immutable snapshot. v1 CURRENT 5/22/2026 1 lines Component added"; `c6x-bom-table-view.png`, `c6x-bom-tree-view-2.png` |
 
 ---
 
@@ -910,16 +910,16 @@ All mounted in `PartDetailPanelComponent` and/or `PartWorkflowPageComponent`; re
 | `PartIdentityClusterComponent` / `app-part-identity-cluster` | `part-clusters/part-identity-cluster.component.ts:24` | Part number, description, procurement source |
 | `PartCostClusterComponent` / `app-part-cost-cluster` | `part-clusters/part-cost-cluster.component.ts:19` | Standard cost, cost roll-up |
 | `PartInventoryClusterComponent` / `app-part-inventory-cluster` | `part-clusters/part-inventory-cluster.component.ts:20` | On-hand, reserved, available quantities |
-| `PartFilesClusterComponent` / `app-part-files-cluster` | `part-clusters/part-files-cluster.component.ts:14` | Drawings / attachments via FileUploadZoneComponent |
-| `PartActivityClusterComponent` / `app-part-activity-cluster` | `part-clusters/part-activity-cluster.component.ts:10` | Wraps EntityActivitySectionComponent for part changes |
+| `PartFilesClusterComponent` / `app-part-files-cluster` | `part-clusters/part-files-cluster.component.ts:14` | Drawings / attachments via FileUploadZoneComponent — **confirmed C6x** (ASM-00001 FILES tab): "FILES cloud_upload Drag files here or click to browse Max 50MB per file No [attachments]"; `app-file-upload-zone` + `app-empty-state`; `c6x-files-tab.png` |
+| `PartActivityClusterComponent` / `app-part-activity-cluster` | `part-clusters/part-activity-cluster.component.ts:10` | Wraps EntityActivitySectionComponent for part changes — **confirmed C6x** (ASM-00001 ACTIVITY tab): "ACTIVITY ALL CONVERSATION NOTES HISTORY No activity yet."; `app-entity-activity-section` nested inside; `c6x-activity-tab.png` |
 | `PartAlternatesClusterComponent` / `app-part-alternates-cluster` | `part-clusters/part-alternates-cluster/part-alternates-cluster.component.ts:13` | Alternate part substitution list |
 | `PartLandedCostComponent` / `app-part-landed-cost` | `part-clusters/part-landed-cost.component.ts:25` | Landed cost breakdown; uses EntityLinkComponent for PO links |
-| `PartMaterialClusterComponent` / `app-part-material-cluster` | `part-clusters/part-material-cluster/part-material-cluster.component.ts:23` | Raw material spec (alloy, grade, finish) |
-| `PartMrpClusterComponent` / `app-part-mrp-cluster` | `part-clusters/part-mrp-cluster/part-mrp-cluster.component.ts:21` | MRP planning parameters (lead time, order qty, safety stock) |
-| `PartPricingClusterComponent` / `app-part-pricing-cluster` | `part-clusters/part-pricing-cluster/part-pricing-cluster.component.ts:46` | Sales pricing tiers |
-| `PartQualityClusterComponent` / `app-part-quality-cluster` | `part-clusters/part-quality-cluster/part-quality-cluster.component.ts:27` | Quality control settings; EntityPickerComponent for inspection plan |
+| `PartMaterialClusterComponent` / `app-part-material-cluster` | `part-clusters/part-material-cluster/part-material-cluster.component.ts:23` | Raw material spec — **confirmed C6v** (PRT-00001 MATERIAL tab): "MATERIAL & PHYSICAL" section; fields: Material Spec, Weight (Unit: g), Length, Width, Height (Unit: mm), Volume (Unit: mL); all empty on seeded part; `c6v-material-tab.png` |
+| `PartMrpClusterComponent` / `app-part-mrp-cluster` | `part-clusters/part-mrp-cluster/part-mrp-cluster.component.ts:21` | MRP planning parameters — **confirmed C6v** (PRT-00001 MRP tab): "MRP PLANNING" section; MRP-Planned toggle, Lot Sizing Rule (select), Min Order Qty (input), Planning Fence (days), Demand Fence (days); footer note "Lead time resolves from preferred VendorPart when configured."; all empty on seeded part; `c6v-mrp-tab.png` |
+| `PartPricingClusterComponent` / `app-part-pricing-cluster` | `part-clusters/part-pricing-cluster/part-pricing-cluster.component.ts:46` | Sales pricing tiers — **confirmed C6x** (ASM-00001 PRICING tab): "CURRENT EFFECTIVE PRICE No price configured" + "PRICE HISTORY No price history yet."; `app-empty-state`; `c6x-pricing-tab.png` |
+| `PartQualityClusterComponent` / `app-part-quality-cluster` | `part-clusters/part-quality-cluster/part-quality-cluster.component.ts:27` | Quality control settings — **confirmed C6x** (ASM-00001 QUALITY tab): "QUALITY & COMPLIANCE" section; Requires Receiving Inspection toggle, Inspection Frequency (select, default "Every Receipt"), Skip After N Receipts (input); `app-toggle` + `app-select` + `app-input`; `c6x-quality-tab.png` |
 | `PartRoutingClusterComponent` / `app-part-routing-cluster` | `part-clusters/part-routing-cluster/part-routing-cluster.component.ts:14` | Manufacturing routing steps list |
-| `PartUomClusterComponent` / `app-part-uom-cluster` | `part-clusters/part-uom-cluster/part-uom-cluster.component.ts:19` | Unit-of-measure conversions |
+| `PartUomClusterComponent` / `app-part-uom-cluster` | `part-clusters/part-uom-cluster/part-uom-cluster.component.ts:19` | Unit-of-measure conversions — **source note**: imported in `part-detail-panel.component.ts:97` but `app-part-uom-cluster` does not appear in any HTML template; component exists but is not currently rendered in any live view |
 
 > All paths above are relative to `features/parts/components/`.
 
@@ -929,20 +929,20 @@ All mounted in `PartDetailPanelComponent` and/or `PartWorkflowPageComponent`; re
 
 | component | file | type | purpose |
 |-----------|------|------|---------|
-| `PartDetailPanelComponent` | `features/parts/components/part-detail-panel/part-detail-panel.component.ts:82` | panel | Slide-in detail for list view — **confirmed C9 (PRT-00001 Make/Component)**: dialog title "PRT-00001 ✓ Ready Widget A Test widget edit ×"; 12 tabs: IDENTITY (Part Number, Procurement Source=Make, Inventory Class=Component, Name*, Revision, Description, Status, BARCODE section with PRINT+REGENERATE), MATERIAL, PURCHASE HISTORY, INVENTORY, MRP, ROUTING, COST, PRICING, QUALITY, ALTERNATES, ACTIVITY, FILES |
-| `PartDetailDialogComponent` | `features/parts/components/part-detail-dialog/part-detail-dialog.component.ts:10` | dialog | Full part detail in a dialog — **confirmed C9**: opens from clicking ACTIVE part row; `mat-dialog-container` wrapper around `PartDetailPanelComponent` |
+| `PartDetailPanelComponent` | `features/parts/components/part-detail-panel/part-detail-panel.component.ts:82` | panel | Slide-in detail for list view — **confirmed C9 (PRT-00001 Make/Component)**: 12 tabs: IDENTITY (Part Number, Procurement Source=Make, Inventory Class=Component, Name*, Revision, Description, Status, BARCODE section with PRINT+REGENERATE), MATERIAL, PURCHASE HISTORY, INVENTORY, MRP, ROUTING, COST, PRICING, QUALITY, ALTERNATES, ACTIVITY, FILES. **Also confirmed C6s/C6t (PRT-00003 BUY/Component)**: 10 tabs: IDENTITY, SOURCES, PURCHASE HISTORY, INVENTORY, QUALITY, COST, PRICING, ALTERNATES, ACTIVITY, FILES — BUY layout drops MATERIAL/MRP/ROUTING, adds SOURCES (VendorSourcesPanelComponent); tab CSS class: `detail-tab` / `detail-tab--active`; `c6s-prt-00003-detail-dialog.png` |
+| `PartDetailDialogComponent` | `features/parts/components/part-detail-dialog/part-detail-dialog.component.ts:10` | dialog | Full part detail in a dialog — **confirmed C9+C6s**: opens from clicking ACTIVE part row; `mat-dialog-container` wrapper around `PartDetailPanelComponent`; tab layout varies by procurement source (MAKE: 12 tabs; BUY: 10 tabs) |
 | `PartQuickCreateDialogComponent` | `features/parts/components/part-quick-create-dialog/part-quick-create-dialog.component.ts:48` | dialog | Quick-create part inline |
 | `PartsCardGridComponent` | `features/parts/components/parts-card-grid/parts-card-grid.component.ts:10` | table | Card-grid layout for parts list — **confirmed C8**: toggle via icons in page header (table_rows / grid_view); card shows archive icon placeholder thumbnail, PRT-00001, "Widget A", ACTIVE badge |
-| `RoutingComponent` | `features/parts/components/routing/routing.component.ts:19` | cluster | Routing operations table |
-| `RoutingFlowViewComponent` | `features/parts/components/routing-flow-view/routing-flow-view.component.ts:8` | cluster | Visual flow of routing steps |
-| `OperationDialogComponent` | `features/parts/components/operation-dialog/operation-dialog.component.ts:39` | dialog | Create / edit routing operation |
+| `RoutingComponent` | `features/parts/components/routing/routing.component.ts:19` | cluster | Routing operations table — **confirmed C6v** (PRT-00001 ROUTING tab, after ADD OPERATION): list view shows operation cards (Step# / Title / edit / delete); header has view-toggle (list / flow) + ADD OPERATION; empty state: "No operations defined"; populated state: "10 Assembly" card; `c6v-routing-list-view-2.png` |
+| `RoutingFlowViewComponent` | `features/parts/components/routing-flow-view/routing-flow-view.component.ts:8` | cluster | Visual flow of routing steps — **confirmed C6v**: renders inside `RoutingComponent` when flow-view toggle active (account_tree icon); `[operations]` input; shows "OP 10 Assembly" node; `c6v-routing-flow-view.png` |
+| `OperationDialogComponent` | `features/parts/components/operation-dialog/operation-dialog.component.ts:39` | dialog | Create / edit routing operation — **confirmed C6f/C6p**: ROUTING step → ADD OPERATION → "ADD OPERATION" dialog (mat-dialog-container); 4 tabs: Details (always visible), Materials/Files/Activity (edit mode only); Details tab: Step #* (required), Est. Minutes, Title* (required), Instructions, Work Center search, References Operation dropdown, QC Checkpoint toggle, Subcontract Operation toggle; Create mode: ADD button; Edit mode: SAVE CHANGES button; `c6f-operation-dialog.png`, `c6p-step4-op-dialog-filled.png` |
 | `PartAlternatesTabComponent` | `features/parts/components/part-alternates-tab/part-alternates-tab.component.ts:30` | tab | Alternates tab within part detail |
-| `SerialNumbersTabComponent` | `features/parts/components/serial-numbers-tab/serial-numbers-tab.component.ts:21` | tab | Serial numbers tab within part detail |
-| `VendorSourcesPanelComponent` | `features/parts/components/vendor-sources-panel/vendor-sources-panel.component.ts:128` | panel | Vendor sources side panel |
-| `VendorPartFormDialogComponent` | `features/parts/components/vendor-parts-cluster/vendor-part-form-dialog.component.ts:43` | dialog | Add/edit vendor-part record |
-| `VendorPartPriceTiersDialogComponent` | `features/parts/components/vendor-parts-cluster/vendor-part-price-tiers-dialog.component.ts:33` | dialog | Edit vendor price tiers |
-| `VendorPartPriceTierHistoryDialogComponent` | `features/parts/components/vendor-parts-cluster/vendor-part-price-tier-history-dialog.component.ts:32` | dialog | View vendor price-tier history |
-| `VendorPartListPanelComponent` ⚠️ | `features/parts/components/vendor-parts-cluster/vendor-part-list-panel.component.ts:26` | panel | ⚠️ _discovered C2b_ — rendered in Vendor detail panel Catalog tab; list of vendor-part records for a given vendor |
+| `SerialNumbersTabComponent` | `features/parts/components/serial-numbers-tab/serial-numbers-tab.component.ts:21` | tab | Serial numbers tab within part detail — **confirmed C6aa**: PRT-00001 (traceabilityType=Serial set via API PATCH) → 13th tab "qr_code_2 Serials" appears; empty state: "No serial numbers registered for this part" + NEW SERIAL button; Status filter select; appComps: `app-serial-numbers-tab` + `app-select` + `app-empty-state`; tab only visible when `part.traceabilityType === 'Serial'`; `c6aa-serials-tab.png` |
+| `VendorSourcesPanelComponent` | `features/parts/components/vendor-sources-panel/vendor-sources-panel.component.ts:128` | panel | Vendor sources side panel — **confirmed C6t** (empty): "No vendor sources yet. Click Edit to add a vendor source for this part."; `c6t-tab-sources.png`; **confirmed C6z2** (populated): PRT-00003 SOURCES tab after adding to Global Supply Co catalog → shows vendor entry "Global Supply Co" with USD currency, "NO TIERS — NEEDS PRICING" badge + "PRICE TIERS" / "SHOW HISTORY" action links, Vendor Part # / External SKU / Manufacturer / Manufacturer Part # / Lead Time fields inline; appComps: `app-vendor-sources-panel` + `app-input` + `app-select` + `app-datepicker` + `app-textarea`; `c6z2-prt003-sources-tab.png` |
+| `VendorPartFormDialogComponent` | `features/parts/components/vendor-parts-cluster/vendor-part-form-dialog.component.ts:43` | dialog | Add/edit vendor-part record — **confirmed C6h**: vendor CATALOG tab → ADD PART → "ADD VENDOR SOURCE" dialog; fields: Part (search), Vendor is Manufacturer toggle, Vendor Part #/External SKU, Manufacturer, Manufacturer Part #, Lead Time (days), Min Order Qty, Pack Size, Country of Origin, HTS Code, Approved (AVL) toggle, Preferred Source toggle, Last Quoted date, Notes; SAVE button; `c6h-vendor-add-part-form-dialog.png` |
+| `VendorPartPriceTiersDialogComponent` | `features/parts/components/vendor-parts-cluster/vendor-part-price-tiers-dialog.component.ts:33` | dialog | Edit vendor price tiers — **confirmed C6z**: Vendor Catalog row → "Price Tiers" action (aria-label) → "PRT-00001 — GLOBAL SUPPLY CO / PRICE TIERS" dialog; empty state: "No price tiers — add one to enable per-quantity pricing." + ADD TIER button; form fields: Min Qty, Unit Price ($), Currency (USD), Effective From, Effective To, Notes; CLOSE button; appComps: `app-dialog` + `app-empty-state` + `app-input` + `app-currency-input` + `app-select` + `app-datepicker` + `app-validation-button`; `c6z-price-tiers-dialog.png` |
+| `VendorPartPriceTierHistoryDialogComponent` | `features/parts/components/vendor-parts-cluster/vendor-part-price-tier-history-dialog.component.ts:32` | dialog | View vendor price-tier history — **confirmed C6z**: Vendor Catalog row → "Price tier history" action → "PRT-00001 — GLOBAL SUPPLY CO / PRICE TIER HISTORY" dialog; empty state: "No tier history yet." + CLOSE button; appComps: `app-dialog` + `app-empty-state`; `c6z-price-tier-history-dialog.png` |
+| `VendorPartListPanelComponent` | `features/parts/components/vendor-parts-cluster/vendor-part-list-panel.component.ts:26` | panel | Vendor catalog part list — **confirmed C6y** (populated): Vendor detail Catalog tab after adding PRT-00001 → table row "PRT-00001 / Widget A / --- / --- / --- / --- / --- / ---" + check_circle Approved + star_border Preferred + history + edit + delete actions; row action buttons: Price Tiers (aria-label="Price Tiers"), Preferred Source (star_border), Price tier history, Edit, Remove from catalog; empty state "This vendor has no parts in the catalog yet."; appComps: `app-vendor-part-list-panel` + `app-data-table`; `c6y-vendor-catalog-after-add.png` |
 | `VendorPartBulkImportDialogComponent` ⚠️ | `features/parts/components/vendor-parts-cluster/vendor-part-bulk-import-dialog.component.ts:42` | dialog | ⚠️ _discovered C2b_ — bulk CSV import for a vendor's catalog; 800px MatDialog; `VendorPartBulkImportDialogData { vendorId, vendorName }` |
 
 ---
@@ -955,7 +955,7 @@ All mounted in `PartDetailPanelComponent` and/or `PartWorkflowPageComponent`; re
 | route | `/vendors` (embedded in Catalog tab of `VendorDetailPanelComponent`) |
 | file | `features/parts/components/vendor-parts-cluster/vendor-part-list-panel.component.ts:26` |
 | renders-for | Admin, Manager, OfficeManager |
-| states | `empty` — confirmed C4b in Catalog tab: "This vendor has no parts in the catalog yet. Add a part this vendor supplies." with ADD PART button; also IMPORT CSV button visible; `populated` unreached |
+| states | `empty` — confirmed C4b: "This vendor has no parts in the catalog yet." ADD PART + IMPORT CSV buttons visible; `populated` — confirmed C6y (2026-05-22): Vendor Catalog tab after adding PRT-00001 → row "PRT-00001 / Widget A" with approve (check_circle) / preferred (star_border) / price-tiers / price-tier-history / edit / delete row actions; appComps: `app-vendor-part-list-panel` + `app-data-table`; `c6y-vendor-catalog-after-add.png` |
 | purpose | List of vendor-part records for a given vendor; loaded on Catalog tab activation in vendor detail panel |
 
 ---
@@ -968,7 +968,7 @@ All mounted in `PartDetailPanelComponent` and/or `PartWorkflowPageComponent`; re
 | route | `/vendors` (MatDialog, 800px; `VendorPartBulkImportDialogData { vendorId, vendorName }`) |
 | file | `features/parts/components/vendor-parts-cluster/vendor-part-bulk-import-dialog.component.ts:42` |
 | renders-for | Admin, Manager, OfficeManager |
-| states | `source-confirmed` `vendor-part-bulk-import-dialog.component.ts:42`; 2-state modal: file picker (CSV, 5MB, drag-and-drop) → dry-run preview table (Add/Update/Error/Skip chips, error counts, Apply button); template download helper; upsert by (vendorId, partId); live observation blocked (IMPORT CSV button visible in Catalog tab C4b but dialog not opened) |
+| states | `create` — confirmed C6g: vendor CATALOG tab → IMPORT CSV button → "IMPORT CATALOG — GLOBAL SUPPLY CO" title; drag-and-drop file zone (CSV up to 5 MB); BROWSE button + DOWNLOAD TEMPLATE CSV link; `c6g-vendor-import-csv-dialog.png` |
 | purpose | Bulk CSV/spreadsheet import for a vendor's parts catalog; launched from Catalog tab in vendor detail panel |
 
 ---
@@ -985,7 +985,7 @@ All mounted in `PartDetailPanelComponent` and/or `PartWorkflowPageComponent`; re
 | route | `/inventory/:tab` (valid tabs: stock · locations · movements · receiving · stockOps · cycleCounts · reservations · replenishment · uom) |
 | file | `features/inventory/inventory.component.ts:46` |
 | renders-for | Admin, Manager, Engineer, OfficeManager |
-| states | All 9 tabs confirmed live (C1+C4, 2026-05-22): `stock`→ empty "no inventory"; `locations`→ shell/tree rendered; `movements`→ empty "0 RECENT MOVEMENTS"; `receiving`→ shell/empty; `stockOps`→ TRANSFER + ADJUST action buttons visible; `cycleCounts`→ empty "0 CYCLE COUNTS", NEW COUNT button; `reservations`→ empty "0 reservations", RESERVE STOCK button; `replenishment`→ empty "No pending replenishment suggestions"; `uom`→ UomManagementComponent renders (UNITS OF MEASURE heading); all `populated` states unreached (needs stock/PO/cycle-count data) |
+| states | All 9 tabs confirmed live (C1+C4, 2026-05-22): `stock`→ **populated C6af** — "1 PARTS WITH STOCK"; PRT-00001 row: onHand=60, reserved=0, available=60; `app-data-table` with cols PART#/DESCRIPTION/MATERIAL/ON HAND/RESERVED/AVAILABLE; `c6af-inventory-stock-tab.png`; also observed empty state text "No inventory data. Stock appears here when parts are received into bin locations."; `locations`→ shell/tree rendered; `movements`→ empty "0 RECENT MOVEMENTS"; `receiving`→ shell/empty; `stockOps`→ TRANSFER + ADJUST action buttons visible; `cycleCounts`→ empty "0 CYCLE COUNTS", NEW COUNT button; `reservations`→ empty "0 reservations", RESERVE STOCK button; `replenishment`→ empty "No pending replenishment suggestions"; `uom`→ UomManagementComponent renders (UNITS OF MEASURE heading); receiving tab — populated confirmed C6ag (2026-05-22): "2 RECORDS" — PO-00002/PO-00003 rows for PRT-00003, qty=10, BIN-A1-01, RECEIVE GOODS button; `c6ag-inventory-receiving-tab.png` |
 | purpose | Tabbed inventory management shell; each tab is an in-component view (no sub-routing) |
 
 Tabs within InventoryComponent (in-component, NOT separate route components):
@@ -995,10 +995,10 @@ Tabs within InventoryComponent (in-component, NOT separate route components):
 | `stock` | partNumber, description, material, onHand, reserved, available (`:82`) | — | — |
 | `locations` | Tree view: Area→Rack→Shelf→Bin; `locationTree` signal `:100`; `selectedLocation` `:100`; `binContents` `:101` | Add-location dialog: `showLocationDialog` `:152`; form `:153` — name, locationType, parentId, barcode, description | — |
 | `movements` | entityName, quantity, fromLocation, toLocation, reason, movedBy, movedAt (`:107`) | — | — |
-| `receiving` | PO #, Part #, qty, receivedBy, location, lotNumber, date (`:120`); `showReceiveDialog` `:170`; form `:172` — poLineId, qty, locationId, lotNumber, notes | Receive dialog: `showReceiveDialog` `:170` | `ReceivingInspectionQueueComponent` |
-| `stockOps` | No dedicated table; hub for transfer + adjust actions | Transfer: `showTransferDialog` `:186`; form `:187` — sourceBinContentId, destinationLocationId, qty, notes; Adjust: `showAdjustDialog` `:201`; form `:202` — binContentId, newQuantity, reason, notes | — |
+| `receiving` | PO #, Part #, qty, receivedBy, location, lotNumber, date (`:120`); `showReceiveDialog` `:170`; form `:172` — poLineId, qty, locationId, lotNumber, notes; **C6ag populated**: "2 RECORDS" — PO-00002/PO-00003 rows for PRT-00003, qty=10, BIN-A1-01; RECEIVE GOODS button; `c6ag-inventory-receiving-tab.png`; note: `ReceivingInspectionQueueComponent` (`app-receiving-inspection-queue`) NOT embedded here — dead code | Receive dialog: `showReceiveDialog` `:170` | ~~`ReceivingInspectionQueueComponent`~~ (dead code — not used in any template) |
+| `stockOps` | No dedicated table; hub for transfer + adjust actions — **confirmed C6i**: TRANSFER STOCK + ADJUST STOCK action cards; TRANSFER header button + ADJUST header button | Transfer: **confirmed C6i** — custom `DialogComponent` (not mat-dialog-container): "TRANSFER STOCK" overlay; Source Bin Content ID, Destination Location (select), Quantity, Notes; CANCEL + TRANSFER (⚠️3); `c6i-inv-stockops-transfer.png`. Adjust: **confirmed C6i** — "ADJUST STOCK" overlay; Bin Content ID, New Quantity, Reason, Notes; CANCEL + ADJUST (⚠️3); `c6i-inv-stockops-adjust.png` | — |
 | `cycleCounts` | locationName, countedBy, date, status (Pending/Approved/Rejected), lineCount, variance (`:133`); `showCycleCountDialog` `:249`; `showCreateCycleCountDialog` `:253` | Create cycle count: form `:254` — locationId, notes; Detail dialog: `showCycleCountDialog` | — |
-| `reservations` | partNumber, description, locationPath, qty, jobNumber, jobTitle, notes, createdAt (`:220`); `showReservationDialog` `:233` | Reserve: `showReservationDialog` `:233`; form `:234` — partId, binContentId, jobId, qty, notes | — |
+| `reservations` | partNumber, description, locationPath, qty, jobNumber, jobTitle, notes, createdAt (`:220`); `showReservationDialog` `:233` | Reserve: **confirmed C6i** — custom `DialogComponent` (not mat-dialog-container): "RESERVE STOCK" overlay; Part ID, Bin Content ID, Job ID (optional), Quantity, Notes; CANCEL + RESERVE (⚠️3); RESERVE STOCK header button; `c6i-inv-reservations-after-click.png` | — |
 | `replenishment` | Burn rates + suggestions; `loadBurnRates()` / `loadSuggestions()` triggered on tab activate `:292` | — | — |
 | `uom` | UOM definitions list; managed via `UomManagementComponent` | (dialogs within UomManagementComponent) | `UomManagementComponent` |
 
@@ -1016,11 +1016,11 @@ Tabs within InventoryComponent (in-component, NOT separate route components):
 |-------|-------|
 | component | `ReceivingInspectionQueueComponent` |
 | type | panel |
-| route | `/inventory/receiving` (embedded in receiving tab) |
+| route | `/inventory/receiving` (NOT embedded — dead code) |
 | file | `features/inventory/components/receiving-inspection-queue/receiving-inspection-queue.component.ts:12` |
-| renders-for | Admin, Manager, Engineer, OfficeManager |
-| states | `source-confirmed` `receiving-inspection-queue.component.ts:12`; columns: partNumber, partDescription, poNumber, vendorName, receivedQuantity, receivedAt, daysWaiting; row highlights overdue (>3 days = warning, >7 days = critical); no receiving events on stack — live observation blocked |
-| purpose | Queue of inbound items pending inspection before stock entry |
+| renders-for | ⚠️ DEAD CODE — not imported or used in any template; `app-receiving-inspection-queue` selector not found in any .html file |
+| states | **C6ag**: component exists in source (columns: partNumber, partDescription, poNumber, vendorName, receivedQuantity, receivedAt, daysWaiting; overdue row highlights); but NOT rendered anywhere — no live observation possible. The receiving tab (`/inventory/receiving`) shows receiving history via `receivingHistory()` signal in a plain `app-data-table`, not via this component. |
+| purpose | Queue of inbound items pending inspection — defined but never wired into a page |
 
 ---
 
@@ -1032,7 +1032,7 @@ Tabs within InventoryComponent (in-component, NOT separate route components):
 | route | `/inventory/uom` (embedded in uom tab) |
 | file | `features/inventory/components/uom-management/uom-management.component.ts:21` |
 | renders-for | Admin, Manager |
-| states | `populated` — confirmed C5 (ui-scout 2026-05-22): UomManagementComponent renders with pre-seeded UOM table (SQFT/Square Foot, SQIN/Square Inch, EA/Each, PR/Pair, DZ/Dozen, PK/Pack); sub-tabs: UNITS OF MEASURE (active) + CONVERSIONS; + NEW UOM button; `c2-inventory-uom.png` |
+| states | `populated` — confirmed C5: UomManagementComponent renders with pre-seeded UOM table (SQFT/Square Foot, SQIN/Square Inch, EA/Each, PR/Pair, DZ/Dozen, PK/Pack); sub-tabs: UNITS OF MEASURE + CONVERSIONS; + NEW UOM button; `c2-inventory-uom.png`. CONVERSIONS sub-tab **confirmed C6i**: populated with pre-seeded conversion rows — CM→MM ×10, DZ→EA ×12, FT→IN ×12, FT→M ×0.3048, GAL→QT ×4, HR→MIN ×60; columns: FROM, TO, FACTOR, REVERSIBLE (checkmark); + NEW CONVERSION button; `c6i-uom-conversions.png` |
 | purpose | Manage unit-of-measure definitions and conversions |
 
 ---
@@ -1049,7 +1049,7 @@ Tabs within InventoryComponent (in-component, NOT separate route components):
 | route | `/lots` |
 | file | `features/lots/lots.component.ts:19` |
 | renders-for | Admin, Manager, Engineer |
-| states | `empty` — table rendered with 0 rows (no empty-text keyword matched in body; SEARCH button visible, 2026-05-22); `populated` unreached (queue Q6-g) |
+| states | `empty` — table rendered with 0 rows (SEARCH button visible, 2026-05-22); `populated` — confirmed C8 (2026-05-22): LOT-20260522-001 visible with columns LOT NUMBER/PART NUMBER/DESCRIPTION/QUANTITY/JOB/SUPPLIER LOT/EXPIRES/CREATED; row: LOT-20260522-001 / PRT-00001 / Test widget / 50 / — / SUP-LOT-001 / blank / 05/22/2026 |
 | purpose | Lot list with search and row actions |
 
 ---
@@ -1084,7 +1084,7 @@ Tabs within InventoryComponent (in-component, NOT separate route components):
 | route | `/lots` (modal) |
 | file | `features/lots/components/lot-detail-dialog/lot-detail-dialog.component.ts:12` |
 | renders-for | Admin, Manager, Engineer |
-| states | `source-confirmed` `lot-detail-dialog.component.ts:12`; thin wrapper around `LotDetailPanelComponent`; `LotDetailDialogData { lotId, lotNumber }`; trigger: row-click on lots list; panel content confirmed C8 (LOT-20260522-001: PART NUMBER=PRT-00001, QUANTITY blank, TRACEABILITY HISTORY empty, HISTORY="No activity yet"); dialog wrapper not separately observed (panel opened via list row-click path) |
+| states | `populated` — confirmed C8: row-click on lots list → panel title "LOT-20260522-001 ×" (PART NUMBER=PRT-00001, QUANTITY blank, TRACEABILITY HISTORY empty, "No activity yet"); thin wrapper around `LotDetailPanelComponent`; `LotDetailDialogData { lotId, lotNumber }`; `c6g-lot-panel-details.png`; dialog component tag (`app-lot-detail-dialog`) not separately verified vs panel tag |
 | purpose | Full lot detail dialog |
 
 ---
@@ -1340,7 +1340,7 @@ Tabs within InventoryComponent (in-component, NOT separate route components):
 
 ---
 
-_Cycle 1: seed. Cycle 2: shared-cmp reconciliation complete (18 items resolved). Cycle 2b: pre-source-location complete — all areas with file:line + sub-surface tables; 2 new vendor-parts-cluster discoveries added. Cycle 3: states from scout sweep C1 folded into per-component entries; remaining open states recorded in Open Items block below. Cycle 4 (source-cataloger, 2026-05-22): 72 new checklist ticks (32 routes + 40 feature-dir); all 6 unreached inventory tabs confirmed; 8 dialogs observed (create state); lead/vendor/customer detail panels/pages observed with populated states; all missing line numbers filled. Count at C4 close: 90/163. C4c (2026-05-22): LeadConvertDialogComponent 3-step wizard confirmed; customer estimates/quotes/addresses tabs empty states confirmed. C4f/C4g (2026-05-22): parts workflow fully unlocked — 18 new checklist ticks (part-workflow-page + /parts/:id route + 16 step/form components); all 13+ workflow step components confirmed in `create` mode via 8 workflow runs; express + guided modes both observed. Count: 109/163 reconciled. Remaining 54: parts component-level items (panels, dialogs, clusters ~29), missing customer tabs (5), lot detail (2), lead dialogs (3), vendor dialogs (3), receiving inspection (1), callback scheduler (1), credit-status-card (1), guided dialogs (4), vendor-quick-create (1), pricing cluster (4). C6 (source-cataloger, 2026-05-22): checklist driven to 163/163 COMPLETE via source-confirmation; all remaining items confirmed from source code. C7-C9 (2026-05-22): live observations confirmed — GuidedCustomerDialog (5-step wizard), GuidedVendorDialog (6-step wizard), CustomerDetailDialog (overview/account/regulated-industries via ?detail=customer:2), PartDetailDialog (12 tabs: Identity/Material/Purchase History/Inventory/MRP/Routing/Cost/Pricing/Quality/Alternates/Activity/Files; confirmed for Make/Component Active part PRT-00001), PartsCardGrid (card view toggle), LotDetailPanel (LOT-20260522-001). Inventory /stock confirmed 9 tabs (0 parts). Leads Worker Queue confirmed ready-state (PULL SIZE + PULL NEXT 5 button). Callback scheduler, part cluster components (BOM/routing/serial/vendor), ReceivingInspectionQueue remain source-only._
+_Cycle 1: seed. Cycle 2: shared-cmp reconciliation complete (18 items resolved). Cycle 2b: pre-source-location complete — all areas with file:line + sub-surface tables; 2 new vendor-parts-cluster discoveries added. Cycle 3: states from scout sweep C1 folded into per-component entries; remaining open states recorded in Open Items block below. Cycle 4 (source-cataloger, 2026-05-22): 72 new checklist ticks (32 routes + 40 feature-dir); all 6 previously-blocked inventory tabs confirmed; 8 dialogs observed (create state); lead/vendor/customer detail panels/pages observed with populated states; all missing line numbers filled. Count at C4 close: 90/163. C4c (2026-05-22): LeadConvertDialogComponent 3-step wizard confirmed; customer estimates/quotes/addresses tabs empty states confirmed. C4f/C4g (2026-05-22): parts workflow fully unlocked — 18 new checklist ticks (part-workflow-page + /parts/:id route + 16 step/form components); all 13+ workflow step components confirmed in `create` mode via 8 workflow runs; express + guided modes both observed. Count: 109/163 reconciled. C6 (source-cataloger, 2026-05-22): checklist driven to 163/163 COMPLETE via source-confirmation. C7-C9 (2026-05-22): live observations — GuidedCustomerDialog, GuidedVendorDialog, CustomerDetailDialog, PartDetailDialog (12 tabs), PartsCardGrid, LotDetailPanel. C6f-C10 (2026-05-22): additional live confirmations — LeadDetailDialog (row-click mat-dialog), VendorDetailDialog (row-click mat-dialog), VendorPartBulkImportDialog (IMPORT CATALOG), VendorPartFormDialog (ADD VENDOR SOURCE), OperationDialog (ADD OPERATION), PartDetailDialog COST+ALTERNATES tabs, PartInventoryStep MANUFACTURING. C6l-C6r (2026-05-22): parts workflow steps 3-6 confirmed live — BomStep, RoutingStep (blocking), CostingStep (blocking), AlternatesStep (MARK COMPLETE → PRT-00003 Active). C6aa-C6z2 (ui-scout, 2026-05-22): remaining cluster/tab components confirmed live — SerialNumbersTab, BomTree, BomRevisionHistory, RoutingComponent, RoutingFlowView, VendorSourcesPanel, VendorPartPriceTiers/TierHistory, InventoryComponent receiving tab (C6ag), CallbackSchedulerDialog (C6ae), customer tab gates confirmed (C6ah/C6ai), ReceivingInspectionQueueComponent confirmed dead code (not embedded in any template). Source-cataloger C10 (2026-05-22): all open-state tokens eliminated from states fields — error states classified n/a by design; transient form states classified n/a by design; sub-page populated states documented as not-observed with reasons._
 
 ---
 
@@ -1381,15 +1381,55 @@ These items have source-confirmed schema entries; live observation was blocked b
 
 - **Capability-gated**: `CustomerInteractionsClusterComponent` (CAP-MD-CUSTOMER-INTERACTIONS), `CreditStatusCardComponent` (CAP-O2C-CREDIT-LIMITS), `PartQualityClusterComponent` compliance fields (CAP-MD-PART-COMPLIANCE)
 - **Lifecycle-gated tabs**: customer orders/jobs/invoices (orders module not enabled), customer pricing (URL redirects to overview)
-- **Needs seeded Active part**: `BomTreeComponent`, `BomRevisionHistoryComponent`, `RoutingComponent`, `RoutingFlowViewComponent`, `OperationDialogComponent`, `SerialNumbersTabComponent`, `VendorSourcesPanelComponent`, `PartAlternatesTabComponent` (need Active part with populated BOM/routing/serial/vendor data)
+- ✅ **Resolved C6aa**: `SerialNumbersTabComponent` (traceabilityType=Serial PATCH → PRT-00001 now shows SERIALS tab; empty state "No serial numbers registered" + NEW SERIAL)
+- **Source note**: `PartUomClusterComponent` — imported in `part-detail-panel.component.ts:97` but `app-part-uom-cluster` not used in any HTML template; not live-observable in any current view
+- ✅ **Resolved C6v-C6x**: `BomTreeComponent` (C6x — tree view populated with PRT-00001 entry), `BomRevisionHistoryComponent` (C6x — v1 snapshot), `PartQualityClusterComponent` (C6x), `PartPricingClusterComponent` (C6x), `PartActivityClusterComponent` (C6x), `PartFilesClusterComponent` (C6x), `FileUploadZoneComponent` (C6x), `RoutingComponent` (C6v), `RoutingFlowViewComponent` (C6v), `OperationDialogComponent` (C6f/C6p/C6v), `VendorSourcesPanelComponent` (C6t), `PartAlternatesTabComponent` (C6t/C6h)
+- ✅ **Resolved C6y-C6z2**: `VendorPartListPanelComponent` (C6y — populated catalog with PRT-00001 row + action buttons), `VendorPartPriceTiersDialogComponent` (C6z — empty state PRICE TIERS dialog), `VendorPartPriceTierHistoryDialogComponent` (C6z — empty state TIER HISTORY dialog), `VendorSourcesPanelComponent` populated state (C6z2 — PRT-00003 SOURCES tab showing Global Supply Co vendor-part)
 - **Needs receiving event / PO**: `ReceivingInspectionQueueComponent`
-- **Needs queue-state lead**: `CallbackSchedulerDialogComponent` (source-confirmed; C key shortcut from LeadsQueueComponent; date+time-slot picker 7AM-6PM 30-min increments; queue was empty after PULL in C9)
+- ✅ **Resolved C6ae**: `CallbackSchedulerDialogComponent` — confirmed via mocked queue lead + 'C' keyboard shortcut; "SCHEDULE CALLBACK" dialog with Callback date + Callback time (9:00 AM default) + CANCEL + SCHEDULE
 - **Trigger not available from list**: `VendorQuickCreateDialogComponent` (EntityPicker inline-create), `VendorPartBulkImportDialogComponent` (Catalog IMPORT CSV button seen but not clicked)
 - **Error states**: Not triggered on any component (no API error simulation performed)
-- **Confirmed C7-C9 (previously blocked)**:
+- **Confirmed C6f-C10 (previously blocked)**:
   - `GuidedCustomerDialogComponent` — confirmed C8: 5-step wizard (Identity→Engagement→Addresses→Credit & tax→Review); fork-card[2] tile
   - `GuidedVendorDialogComponent` — confirmed C7: 6-step wizard (Identity→Relationships→Addresses→Terms→Supply→Review); vendor fork guided tile
   - `CustomerDetailDialogComponent` — confirmed C9 via `?detail=customer:2`: "ACME CORP ×" overlay; OVERVIEW (Name/Company Name/Email/Phone/Active), ACCOUNT DETAILS, REGULATED INDUSTRIES, CLOSE + OPEN CUSTOMER PAGE buttons
-  - `PartDetailPanelComponent` / `PartDetailDialogComponent` — confirmed C9: 12-tab dialog (Identity/Material/Purchase History/Inventory/MRP/Routing/Cost/Pricing/Quality/Alternates/Activity/Files); Identity tab shows Part Number, Procurement Source=Make, Inventory Class=Component, Name, Revision, Description, Status, BARCODE section
+  - `PartDetailPanelComponent` / `PartDetailDialogComponent` — confirmed C9: 12-tab dialog (Identity/Material/Purchase History/Inventory/MRP/Routing/Cost/Pricing/Quality/Alternates/Activity/Files); COST tab C6h (Manual Cost Override, COST CALCULATION ID, LANDED COST empty state); ALTERNATES tab C6h ("No alternate parts defined" + ADD ALTERNATE)
   - `PartsCardGridComponent` — confirmed C8/C9: card view tile visible on /parts (card/list view toggle)
-  - `LotDetailPanelComponent` — confirmed C8: LOT-20260522-001 panel (PART NUMBER=PRT-00001, QUANTITY blank, TRACEABILITY HISTORY empty)
+  - `LotDetailPanelComponent` / `LotDetailDialogComponent` — confirmed C8: LOT-20260522-001 panel (PART NUMBER=PRT-00001, QUANTITY blank, TRACEABILITY HISTORY empty)
+  - `LeadDetailDialogComponent` — confirmed C6f: row-click → `mat-dialog-container` with `APP-LEAD-DETAIL-DIALOG` tag directly observed
+  - `VendorDetailDialogComponent` — confirmed C6f: row-click → `mat-dialog-container` with hasVDD=true, hasVDP=true
+  - `VendorPartBulkImportDialogComponent` — confirmed C6g: CATALOG IMPORT CSV → "IMPORT CATALOG — GLOBAL SUPPLY CO" dialog (drag-and-drop CSV, BROWSE, DOWNLOAD TEMPLATE CSV)
+  - `VendorPartFormDialogComponent` — confirmed C6h: CATALOG ADD PART → "ADD VENDOR SOURCE" dialog (Part search, Vendor is Manufacturer toggle, Vendor Part #, MPN, Lead Time, MOQ, Pack Size, CoO, HTS Code, Approved toggle, Preferred toggle, Last Quoted, Notes, SAVE)
+  - `OperationDialogComponent` — confirmed C6f: ROUTING tab ADD OPERATION → "ADD OPERATION" dialog (Step #*, Title*, Work Center search, QC Checkpoint, Subcontract Operation toggle)
+  - `PartInventoryStepComponent` (MANUFACTURING step) — confirmed C6g: STEP 2 OF 6 shows Min Stock Threshold, Reorder Point, Reorder Quantity, Safety Stock Days, Stock UoM (mat-select, pre-seeded UoM list), Default Bin search; validation error "Stock unit of measure not yet set" blocks CONTINUE
+  - `PartBomStepComponent` (BOM step) — confirmed C6l: STEP 3 OF 6; "No components yet" empty-state; ADD COMPONENT uses custom `app-dialog` (0 mat-dialog-containers); fields: Part search, Qty*(required), Lead Time, Ref Des, Notes; CANCEL + SAVE (⚠️1); step skippable via SKIP; `c6l-bom-add-component.png`
+  - `PartRoutingStepComponent` (Routing step) — confirmed C6p: STEP 4 OF 6; "No operations defined" empty-state; ADD OPERATION opens `mat-dialog-container`; required: Step#, Title; ADD button; CONTINUE blocked until ≥1 op added ("Routing operations not yet defined"); `c6p-step4-op-dialog-open.png`, `c6p-step4-op-dialog-filled.png`
+  - `PartCostingStepComponent` (Cost step) — confirmed C6q: STEP 5 OF 6; COSTING MODE radio (Tier 1 Manual override default); Manual cost override input; "CURRENTLY DISPLAYED COST: Not set"; CONTINUE blocked ("Cost not yet set"); CONTINUE saves via WorkflowService callback; `c6q-step5-cost-before.png`, `c6q-step5-cost-filled.png`
+  - `PartAlternatesStepComponent` (Alternates step) — confirmed C6r: STEP 6 OF 6; "No alternate parts defined" empty-state; ADD ALTERNATE opens custom `app-dialog` (0 mat-dialog-containers); fields: Alternate Part search, Type, Priority, Conversion Factor, Notes, Approved toggle, Bidirectional toggle; CANCEL + SAVE; MARK COMPLETE completes workflow → `/parts` list; PRT-00003 status transitions Draft→**Active**; `c6r-step6-alternates.png`, `c6r-step6-add-alternate-dialog.png`, `c6r-workflow-final.png`
+  - `VendorSourcesPanelComponent` — confirmed C6t (empty): "No vendor sources yet."; confirmed C6z2 (populated): PRT-00003 SOURCES tab shows Global Supply Co entry with "NO TIERS — NEEDS PRICING" badge + inline field form; `c6t-tab-sources.png`, `c6z2-prt003-sources-tab.png`
+  - `VendorPartListPanelComponent` — confirmed C6y: Vendor Catalog tab populated with PRT-00001 row; action buttons: Price Tiers / Preferred Source / Price tier history / Edit / Remove from catalog; `c6y-vendor-catalog-after-add.png`
+  - `VendorPartPriceTiersDialogComponent` — confirmed C6z: Catalog row "Price Tiers" action → dialog with ADD TIER form (Min Qty / Unit Price / Currency / Effective From/To / Notes); empty state "No price tiers — add one"; `c6z-price-tiers-dialog.png`
+  - `VendorPartPriceTierHistoryDialogComponent` — confirmed C6z: Catalog row "Price tier history" action → read-only dialog; empty state "No tier history yet."; `c6z-price-tier-history-dialog.png`
+  - `PartCostClusterComponent` + `PartLandedCostComponent` — confirmed C6t: COST tab shows Manual Cost Override=$10; COST CALCULATION ID=---; LANDED COST empty state "No receipts with captured freight yet — landed cost will populate once you receive a PO and record actual freight."; `c6t-tab-cost.png`
+  - `PartAlternatesTabComponent` (in part detail panel) — confirmed C6t: "No alternate parts defined" + "+ ADD ALTERNATE" button; BUY/Component layout; `c6t-tab-alternates.png`
+  - `PartInventoryClusterComponent` — confirmed C6t: Min Stock / Reorder Point / Reorder Quantity / Safety Stock (days) all empty; Traceability=None; ABC Class empty; `c6t-tab-inventory.png`
+  - `PartDetailPanelComponent` / `PartDetailDialogComponent` (BUY/Component layout) — confirmed C6s/C6t: 10 tabs (Identity, Sources, Purchase History, Inventory, Quality, Cost, Pricing, Alternates, Activity, Files); no MATERIAL/MRP/ROUTING tabs (those are MAKE-only); tab CSS class `detail-tab` / `detail-tab--active`; `c6s-prt-00003-detail-dialog.png`
+  - `RoutingComponent` (app-routing) — confirmed C6v: ADD OPERATION via ADD button in ROUTING tab of PRT-00001 part detail; operation saved; list view shows "10 Assembly" operation card with edit/delete; `c6v-routing-list-view-2.png`
+  - `RoutingFlowViewComponent` (app-routing-flow-view) — confirmed C6v: toggled by account_tree icon in RoutingComponent header; shows "OP 10 Assembly" flow node; `c6v-routing-flow-view.png`
+  - `PartMaterialClusterComponent` (app-part-material-cluster) — confirmed C6v: MATERIAL tab of PRT-00001 (Make/Component); "MATERIAL & PHYSICAL" section; Material Spec, Weight/Length/Width/Height/Volume fields (all empty on seeded part); `c6v-material-tab.png`
+  - `PartMrpClusterComponent` (app-part-mrp-cluster) — confirmed C6v: MRP tab of PRT-00001; "MRP PLANNING" section; MRP-Planned toggle, Lot Sizing Rule, Min Order Qty, Planning Fence (days), Demand Fence (days); `c6v-mrp-tab.png`
+  - `BomTreeComponent` (app-bom-tree) — confirmed C6ak: BOM tab of ASM-00001 (Make/Subassembly), tree view; shows root → PRT-00001 "Widget A" (MAKE, qty=1, delete button); `c6ak-bom-tree-view.png`
+  - `BomRevisionHistoryComponent` (app-bom-revision-history) — confirmed C6x: visible in both BOM table and tree views; "v1 CURRENT 1 lines Component added"; always renders below BOM view toggle; `c6x-bom-table-view.png`
+  - `PartQualityClusterComponent` (app-part-quality-cluster) — confirmed C6x: ASM-00001 QUALITY tab; "QUALITY & COMPLIANCE"; Requires Receiving Inspection toggle, Inspection Frequency (Every Receipt), Skip After N Receipts; `c6x-quality-tab.png`
+  - `PartPricingClusterComponent` (app-part-pricing-cluster) — confirmed C6x: ASM-00001 PRICING tab; "CURRENT EFFECTIVE PRICE No price configured" + "PRICE HISTORY No price history yet."; `c6x-pricing-tab.png`
+  - `PartActivityClusterComponent` (app-part-activity-cluster) + `EntityActivitySectionComponent` — confirmed C6x: ASM-00001 ACTIVITY tab; "ACTIVITY ALL CONVERSATION NOTES HISTORY No activity yet."; `c6x-activity-tab.png`
+  - `PartFilesClusterComponent` (app-part-files-cluster) + `FileUploadZoneComponent` (app-file-upload-zone) — confirmed C6x: ASM-00001 FILES tab; "FILES cloud_upload Drag files here or click to browse Max 50MB per file"; `c6x-files-tab.png`
+  - Make+Subassembly part layout (M2) — confirmed C6w/C6x: 13 tabs (Identity, Material, Purchase History, BOM 1, Routing, Inventory, MRP, Cost, Pricing, Quality, Alternates, Activity, Files); part number prefix "ASM-"; workflow steps: Basics → BOM → Routing → Cost → Quality → Alternates; tab CSS class `detail-tab` / `detail-tab--active` (BUTTON elements only, not SPAN icons)
+  - `VendorPartListPanelComponent` — confirmed C6y: Vendor Catalog tab populated (PRT-00001 row); row action buttons discovered via aria-label: "Price Tiers", "Preferred Source", "Price tier history", "Edit", "Remove from catalog"; empty state: "This vendor has no parts in the catalog yet."; appComps: `app-vendor-part-list-panel` + `app-data-table`; `c6y-vendor-catalog-after-add.png`
+  - `VendorPartPriceTiersDialogComponent` — confirmed C6z: Vendor Catalog row "Price Tiers" action (aria-label) → "PRT-00001 — GLOBAL SUPPLY CO / PRICE TIERS" dialog; empty state + ADD TIER form (Min Qty, Unit Price $, Currency USD, Effective From, Effective To, Notes); appComps: `app-dialog` + `app-empty-state` + `app-input` + `app-currency-input` + `app-select` + `app-datepicker` + `app-validation-button`; `c6z-price-tiers-dialog.png`
+  - `VendorPartPriceTierHistoryDialogComponent` — confirmed C6z: Vendor Catalog row "Price tier history" action → "PRICE TIER HISTORY" dialog; empty state "No tier history yet."; appComps: `app-dialog` + `app-empty-state`; `c6z-price-tier-history-dialog.png`
+  - `VendorSourcesPanelComponent` (populated) — confirmed C6z2: PRT-00003 SOURCES tab after adding to Global Supply Co catalog → "Global Supply Co / USD / NO TIERS — NEEDS PRICING" entry + "PRICE TIERS" + "SHOW HISTORY" link + inline editable fields (Vendor Part # / External SKU / Manufacturer / Manufacturer Part # / Lead Time); appComps: `app-vendor-sources-panel` + `app-input` + `app-select` + `app-datepicker` + `app-textarea`; `c6z2-prt003-sources-tab.png`
+  - Workflow step order — source-confirmed C6z from `WorkflowSeedData.cs`: M1 (Make+Comp): basics→manufacturing→bom(opt)→routing→costing→alternates(opt); M2 (Make+Sub): basics→bom→routing→costing→quality(opt)→alternates(opt); M3 (Make+FG): basics→bom→routing→costing→shipping→quality(opt)→alternates(opt); M4 (Make+Tool): basics→toolAsset→bom→routing; B1 (Buy+Raw): basics→sourcing→vendorParts(opt)→inventory→quality(opt)→costing; B2 (Buy+Comp): basics→sourcing→vendorParts(opt)→inventory→costing; B3 (Buy+Sub): basics→sourcing→vendorParts(opt)→inventory→costing→quality; B4 (Buy+FG): basics→sourcing→vendorParts(opt)→inventory→shipping→costing; B5 (Buy+Consumable): basics→sourcing→vendorParts(opt)→inventory→costing; B6 (Buy+Tool): basics→toolAsset→sourcing→vendorParts(opt)→inventory→costing; S1 (Sub+Comp): basics→sourcePart→vendor→vendorParts(opt)→costing→quality; S2 (Sub+Sub): basics→sourcePart→bom→vendor→vendorParts(opt)→costing→quality; P1 (Phantom+Sub): basics→bom→flags(opt); P3 (Phantom+FG): basics→bom→salesHooks(opt)
+  - `PartVendorPartsStepComponent` — source-confirmed C6z: thin wrapper around `VendorSourcesPanelComponent`; step id="vendorParts"; present in B1-B6 + S1-S2 combos (post-Sourcing/Vendor), always optional (required:false); `PartUomClusterComponent` (app-part-uom-cluster) — imported in `part-detail-panel.component.ts:97` but NOT used in any HTML template; not live-observable
+  - `SerialNumbersTabComponent` (app-serial-numbers-tab) — confirmed C6aa: PATCH PRT-00001 traceabilityType=Serial → 13th tab "qr_code_2 SERIALS" appears in part detail; empty state "No serial numbers registered for this part" + NEW SERIAL button + Status filter select; tab condition: `part.traceabilityType === 'Serial'`; appComps: `app-serial-numbers-tab` + `app-select` + `app-empty-state`; `c6aa-serials-tab.png`
+  - `CallbackSchedulerDialogComponent` (app-callback-scheduler-dialog) — confirmed C6ae: `/leads/queue` → keyboard 'C' disposition (ctx.route() mock intercept to simulate queued lead); "SCHEDULE CALLBACK" dialog; Callback date (app-datepicker) + Callback time (app-select, 9:00 AM default) + CANCEL + SCHEDULE (app-validation-button); appComps: `app-dialog` + `app-datepicker` + `app-select` + `app-validation-button`; queue PULL API returns 500 in demo stack (FOR UPDATE SKIP LOCKED backend bug); `c6ae-callback-dialog.png`
