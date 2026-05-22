@@ -184,7 +184,7 @@
 
 #### lots/
 - [x] `lots.component.ts`
-- [x] `components/lot-detail-dialog/lot-detail-dialog.component.ts` — source-confirmed `lot-detail-dialog.component.ts:12`; thin wrapper around `LotDetailPanelComponent`; `LotDetailDialogData { lotId, lotNumber }`; trigger: row-click on lots list (0 lots on stack — no live observation)
+- [x] `components/lot-detail-dialog/lot-detail-dialog.component.ts` — source-confirmed `lot-detail-dialog.component.ts:12`; thin wrapper around `LotDetailPanelComponent`; `LotDetailDialogData { lotId, lotNumber }`; trigger: row-click on lots list; panel content confirmed C8 (LOT-20260522-001); dialog wrapper live observation not attempted separately (panel side-panel opened directly)
 - [x] `components/lot-detail-panel/lot-detail-panel.component.ts` — source-confirmed `lot-detail-panel.component.ts:13`; read-only; inputs: lotId + lotNumber; trace signal via `LotService.trace(lotNumber)`; trace event icons: Job/ProductionRun/PurchaseOrder/BinLocation/QcInspection; `EntityActivitySectionComponent` for activity feed; no forms/dialogs; 0 lots on stack (no live observation)
 - [x] `components/lot-dialog/lot-dialog.component.ts`
 
@@ -597,7 +597,7 @@ Tabs within CustomerDetailComponent — observed C4b:
 | route | `/customers` (modal, can deep-link to `/customers/:id/overview`) |
 | file | `features/customers/components/customer-detail-dialog/customer-detail-dialog.component.ts:38` |
 | renders-for | Admin, Manager, PM, OfficeManager |
-| states | `source-confirmed` `customer-detail-dialog.component.ts:38`; 640px preview dialog wrapping `CustomerIdentityClusterComponent` + `CustomerOverviewTabComponent`; trigger: `?detail=customer:{id}` URL param or cross-entity EntityLink clicks; "Open customer page" footer button; not triggered by row-click on customers list (row-click navigates full page) |
+| states | `populated` — confirmed C9 via `?detail=customer:2` URL: "ACME CORP ×" dialog title; OVERVIEW section: Name*=Acme Corp, Company Name (blank), Email=contact@acme.com, Phone=(555) 100-2000, Active toggle checked; ACCOUNT DETAILS: Customer Name/Email/Phone/Status ACTIVE/Customer Since 05/21/2026; REGULATED INDUSTRIES section (FDA-regulated, AS9100/aerospace, IATF 16949/automotive, ITAR-controlled/defense toggles all off); footer: CLOSE + OPEN CUSTOMER PAGE buttons; 640px dialog; trigger: `?detail=customer:{id}` URL param or cross-entity EntityLink clicks; not triggered by row-click (navigates full page) |
 | purpose | Quick-view customer detail in a dialog before optionally full-navigating |
 
 ---
@@ -610,7 +610,7 @@ Tabs within CustomerDetailComponent — observed C4b:
 | route | `/customers` (modal) |
 | file | `features/customers/components/new-customer-fork-dialog/new-customer-fork-dialog.component.ts:46` |
 | renders-for | Admin, Manager, PM, OfficeManager |
-| states | `create` — confirmed C4: "HOW WOULD YOU LIKE TO ADD THIS CUSTOMER?" — fork options: flash_on Quick add (MOST COMMON — "Drop in a name…"), person_add Convert from lead; source-confirmed 3rd path: tune Guided (source: `new-customer-fork-dialog.component.ts`) — scout sweep only encountered 2 tiles; triggered by NEW CUSTOMER button |
+| states | `create` — confirmed C8: 3 fork cards: (1) flash_on "Quick add Most common — Drop in a name + a couple of contact bits and keep moving."; (2) person_add "Convert from lead — Pick an existing lead and run it through the convert stepper"; (3) tune "Guided setup — Step through identity, engagement, addresses, and billing for complex customer relationships."; CANCEL button; triggered by + NEW CUSTOMER button |
 | purpose | Fork chooser: quick / convert-from-lead / guided creation paths |
 
 ---
@@ -623,7 +623,7 @@ Tabs within CustomerDetailComponent — observed C4b:
 | route | `/customers` (modal) |
 | file | `features/customers/components/guided-customer-dialog/guided-customer-dialog.component.ts:43` |
 | renders-for | Admin, Manager, PM, OfficeManager |
-| states | `source-confirmed` `guided-customer-dialog.component.ts:43`; 5-step wizard: Identity → Engagement shape (Unknown/QuickQuote/Repeat/Strategic/Prototype) → Addresses (billing+shipping, same-as-billing toggle) → Credit & tax (credit limit, currency, tax-exempt) → Review; 720px; trigger: `customers.component.ts:325` `openGuidedCreateCustomer()` when fork returns 'guided' (fork has 3 paths: quick/fromLead/guided); live observation blocked (guided tile not encountered during scout sweep) |
+| states | `create` — confirmed C8 by clicking fork-card[2] "Guided setup": "GUIDED CUSTOMER SETUP" title; 5-step progress header: 1 Identi… → 2 Engag… → 3 Addr… → 4 Credi… → 5 Review; Step 1 "Who is this customer? Capture the basics first." fields: Display name* (required), Company name, Primary contact name, Email, Phone; CANCEL + NEXT buttons; 720px dialog; trigger: `customers.component.ts:325` `openGuidedCreateCustomer()` when fork returns 'guided' |
 | purpose | Step-by-step guided new customer creation wizard |
 
 ---
@@ -779,7 +779,7 @@ Tabs within CustomerDetailComponent — observed C4b:
 | route | `/vendors` (modal) |
 | file | `features/vendors/components/guided-vendor-dialog/guided-vendor-dialog.component.ts:64` |
 | renders-for | Admin, Manager, OfficeManager |
-| states | `source-confirmed` `guided-vendor-dialog.component.ts:64`; separate 6-step wizard (NOT same as VendorDialog flat form): Identity → Relationship type (Transactional/Strategic/Subcontractor/Distributor) → Address → Terms (payment terms) → Supply items (EntityPicker + PartQuickCreateDialog inline) → Review; returns GuidedVendorResult; trigger: `vendors.component.ts:189` fork returns 'guided'; live observation blocked (scout did not select guided path) |
+| states | `create` — confirmed C7 via vendor fork "Guided" tile: "NEW VENDOR — GUIDED SETUP" title; 6-step progress: 1 Identi… → 2 Relati… → 3 Addr… → 4 Terms → 5 Suppl… → 6 Review; Step 1 "Who is this vendor and how do you reach them?" fields: Company Name* (required), Contact, Email, Phone; CANCEL + NEXT buttons; trigger: `vendors.component.ts:189` fork returns 'guided' (fork has 2 cards: Quick add / Guided setup) |
 | purpose | Step-by-step guided vendor creation wizard |
 
 ---
@@ -929,10 +929,10 @@ All mounted in `PartDetailPanelComponent` and/or `PartWorkflowPageComponent`; re
 
 | component | file | type | purpose |
 |-----------|------|------|---------|
-| `PartDetailPanelComponent` | `features/parts/components/part-detail-panel/part-detail-panel.component.ts:82` | panel | Slide-in detail for list view |
-| `PartDetailDialogComponent` | `features/parts/components/part-detail-dialog/part-detail-dialog.component.ts:10` | dialog | Full part detail in a dialog |
+| `PartDetailPanelComponent` | `features/parts/components/part-detail-panel/part-detail-panel.component.ts:82` | panel | Slide-in detail for list view — **confirmed C9 (PRT-00001 Make/Component)**: dialog title "PRT-00001 ✓ Ready Widget A Test widget edit ×"; 12 tabs: IDENTITY (Part Number, Procurement Source=Make, Inventory Class=Component, Name*, Revision, Description, Status, BARCODE section with PRINT+REGENERATE), MATERIAL, PURCHASE HISTORY, INVENTORY, MRP, ROUTING, COST, PRICING, QUALITY, ALTERNATES, ACTIVITY, FILES |
+| `PartDetailDialogComponent` | `features/parts/components/part-detail-dialog/part-detail-dialog.component.ts:10` | dialog | Full part detail in a dialog — **confirmed C9**: opens from clicking ACTIVE part row; `mat-dialog-container` wrapper around `PartDetailPanelComponent` |
 | `PartQuickCreateDialogComponent` | `features/parts/components/part-quick-create-dialog/part-quick-create-dialog.component.ts:48` | dialog | Quick-create part inline |
-| `PartsCardGridComponent` | `features/parts/components/parts-card-grid/parts-card-grid.component.ts:10` | table | Card-grid layout for parts list |
+| `PartsCardGridComponent` | `features/parts/components/parts-card-grid/parts-card-grid.component.ts:10` | table | Card-grid layout for parts list — **confirmed C8**: toggle via icons in page header (table_rows / grid_view); card shows archive icon placeholder thumbnail, PRT-00001, "Widget A", ACTIVE badge |
 | `RoutingComponent` | `features/parts/components/routing/routing.component.ts:19` | cluster | Routing operations table |
 | `RoutingFlowViewComponent` | `features/parts/components/routing-flow-view/routing-flow-view.component.ts:8` | cluster | Visual flow of routing steps |
 | `OperationDialogComponent` | `features/parts/components/operation-dialog/operation-dialog.component.ts:39` | dialog | Create / edit routing operation |
@@ -1062,7 +1062,7 @@ Tabs within InventoryComponent (in-component, NOT separate route components):
 | route | `/lots` (slide-in) |
 | file | `features/lots/components/lot-detail-panel/lot-detail-panel.component.ts:13` |
 | renders-for | Admin, Manager, Engineer |
-| states | `source-confirmed` `lot-detail-panel.component.ts:13`; inputs: lotId, lotNumber; trace signal via `LotService.trace(lotNumber)`; trace event icons: Job/ProductionRun/PurchaseOrder/BinLocation/QcInspection; `EntityActivitySectionComponent` for activity feed; read-only (no forms/dialogs); live observation blocked (0 lots on stack) |
+| states | `populated` — confirmed C8 (LOT-20260522-001, PRT-00001, qty 50 on stack): panel title "LOT-20260522-001 ×"; PART NUMBER: PRT-00001; QUANTITY (blank — lot created without job-linkage); TRACEABILITY HISTORY section (empty — no job/PO events); HISTORY section: "No activity yet."; read-only; trigger: row-click on lots list |
 | purpose | Right-side detail panel for selected lot; displays trace provenance + activity feed |
 
 `LotDetailPanelComponent` sub-surfaces (source-confirmed; live observation requires seeded lot):
@@ -1084,7 +1084,7 @@ Tabs within InventoryComponent (in-component, NOT separate route components):
 | route | `/lots` (modal) |
 | file | `features/lots/components/lot-detail-dialog/lot-detail-dialog.component.ts:12` |
 | renders-for | Admin, Manager, Engineer |
-| states | `source-confirmed` `lot-detail-dialog.component.ts:12`; thin wrapper around `LotDetailPanelComponent`; `LotDetailDialogData { lotId, lotNumber }`; trigger: row-click on lots list; live observation blocked (0 lots on stack) |
+| states | `source-confirmed` `lot-detail-dialog.component.ts:12`; thin wrapper around `LotDetailPanelComponent`; `LotDetailDialogData { lotId, lotNumber }`; trigger: row-click on lots list; panel content confirmed C8 (LOT-20260522-001: PART NUMBER=PRT-00001, QUANTITY blank, TRACEABILITY HISTORY empty, HISTORY="No activity yet"); dialog wrapper not separately observed (panel opened via list row-click path) |
 | purpose | Full lot detail dialog |
 
 ---
@@ -1340,7 +1340,7 @@ Tabs within InventoryComponent (in-component, NOT separate route components):
 
 ---
 
-_Cycle 1: seed. Cycle 2: shared-cmp reconciliation complete (18 items resolved). Cycle 2b: pre-source-location complete — all areas with file:line + sub-surface tables; 2 new vendor-parts-cluster discoveries added. Cycle 3: states from scout sweep C1 folded into per-component entries; remaining open states recorded in Open Items block below. Cycle 4 (source-cataloger, 2026-05-22): 72 new checklist ticks (32 routes + 40 feature-dir); all 6 unreached inventory tabs confirmed; 8 dialogs observed (create state); lead/vendor/customer detail panels/pages observed with populated states; all missing line numbers filled. Count at C4 close: 90/163. C4c (2026-05-22): LeadConvertDialogComponent 3-step wizard confirmed; customer estimates/quotes/addresses tabs empty states confirmed. C4f/C4g (2026-05-22): parts workflow fully unlocked — 18 new checklist ticks (part-workflow-page + /parts/:id route + 16 step/form components); all 13+ workflow step components confirmed in `create` mode via 8 workflow runs; express + guided modes both observed. Count: 109/163 reconciled. Remaining 54: parts component-level items (panels, dialogs, clusters ~29), missing customer tabs (5), lot detail (2), lead dialogs (3), vendor dialogs (3), receiving inspection (1), callback scheduler (1), credit-status-card (1), guided dialogs (4), vendor-quick-create (1), pricing cluster (4)._
+_Cycle 1: seed. Cycle 2: shared-cmp reconciliation complete (18 items resolved). Cycle 2b: pre-source-location complete — all areas with file:line + sub-surface tables; 2 new vendor-parts-cluster discoveries added. Cycle 3: states from scout sweep C1 folded into per-component entries; remaining open states recorded in Open Items block below. Cycle 4 (source-cataloger, 2026-05-22): 72 new checklist ticks (32 routes + 40 feature-dir); all 6 unreached inventory tabs confirmed; 8 dialogs observed (create state); lead/vendor/customer detail panels/pages observed with populated states; all missing line numbers filled. Count at C4 close: 90/163. C4c (2026-05-22): LeadConvertDialogComponent 3-step wizard confirmed; customer estimates/quotes/addresses tabs empty states confirmed. C4f/C4g (2026-05-22): parts workflow fully unlocked — 18 new checklist ticks (part-workflow-page + /parts/:id route + 16 step/form components); all 13+ workflow step components confirmed in `create` mode via 8 workflow runs; express + guided modes both observed. Count: 109/163 reconciled. Remaining 54: parts component-level items (panels, dialogs, clusters ~29), missing customer tabs (5), lot detail (2), lead dialogs (3), vendor dialogs (3), receiving inspection (1), callback scheduler (1), credit-status-card (1), guided dialogs (4), vendor-quick-create (1), pricing cluster (4). C6 (source-cataloger, 2026-05-22): checklist driven to 163/163 COMPLETE via source-confirmation; all remaining items confirmed from source code. C7-C9 (2026-05-22): live observations confirmed — GuidedCustomerDialog (5-step wizard), GuidedVendorDialog (6-step wizard), CustomerDetailDialog (overview/account/regulated-industries via ?detail=customer:2), PartDetailDialog (12 tabs: Identity/Material/Purchase History/Inventory/MRP/Routing/Cost/Pricing/Quality/Alternates/Activity/Files; confirmed for Make/Component Active part PRT-00001), PartsCardGrid (card view toggle), LotDetailPanel (LOT-20260522-001). Inventory /stock confirmed 9 tabs (0 parts). Leads Worker Queue confirmed ready-state (PULL SIZE + PULL NEXT 5 button). Callback scheduler, part cluster components (BOM/routing/serial/vendor), ReceivingInspectionQueue remain source-only._
 
 ---
 
@@ -1381,10 +1381,15 @@ These items have source-confirmed schema entries; live observation was blocked b
 
 - **Capability-gated**: `CustomerInteractionsClusterComponent` (CAP-MD-CUSTOMER-INTERACTIONS), `CreditStatusCardComponent` (CAP-O2C-CREDIT-LIMITS), `PartQualityClusterComponent` compliance fields (CAP-MD-PART-COMPLIANCE)
 - **Lifecycle-gated tabs**: customer orders/jobs/invoices (orders module not enabled), customer pricing (URL redirects to overview)
-- **Needs seeded Active part**: All part cluster components, `PartDetailPanelComponent`, `PartDetailDialogComponent`, `BomTreeComponent`, `BomRevisionHistoryComponent`, `RoutingComponent`, `RoutingFlowViewComponent`, `OperationDialogComponent`, `SerialNumbersTabComponent`, `VendorSourcesPanelComponent`, `PartAlternatesTabComponent`, `PartsCardGridComponent` (populated state)
-- **Needs seeded lot**: `LotDetailPanelComponent`, `LotDetailDialogComponent`
-- **Needs receiving event**: `ReceivingInspectionQueueComponent`
-- **Needs queue-state lead**: `CallbackSchedulerDialogComponent`
-- **Trigger not available from list**: `GuidedCustomerDialogComponent` (fork guided tile), `GuidedVendorDialogComponent` (fork guided path), `CustomerDetailDialogComponent` (?detail= URL or EntityLink), `VendorQuickCreateDialogComponent` (EntityPicker inline-create), `VendorPartBulkImportDialogComponent` (Catalog IMPORT CSV button seen but not clicked)
+- **Needs seeded Active part**: `BomTreeComponent`, `BomRevisionHistoryComponent`, `RoutingComponent`, `RoutingFlowViewComponent`, `OperationDialogComponent`, `SerialNumbersTabComponent`, `VendorSourcesPanelComponent`, `PartAlternatesTabComponent` (need Active part with populated BOM/routing/serial/vendor data)
+- **Needs receiving event / PO**: `ReceivingInspectionQueueComponent`
+- **Needs queue-state lead**: `CallbackSchedulerDialogComponent` (source-confirmed; C key shortcut from LeadsQueueComponent; date+time-slot picker 7AM-6PM 30-min increments; queue was empty after PULL in C9)
+- **Trigger not available from list**: `VendorQuickCreateDialogComponent` (EntityPicker inline-create), `VendorPartBulkImportDialogComponent` (Catalog IMPORT CSV button seen but not clicked)
 - **Error states**: Not triggered on any component (no API error simulation performed)
-- **Populated states not observed**: inventory stock, lots list, parts list (0 items of each on stack)
+- **Confirmed C7-C9 (previously blocked)**:
+  - `GuidedCustomerDialogComponent` — confirmed C8: 5-step wizard (Identity→Engagement→Addresses→Credit & tax→Review); fork-card[2] tile
+  - `GuidedVendorDialogComponent` — confirmed C7: 6-step wizard (Identity→Relationships→Addresses→Terms→Supply→Review); vendor fork guided tile
+  - `CustomerDetailDialogComponent` — confirmed C9 via `?detail=customer:2`: "ACME CORP ×" overlay; OVERVIEW (Name/Company Name/Email/Phone/Active), ACCOUNT DETAILS, REGULATED INDUSTRIES, CLOSE + OPEN CUSTOMER PAGE buttons
+  - `PartDetailPanelComponent` / `PartDetailDialogComponent` — confirmed C9: 12-tab dialog (Identity/Material/Purchase History/Inventory/MRP/Routing/Cost/Pricing/Quality/Alternates/Activity/Files); Identity tab shows Part Number, Procurement Source=Make, Inventory Class=Component, Name, Revision, Description, Status, BARCODE section
+  - `PartsCardGridComponent` — confirmed C8/C9: card view tile visible on /parts (card/list view toggle)
+  - `LotDetailPanelComponent` — confirmed C8: LOT-20260522-001 panel (PART NUMBER=PRT-00001, QUANTITY blank, TRACEABILITY HISTORY empty)
