@@ -1,0 +1,92 @@
+{
+  "routingHasOps": false,
+  "addOpDialogText": "ADD OPERATION\nclose\nsettings\nDETAILS\nStep #\nEst. Minutes\nTitle\nInstructions\nWork Center\nsearch\nReferences Operation\nQC Checkpoint\nSubcontract Operation\nCANCEL\nwarning\n1\nADD",
+  "opDlgButtons": [
+    {
+      "txt": "close",
+      "disabled": false
+    },
+    {
+      "txt": "settings Details",
+      "disabled": false
+    },
+    {
+      "txt": "",
+      "disabled": false
+    },
+    {
+      "txt": "",
+      "disabled": false
+    },
+    {
+      "txt": "Cancel",
+      "disabled": false
+    },
+    {
+      "txt": "Add",
+      "disabled": false
+    }
+  ],
+  "afterAddDlgCount": 1,
+  "routingAfterAdd": "settings\nPRT-00001 \ncheck_circle\nReady\nWidget A\nTest widget\nedit\nclose\nbadge\nIDENTITY\ncategory\nMATERIAL\nreceipt_long\nPURCHASE HISTORY\ninventory_2\nINVENTORY\nevent_available\nMRP\nalt_route\nROUTING\npayments\nCOST\nsell\nPRICING\nfact_check\nQUALITY\nswap_horiz\nALTERNATES\ntimeline\nACTIVITY\nattach_file\nFILES\nRouting\nview_list\naccount_tree\nadd\nADD OPERATION\n10\nAssembly\nedit\ndelete",
+  "routingComponents": [
+    {
+      "tag": "app-part-detail-dialog",
+      "text": "settings\nPRT-00001 \ncheck_circle\nReady\nWidget A\nTest widget\n"
+    },
+    {
+      "tag": "app-part-detail-panel",
+      "text": "settings\nPRT-00001 \ncheck_circle\nReady\nWidget A\nTest widget\n"
+    },
+    {
+      "tag": "app-entity-completeness-chip",
+      "text": "check_circle\nReady"
+    },
+    {
+      "tag": "app-part-routing-cluster",
+      "text": "Routing\nview_list\naccount_tree\nadd\nADD OPERATION\n10\nAssembly"
+    },
+    {
+      "tag": "app-routing",
+      "text": "Routing\nview_list\naccount_tree\nadd\nADD OPERATION\n10\nAssembly"
+    }
+  ],
+  "flowViewState": {
+    "hasFlowView": true,
+    "flowViewText": "OP 10\nAssembly",
+    "appComps": [
+      "app-part-detail-dialog",
+      "app-part-detail-panel",
+      "app-entity-completeness-chip",
+      "app-part-routing-cluster",
+      "app-routing",
+      "app-routing-flow-view"
+    ],
+    "fullText": "uting\nview_list\naccount_tree\nadd\nADD OPERATION\nOP 10\nAssembly"
+  },
+  "materialTab": {
+    "clusterText": "MATERIAL & PHYSICAL\nMaterial Spec\nWeight\nUnit\ng\nLength\nWidth\nHeight\nUnit\nmm\nVolume\nUnit\nmL",
+    "appComps": [
+      "app-part-detail-dialog",
+      "app-part-detail-panel",
+      "app-entity-completeness-chip",
+      "app-part-material-cluster",
+      "app-select",
+      "app-input"
+    ],
+    "fullText": "ts\nCOST\nsell\nPRICING\nfact_check\nQUALITY\nswap_horiz\nALTERNATES\ntimeline\nACTIVITY\nattach_file\nFILES\nMATERIAL & PHYSICAL\nMaterial Spec\nWeight\nUnit\ng\nLength\nWidth\nHeight\nUnit\nmm\nVolume\nUnit\nmL"
+  },
+  "mrpTab": {
+    "clusterText": "MRP PLANNING\nMRP-Planned\nLot Sizing Rule\nMin Order Qty\nPlanning Fence (days)\nDemand Fence (days)\n\nLead time resolves from preferred VendorPart when configured.",
+    "appComps": [
+      "app-part-detail-dialog",
+      "app-part-detail-panel",
+      "app-entity-completeness-chip",
+      "app-part-mrp-cluster",
+      "app-toggle",
+      "app-select",
+      "app-input"
+    ],
+    "fullText": "ts\nCOST\nsell\nPRICING\nfact_check\nQUALITY\nswap_horiz\nALTERNATES\ntimeline\nACTIVITY\nattach_file\nFILES\nMRP PLANNING\nMRP-Planned\nLot Sizing Rule\nMin Order Qty\nPlanning Fence (days)\nDemand Fence (days)\n\nLead time resolves from preferred VendorPart when configured."
+  }
+}

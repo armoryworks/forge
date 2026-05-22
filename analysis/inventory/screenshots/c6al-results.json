@@ -1,0 +1,103 @@
+{
+  "partsPopulated": {
+    "rowCount": 0,
+    "bodyText": "Skip to main content\nHOME\nchevron_right\nPRODUCTION\nchevron_right\nPARTS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\ncategory\nhub\nevent_available\nbatch_prediction\nspeed\nstorefront\nsettings\nPARTS CATALOG\nManage parts, BOMs, and specifications\nhelp_outline\nadd\nNEW PART\nSearch\nStatus\nActive\nProcurement Source\nAll procurement sources\nInventory Class\nAll inventory clas",
+    "appComps": [
+      "app-root",
+      "app-header",
+      "app-chat",
+      "app-ai-help-panel",
+      "app-training-context-panel",
+      "app-connection-banner",
+      "app-announcement-overlay",
+      "app-onboarding-banner",
+      "app-sidebar",
+      "app-parts",
+      "app-page-header",
+      "app-input",
+      "app-select",
+      "app-data-table",
+      "app-entity-completeness-badge"
+    ]
+  },
+  "leadsError": {
+    "bodyText": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nLEADS\nchevron_right\nALL LEADS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\nlist\nupload_file\nspeed\ncampaign\nblock\ncard_giftcard\nbusiness\nstorefront\nsettings\nLEADS\nTrack and qualify potential sales opportunities\nview_list\nview_column\nadd\nNEW LEAD\nexpand_more\nSearch\nStatus\nperson_search\n\nNo leads found\n\nLeads track potential sales opportunities. Click New Lead to start capturing prospects.\n\nerror\nServer Error",
+    "appComps": [
+      "app-root",
+      "app-header",
+      "app-chat",
+      "app-ai-help-panel",
+      "app-training-context-panel",
+      "app-connection-banner",
+      "app-announcement-overlay",
+      "app-onboarding-banner",
+      "app-sidebar",
+      "app-leads",
+      "app-page-header",
+      "app-input",
+      "app-select",
+      "app-data-table",
+      "app-empty-state"
+    ]
+  },
+  "customersError": {
+    "bodyText": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nCUSTOMERS\nchevron_right\nALL CUSTOMERS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\nlist\ncontacts\nvpn_key\nfilter_alt\nupload_file\nstorefront\nsettings\nCUSTOMERS\nManage customer contacts and addresses\nadd\nNEW CUSTOMER\nSearch\nStatus\npeople\n\nNo customers found\n\nerror\nServer Error (500)\n\nInternal Server Error\n\n{\n  \"message\": \"Internal Server Error\"\n}\ncontent_copy\nclose",
+    "appComps": [
+      "app-root",
+      "app-header",
+      "app-chat",
+      "app-ai-help-panel",
+      "app-training-context-panel",
+      "app-connection-banner",
+      "app-announcement-overlay",
+      "app-onboarding-banner",
+      "app-sidebar",
+      "app-customers",
+      "app-page-header",
+      "app-input",
+      "app-select",
+      "app-data-table",
+      "app-empty-state"
+    ]
+  },
+  "vendorsError": {
+    "bodyText": "Skip to main content\nHOME\nchevron_right\nPURCHASING\nchevron_right\nVENDORS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\nstorefront\ndescription\nrequest_page\nstorefront\nsettings\nVENDORS\nManage suppliers and vendor relationships\nadd\nNEW VENDOR\nSearch\nStatus\nstore\n\nNo vendors found\n\nerror\nServer Error (500)\n\nInternal Server Error\n\n{\n  \"message\": \"Internal Server Error\"\n}\ncontent_copy\nclose",
+    "appComps": [
+      "app-root",
+      "app-header",
+      "app-chat",
+      "app-ai-help-panel",
+      "app-training-context-panel",
+      "app-connection-banner",
+      "app-announcement-overlay",
+      "app-onboarding-banner",
+      "app-sidebar",
+      "app-vendors",
+      "app-page-header",
+      "app-input",
+      "app-select",
+      "app-data-table",
+      "app-empty-state"
+    ]
+  },
+  "partsError": {
+    "bodyText": "Skip to main content\nHOME\nchevron_right\nPRODUCTION\nchevron_right\nPARTS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\ncategory\nhub\nevent_available\nbatch_prediction\nspeed\nstorefront\nsettings\nPARTS CATALOG\nManage parts, BOMs, and specifications\nhelp_outline\nadd\nNEW PART\nSearch\nStatus\nActive\nProcurement Source\nAll procurement sources\nInventory Class\nAll inventory classes\nPART #\nmore_vert\n\t\nNAME\nmore_vert\n\t\nREV\nmore_vert\n\t\nPROCUREMENT\nmore_vert\n\t\nCLASS\nmore_vert\n\t\nST",
+    "appComps": [
+      "app-root",
+      "app-header",
+      "app-chat",
+      "app-ai-help-panel",
+      "app-training-context-panel",
+      "app-connection-banner",
+      "app-announcement-overlay",
+      "app-onboarding-banner",
+      "app-sidebar",
+      "app-parts",
+      "app-page-header",
+      "app-input",
+      "app-select",
+      "app-data-table",
+      "app-offline-banner"
+    ]
+  }
+}

@@ -1,0 +1,126 @@
+{
+  "leadDetailDialogBody": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nLEADS\nchevron_right\nALL LEADS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nwarning\nComplete your employee profile — 3 sections remaining\nCOMPLETE NOW\nSKIP ONBOARDING\nclose\narrow_back\nlist\nupload_file\nspeed\ncampaign\nblock\ncard_giftcard\nbusiness\nstorefront\nsettings\nLEADS\nTrack and qualify potential sales opportunities\nview_list\nview_column\nadd\nNEW LEAD\nexpand_more\nSearch\nStatus\n\t\nCOMPANY\nmore_vert\n\t\nCONTACT\nmore_vert\n\t",
+  "custDetailDialogBody": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nCUSTOMERS\nchevron_right\nALL CUSTOMERS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nwarning\nComplete your employee profile — 3 sections remaining\nCOMPLETE NOW\nSKIP ONBOARDING\nclose\narrow_back\nlist\ncontacts\nvpn_key\nfilter_alt\nupload_file\nstorefront\nsettings\nCUSTOMERS\nManage customer contacts and addresses\nadd\nNEW CUSTOMER\nSearch\nStatus\nNAME\nmore_vert\n\t\nCOMPANY\nmore_vert\n\t\nEMAIL\nmore_vert\n\t\nPHONE\nmore_vert\n\t\nACTIVE\nmore",
+  "vendDetailDialogBody": "Skip to main content\nHOME\nchevron_right\nPURCHASING\nchevron_right\nVENDORS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nwarning\nComplete your employee profile — 3 sections remaining\nCOMPLETE NOW\nSKIP ONBOARDING\nclose\narrow_back\nstorefront\ndescription\nrequest_page\nstorefront\nsettings\nVENDORS\nManage suppliers and vendor relationships\nadd\nNEW VENDOR\nSearch\nStatus\nCOMPANY NAME\nmore_vert\n\t\nCONTACT\nmore_vert\n\t\nEMAIL\nmore_vert\n\t\nPHONE\nmore_vert\n\t\nACTIVE\nmore_vert\n\t\nPOS\nmore_vert\n\t",
+  "lotPanelBody": "Skip to main content\nHOME\nchevron_right\nPRODUCTION\nchevron_right\nPRODUCTION LOTS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nwarning\nComplete your employee profile — 3 sections remaining\nCOMPLETE NOW\nSKIP ONBOARDING\nclose\narrow_back\ncategory\nhub\nevent_available\nbatch_prediction\nspeed\nstorefront\nsettings\nPRODUCTION LOTS\nTrack production lot traceability\nSearch lot number or part\nsearch\nSEARCH\nadd\nNEW LOT\nLOT NUMBER\nmore_vert\n\t\nPART NUMBER\nmore_vert\n\t\nDESCRIPTION\nmore_vert\n\t\nQUANTITY\nmore_vert\n\t\nJOB\nmore_vert\n\t\nSUPPLIER LOT\nmore_vert\n\t\nEXPIRES\nmore_vert\n\t\nCREATED\nmore_vert\n\t\ndownload\ngrid_on\nsettings\n\nLOT-20260522-001\tPRT-00001\tTest widget\t50\t—\tSUP-LOT-001\t\t05/22/2026 01:14 AM\t\nLOT-20260522-001\nclose\nPART NUMBER\nPRT-00001\nQUANTITY\nTRACEABILITY HISTORY\nHISTORY\n\nNo activity yet.",
+  "lotPanelBtns": [
+    {
+      "txt": "school",
+      "aria": "Training help for this page"
+    },
+    {
+      "txt": "notifications_none",
+      "aria": "Notifications"
+    },
+    {
+      "txt": "light_mode",
+      "aria": "Toggle theme"
+    },
+    {
+      "txt": "Admin, Forgemenu",
+      "aria": "User menu"
+    },
+    {
+      "txt": "Complete Now",
+      "aria": ""
+    },
+    {
+      "txt": "Skip onboarding",
+      "aria": "Skip onboarding"
+    },
+    {
+      "txt": "close",
+      "aria": "Dismiss onboarding banner"
+    },
+    {
+      "txt": "arrow_back",
+      "aria": "Back"
+    },
+    {
+      "txt": "settings",
+      "aria": "Admin"
+    },
+    {
+      "txt": "search Search",
+      "aria": "Search"
+    },
+    {
+      "txt": "add New Lot",
+      "aria": "New Lot"
+    },
+    {
+      "txt": "more_vert",
+      "aria": "Lot Number options"
+    },
+    {
+      "txt": "more_vert",
+      "aria": "Part Number options"
+    },
+    {
+      "txt": "more_vert",
+      "aria": "Description options"
+    },
+    {
+      "txt": "more_vert",
+      "aria": "Quantity options"
+    },
+    {
+      "txt": "more_vert",
+      "aria": "Job options"
+    },
+    {
+      "txt": "more_vert",
+      "aria": "Supplier Lot options"
+    },
+    {
+      "txt": "more_vert",
+      "aria": "Expires options"
+    },
+    {
+      "txt": "more_vert",
+      "aria": "Created options"
+    },
+    {
+      "txt": "download",
+      "aria": "Export CSV"
+    },
+    {
+      "txt": "grid_on",
+      "aria": "Export Excel"
+    },
+    {
+      "txt": "settings",
+      "aria": "Manage columns"
+    },
+    {
+      "txt": "close",
+      "aria": "Close detail"
+    }
+  ],
+  "lotDetailPanelEl": {
+    "found": true,
+    "text": "LOT-20260522-001closePart NumberPRT-00001QuantityTraceability HistoryHistoryNo activity yet."
+  },
+  "partDetailBody": "Skip to main content\nHOME\nchevron_right\nPRODUCTION\nchevron_right\nPARTS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nwarning\nComplete your employee profile — 3 sections remaining\nCOMPLETE NOW\nSKIP ONBOARDING\nclose\narrow_back\ncategory\nhub\nevent_available\nbatch_prediction\nspeed\nstorefront\nsettings\nPARTS CATALOG\nManage parts, BOMs, and specifications\nhelp_outline\nadd\nNEW PART\nSearch\nStatus\nActive\nProcurement Source\nAll procurement sources\nInventory Class\nAll inventory classes\nPART #\nmore_vert\n\t\nNAME\nmore_vert\n\t\nREV\nmore_vert\n\t\nPROCUREMENT\nmore_vert\n\t\nCLASS\nmore_vert\n\t\nSTATUS\nmore_vert\n\t\nPRICE\nmore_vert\n\t\nBOM\nmore_vert\n\t\ntable_rows\ngrid_view\ndownload\ngrid_on\nsettings\n\nDRAFT\t(Unnamed draft)Step: basics · Last edited 5/21/26, 11:35 PM\nclose\n\t\tBUY\tCOMPONENT\tDRAFT\t---\t---\t\nDRAFT\t(Unnamed draft)Step: basics · Last edited 5/21/26, 11:35 PM\nclose\n\t\tMAKE\tCOMPONENT\tDRAFT\t---\t---\t\nDRAFT\t(Unnamed draft)Step: basics · Last edited 5/21/26, 11:35 PM\nclose\n\t\tBUY\tCOMPONENT\tDRAFT\t---\t---\t\nDRAFT\t(Unnamed draft)Step: basics · Last edited 5/21/26, 11:35 PM\nclose\n\t\tBUY\tCOMPONENT\tDRAFT\t---\t---\t\nDRAFT\t(Unnamed draft)Step: basics · Last edited 5/21/26, 11:35 PM\nclose\n\t\tBUY\tCOMPONENT\tDRAFT\t---\t---\t\nDRAFT\t(Unnamed draft)Step: basics · Last edited 5/21/26, 11:35 PM\nclose\n\t\tBUY\tCOMPONENT\tDRAFT\t---\t---\t\nDRAFT\t(Unnamed draft)Step: basics · Last edited 5/21/26, 11:35 PM\nclose\n\t\tBUY\tCOMPONENT\tDRAFT\t---\t---\t\nDRAFT\t(Unnamed draft)Step: basics · Last edited 5/21/26, 11:35 PM\nclose\n\t\tBUY\tCOMPONENT\tDRAFT\t---\t---\t\nPRT-00001\tWidget A\tA\tMAKE\tCOMPONENT\tACTIVE\t---\t---\t\nsettings\nPRT-00001 \ncheck_circle\nReady\nWidget A\nTest widget\nedit\nclose\nbadge\nIDENTITY\ncategory\nMATERIAL\nreceipt_long\nPURCHASE HISTORY\ninventory_2\nINVENTORY\nevent_available\nMRP\nalt_route\nROUTING\npayments\nCOST\nsell\nPRICING\nfact_check\nQUALITY\nswap_horiz\nALTERNATES\ntimeline\nACTIVITY\nattach_file\nFILES\nIDENTITY\nPART NUMBER\nPRT-00001\nPROCUREMENT SOURCE\nMake\nINVENTORY CLASS\nComponent\nName\nRevision\nDescription\nStatus\nActive\nqr_code_2\nBARCODE\nPRT-PRT-00001\ncontent_copy\nprint\nPRINT\nrefresh\nREGENERATE",
+  "partDetailEl": {
+    "tag": "MAT-DIALOG-CONTAINER",
+    "cls": "mat-mdc-dialog-container mdc-dialog cdk-dialog-container mdc",
+    "text": "settings PRT-00001 check_circleReadyWidget ATest widgeteditclosebadge Identity category Material receipt_long Purchase History inventory_2 Inventory event_available MRP alt_route Routing payments Cost"
+  },
+  "partDraftClick": "Skip to main content\nHOME\nchevron_right\nPRODUCTION\nchevron_right\nPARTS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nwarning\nComplete your employee profile — 3 sections remaining\nCOMPLETE NOW\nSKIP ONBOARDING\nclose\narrow_back\ncategory\nhub\nevent_available\nbatch_prediction\nspeed\nstorefront\nsettings\nPARTS CATALOG\nManage parts, BOMs, and specifications\nhelp_outline\nadd\nNEW PART\nSearch\nStatus\nActive\nProcurement Source\nAll procurement sources\nInventory Class\nAll inventory classes\nPART #\nmore_vert\n\t\nNAME\nmore_vert\n\t\nREV\nmore_vert\n\t\nPROCUREMENT\nmore_vert\n\t\nCLASS\nmore_vert\n\t\nSTATUS\nmore_vert\n\t\nPRICE\nmore_vert\n\t\nBOM\nmore_vert\n\t\ntable_rows\ngrid_view\ndownload\ngrid_on\nsettings\n\nDRAFT\t(Unnamed draft)Step: basics · Last edited 5/21/26, 11:35 PM\nclose\n\t\tBUY\tCOMPONENT\tDRAFT\t---\t---\t\nDRAFT\t(Unnamed draft)Step: basics · Last edited 5/21/26, 11:35 PM\nclose\n\t\tMAKE\tCOMPONENT\tDRAFT\t---\t---\t\nDRAFT\t(Unnamed draft)Step: basics · Last edited 5/21/26, 11:35 PM\nclose\n\t\tBUY\tCOMPONENT\tDRAFT\t---\t---\t\nDRAFT\t(Unnamed draft)Step: basics · Last edited 5/21/26, 11:35 PM\nclose\n\t\tBUY\tCOMPONENT\tDRAFT\t---\t---\t\nDRAFT\t(Unnamed draft)Step: basics · Last edited 5/21/26, 11:35 PM\nclose\n\t\tBUY\tCOMPONENT\tDRAFT\t---\t---\t\nDRAFT\t(Unnamed draft)Step: basics · Last edited 5/21/26, 11:35 PM\nclose\n\t\tBUY\tCOMPONENT\tDRAFT\t---\t---\t\nDRAFT\t(Unnamed draft)Step: basics · Last edited 5/21/26, 11:35 PM\nclose\n\t\tBUY\tCOMPONENT\tDRAFT\t---\t---\t\nDRAFT\t(Unnamed draft)Step: basics · Last edited 5/21/26, 11:35 PM\nclose\n\t\tBUY\tCOMPONENT\tDRAFT\t---\t---\t\nPRT-00001\tWidget A\tA\tMAKE\tCOMPONENT\tACTIVE\t---\t---\t\nsettings\nPRT-00001 \ncheck_circle\nReady\nWidget A\nTest widget\nedit\nclose\nbadge\nIDENTITY\ncategory\nMATERIAL\nreceipt_long\nPURCHASE HISTORY\ninventory_2\nINVENTORY\nevent_available\nMRP\nalt_route\nROUTING\npayments\nCOST\nsell\nPRICING\nfact_check\nQUALITY\nswap_horiz\nALTERNATES\ntimeline\nACTIVITY\nattach_file\nFILES\nIDENTITY\nPART NUMBER\nPRT-00001\nPROCUREMENT SOURCE\nMake\nINVENTORY CLASS\nComponent\nName\nRevision\nDescription\nStatus\nActive\nqr_code_2\nBARCODE\nPRT-PRT-00001\ncontent_copy\nprint\nPRINT\nrefresh\nREGENERATE",
+  "stepBtnsNew": [],
+  "partForkDialog": {
+    "found": false
+  },
+  "leadPanelBody": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nLEADS\nchevron_right\nALL LEADS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nwarning\nComplete your employee profile — 3 sections remaining\nCOMPLETE NOW\nSKIP ONBOARDING\nclose\narrow_back\nlist\nupload_file\nspeed\ncampaign\nblock\ncard_giftcard\nbusiness\nstorefront\nsettings\nLEADS\nTrack and qualify potential sales opportunities\nview_list\nview_column\nadd\nNEW LEAD\nexpand_more\nSearch\nStatus\n\t\nCOMPANY\nmore_vert\n\t\nCONTACT\nmore_vert\n\t\nSOURCE\nmore_vert\n\t\nSTATUS\nmore_vert\n\t\nFOLLOW-UP\nmore_vert\n\t\nCREATED\nmore_vert\n\t\ndownload\ngrid_on\nsettings\n\n\n\tBeta Industries\t—\tDirect\t\nNEW\n\t—\t05/21/2026\t\nbusiness\nBeta Industries\nedit\nclose\nSTATUS\nNEW\nSOURCE\nDirect\nCLASSIFICATION\nprecision_manufacturing\nCAP FIT: NOT ASSESSED\narrow_drop_down\nlock\nNDA: NONE\narrow_drop_down\npublic\nITAR: N/A\narrow_drop_down\nUPDATE STATUS\nNEW\nCONTACTED\nQUOTING\nLOST\nCONVERT\nperson_add\nCONVERT TO CUSTOMER\nforum\nRECENT COMMUNICATIONS\n0\nmail_outline\nNo recent communications. Connect a mailbox or phone line under Account > Communications to start auto-logging.\nACTIVITY\nALL\nCONVERSATION\nNOTES\nHISTORY\n\nNo activity yet.",
+  "guidedCustStep2": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nCUSTOMERS\nchevron_right\nALL CUSTOMERS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nwarning\nComplete your employee profile — 3 sections remaining\nCOMPLETE NOW\nSKIP ONBOARDING\nclose\narrow_back\nlist\ncontacts\nvpn_key\nfilter_",
+  "guidedCustStep3": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nCUSTOMERS\nchevron_right\nALL CUSTOMERS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nwarning\nComplete your employee profile — 3 sections remaining\nCOMPLETE NOW\nSKIP ONBOARDING\nclose\narrow_back\nlist\ncontacts\nvpn_key\nfilter_",
+  "guidedCustStep4": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nCUSTOMERS\nchevron_right\nALL CUSTOMERS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nwarning\nComplete your employee profile — 3 sections remaining\nCOMPLETE NOW\nSKIP ONBOARDING\nclose\narrow_back\nlist\ncontacts\nvpn_key\nfilter_",
+  "guidedCustStep5": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nCUSTOMERS\nchevron_right\nALL CUSTOMERS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nwarning\nComplete your employee profile — 3 sections remaining\nCOMPLETE NOW\nSKIP ONBOARDING\nclose\narrow_back\nlist\ncontacts\nvpn_key\nfilter_",
+  "creditStatusCard": {
+    "found": false,
+    "creditEls": []
+  },
+  "invReceivingBody": "Skip to main content\nHOME\nchevron_right\nINVENTORY\nchevron_right\nINVENTORY\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nwarning\nComplete your employee profile — 3 sections remaining\nCOMPLETE NOW\nSKIP ONBOARDING\nclose\narrow_back\ninventory\nbuild\nprecision_manufacturing\nstorefront\nsettings\nINVENTORY\nTrack stock levels, locations, and movements\nhelp_outline\nadd\nRECEIVE GOODS\ninventory\nSTOCK LEVELS\nwarehouse\nLOCATIONS\nswap_horiz\nMOVEMENTS\nlocal_shipping\nRECEIVING\ntune\nSTOCK OPS\nfact_check\nCYCLE COUNTS\nlock\nRESERVATIONS\nshopping_cart\nREPLENISHMENT\nstraighten\nUNITS OF MEASURE\n0 RECORDS\nlocal_shipping\n\nNo receiving records",
+  "stepsNofork": []
+}

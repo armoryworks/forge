@@ -1,0 +1,65 @@
+{
+  "workflowError": "No part rows found after Draft filter",
+  "reserveFormType": {
+    "dlgCount": 0,
+    "hasInlineForm": false
+  },
+  "reserveBodyAfter": "Skip to main content\nHOME\nchevron_right\nINVENTORY\nchevron_right\nINVENTORY\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\ninventory\nbuild\nprecision_manufacturing\nstorefront\nsettings\nINVENTORY\nTrack stock levels, locations, and movements\nhelp_outline\nadd\nRESERVE STOCK\ninventory\nSTOCK LEVELS\nwarehouse\nLOCATIONS\nswap_horiz\nMOVEMENTS\nlocal_shipping\nRECEIVING\ntune\nSTOCK ",
+  "reserveFormInputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search jobs, parts, people...",
+      "formcontrol": "",
+      "ariaLabel": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "placeholder": "",
+      "formcontrol": "",
+      "ariaLabel": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "placeholder": "",
+      "formcontrol": "",
+      "ariaLabel": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "placeholder": "",
+      "formcontrol": "",
+      "ariaLabel": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "placeholder": "",
+      "formcontrol": "",
+      "ariaLabel": ""
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "",
+      "placeholder": "",
+      "formcontrol": "",
+      "ariaLabel": ""
+    }
+  ],
+  "transferForm": {
+    "dlgCount": 0,
+    "body": "Skip to main content\nHOME\nchevron_right\nINVENTORY\nchevron_right\nINVENTORY\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\ninventory\nbuild\nprecision_manufacturing\nstorefront\nsettings\nINVENTORY\nTrack stock levels, locations, and movements\nhelp_outline\nswap_horiz\nTRANSFE"
+  },
+  "adjustForm": {
+    "dlgCount": 0,
+    "body": "Skip to main content\nHOME\nchevron_right\nINVENTORY\nchevron_right\nINVENTORY\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\ninventory\nbuild\nprecision_manufacturing\nstorefront\nsettings\nINVENTORY\nTrack stock levels, locations, and movements\nhelp_outline\nswap_horiz\nTRANSFE"
+  },
+  "uomConversions": "Skip to main content\nHOME\nchevron_right\nINVENTORY\nchevron_right\nINVENTORY\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\ninventory\nbuild\nprecision_manufacturing\nstorefront\nsettings\nINVENTORY\nTrack stock levels, locations, and movements\nhelp_outline\ninventory\nSTOCK LE",
+  "addLocationForm": {
+    "dlgCount": 0,
+    "content": "Skip to main content\nHOME\nchevron_right\nINVENTORY\nchevron_right\nINVENTORY\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\ninventory\nbuild\nprecision_manufacturing\nstorefront\nsettings\nINVENTORY\nTrack stock levels, locations, and movements\nhelp_outline\nadd\nADD LOCATION\ni"
+  }
+}

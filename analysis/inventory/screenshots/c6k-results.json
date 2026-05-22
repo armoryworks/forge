@@ -1,0 +1,44 @@
+{
+  "partsVisible": {
+    "cards": [],
+    "rows": [
+      "Draft(Unnamed draft) Step: basics · Last edited 5/21/26, 11:",
+      "Draft(Unnamed draft) Step: basics · Last edited 5/21/26, 11:",
+      "Draft(Unnamed draft) Step: basics · Last edited 5/21/26, 11:",
+      "Draft(Unnamed draft) Step: basics · Last edited 5/21/26, 11:",
+      "Draft(Unnamed draft) Step: basics · Last edited 5/21/26, 11:",
+      "Draft(Unnamed draft) Step: basics · Last edited 5/21/26, 11:",
+      "Draft(Unnamed draft) Step: basics · Last edited 5/21/26, 11:",
+      "PRT-00001Widget A A MakeComponentActive------",
+      "PRT-00002Widget A A MakeComponentDraft------",
+      "PRT-00003Test Part C6Gedit_noteDraft A BuyComponentDraft----",
+      "RAW-00001Widget A A MakeRawDraft------"
+    ]
+  },
+  "workflowOpened": {
+    "counter": {
+      "full": "STEP 2 OF 6",
+      "current": 2,
+      "total": 6
+    },
+    "text": "PRT-00003\nSTEP 2 OF 6\n·\nMANUFACTURING\nExpress\nAll at once\nGuided\nStep by step\nclose\ncheck\nBasics\nchevron_right\n2\nManufacturing\nchevron_right\nlock\nBill of Materials\nOPTIONAL\nchevron_right\nlock\nRouting\nchevron_right\nlock\nCost\nchevron_right\nlock\nAlternates\nOPTIONAL\nInventory\n\nStock thresholds and unit of measure. Drives reorder triggers and bin defaults.\n\nMin Stock Threshold\nReorder Point\nReorder Qua"
+  },
+  "selectsOnStep2": [
+    {
+      "i": 0,
+      "formControl": "",
+      "ariaLabel": "",
+      "currentVal": ""
+    }
+  ],
+  "uomSelected": {
+    "select": 0,
+    "formControl": "",
+    "value": "Each (EA)"
+  },
+  "workflowFinal": "PRT-00003\nSTEP 2 OF 6\n·\nMANUFACTURING\nExpress\nAll at once\nGuided\nStep by step\nclose\ncheck\nBasics\nchevron_right\n2\nManufacturing\nchevron_right\nlock\nBill of Materials\nOPTIONAL\nchevron_right\nlock\nRouting\nchevron_right\nlock\nCost\nchevron_right\nlock\nAlternates\nOPTIONAL\nInventory\n\nStock thresholds and unit of measure. Drives reorder triggers and bin defaults.\n\nMin Stock Threshold\nReorder Point\nReorder Qua",
+  "addLocation": {
+    "dlgCount": 0,
+    "text": "Skip to main content\nHOME\nchevron_right\nINVENTORY\nchevron_right\nINVENTORY\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\ninventory\nbuild\nprecision_manufacturing\nstorefront\nsettings\nINVENTORY\nTrack stock levels, locations, and movements\nhelp_outline\nadd\nADD LOCATION\ni"
+  }
+}

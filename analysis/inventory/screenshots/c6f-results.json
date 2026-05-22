@@ -1,0 +1,43 @@
+{
+  "customerDetailPageBody": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nCUSTOMERS\nchevron_right\nALL CUSTOMERS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\nwarning\nComplete your employee profile — 3 sections remaining\nCOMPLETE NOW\nSKIP ONBOARDING\nclose\narrow_back\nlist\ncontacts\nvpn_key\nfilter_alt\nupload_file\nstorefront\nsettings\nchevron_left\nCustomers\nedit\nEDIT\narchive\nAcme Corp\nACTIVE\ncheck_circle\nReady\nemail\ncontact@acme.com\nphone\n555-100-2000\n0\nOPEN ESTIMATES\n0\nOPEN QUOTES\n0\nOPEN ORDERS\n0\nACTIVE JOBS\n$0.00\nOUTSTANDING\n$0.00\nYTD REVENUE\nOverview\nContacts\nAddresses\nEstimates\nQuotes\nActiv",
+  "customerPageTabs": [
+    "Home",
+    "All Customers",
+    "Overview",
+    "Contacts",
+    "Addresses",
+    "Estimates",
+    "Quotes",
+    "Activity"
+  ],
+  "customerDetailDialog": {
+    "count": 1,
+    "firstText": "ACME CORP\nclose\nOVERVIEW\nName\nCompany Name\nEmail\nPhone\nActive\nACCOUNT DETAILS\nCUSTOMER NAME\nAcme Corp\nEMAIL\ncontact@acme.com\nPHONE\n555-100-2000\nSTATUS\nACTIVE\nCUSTOMER SINCE\n05/21/2026\nREGULATED INDUST"
+  },
+  "customerDialogTabs": [],
+  "workflowPage": {
+    "found": true,
+    "text": "New part\nSTEP 1 OF 6\n·\nBASICS\nExpress\nAll at once\nGuided\nStep by step\nhelp_outline\nclose\n1\nBasics\nchevron_right\nlock\nManufacturing\nchevron_right\nlock\nBill of Materials\nOPTIONAL\nchevron_right\nlock\nRouting\nchevron_right\nlock\nCost\nchevron_right\nlock\nAlternates\nOPTIONAL\nBasics\n\nName and a short descript"
+  },
+  "workflowStep2": "New part\nSTEP 1 OF 6\n·\nBASICS\nExpress\nAll at once\nGuided\nStep by step\nhelp_outline\nclose\n1\nBasics\nchevron_right\nlock\nManufacturing\nchevron_right\nlock\nBill of Materials\nOPTIONAL\nchevron_right\nlock\nRouting\nchevron_right\nlock\nCost\nchevron_right\nlock\nAlternates\nOPTIONAL\nBasics\n\nName and a short description — the minimum to identify this part. The procurement and inventory axes were chosen on the previ",
+  "workflowStep3": "New part\nSTEP 1 OF 6\n·\nBASICS\nExpress\nAll at once\nGuided\nStep by step\nhelp_outline\nclose\n1\nBasics\nchevron_right\nlock\nManufacturing\nchevron_right\nlock\nBill of Materials\nOPTIONAL\nchevron_right\nlock\nRouting\nchevron_right\nlock\nCost\nchevron_right\nlock\nAlternates\nOPTIONAL\nBasics\n\nName and a short description — the minimum to identify this part. The procurement and inventory axes were chosen on the previ",
+  "workflowStep4": "New part\nSTEP 1 OF 6\n·\nBASICS\nExpress\nAll at once\nGuided\nStep by step\nhelp_outline\nclose\n1\nBasics\nchevron_right\nlock\nManufacturing\nchevron_right\nlock\nBill of Materials\nOPTIONAL\nchevron_right\nlock\nRouting\nchevron_right\nlock\nCost\nchevron_right\nlock\nAlternates\nOPTIONAL\nBasics\n\nName and a short description — the minimum to identify this part. The procurement and inventory axes were chosen on the previ",
+  "workflowStep5": "New part\nSTEP 1 OF 6\n·\nBASICS\nExpress\nAll at once\nGuided\nStep by step\nhelp_outline\nclose\n1\nBasics\nchevron_right\nlock\nManufacturing\nchevron_right\nlock\nBill of Materials\nOPTIONAL\nchevron_right\nlock\nRouting\nchevron_right\nlock\nCost\nchevron_right\nlock\nAlternates\nOPTIONAL\nBasics\n\nName and a short description — the minimum to identify this part. The procurement and inventory axes were chosen on the previ",
+  "workflowStep6": "New part\nSTEP 1 OF 6\n·\nBASICS\nExpress\nAll at once\nGuided\nStep by step\nhelp_outline\nclose\n1\nBasics\nchevron_right\nlock\nManufacturing\nchevron_right\nlock\nBill of Materials\nOPTIONAL\nchevron_right\nlock\nRouting\nchevron_right\nlock\nCost\nchevron_right\nlock\nAlternates\nOPTIONAL\nBasics\n\nName and a short description — the minimum to identify this part. The procurement and inventory axes were chosen on the previ",
+  "operationDialog": "ADD OPERATION\nclose\nsettings\nDETAILS\nStep #\nEst. Minutes\nTitle\nInstructions\nWork Center\nsearch\nReferences Operation\nQC Checkpoint\nSubcontract Operation\nCANCEL\nwarning\n1\nADD",
+  "cycleCountDialog": "",
+  "reserveDialog": "",
+  "leadDetail": {
+    "type": "dialog",
+    "cls": "mat-mdc-dialog-container mdc-dialog cdk-dialog-container mdc",
+    "text": "business\nBeta Industries\nedit\nclose\nSTATUS\nNEW\nSOURCE\nDirect\nCLASSIFICATION\nprecision_manufacturing\nCAP FIT: NOT ASSESSED\narrow_drop_down\nlock\nNDA: NONE\narrow_drop_down\npublic\nITAR: N/A\narrow_drop_dow"
+  },
+  "vendorDialogCheck": {
+    "dialogCount": 1,
+    "hasVDD": true,
+    "hasVDP": true,
+    "text": "store\nGlobal Supply Co \ncheck_circle\nReady\nedit\nclose\nINFO\nPURCHASE ORDERS (0)\nCATALOG\nSCORECARD\nSTATUS\nACTIVE\nEMAIL\nsupply@global.com\nPHONE\n555-200-0",
+    "vddText": "store\nGlobal Supply Co \ncheck_circle\nReady\nedit\nclose\nINFO\nPURCHASE ORDERS (0)\nCATALOG\nSCORECARD\nSTATUS\nACTIVE\nEMAIL\nsupply@global.com\nPHONE\n555-200-0",
+    "vdpText": "store\nGlobal Supply Co \ncheck_circle\nReady\nedit\nclose\nINFO\nPURCHASE ORDERS (0)\nCATALOG\nSCORECARD\nSTATUS\nACTIVE\nEMAIL\nsupply@global.com\nPHONE\n555-200-0"
+  }
+}

@@ -1,0 +1,149 @@
+{
+  "tabElements": [
+    {
+      "tag": "BUTTON",
+      "cls": "mat-mdc-tooltip-trigger completeness-chi",
+      "txt": "check_circleReady"
+    },
+    {
+      "tag": "BUTTON",
+      "cls": "mat-mdc-tooltip-trigger icon-btn",
+      "txt": "edit"
+    },
+    {
+      "tag": "BUTTON",
+      "cls": "mat-mdc-tooltip-trigger icon-btn",
+      "txt": "close"
+    },
+    {
+      "tag": "DIV",
+      "cls": "detail-tabs",
+      "txt": "badge Identity store Sources r"
+    },
+    {
+      "tag": "BUTTON",
+      "cls": "detail-tab detail-tab--active",
+      "txt": "badge Identity"
+    },
+    {
+      "tag": "SPAN",
+      "cls": "material-icons-outlined detail-tab__icon",
+      "txt": "badge"
+    },
+    {
+      "tag": "BUTTON",
+      "cls": "detail-tab",
+      "txt": "store Sources"
+    },
+    {
+      "tag": "SPAN",
+      "cls": "material-icons-outlined detail-tab__icon",
+      "txt": "store"
+    },
+    {
+      "tag": "BUTTON",
+      "cls": "detail-tab",
+      "txt": "receipt_long Purchase History"
+    },
+    {
+      "tag": "SPAN",
+      "cls": "material-icons-outlined detail-tab__icon",
+      "txt": "receipt_long"
+    },
+    {
+      "tag": "BUTTON",
+      "cls": "detail-tab",
+      "txt": "inventory_2 Inventory"
+    },
+    {
+      "tag": "SPAN",
+      "cls": "material-icons-outlined detail-tab__icon",
+      "txt": "inventory_2"
+    },
+    {
+      "tag": "BUTTON",
+      "cls": "detail-tab",
+      "txt": "fact_check Quality"
+    },
+    {
+      "tag": "SPAN",
+      "cls": "material-icons-outlined detail-tab__icon",
+      "txt": "fact_check"
+    },
+    {
+      "tag": "BUTTON",
+      "cls": "detail-tab",
+      "txt": "payments Cost"
+    },
+    {
+      "tag": "SPAN",
+      "cls": "material-icons-outlined detail-tab__icon",
+      "txt": "payments"
+    },
+    {
+      "tag": "BUTTON",
+      "cls": "detail-tab",
+      "txt": "sell Pricing"
+    },
+    {
+      "tag": "SPAN",
+      "cls": "material-icons-outlined detail-tab__icon",
+      "txt": "sell"
+    },
+    {
+      "tag": "BUTTON",
+      "cls": "detail-tab",
+      "txt": "swap_horiz Alternates"
+    },
+    {
+      "tag": "SPAN",
+      "cls": "material-icons-outlined detail-tab__icon",
+      "txt": "swap_horiz"
+    },
+    {
+      "tag": "BUTTON",
+      "cls": "detail-tab",
+      "txt": "timeline Activity"
+    },
+    {
+      "tag": "SPAN",
+      "cls": "material-icons-outlined detail-tab__icon",
+      "txt": "timeline"
+    },
+    {
+      "tag": "BUTTON",
+      "cls": "detail-tab",
+      "txt": "attach_file Files"
+    },
+    {
+      "tag": "SPAN",
+      "cls": "material-icons-outlined detail-tab__icon",
+      "txt": "attach_file"
+    },
+    {
+      "tag": "BUTTON",
+      "cls": "action-btn action-btn--sm",
+      "txt": "add Generate Barcode"
+    }
+  ],
+  "tab_sources": "settings\nPRT-00003 \ncheck_circle\nReady\nTest Part C6G\nedit\nclose\nbadge\nIDENTITY\nstore\nSOURCES\nreceipt_long\nPURCHASE HISTORY\ninventory_2\nINVENTORY\nfact_check\nQUALITY\npayments\nCOST\nsell\nPRICING\nswap_horiz\nALTERNATES\ntimeline\nACTIVITY\nattach_file\nFILES\nstorefront\n\nNo vendor sources yet.\n\nClick Edit to add a vendor source for this part.",
+  "tab_cost": "settings\nPRT-00003 \ncheck_circle\nReady\nTest Part C6G\nedit\nclose\nbadge\nIDENTITY\nstore\nSOURCES\nreceipt_long\nPURCHASE HISTORY\ninventory_2\nINVENTORY\nfact_check\nQUALITY\npayments\nCOST\nsell\nPRICING\nswap_horiz\nALTERNATES\ntimeline\nACTIVITY\nattach_file\nFILES\nCOST\nManual Cost Override\n$ \nCOST CALCULATION ID\n---\nLANDED COST\nlocal_shipping\nNo receipts with captured freight yet — landed cost will populate once you receive a PO and record actual freight.",
+  "tab_alternates": "settings\nPRT-00003 \ncheck_circle\nReady\nTest Part C6G\nedit\nclose\nbadge\nIDENTITY\nstore\nSOURCES\nreceipt_long\nPURCHASE HISTORY\ninventory_2\nINVENTORY\nfact_check\nQUALITY\npayments\nCOST\nsell\nPRICING\nswap_horiz\nALTERNATES\ntimeline\nACTIVITY\nattach_file\nFILES\nadd\nADD ALTERNATE\nswap_horiz\n\nNo alternate parts defined",
+  "tab_purchase-history": "settings\nPRT-00003 \ncheck_circle\nReady\nTest Part C6G\nedit\nclose\nbadge\nIDENTITY\nstore\nSOURCES\nreceipt_long\nPURCHASE HISTORY\ninventory_2\nINVENTORY\nfact_check\nQUALITY\npayments\nCOST\nsell\nPRICING\nswap_horiz\nALTERNATES\ntimeline\nACTIVITY\nattach_file\nFILES\nSearch\nShowing last 0 (max 50)\nreceipt_long\n\nNo purchase orders include this part yet.",
+  "tab_inventory": "settings\nPRT-00003 \ncheck_circle\nReady\nTest Part C6G\nedit\nclose\nbadge\nIDENTITY\nstore\nSOURCES\nreceipt_long\nPURCHASE HISTORY\ninventory_2\nINVENTORY\nfact_check\nQUALITY\npayments\nCOST\nsell\nPRICING\nswap_horiz\nALTERNATES\ntimeline\nACTIVITY\nattach_file\nFILES\nINVENTORY\nMin Stock\nReorder Point\nReorder Quantity\nSafety Stock (days)\nTraceability\nNone\nABC Class",
+  "allDialogTabs": [
+    "check_circleReady",
+    "edit",
+    "close",
+    "badge Identity",
+    "store Sources",
+    "receipt_long Purchase History",
+    "inventory_2 Inventory",
+    "fact_check Quality",
+    "payments Cost",
+    "sell Pricing",
+    "swap_horiz Alternates",
+    "timeline Activity",
+    "attach_file Files"
+  ]
+}
