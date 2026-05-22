@@ -2,7 +2,7 @@
 
 > **Phase:** master-data · **Method:** observe-and-record (no code changes)
 > **Single writer:** source-cataloger owns this file. Scout writes queue only.
-> **Source on disk:** HEAD e9b7802 (running binary main-c7e76cf — flag any live/source mismatch)
+> **Source on disk:** HEAD e9b7802 (drift resolved — running app matches source; file:line mappings are authoritative)
 > **Last commit:** _C2b-source-prelocation_
 
 ---
