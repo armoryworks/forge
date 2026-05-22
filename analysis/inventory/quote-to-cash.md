@@ -1,9 +1,9 @@
 # Quote-to-Cash Region — Component Inventory
 
 > **Phase:** quote-to-cash · **Method:** observe-and-record (no code changes)
-> **Single writer:** ui-scout (sole writer of both catalog + queue)
+> **Single writer:** source-cataloger owns this file; scout owns quote-to-cash-queue.md only
 > **Source on disk:** HEAD e9b7802 (file:line mappings from source)
-> **Last updated:** Cycle 4 — live Playwright sweep complete (admin + 5 role users; screenshots at `E:/dev/forge/analysis/screenshots/q2c-cycle2/`, `q2c-cycle3/`)
+> **Last updated:** Cycle 5 — cataloger reconciliation: scout live-state entries verified against source, role discrepancy flagged, metadata corrected
 
 ---
 
@@ -15,7 +15,7 @@
 
 **DN-3 — EstimateFormDialogComponent not wired:** Component exists but grep of all `.ts` files finds zero callers. Not reachable from current navigation. Dead code or pending wiring.
 
-**DN-4 — PM role has broader access than source role-guards suggest:** Live sweep confirms PM can access `/purchasing`, `/shipments`, `/invoices`, `/payments` (all route-accessible, page header rendered). Catalog entries below updated to include PM where confirmed.
+**DN-4 — PM live access contradicts source route guards (investigate):** Live sweep observed PM reaching `/purchasing`, `/shipments`, `/invoices`, `/payments` with page-header rendered. Source `app.routes.ts:157,163,181,187,193` gates all five routes as `roleGuard('Admin','Manager','OfficeManager')` — PM is not listed. `roleGuard` calls `auth.hasAnyRole()` which is a pure `user.roles.includes()` check with no capability bypass (`auth.service.ts:96-99`). **Most likely cause: `pm@forge.local` was seeded with multiple server-side roles (PM + OfficeManager or similar).** `renders-for` fields in catalog entries use source-authoritative role lists; the role matrix records live observation. The discrepancy should be resolved by inspecting the JWT for `pm@forge.local`.
 
 **DN-5 — `/sales-orders/recurring` does not render app-page-header:** All four accessible roles (Admin, OfficeManager, Manager, PM) reach the route but `app-page-header` is absent (uses `PageLayoutComponent` + `ToolbarComponent` instead).
 
@@ -53,7 +53,7 @@
 - [x] `/quotes` — QuotesComponent (list)
 - [x] `/sales-orders` — SalesOrdersComponent (list)
 - [x] `/sales-orders/recurring` — RecurringOrdersComponent (recurring templates list)
-- [ ] `/purchase-orders` → redirects to `/purchase-orders/orders`
+- [x] `/purchase-orders` → redirects to `/purchase-orders/orders` (no page component; redirect confirmed in `purchase-orders.routes.ts`)
 - [x] `/purchase-orders/orders` — PurchaseOrdersComponent (orders tab)
 - [x] `/purchase-orders/suggestions` — PurchaseOrdersComponent (suggestions tab / AutoPoPanelComponent)
 - [x] `/purchase-orders/settings` — PurchaseOrdersComponent (settings tab / AutoPoSettingsPanelComponent; Admin only)
@@ -331,7 +331,7 @@
 | type | dialog |
 | route | `/sales-orders/recurring` |
 | file | `features/sales-orders/components/recurring-order-dialog/recurring-order-dialog.component.ts:16` |
-| renders-for | Admin, Manager |
+| renders-for | Admin, Manager, PM, OfficeManager (inherits route guard; no button-level role gate in template — confirmed cycle 2) |
 | states | unreached (no trigger pressed in sweep) |
 | purpose | Create a recurring SO template; fields include schedule config, customer, product lines via EntityPicker |
 
@@ -508,8 +508,6 @@
 
 ---
 
-| field | value |
-|-------|-------|
 ~~`app-auto-po-suggestions` / AutoPoSuggestionsComponent~~ — **dead code**: file exists at `features/purchase-orders/components/auto-po-suggestions/auto-po-suggestions.component.ts:19` but is never imported by `AutoPoPanelComponent`, `PurchaseOrdersComponent`, or any other component. The suggestions tab is rendered entirely within `AutoPoPanelComponent`'s own DataTable. No inventory entry required.
 
 ---
@@ -521,7 +519,7 @@
 | route | `/purchase-orders/settings` |
 | file | `features/purchase-orders/components/auto-po-settings-panel/auto-po-settings-panel.component.ts:16` |
 | renders-for | Admin only (source: PurchaseOrdersComponent line 55 `isAdmin = this.auth.hasRole('Admin')`) |
-| states | observed (page accessible; no config content detected in sweep) |
+| states | populated (settings tab rendered for Admin; non-Admin content visibility unverified — see Q7-e in queue) |
 | purpose | Configure Auto-PO global settings: reorder threshold mode, lead-time buffer, default vendor strategy, toggle on/off |
 
 **Shared components:** InputComponent · SelectComponent · ToggleComponent · ValidationButtonComponent · LoadingBlockDirective
@@ -826,9 +824,9 @@
 | `/customer-returns` | ✓ | ✓ | ✓ | ✓ | ✗ | ✗ |
 
 **Notes:**
-- `/purchase-orders/settings` source says Admin-only (`isAdmin` guard in component) but route guard allows all four accessible roles. Within-page content may be hidden for non-Admin — not yet verified with non-Admin on that tab.
-- `RecurringOrderDialogComponent` source says "Admin, Manager" — PM's ability to create recurring templates NOT verified live.
-- Capability-level differences (OM vs Manager vs PM: create buttons present/hidden?) are NOT yet verified. All three roles saw accessible pages; button-level capability gating needs targeted sweep.
+- PM column shows ✓ for routes where source `roleGuard` does NOT include PM (`/purchasing`, `/purchase-orders/*`, `/shipments`, `/invoices`, `/payments`). This is live-observed behaviour, likely caused by `pm@forge.local` having multiple server roles. See DN-4. Catalog `renders-for` fields use source-authoritative lists (PM excluded from those routes).
+- `/purchase-orders/settings`: route guard allows Admin/Manager/OfficeManager (not PM per source). Within-page content guarded by `isAdmin` — non-Admin content visibility not yet verified (see Q7-e).
+- Capability-level differences (OM vs Manager vs PM: create button presence) not yet verified (see Q7-f).
 
 ---
 
@@ -887,33 +885,39 @@ All create dialogs show validation badge `▲{n}` between Cancel and Submit. Sub
 
 ## Open Items / Caveats
 
-### Source-resolved (Cycles 1–4)
+### Source-resolved (Cycles 1–5)
 
 - ~~**Approximate line numbers**~~ — PoDialogComponent `:42`, OffTierPromptDialogComponent `:30`, ScheduleTimelineComponent `:16` all confirmed exact.
-- ~~**SoDialogComponent role gate**~~ — template has no `*appHasRole`/`*appHasCapability` on the create button; gate is the route guard only. Confirmed.
-- ~~**RecurringOrders role gate**~~ — no additional guard in `sales-orders.routes.ts`; template no button-level gating. Confirmed.
+- ~~**SoDialogComponent role gate**~~ — template has no `*appHasRole`/`*appHasCapability` on the create button; gate is the route guard only.
+- ~~**RecurringOrders role gate**~~ — no additional guard in `sales-orders.routes.ts`; template no button-level gating.
+- ~~**RecurringOrderDialogComponent renders-for**~~ — corrected to Admin/Manager/PM/OfficeManager (inherits route guard; no button gate).
 - ~~**Payment method full list**~~ — source-confirmed: Cash · Check · CreditCard · BankTransfer · Wire · Other.
 - ~~**AutoPoSuggestionsComponent nesting**~~ — confirmed dead code; not imported anywhere.
 - ~~**features/ tree reconciliation**~~ — all 43 live + 1 dead-code files accounted for.
 - ~~**shared/ tree coverage**~~ — 21 shared components + 3 directives documented.
 - ~~**All `states` fields**~~ — Cycle 4 live sweep: all states updated from `unconfirmed` to observed or `unreached`.
+- ~~**Scout metadata error**~~ — Cycle 5: corrected "Single writer" to source-cataloger; DN-4 expanded with roleGuard source analysis.
 
-### Still open (queued in quote-to-cash-queue.md)
+### Still open (gating set — queue items)
 
-The following checklist items remain unticked because the components have `unreached` states. Seeding and re-sweep required:
+Checklist items remain unticked because components have `unreached` states. Seeding and re-sweep required per queue:
 
-- SalesOrderDetailPanelComponent + 8 tabs (needs confirmed SO in production stage)
-- ScheduleTimelineComponent (within SO detail, schedule tab)
-- RecurringOrderDialogComponent (needs click of New Recurring Template)
-- RfqDetailDialogComponent (needs 1 RFQ seeded)
-- OffTierPromptDialogComponent (requires off-tier pricing trigger)
-- ShipmentDetailPanelComponent + TrackingTimelineComponent + ShippingRatesDialogComponent (needs shipment)
-- InvoiceDetailPanelComponent (needs invoice)
-- PaymentDetailPanelComponent (needs payment)
-- CustomerReturnDetailPanelComponent (needs return)
-- AutoPoSettingsPanelComponent content (Admin-level content not seen)
-- Capability-level role differences (OM vs Manager vs PM button visibility)
+| queue-id | component | pre-req |
+|----------|-----------|---------|
+| Q1-b | SalesOrderDetailDialog/Panel + 8 tabs + ScheduleTimeline | confirmed SO in production stage |
+| Q1-d | RfqDetailDialogComponent | 1 RFQ seeded |
+| Q1-e | InvoiceDetailDialog/Panel | 1 invoice seeded |
+| Q1-f | ShipmentDetailDialog/Panel + TrackingTimeline + ShippingRatesDialog | 1 shipment seeded |
+| Q1-g | PaymentDetailDialog/Panel | 1 payment seeded |
+| Q1-h | CustomerReturnDetailDialog/Panel | 1 return seeded |
+| Q1-i | RecurringOrderDialogComponent | click New Recurring Template button |
+| Q3-b | AutoPoSettingsPanelComponent non-Admin view | Manager or OfficeManager on settings tab |
+| Q3-c | OffTierPromptDialogComponent | off-tier pricing trigger in PO create |
+| Q7-e | Manager vs Admin on settings tab content | targeted role sweep |
+| Q7-f | Button-level capability differences (OM/Mgr/PM) | targeted capability sweep |
+| Q6-a–d | Customer detail Q2C tabs (estimates/quotes/orders/invoices) | seeded Q2C records linked to customer |
+| Q4-a,b | EstimateFormDialogComponent (full populated form) | caller wiring (currently dead code, DN-3) |
 
 ---
 
-*Cycle 4 live sweep complete — 38/43 live components observed; 16 unreached (detail panels + edge-case dialogs). Queue in quote-to-cash-queue.md. Phase NOT complete until all items closed.*
+*Cycle 5 reconciliation complete — scout entries verified against source; 12 checklist items remain unticked (all `unreached`). Phase NOT complete until queue drained and all items ticked.*
