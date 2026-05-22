@@ -3,7 +3,7 @@
 > **Phase:** master-data · **Method:** observe-and-record (no code changes)
 > **Single writer:** source-cataloger owns this file. Scout writes queue only.
 > **Source on disk:** HEAD e9b7802 (running binary main-c7e76cf — flag any live/source mismatch)
-> **Last commit:** _C2-source-prelocation_
+> **Last commit:** _C2b-source-prelocation_
 
 ---
 
@@ -174,6 +174,8 @@
 - [ ] `components/vendor-parts-cluster/vendor-part-price-tier-history-dialog.component.ts`
 - [ ] `components/vendor-parts-cluster/vendor-part-price-tiers-dialog.component.ts`
 - [ ] `components/vendor-sources-panel/vendor-sources-panel.component.ts`
+- [ ] `components/vendor-parts-cluster/vendor-part-list-panel.component.ts` ⚠️ _discovered C2b — via VendorDetailPanelComponent import_
+- [ ] `components/vendor-parts-cluster/vendor-part-bulk-import-dialog.component.ts` ⚠️ _discovered C2b — via VendorDetailPanelComponent import_
 
 #### inventory/
 - [ ] `inventory.component.ts` (InventoryComponent — all 9 tabs)
@@ -230,7 +232,7 @@
 | route | `/leads` |
 | file | `features/leads/leads.component.ts:44` |
 | renders-for | Admin, Manager, PM |
-| states | _queue: scout to confirm empty/loading/populated/error_ |
+| states | TODO(scout-C2) |
 | purpose | Root leads list view; shell for all sub-pages |
 
 ---
@@ -243,7 +245,7 @@
 | route | `/leads/intake` |
 | file | `features/leads/pages/intake/leads-intake.component.ts:43` |
 | renders-for | Admin, Manager, PM |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Intake form / entry point for new leads |
 
 ---
@@ -256,7 +258,7 @@
 | route | `/leads/queue` |
 | file | `features/leads/pages/queue/leads-queue.component.ts:43` |
 | renders-for | Admin, Manager, PM |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Actionable queue of leads awaiting follow-up |
 
 ---
@@ -269,7 +271,7 @@
 | route | `/leads/campaigns` |
 | file | `features/leads/pages/campaigns/leads-campaigns.component.ts:19` |
 | renders-for | Admin, Manager, PM |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Campaign management for leads outreach |
 
 ---
@@ -282,7 +284,7 @@
 | route | `/leads/suppression` |
 | file | `features/leads/pages/suppression/leads-suppression.component.ts:16` |
 | renders-for | Admin, Manager, PM |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Suppression list management (do-not-contact) |
 
 ---
@@ -295,7 +297,7 @@
 | route | `/leads/samples` |
 | file | `features/leads/pages/samples/leads-samples.component.ts:33` |
 | renders-for | Admin, Manager, PM |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Sample requests tied to leads |
 
 ---
@@ -308,7 +310,7 @@
 | route | `/leads/accounts` |
 | file | `features/leads/pages/accounts/leads-accounts.component.ts:34` |
 | renders-for | Admin, Manager, PM |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Account-level leads grouping view |
 
 ---
@@ -319,10 +321,24 @@
 | component | `LeadDetailPanelComponent` / `app-lead-detail-panel` |
 | type | panel |
 | route | `/leads` (slide-in) |
-| file | `features/leads/components/lead-detail-panel/lead-detail-panel.component.ts` |
+| file | `features/leads/components/lead-detail-panel/lead-detail-panel.component.ts:25` |
 | renders-for | Admin, Manager, PM |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Right-side detail panel for a selected lead without navigating away |
+
+`LeadDetailPanelComponent` sub-surfaces (all states: TODO(scout-C2)):
+
+| sub-surface | type | file:line | purpose |
+|-------------|------|-----------|---------|
+| Status chip rail | action | `statuses` array `:68`; `updateStatus()` `:233`; `statusPending` signal `:231` | Clickable status chips (New/Contacted/Qualified/…); patches lead status in-place |
+| Capability-fit chip | action | `setCapabilityFit()` `:150`; `capFitPending` signal `:146` | Toggle capability fit assessment (Yes/No/Unknown) |
+| NDA state chip | action | `setNdaState()` `:164`; `ndaPending` signal `:147` | Toggle NDA status (Signed/Pending/None) |
+| Export control chip | action | `setExportControl()` `:178`; `exportPending` signal `:148` | Toggle export control flag |
+| Lost-reason dialog | dialog | `showLostDialog` signal `:61`; `lostReasonControl` `:62`; `DialogComponent` | Inline dialog: textarea for lost reason; triggered when status flipped to Lost |
+| Convert to Customer | action | `convertLead()` `:287`; opens `LeadConvertDialogComponent` `:291` via MatDialog | Launches LeadConvertDialogComponent with AddressFormComponent |
+| Campaign name lookup | state | `campaignNames` signal `:53` | Lazy-loaded map of campaignId → name; renders campaign chip if lead has campaign |
+| Activity feed | shared-cmp | `EntityActivitySectionComponent` (import `:30`) | Full change/activity log for the lead |
+| Recent communications | shared-cmp | `RecentCommunicationsComponent` (imported) | Last N communications (calls, emails) with the lead |
 
 ---
 
@@ -332,9 +348,9 @@
 | component | `LeadDetailDialogComponent` / `app-lead-detail-dialog` |
 | type | dialog |
 | route | `/leads` (modal) |
-| file | `features/leads/components/lead-detail-dialog/lead-detail-dialog.component.ts` |
+| file | `features/leads/components/lead-detail-dialog/lead-detail-dialog.component.ts:17` |
 | renders-for | Admin, Manager, PM |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Full-detail dialog for a lead (alternative to panel) |
 
 ---
@@ -345,9 +361,9 @@
 | component | `NewLeadForkDialogComponent` / `app-new-lead-fork-dialog` |
 | type | dialog |
 | route | `/leads` (modal) |
-| file | `features/leads/components/new-lead-fork-dialog/new-lead-fork-dialog.component.ts` |
+| file | `features/leads/components/new-lead-fork-dialog/new-lead-fork-dialog.component.ts:46` |
 | renders-for | Admin, Manager, PM |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Fork chooser: manual entry vs. import vs. campaign for new lead creation |
 
 ---
@@ -358,9 +374,9 @@
 | component | `LeadConvertDialogComponent` / `app-lead-convert-dialog` |
 | type | dialog |
 | route | `/leads` (modal) |
-| file | `features/leads/components/lead-convert-dialog/lead-convert-dialog.component.ts` |
+| file | `features/leads/components/lead-convert-dialog/lead-convert-dialog.component.ts:41` |
 | renders-for | Admin, Manager, PM |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Convert a lead to a customer |
 
 ---
@@ -371,9 +387,9 @@
 | component | `AccountDialogComponent` / `app-account-dialog` |
 | type | dialog |
 | route | `/leads/accounts` (modal) |
-| file | `features/leads/components/account-dialog/account-dialog.component.ts` |
+| file | `features/leads/components/account-dialog/account-dialog.component.ts:18` |
 | renders-for | Admin, Manager, PM |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Create / edit a leads account |
 
 ---
@@ -384,9 +400,9 @@
 | component | `CallbackSchedulerDialogComponent` / `app-callback-scheduler-dialog` |
 | type | dialog |
 | route | `/leads` (modal) |
-| file | `features/leads/components/callback-scheduler-dialog/callback-scheduler-dialog.component.ts` |
+| file | `features/leads/components/callback-scheduler-dialog/callback-scheduler-dialog.component.ts:23` |
 | renders-for | Admin, Manager, PM |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Schedule a callback for a lead |
 
 ---
@@ -397,9 +413,9 @@
 | component | `CampaignDialogComponent` / `app-campaign-dialog` |
 | type | dialog |
 | route | `/leads/campaigns` (modal) |
-| file | `features/leads/components/campaign-dialog/campaign-dialog.component.ts` |
+| file | `features/leads/components/campaign-dialog/campaign-dialog.component.ts:30` |
 | renders-for | Admin, Manager, PM |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Create / edit a lead campaign |
 
 ---
@@ -416,7 +432,7 @@
 | route | `/customers` |
 | file | `features/customers/customers.component.ts:38` |
 | renders-for | Admin, Manager, PM, OfficeManager |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Customer list with search, filter, and row actions |
 
 ---
@@ -429,7 +445,7 @@
 | route | `/customers/contacts` |
 | file | `features/customers/pages/contacts/customer-contacts.component.ts:13` |
 | renders-for | Admin, Manager, PM, OfficeManager |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Cross-customer contacts list |
 
 ---
@@ -442,7 +458,7 @@
 | route | `/customers/portal-access` |
 | file | `features/customers/pages/portal-access/customer-portal-access.component.ts:29` |
 | renders-for | Admin, OfficeManager |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Manage customer portal login provisioning |
 
 ---
@@ -455,7 +471,7 @@
 | route | `/customers/segments` |
 | file | `features/customers/pages/segments/customer-segments.component.ts:19` |
 | renders-for | Admin, Manager |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Customer segmentation / tag management |
 
 ---
@@ -468,7 +484,7 @@
 | route | `/customers/import` |
 | file | `features/customers/pages/import/customer-import.component.ts:20` |
 | renders-for | Admin, Manager |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Bulk import customers from CSV / spreadsheet |
 
 ---
@@ -481,7 +497,7 @@
 | route | `/customers/:id/:tab` (default tab: overview) |
 | file | `features/customers/pages/customer-detail/customer-detail.component.ts:56` |
 | renders-for | Admin, Manager, PM, OfficeManager |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Multi-tab customer detail shell; tab layout driven by resolver (role + status) |
 
 Tabs within CustomerDetailComponent — pre-located with file:line (states: TODO(scout-C2)):
@@ -581,7 +597,7 @@ Tabs within CustomerDetailComponent — pre-located with file:line (states: TODO
 | route | `/customers` (modal, can deep-link to `/customers/:id/overview`) |
 | file | `features/customers/components/customer-detail-dialog/customer-detail-dialog.component.ts` |
 | renders-for | Admin, Manager, PM, OfficeManager |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Quick-view customer detail in a dialog before optionally full-navigating |
 
 ---
@@ -594,7 +610,7 @@ Tabs within CustomerDetailComponent — pre-located with file:line (states: TODO
 | route | `/customers` (modal) |
 | file | `features/customers/components/new-customer-fork-dialog/new-customer-fork-dialog.component.ts` |
 | renders-for | Admin, Manager, PM, OfficeManager |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Fork chooser: convert lead vs. new customer creation path |
 
 ---
@@ -607,7 +623,7 @@ Tabs within CustomerDetailComponent — pre-located with file:line (states: TODO
 | route | `/customers` (modal) |
 | file | `features/customers/components/guided-customer-dialog/guided-customer-dialog.component.ts` |
 | renders-for | Admin, Manager, PM, OfficeManager |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Step-by-step guided new customer creation wizard |
 
 ---
@@ -620,7 +636,7 @@ Tabs within CustomerDetailComponent — pre-located with file:line (states: TODO
 | route | `/customers` (modal — within new-customer fork flow) |
 | file | `features/customers/components/new-customer-fork-dialog/lead-picker-dialog.component.ts` |
 | renders-for | Admin, Manager, PM, OfficeManager |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Pick existing lead to convert when creating a customer |
 
 ---
@@ -633,7 +649,7 @@ Tabs within CustomerDetailComponent — pre-located with file:line (states: TODO
 | route | `/customers/portal-access` (modal) |
 | file | `features/customers/components/provision-portal-access-dialog/provision-portal-access-dialog.component.ts` |
 | renders-for | Admin, OfficeManager |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Provision / revoke customer portal access |
 
 ---
@@ -678,7 +694,7 @@ Tabs within CustomerDetailComponent — pre-located with file:line (states: TODO
 | route | `/vendors` |
 | file | `features/vendors/vendors.component.ts:29` |
 | renders-for | Admin, Manager, OfficeManager |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Vendor list; only top-level vendor route |
 
 ---
@@ -689,10 +705,30 @@ Tabs within CustomerDetailComponent — pre-located with file:line (states: TODO
 | component | `VendorDetailPanelComponent` / `app-vendor-detail-panel` |
 | type | panel |
 | route | `/vendors` (slide-in) |
-| file | `features/vendors/components/vendor-detail-panel/vendor-detail-panel.component.ts` |
+| file | `features/vendors/components/vendor-detail-panel/vendor-detail-panel.component.ts:51` |
 | renders-for | Admin, Manager, OfficeManager |
-| states | _queue_ |
-| purpose | Right-side detail panel for selected vendor |
+| states | TODO(scout-C2) |
+| purpose | Right-side detail panel for selected vendor; 4-tab layout: info / purchase-orders / scorecard / catalog |
+
+`VendorDetailPanelComponent` sub-surfaces (all states: TODO(scout-C2)):
+
+| sub-surface | type | file:line | purpose |
+|-------------|------|-----------|---------|
+| Tab rail | state | `activeTab` signal `:64` → `'info' \| 'purchase-orders' \| 'scorecard' \| 'catalog'` | Drives which tab content renders |
+| Info tab — edit dialog | dialog | `showEditDialog` signal `:72`; `openEditVendor()` `:104`; `VendorDialogComponent` (inline toggle) | In-panel edit form for vendor master fields |
+| Info tab — toggle active | action | `toggleActive()` `:118` | Activates / deactivates vendor; snackbar feedback |
+| Info tab — delete | action | `deleteVendor()` `:130`; `ConfirmDialogComponent` `:133` | Deletes vendor after confirmation |
+| Purchase-orders tab | table | `poColumns` DataTable `:76` | PO number, status, line count, expected delivery, created date; row click → `/purchase-orders?detail=…` |
+| Scorecard tab | tab | `VendorScorecardTabComponent` (import `:24`) | Embedded scorecard; lazy-loaded on tab activation |
+| Catalog tab — parts list | panel | `VendorPartListPanelComponent` (import `:25`); `loadVendorParts()` `:181` | ⚠️ _discovered C2b_ — list of vendor-part records for this vendor; loaded on tab activate |
+| Catalog tab — add part | action | `openVendorPartCreate()` `:195`; `VendorPartFormDialogComponent` `:198` (MatDialog) | Opens form dialog to add a new vendor-part record |
+| Catalog tab — edit part | action | `openVendorPartEdit()` `:230`; `VendorPartFormDialogComponent` `:233` (MatDialog) | Opens form dialog to edit an existing vendor-part record |
+| Catalog tab — bulk import | action | `openVendorPartImport()` `:215`; `VendorPartBulkImportDialogComponent` `:218` (MatDialog, 800px) | ⚠️ _discovered C2b_ — bulk CSV/spreadsheet import for vendor catalog |
+| Catalog tab — price tiers | action | `openVendorPartTiers()` `:275`; `VendorPartPriceTiersDialogComponent` `:278` (MatDialog, 700px) | Edit price-break tiers for a vendor-part record |
+| Catalog tab — tier history | action | `openVendorPartTierHistory()` `:286`; `VendorPartPriceTierHistoryDialogComponent` `:288` (MatDialog, 700px) | Read-only view of tier history for a vendor-part record |
+| Catalog tab — toggle preferred | action | `toggleVendorPartPreferred()` `:269` | Marks a vendor-part as preferred source |
+| Catalog tab — delete part | action | `deleteVendorPart()` `:249`; `ConfirmDialogComponent` `:251` | Removes vendor-part from catalog after confirmation |
+| Activity feed | shared-cmp | `EntityActivitySectionComponent` (import `:43`) | Vendor-level change/activity log; rendered in info tab |
 
 ---
 
@@ -702,9 +738,9 @@ Tabs within CustomerDetailComponent — pre-located with file:line (states: TODO
 | component | `VendorDetailDialogComponent` / `app-vendor-detail-dialog` |
 | type | dialog |
 | route | `/vendors` (modal) |
-| file | `features/vendors/components/vendor-detail-dialog/vendor-detail-dialog.component.ts` |
+| file | `features/vendors/components/vendor-detail-dialog/vendor-detail-dialog.component.ts:11` |
 | renders-for | Admin, Manager, OfficeManager |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Full vendor detail dialog |
 
 ---
@@ -715,9 +751,9 @@ Tabs within CustomerDetailComponent — pre-located with file:line (states: TODO
 | component | `VendorDialogComponent` / `app-vendor-dialog` |
 | type | dialog |
 | route | `/vendors` (modal) |
-| file | `features/vendors/components/vendor-dialog/vendor-dialog.component.ts` |
+| file | `features/vendors/components/vendor-dialog/vendor-dialog.component.ts:21` |
 | renders-for | Admin, Manager, OfficeManager |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Create / edit vendor form dialog |
 
 ---
@@ -728,9 +764,9 @@ Tabs within CustomerDetailComponent — pre-located with file:line (states: TODO
 | component | `NewVendorForkDialogComponent` / `app-new-vendor-fork-dialog` |
 | type | dialog |
 | route | `/vendors` (modal) |
-| file | `features/vendors/components/new-vendor-fork-dialog/new-vendor-fork-dialog.component.ts` |
+| file | `features/vendors/components/new-vendor-fork-dialog/new-vendor-fork-dialog.component.ts:30` |
 | renders-for | Admin, Manager, OfficeManager |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Fork chooser for new vendor creation |
 
 ---
@@ -741,9 +777,9 @@ Tabs within CustomerDetailComponent — pre-located with file:line (states: TODO
 | component | `GuidedVendorDialogComponent` |
 | type | dialog |
 | route | `/vendors` (modal) |
-| file | `features/vendors/components/guided-vendor-dialog/guided-vendor-dialog.component.ts` |
+| file | `features/vendors/components/guided-vendor-dialog/guided-vendor-dialog.component.ts:64` |
 | renders-for | Admin, Manager, OfficeManager |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Step-by-step guided vendor creation wizard |
 
 ---
@@ -754,9 +790,9 @@ Tabs within CustomerDetailComponent — pre-located with file:line (states: TODO
 | component | `VendorQuickCreateDialogComponent` |
 | type | dialog |
 | route | `shared` (spawned from other surfaces — POs, parts sourcing) |
-| file | `features/vendors/components/vendor-quick-create-dialog/vendor-quick-create-dialog.component.ts` |
+| file | `features/vendors/components/vendor-quick-create-dialog/vendor-quick-create-dialog.component.ts:40` |
 | renders-for | Admin, Manager, OfficeManager |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Inline quick-create vendor without leaving current context |
 
 ---
@@ -767,9 +803,9 @@ Tabs within CustomerDetailComponent — pre-located with file:line (states: TODO
 | component | `VendorScorecardTabComponent` / `app-vendor-scorecard-tab` |
 | type | tab |
 | route | `/vendors` (within vendor detail panel or dialog) |
-| file | `features/vendors/components/vendor-scorecard-tab/vendor-scorecard-tab.component.ts` |
+| file | `features/vendors/components/vendor-scorecard-tab/vendor-scorecard-tab.component.ts:12` |
 | renders-for | Admin, Manager, OfficeManager |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Vendor performance scorecard embedded in detail |
 
 ---
@@ -786,8 +822,21 @@ Tabs within CustomerDetailComponent — pre-located with file:line (states: TODO
 | route | `/parts` |
 | file | `features/parts/parts.component.ts:48` |
 | renders-for | Admin, Manager, Engineer, PM |
-| states | _queue_ |
-| purpose | Parts list with search, grid/table toggle, and card grid |
+| states | TODO(scout-C2) |
+| purpose | Parts list with search, multi-filter bar, table/card-grid toggle, and ghost rows for entity-less workflow drafts |
+
+`PartsComponent` list-level sub-surfaces (all states: TODO(scout-C2)):
+
+| sub-surface | type | file:line | purpose |
+|-------------|------|-----------|---------|
+| Parts table | table | `partColumns` `:182` — partNumber, name, revision, procurementSource, inventoryClass, status, effectivePrice, bomEntryCount, completeness (hidden by default) | Primary list view; `combinedRows` computed `:94` prepends ghost rows for in-flight workflow drafts |
+| Card grid | panel | `PartsCardGridComponent` (import `:37`); toggled via `viewMode` `:134` | Alternate card layout; view mode persisted via `UserPreferencesService` |
+| Search control | state | `searchControl` FormControl `:142`; debounced via `searchTerm` signal `:151` | Free-text search against part number / name / description |
+| Status filter | state | `statusFilterControl` `:145` — Active (default) / Draft / Prototype / Obsolete / all | Defaults to Active; user opts into Draft explicitly to see in-flight workflow drafts |
+| Procurement filter | state | `procurementFilterControl` `:148` — Make / Buy / Subcontract / Phantom / all | Filter by procurement axis |
+| Inventory class filter | state | `inventoryClassFilterControl` `:149` — Raw / Component / Subassembly / FinishedGood / Consumable / Tool / all | Filter by inventory class axis |
+| New part fork | action | `NewPartForkDialogComponent` (import `:42`); opened via MatDialog | Fork: express vs. guided workflow vs. source-from-part |
+| Part detail dialog | action | `PartDetailDialogComponent` (import `:39`); `DetailDialogService` `:38` | Row click on materialized part opens detail dialog |
 
 ---
 
@@ -799,7 +848,7 @@ Tabs within CustomerDetailComponent — pre-located with file:line (states: TODO
 | route | `/parts/new` · `/parts/:id` |
 | file | `features/parts/workflow/part-workflow-page/part-workflow-page.component.ts:28` |
 | renders-for | Admin, Manager, Engineer, PM |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Multi-step workflow shell for creating or editing a part |
 
 ---
@@ -892,6 +941,8 @@ All mounted in `PartDetailPanelComponent` and/or `PartWorkflowPageComponent`; re
 | `VendorPartFormDialogComponent` | `features/parts/components/vendor-parts-cluster/vendor-part-form-dialog.component.ts` | dialog | Add/edit vendor-part record |
 | `VendorPartPriceTiersDialogComponent` | `features/parts/components/vendor-parts-cluster/vendor-part-price-tiers-dialog.component.ts` | dialog | Edit vendor price tiers |
 | `VendorPartPriceTierHistoryDialogComponent` | `features/parts/components/vendor-parts-cluster/vendor-part-price-tier-history-dialog.component.ts` | dialog | View vendor price-tier history |
+| `VendorPartListPanelComponent` ⚠️ | `features/parts/components/vendor-parts-cluster/vendor-part-list-panel.component.ts` | panel | ⚠️ _discovered C2b_ — rendered in Vendor detail panel Catalog tab; list of vendor-part records for a given vendor |
+| `VendorPartBulkImportDialogComponent` ⚠️ | `features/parts/components/vendor-parts-cluster/vendor-part-bulk-import-dialog.component.ts` | dialog | ⚠️ _discovered C2b_ — bulk CSV import for a vendor's catalog; 800px MatDialog; `VendorPartBulkImportDialogData { vendorId, vendorName }` |
 
 ---
 
@@ -907,22 +958,22 @@ All mounted in `PartDetailPanelComponent` and/or `PartWorkflowPageComponent`; re
 | route | `/inventory/:tab` (valid tabs: stock · locations · movements · receiving · stockOps · cycleCounts · reservations · replenishment · uom) |
 | file | `features/inventory/inventory.component.ts:46` |
 | renders-for | Admin, Manager, Engineer, OfficeManager |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Tabbed inventory management shell; each tab is an in-component view (no sub-routing) |
 
 Tabs within InventoryComponent (in-component, NOT separate route components):
 
-| tab | purpose |
-|-----|---------|
-| `stock` | On-hand / available / reserved summary per part |
-| `locations` | Storage location list; includes add-location dialog (lines 152-164) |
-| `movements` | Inventory movement history log |
-| `receiving` | Receiving history list + "Receive" dialog (lines 169-183); embeds ReceivingInspectionQueueComponent |
-| `stockOps` | Stock-ops hub: contains "Transfer" dialog (lines 185-198: `showTransferDialog` / `transferForm`) and "Adjust" dialog (lines 200-213: `showAdjustDialog` / `adjustForm`) |
-| `cycleCounts` | Cycle count list and management |
-| `reservations` | Active inventory reservations |
-| `replenishment` | Replenishment / reorder suggestions |
-| `uom` | Unit-of-measure management (embeds UomManagementComponent) |
+| tab | key columns / signals | in-component dialogs | embedded component |
+|-----|-----------------------|---------------------|--------------------|
+| `stock` | partNumber, description, material, onHand, reserved, available (`:82`) | — | — |
+| `locations` | Tree view: Area→Rack→Shelf→Bin; `locationTree` signal `:100`; `selectedLocation` `:100`; `binContents` `:101` | Add-location dialog: `showLocationDialog` `:152`; form `:153` — name, locationType, parentId, barcode, description | — |
+| `movements` | entityName, quantity, fromLocation, toLocation, reason, movedBy, movedAt (`:107`) | — | — |
+| `receiving` | PO #, Part #, qty, receivedBy, location, lotNumber, date (`:120`); `showReceiveDialog` `:170`; form `:172` — poLineId, qty, locationId, lotNumber, notes | Receive dialog: `showReceiveDialog` `:170` | `ReceivingInspectionQueueComponent` |
+| `stockOps` | No dedicated table; hub for transfer + adjust actions | Transfer: `showTransferDialog` `:186`; form `:187` — sourceBinContentId, destinationLocationId, qty, notes; Adjust: `showAdjustDialog` `:201`; form `:202` — binContentId, newQuantity, reason, notes | — |
+| `cycleCounts` | locationName, countedBy, date, status (Pending/Approved/Rejected), lineCount, variance (`:133`); `showCycleCountDialog` `:249`; `showCreateCycleCountDialog` `:253` | Create cycle count: form `:254` — locationId, notes; Detail dialog: `showCycleCountDialog` | — |
+| `reservations` | partNumber, description, locationPath, qty, jobNumber, jobTitle, notes, createdAt (`:220`); `showReservationDialog` `:233` | Reserve: `showReservationDialog` `:233`; form `:234` — partId, binContentId, jobId, qty, notes | — |
+| `replenishment` | Burn rates + suggestions; `loadBurnRates()` / `loadSuggestions()` triggered on tab activate `:292` | — | — |
+| `uom` | UOM definitions list; managed via `UomManagementComponent` | (dialogs within UomManagementComponent) | `UomManagementComponent` |
 
 > **Source note (inventory.component.ts:44,64,71):** The authoritative tab type is
 > `'stock' | 'locations' | 'movements' | 'receiving' | 'stockOps' | 'cycleCounts' | 'reservations' | 'replenishment' | 'uom'` (line 44).
@@ -941,7 +992,7 @@ Tabs within InventoryComponent (in-component, NOT separate route components):
 | route | `/inventory/receiving` (embedded in receiving tab) |
 | file | `features/inventory/components/receiving-inspection-queue/receiving-inspection-queue.component.ts` |
 | renders-for | Admin, Manager, Engineer, OfficeManager |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Queue of inbound items pending inspection before stock entry |
 
 ---
@@ -954,7 +1005,7 @@ Tabs within InventoryComponent (in-component, NOT separate route components):
 | route | `/inventory/uom` (embedded in uom tab) |
 | file | `features/inventory/components/uom-management/uom-management.component.ts` |
 | renders-for | Admin, Manager |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Manage unit-of-measure definitions and conversions |
 
 ---
@@ -971,7 +1022,7 @@ Tabs within InventoryComponent (in-component, NOT separate route components):
 | route | `/lots` |
 | file | `features/lots/lots.component.ts:19` |
 | renders-for | Admin, Manager, Engineer |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Lot list with search and row actions |
 
 ---
@@ -982,10 +1033,19 @@ Tabs within InventoryComponent (in-component, NOT separate route components):
 | component | `LotDetailPanelComponent` |
 | type | panel |
 | route | `/lots` (slide-in) |
-| file | `features/lots/components/lot-detail-panel/lot-detail-panel.component.ts` |
+| file | `features/lots/components/lot-detail-panel/lot-detail-panel.component.ts:13` |
 | renders-for | Admin, Manager, Engineer |
-| states | _queue_ |
-| purpose | Right-side detail panel for selected lot |
+| states | TODO(scout-C2) |
+| purpose | Right-side detail panel for selected lot; displays trace provenance + activity feed |
+
+`LotDetailPanelComponent` sub-surfaces (all states: TODO(scout-C2)):
+
+| sub-surface | type | file:line | purpose |
+|-------------|------|-----------|---------|
+| Lot trace timeline | state | `trace` signal `:29` (LotTrace model); `getTraceEventIcon()` `:44` | Chronological provenance events — Job / ProductionRun / PurchaseOrder / BinLocation / QcInspection; icon per event type |
+| Activity feed | shared-cmp | `EntityActivitySectionComponent` (import `:16`) | Lot-level change/activity log |
+
+> No forms or dialogs in this panel; it is read-only (trace + activity only).
 
 ---
 
@@ -995,9 +1055,9 @@ Tabs within InventoryComponent (in-component, NOT separate route components):
 | component | `LotDetailDialogComponent` |
 | type | dialog |
 | route | `/lots` (modal) |
-| file | `features/lots/components/lot-detail-dialog/lot-detail-dialog.component.ts` |
+| file | `features/lots/components/lot-detail-dialog/lot-detail-dialog.component.ts:12` |
 | renders-for | Admin, Manager, Engineer |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Full lot detail dialog |
 
 ---
@@ -1008,9 +1068,9 @@ Tabs within InventoryComponent (in-component, NOT separate route components):
 | component | `LotDialogComponent` |
 | type | dialog |
 | route | `/lots` (modal) |
-| file | `features/lots/components/lot-dialog/lot-dialog.component.ts` |
+| file | `features/lots/components/lot-dialog/lot-dialog.component.ts:21` |
 | renders-for | Admin, Manager, Engineer |
-| states | _queue_ |
+| states | TODO(scout-C2) |
 | purpose | Create / edit lot form dialog |
 
 ---
@@ -1253,7 +1313,7 @@ Tabs within InventoryComponent (in-component, NOT separate route components):
 
 ---
 
-_Cycle 1: seed. Cycle 2: shared-cmp reconciliation complete (18 items resolved). Queue drained next cycle after scout delivers `master-data-queue.md`._
+_Cycle 1: seed. Cycle 2: shared-cmp reconciliation complete (18 items resolved). Cycle 2b: all pre-source-location complete — leads/vendors/lots/inventory/parts list panels pre-located with full file:line + sub-surface tables. Two new vendor-parts-cluster components discovered and added to checklist. States transcription (C3) blocked on scout queue delivery._
 
 ---
 
