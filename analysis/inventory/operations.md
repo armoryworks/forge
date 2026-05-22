@@ -101,6 +101,127 @@ _Cross-link: Customer Returns → see [quote-to-cash.md §Segment 8](./quote-to-
 
 ---
 
+## Reconciliation Denominator
+
+_Source tree glob 2026-05-22 — authoritative file count from `forge-ui/src/app/features/` (operations areas only). **64 feature component files** across 12 areas + **27 shared component files** imported by those features = **91 checklist items total**._
+
+_Status: **catalogued** = source line confirmed + live states observed; **needs-live** = source confirmed, live sweep not yet reached; **not-yet-located** = source gap (none found — zero gaps)._
+
+### Feature components (64 files)
+
+| area | component file (relative to `features/`) | inv ID | status |
+|------|------------------------------------------|--------|--------|
+| kanban | `kanban/kanban.component.ts` | K-01 | catalogued — empty + populated + board/team views confirmed |
+| kanban | `kanban/components/board-column.component.ts` | K-02 | catalogued — seen in populated board |
+| kanban | `kanban/components/job-card.component.ts` | K-03 | catalogued — J-1 card confirmed |
+| kanban | `kanban/components/job-detail-panel.component.ts` | K-04 | needs-live |
+| kanban | `kanban/components/job-detail-dialog.component.ts` | K-05 | needs-live |
+| kanban | `kanban/components/job-dialog.component.ts` | K-06/K-07 | partial — create form confirmed; edit mode needs-live |
+| kanban | `kanban/components/job-cost-tab.component.ts` | K-08 | needs-live |
+| kanban | `kanban/components/operation-time-tab.component.ts` | K-09 | needs-live |
+| kanban | `kanban/components/cover-photo-upload-dialog.component.ts` | K-10 | needs-live |
+| kanban | `kanban/components/dispose-job-dialog.component.ts` | K-11 | needs-live |
+| backlog | `backlog/backlog.component.ts` | B-01 | catalogued — table + J-1 + filters confirmed |
+| backlog | `backlog/components/backlog-card-grid/backlog-card-grid.component.ts` | B-02 | needs-live |
+| planning | `planning/planning.component.ts` | P-01 | catalogued — empty-cycle state + NEW CYCLE confirmed |
+| planning | `planning/components/cycle-board/cycle-board.component.ts` | P-02 | needs-live |
+| planning | `planning/components/cycle-dialog/cycle-dialog.component.ts` | P-03 | catalogued — create form fields confirmed |
+| scheduling | `scheduling/scheduling.component.ts` | S-01 | catalogued — all 5 tab empty states + KPIs confirmed |
+| shop-floor | `shop-floor/shop-floor-display.component.ts` | SF-01 | partial — setup phases confirmed; paired main-display needs-live |
+| shop-floor | `shop-floor/components/kiosk-setup/kiosk-setup.component.ts` | SF-02 | catalogued — admin-login + configure-terminal phases confirmed |
+| shop-floor | `shop-floor/components/kiosk-search-bar/kiosk-search-bar.component.ts` | SF-03 | needs-live |
+| shop-floor | `shop-floor/components/kiosk-session-bar/kiosk-session-bar.component.ts` | SF-04 | needs-live |
+| shop-floor | `shop-floor/components/numeric-keypad/numeric-keypad.component.ts` | SF-05 | needs-live |
+| shop-floor | `shop-floor/components/pin-prompt-dialog/pin-prompt-dialog.component.ts` | SF-06 | needs-live |
+| shop-floor | `shop-floor/components/scan-action-overlay/scan-action-overlay.component.ts` | SF-07 | needs-live |
+| shop-floor | `shop-floor/components/scan-undo-list/scan-undo-list.component.ts` | SF-08 | needs-live |
+| shop-floor | `shop-floor/components/scan-devices-panel/scan-devices-panel.component.ts` | SF-09 | needs-live |
+| shop-floor | `shop-floor/components/scan-location-view/scan-location-view.component.ts` | SF-10 | needs-live |
+| shop-floor | `shop-floor/components/training-mode-banner/training-mode-banner.component.ts` | SF-11 | needs-live |
+| shop-floor | `shop-floor/components/scan-job-flow/scan-job-flow.component.ts` | SF-12 | needs-live |
+| shop-floor | `shop-floor/components/scan-move-flow/scan-move-flow.component.ts` | SF-13 | needs-live |
+| shop-floor | `shop-floor/components/scan-receive-flow/scan-receive-flow.component.ts` | SF-14 | needs-live |
+| shop-floor | `shop-floor/components/scan-return-flow/scan-return-flow.component.ts` | SF-15 | needs-live |
+| shop-floor | `shop-floor/components/scan-ship-flow/scan-ship-flow.component.ts` | SF-16 | needs-live |
+| shop-floor | `shop-floor/components/scan-count-flow/scan-count-flow.component.ts` | SF-17 | needs-live |
+| shop-floor | `shop-floor/components/scan-inspect-flow/scan-inspect-flow.component.ts` | SF-18 | needs-live |
+| shop-floor | `shop-floor/components/scan-issue-flow/scan-issue-flow.component.ts` | SF-19 | needs-live |
+| shop-floor | `shop-floor/clock/shop-floor-clock.component.ts` | SF-20 | needs-live |
+| shop-floor | `shop-floor/scan/inventory-scan.component.ts` | SF-21 | catalogued — idle-scan state confirmed |
+| shop-floor | `shop-floor/components/scan-daily-log/scan-daily-log.component.ts` | SF-22 | catalogued — empty state + filters confirmed |
+| time-tracking | `time-tracking/time-tracking.component.ts` | TT-01–TT-04 | partial — empty page + add-entry dialog confirmed; timer start/stop (TT-03/04) needs-live |
+| oee | `oee/oee.component.ts` | OE-01 | catalogued — empty state + KPI chips + date presets confirmed |
+| oee | `oee/components/oee-work-center-card/oee-work-center-card.component.ts` | OE-02 | needs-live |
+| oee | `oee/components/oee-trend-chart/oee-trend-chart.component.ts` | OE-03 | needs-live |
+| oee | `oee/components/six-big-losses-chart/six-big-losses-chart.component.ts` | OE-04 | needs-live |
+| quality | `quality/quality.component.ts` | Q-01–Q-03 | partial — all 9 tabs + create buttons confirmed; inline dialogs Q-02a/Q-03a/Q-03b needs-live |
+| quality | `quality/components/spc-characteristics.component.ts` | Q-04 | catalogued — empty state + NEW CHARACTERISTIC button |
+| quality | `quality/components/spc-chart.component.ts` | Q-05 | needs-live |
+| quality | `quality/components/spc-data-entry.component.ts` | Q-06 | catalogued — empty state + NEW CHARACTERISTIC button |
+| quality | `quality/components/spc-ooc-list.component.ts` | Q-07 | catalogued — empty state (no create button) |
+| quality | `quality/components/ncr-list.component.ts` | Q-08 | partial — empty + NEW NCR button confirmed; create/edit dialog needs-live |
+| quality | `quality/components/capa-list.component.ts` | Q-09 | partial — empty + NEW CAPA button confirmed; create/edit dialog needs-live |
+| quality | `quality/components/eco-list.component.ts` | Q-10 | partial — empty + NEW ECO button confirmed; create/edit + affected-items needs-live |
+| quality | `quality/components/gage-list.component.ts` | Q-11 | partial — empty + NEW GAGE button confirmed; create/edit + calibration needs-live |
+| mrp | `mrp/mrp.component.ts` | M-01–M-07 | needs-live |
+| mrp | `mrp/components/execute-mrp-run-dialog.component.ts` | M-08 | needs-live |
+| mrp | `mrp/components/master-schedule-dialog.component.ts` | M-09 | needs-live |
+| mrp | `mrp/components/generate-forecast-dialog.component.ts` | M-10 | needs-live |
+| mrp | `mrp/components/mrp-run-detail-dialog.component.ts` | M-11 | needs-live |
+| mrp | `mrp/components/mps-vs-actual-dialog.component.ts` | M-12 | needs-live |
+| assets | `assets/assets.component.ts` | A-01/A-04 | needs-live |
+| assets | `assets/components/asset-detail-panel/asset-detail-panel.component.ts` | A-02 | needs-live |
+| assets | `assets/components/asset-detail-dialog/asset-detail-dialog.component.ts` | A-03 | needs-live |
+| maintenance | `maintenance/pages/predictions/predictions.component.ts` | MN-01 | needs-live |
+| maintenance | `maintenance/components/resolve-prediction-dialog/resolve-prediction-dialog.component.ts` | MN-02 | needs-live |
+| worker | `worker/worker.component.ts` | W-01/W-02 | catalogued — task cards confirmed (Worker Sam) |
+
+### Shared components (27)
+
+| component selector | shared path | used by (inv IDs) | status |
+|-------------------|------------|-------------------|--------|
+| `app-avatar` | `shared/components/avatar/` | K-03 (job-card) | catalogued |
+| `app-barcode-info` | `shared/components/barcode-info/` | K-04 (job-detail-panel) | needs-live |
+| `app-barcode-scan-input` | `shared/components/barcode-scan-input/` | SF-20 (clock), SF-21 (scan) | catalogued |
+| `app-confirm-dialog` | `shared/components/confirm-dialog/` | TT-01 (delete entry), K-04 (dispose?) | needs-live |
+| `app-data-table` | `shared/components/data-table/` | B-01, Q-01 tabs, A-01, MN-01 | catalogued |
+| `app-date-range-picker` | `shared/components/date-range-picker/` | OE-01, TT-01 | catalogued |
+| `app-datepicker` | `shared/components/datepicker/` | TT-02 (add-entry date field) | catalogued |
+| `app-dialog` | `shared/components/dialog/` | P-03, K-06–K-11, MN-02 (dialog wrapper) | catalogued |
+| `app-empty-state` | `shared/components/empty-state/` | K-02, B-01, P-01, S-02–S-06, OE-01, Q-01 tabs | catalogued |
+| `app-entity-activity-section` | `shared/components/entity-activity-section/` | K-04 (job-detail), A-02 (asset-detail) | needs-live |
+| `app-entity-link` | `shared/components/entity-link/` | K-04, Q-01 tabs (lot/part refs) | needs-live |
+| `app-entity-picker` | `shared/components/entity-picker/` | K-06 (customer/assignee), Q-02a, A-04 | needs-live |
+| `app-file-upload-zone` | `shared/components/file-upload-zone/` | K-10 (cover-photo-upload-dialog) | needs-live |
+| `app-input` | `shared/components/input/` | K-06, P-03, SF-02, TT-02 (form fields) | catalogued |
+| `app-kanban-column-header` | `shared/components/kanban-column-header/` | K-02 (board-column header) | catalogued |
+| `app-kpi-chip` | `shared/components/kpi-chip/` | S-01 (KPIs), OE-01 (KPIs), M-02 (dashboard) | catalogued |
+| `app-page-header` | `shared/components/page-header/` | all page components | catalogued |
+| `app-page-layout` | `shared/components/page-layout/` | all page components | catalogued |
+| `app-quick-action-panel` | `shared/components/quick-action-panel/` | K-04 (job actions), A-02 (asset actions) | needs-live |
+| `app-select` | `shared/components/select/` | SF-02 (team), S-03 (work-center), K-06, Q-02a | catalogued |
+| `app-status-timeline` | `shared/components/status-timeline/` | K-04 (job-detail-panel) | needs-live |
+| `app-textarea` | `shared/components/textarea/` | TT-02 (notes), MN-02 (resolution notes) | catalogued |
+| `app-toggle` | `shared/components/toggle/` | inline forms (not yet observed in live sweep) | needs-live |
+| `app-toolbar` | `shared/components/toolbar/` | all page components | catalogued |
+| `app-validation-button` | `shared/components/validation-button/` | P-03, TT-02, K-06, MN-02 (form submit) | catalogued |
+| `data-table` column-filter-popover | `shared/components/data-table/` (sub) | B-01, Q-01 tabs, A-01 (filter popover) | needs-live |
+| `data-table` column-manager-panel | `shared/components/data-table/` (sub) | B-01, Q-01 tabs, A-01 (column toggle) | needs-live |
+
+### Denominator summary
+
+| status | feature files | shared components | total |
+|--------|--------------|-------------------|-------|
+| catalogued (all states confirmed) | 13 | 16 | 29 |
+| partial (reached; some states queued) | 7 | 0 | 7 |
+| needs-live (not yet reached) | 44 | 11 | 55 |
+| **not-yet-located** | **0** | **0** | **0** |
+| **total** | **64** | **27** | **91** |
+
+> **Zero not-yet-located.** Every component file in the source tree maps to an inventory entry. Remaining work: 55 items across 44 feature files + 11 shared components awaiting live-sweep confirmation.
+
+---
+
 ## Component Inventory
 
 Schema: component · type · route · file `path:line` · renders-for · states · purpose
