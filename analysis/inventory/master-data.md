@@ -3,7 +3,7 @@
 > **Phase:** master-data · **Method:** observe-and-record (no code changes)
 > **Single writer:** source-cataloger owns this file. Scout writes queue only.
 > **Source on disk:** HEAD e9b7802 (running binary main-c7e76cf — flag any live/source mismatch)
-> **Last commit:** _shared-cmp-reconciliation_
+> **Last commit:** _C2-source-prelocation_
 
 ---
 
@@ -193,20 +193,20 @@
 - [x] ✅ `shared/components/data-table` — 18 usage sites across all 6 areas
 - [x] ✅ `shared/components/page-header` — 13 usage sites across all 6 areas
 - [x] ✅ `shared/components/page-layout` — 3 usage sites (leads/samples, leads/accounts, customers/portal-access)
-- [x] ❌ `shared/components/detail-side-panel` — no master-data usage; panels are feature-specific components
-- [x] ❌ `shared/components/slideout` — no master-data usage confirmed
+- [x] ❌ `shared/components/detail-side-panel` — **deliberately unused** in master-data; panels (leads, vendors, lots) are feature-specific components, not wrappers of this shared cmp
+- [x] ❌ `shared/components/slideout` — **deliberately unused** in master-data; used in other regions (sales-orders, kanban)
 - [x] ✅ `shared/components/dialog` — 8+ usage sites across leads, customers, parts, inventory
 - [x] ✅ `shared/components/entity-picker` — 16 usage sites; heaviest in parts workflow
 - [x] ✅ `shared/components/empty-state` — 9 usage sites across customers, vendors, leads, inventory, lots
-- [x] ✅ `shared/components/loading-overlay` (impl: `LoadingBlockDirective`) — 20+ sites across all 6 areas
-- [x] ❌ `shared/components/status-badge` — no master-data usage (only dashboard/kanban)
+- [x] ✅ `shared/components/loading-overlay` (impl: `LoadingBlockDirective` from `shared/directives/`) — 20+ sites across all 6 areas; `LoadingOverlayComponent` itself is not used in master-data
+- [x] ❌ `shared/components/status-badge` — **deliberately unused** in master-data list surfaces; row status is rendered via text/CSS class, not via this shared badge
 - [x] ✅ `shared/components/entity-link` — 2 usage sites (parts/part-landed-cost, parts/part-detail-panel)
 - [x] ✅ `shared/components/entity-activity-section` — 5 usage sites (leads, customers, vendors, parts, lots)
 - [x] ✅ `shared/components/workflow` — 1 usage site (parts/part-workflow-page)
 - [x] ✅ `shared/components/address-form` — 4 usage sites (leads/convert, customers/guided, vendors/dialog, vendors/guided)
 - [x] ✅ `shared/components/file-upload-zone` — 2 usage sites (parts/operation-dialog, parts/part-files-cluster)
-- [x] ❌ `shared/components/rich-text-editor` — no master-data usage confirmed
-- [x] ❌ `shared/components/autocomplete` — no master-data usage (used in quotes/POs/shipments/SOs only)
+- [x] ❌ `shared/components/rich-text-editor` — **deliberately unused** in master-data; no long-form rich text fields in these entities
+- [x] ❌ `shared/components/autocomplete` — **deliberately unused** in master-data features; used in SO/PO/quote/shipment dialogs only
 - [x] ✅ `shared/components/entity-completeness-badge` + `entity-completeness-chip` — 6 usage sites (customers, vendors, parts list + detail panels)
 
 ---
@@ -484,23 +484,92 @@
 | states | _queue_ |
 | purpose | Multi-tab customer detail shell; tab layout driven by resolver (role + status) |
 
-Tabs within CustomerDetailComponent (each is a separate component):
+Tabs within CustomerDetailComponent — pre-located with file:line (states: TODO(scout-C2)):
 
-| tab id | component | file |
-|--------|-----------|------|
-| overview | `CustomerOverviewTabComponent` | `pages/customer-detail/tabs/customer-overview-tab.component.ts` |
-| contacts | _(cluster-based — CustomerContactsClusterComponent)_ | `components/customer-clusters/customer-contacts-cluster.component.ts` |
-| addresses | _(cluster-based — CustomerAddressesClusterComponent)_ | `components/customer-clusters/customer-addresses-cluster.component.ts` |
-| estimates | `CustomerEstimatesTabComponent` | `pages/customer-detail/tabs/customer-estimates-tab.component.ts` |
-| quotes | `CustomerQuotesTabComponent` | `pages/customer-detail/tabs/customer-quotes-tab.component.ts` |
-| orders | `CustomerOrdersTabComponent` | `pages/customer-detail/tabs/customer-orders-tab.component.ts` |
-| jobs | `CustomerJobsTabComponent` | `pages/customer-detail/tabs/customer-jobs-tab.component.ts` |
-| invoices | `CustomerInvoicesTabComponent` | `pages/customer-detail/tabs/customer-invoices-tab.component.ts` |
-| pricing | `CustomerPricingTabComponent` | `pages/customer-detail/tabs/customer-pricing-tab.component.ts` |
-| interactions | _(cluster-based — CustomerInteractionsClusterComponent)_ | `components/customer-clusters/customer-interactions-cluster.component.ts` |
-| activity | `CustomerActivityTabComponent` + `CustomerActivityClusterComponent` | `tabs/customer-activity-tab.component.ts` + `components/customer-clusters/customer-activity-cluster.component.ts` |
+| tab id | component | file:line (@Component) | capability gate | lifecycle gate |
+|--------|-----------|------------------------|-----------------|----------------|
+| `overview` | `CustomerOverviewTabComponent` | `pages/customer-detail/tabs/customer-overview-tab.component.ts:21` | none | all |
+| `contacts` | `CustomerContactsClusterComponent` _(cluster, no tab cmp)_ | `components/customer-clusters/customer-contacts-cluster.component.ts:36` | `CAP-MD-CUSTOMER-CONTACTS` | all |
+| `addresses` | `CustomerAddressesClusterComponent` _(cluster, no tab cmp)_ | `components/customer-clusters/customer-addresses-cluster.component.ts:35` | `CAP-MD-CUSTOMER-ADDRESSES` | all |
+| `estimates` | `CustomerEstimatesTabComponent` | `pages/customer-detail/tabs/customer-estimates-tab.component.ts:34` | none | Active + Prospect |
+| `quotes` | `CustomerQuotesTabComponent` | `pages/customer-detail/tabs/customer-quotes-tab.component.ts:23` | none | Active + Prospect |
+| `orders` | `CustomerOrdersTabComponent` | `pages/customer-detail/tabs/customer-orders-tab.component.ts:23` | none | Active only |
+| `jobs` | `CustomerJobsTabComponent` | `pages/customer-detail/tabs/customer-jobs-tab.component.ts:24` | none | Active only |
+| `invoices` | `CustomerInvoicesTabComponent` | `pages/customer-detail/tabs/customer-invoices-tab.component.ts:24` | none | Active only |
+| `pricing` | `CustomerPricingTabComponent` | `pages/customer-detail/tabs/customer-pricing-tab.component.ts:40` | none | all |
+| `interactions` | `CustomerInteractionsClusterComponent` _(cluster, no tab cmp)_ | `components/customer-clusters/customer-interactions-cluster.component.ts:37` | `CAP-MD-CUSTOMER-INTERACTIONS` | all |
+| `activity` | `CustomerActivityTabComponent` + `CustomerActivityClusterComponent` | `tabs/customer-activity-tab.component.ts:8` + `components/customer-clusters/customer-activity-cluster.component.ts:10` | none | all |
 
-> NOTE: contacts/addresses/interactions are rendered as cluster components, not standalone tab components. The resolver gates tabs by customer status (Active gets all; Prospect omits orders/jobs/invoices).
+> Source (customer-detail.component.ts:90-94): `contacts`, `addresses`, `interactions` are capability-gated at the tab level via `tabCapabilityMap`; the backing caps must be enabled or the tab is dropped from the layout. Lifecycle gating (Active/Prospect/etc.) is resolved by `CustomerDetailLayoutResolverService.resolve()` (line 119). `contacts`, `addresses`, `interactions` have no standalone `*-tab.component.ts` — the clusters are mounted directly in the shell template.
+
+---
+
+#### Pre-located customer cluster entries (states: TODO(scout-C2))
+
+---
+
+##### CustomerIdentityClusterComponent
+| field | value |
+|-------|-------|
+| component | `CustomerIdentityClusterComponent` / `app-customer-identity-cluster` |
+| type | cluster |
+| route | `/customers/:id/overview` (mounted in overview tab) |
+| file | `features/customers/components/customer-clusters/customer-identity-cluster.component.ts:21` |
+| renders-for | Admin, Manager, PM, OfficeManager |
+| states | TODO(scout-C2) |
+| purpose | Editable identity cluster: name, status, credit limit, account type; emits patch to CustomerDetailComponent |
+
+---
+
+##### CustomerContactsClusterComponent
+| field | value |
+|-------|-------|
+| component | `CustomerContactsClusterComponent` / `app-customer-contacts-cluster` |
+| type | cluster |
+| route | `/customers/:id/contacts` (cluster-mounted as tab; gated by `CAP-MD-CUSTOMER-CONTACTS`) |
+| file | `features/customers/components/customer-clusters/customer-contacts-cluster.component.ts:36` |
+| renders-for | Admin, Manager, PM, OfficeManager — when `CAP-MD-CUSTOMER-CONTACTS` enabled |
+| states | TODO(scout-C2) |
+| purpose | Contact list for the customer; add/edit contacts inline |
+
+---
+
+##### CustomerAddressesClusterComponent
+| field | value |
+|-------|-------|
+| component | `CustomerAddressesClusterComponent` / `app-customer-addresses-cluster` |
+| type | cluster |
+| route | `/customers/:id/addresses` (cluster-mounted as tab; gated by `CAP-MD-CUSTOMER-ADDRESSES`) |
+| file | `features/customers/components/customer-clusters/customer-addresses-cluster.component.ts:35` |
+| renders-for | Admin, Manager, PM, OfficeManager — when `CAP-MD-CUSTOMER-ADDRESSES` enabled |
+| states | TODO(scout-C2) |
+| purpose | Shipping / billing address list; add/edit addresses via AddressFormComponent |
+
+---
+
+##### CustomerInteractionsClusterComponent
+| field | value |
+|-------|-------|
+| component | `CustomerInteractionsClusterComponent` / `app-customer-interactions-cluster` |
+| type | cluster |
+| route | `/customers/:id/interactions` (cluster-mounted as tab; gated by `CAP-MD-CUSTOMER-INTERACTIONS`) |
+| file | `features/customers/components/customer-clusters/customer-interactions-cluster.component.ts:37` |
+| renders-for | Admin, Manager, PM, OfficeManager — when `CAP-MD-CUSTOMER-INTERACTIONS` enabled |
+| states | TODO(scout-C2) |
+| purpose | Call log / interaction history feed; log new interactions inline |
+
+---
+
+##### CustomerActivityClusterComponent
+| field | value |
+|-------|-------|
+| component | `CustomerActivityClusterComponent` / `app-customer-activity-cluster` |
+| type | cluster |
+| route | `/customers/:id/activity` (embedded inside CustomerActivityTabComponent) |
+| file | `features/customers/components/customer-clusters/customer-activity-cluster.component.ts:10` |
+| renders-for | Admin, Manager, PM, OfficeManager |
+| states | TODO(scout-C2) |
+| purpose | Wraps shared `EntityActivitySectionComponent`; renders the full change/activity feed for the customer |
 
 ---
 
@@ -737,53 +806,72 @@ Tabs within CustomerDetailComponent (each is a separate component):
 
 #### Workflow step components (all embedded in PartWorkflowPageComponent)
 
-| component | file | purpose |
-|-----------|------|---------|
+| component | file:line | purpose |
+|-----------|-----------|---------|
 | `NewPartForkDialogComponent` | `workflow/new-part-fork-dialog/new-part-fork-dialog.component.ts` | Fork: express vs. full vs. source-from-part |
 | `PartExpressFormComponent` | `workflow/part-express-form/part-express-form.component.ts` | Quick single-form part creation |
 | `PartBasicsStepComponent` | `workflow/part-basics-step/part-basics-step.component.ts` | Step 1: part number, description, type |
 | `PartFlagsStepComponent` | `workflow/part-flags-step/part-flags-step.component.ts` | Step 2: purchased/manufactured/phantom flags |
 | `PartCostingStepComponent` | `workflow/part-costing-step/part-costing-step.component.ts` | Step 3: standard cost, landed cost |
-| `PartBomStepComponent` | `workflow/part-bom-step/part-bom-step.component.ts` | Step 4: BOM assembly (embeds BomTreeComponent) |
-| `PartRoutingStepComponent` | `workflow/part-routing-step/part-routing-step.component.ts` | Step 5: manufacturing routing |
-| `PartSourcingStepComponent` | `workflow/part-sourcing-step/part-sourcing-step.component.ts` | Step 6: vendor sourcing |
-| `PartQualityStepComponent` | `workflow/part-quality-step/part-quality-step.component.ts` | Step 7: quality settings |
-| `PartAlternatesStepComponent` | `workflow/part-alternates-step/part-alternates-step.component.ts` | Step 8: alternate parts |
-| `PartSalesHooksStepComponent` | `workflow/part-sales-hooks-step/part-sales-hooks-step.component.ts` | Step 9: sales/pricing hooks |
-| `PartShippingStepComponent` | `workflow/part-shipping-step/part-shipping-step.component.ts` | Step 10: shipping / UOM settings |
+| `PartBomStepComponent` | `workflow/part-bom-step/part-bom-step.component.ts:51` | BOM composition: table of child parts + in-component add/delete dialogs (see expanded entry below) |
+| `PartRoutingStepComponent` | `workflow/part-routing-step/part-routing-step.component.ts` | Manufacturing routing |
+| `PartSourcingStepComponent` | `workflow/part-sourcing-step/part-sourcing-step.component.ts` | Vendor sourcing |
+| `PartQualityStepComponent` | `workflow/part-quality-step/part-quality-step.component.ts` | Quality settings |
+| `PartAlternatesStepComponent` | `workflow/part-alternates-step/part-alternates-step.component.ts` | Alternate parts |
+| `PartSalesHooksStepComponent` | `workflow/part-sales-hooks-step/part-sales-hooks-step.component.ts` | Sales/pricing hooks |
+| `PartShippingStepComponent` | `workflow/part-shipping-step/part-shipping-step.component.ts` | Shipping / UOM settings |
 | `PartSourcePartStepComponent` | `workflow/part-source-part-step/part-source-part-step.component.ts` | Fork path: clone from existing part |
 | `PartToolAssetStepComponent` | `workflow/part-tool-asset-step/part-tool-asset-step.component.ts` | Tool/asset-type part setup |
+| `PartVendorStepComponent` ⚠️ | `workflow/part-vendor-step/part-vendor-step.component.ts` | _Discovered via grep C1.5 — not in original list; needs entry_ |
+| `PartInventoryStepComponent` ⚠️ | `workflow/part-inventory-step/part-inventory-step.component.ts` | _Discovered via grep C1.5 — not in original list; needs entry_ |
 
-> All workflow steps: renders-for Admin/Manager/Engineer/PM; states _queue_.
+> All workflow steps: renders-for Admin/Manager/Engineer/PM; states TODO(scout-C2).
 
 ---
 
-#### BOM sub-components (embedded in PartBomStepComponent / parts detail)
+#### BOM step — expanded pre-located entry (states: TODO(scout-C2))
 
-| component | file | purpose |
-|-----------|------|---------|
-| `BomTreeComponent` | `features/parts/components/bom-tree/bom-tree.component.ts` | Visual BOM hierarchy tree |
+`PartBomStepComponent` (`workflow/part-bom-step/part-bom-step.component.ts:51`) sub-surfaces:
+
+| sub-surface | type | file:line | purpose |
+|-------------|------|-----------|---------|
+| BOM entries table | table | `:91` (`bomColumns` def) | DataTable — child part number, qty, source type, lead time, ref designator, delete action |
+| Add BOM entry dialog | dialog | `showAddDialog` signal `:81`; `openAdd()` `:160` | In-component `DialogComponent`; fields: childPartId (EntityPicker), quantity, sourceType (auto), referenceDesignator, leadTimeDays, notes |
+| Child part EntityPicker | shared-cmp | `@ViewChild('childPartPicker')` `:72` | Selects child part; on change auto-derives `sourceType` from child's `procurementSource` (Make/Subcontract/Phantom → Make; Buy → Buy) |
+| Auto-source label | state | `autoSourceLabel` computed `:119` | Read-only display line showing auto-derived source type; null until part picked |
+| Quick-create child part | action | `onCreateChildPart()` `:211`; opens `PartQuickCreateDialogComponent` `:212` | Inline part creation if child not yet registered; pre-fills with typed term |
+| Delete BOM entry | action | `deleteEntry()` `:222`; opens `ConfirmDialogComponent` `:225` | Deletes a BOM row; requires confirmation |
+
+BOM visualization components (mounted in part detail panel, not the workflow step):
+
+| component | file:line | purpose |
+|-----------|-----------|---------|
+| `BomTreeComponent` / `app-bom-tree` | `features/parts/components/bom-tree/bom-tree.component.ts:9` | Visual BOM hierarchy tree |
 | `BomRevisionHistoryComponent` | `features/parts/components/bom-revision-history/bom-revision-history.component.ts` | BOM revision change history |
 
 ---
 
-#### Part cluster components (embedded in part detail)
+#### Part cluster components — pre-located (states: TODO(scout-C2))
 
-| component | file | purpose |
-|-----------|------|---------|
-| `PartIdentityClusterComponent` | `features/parts/components/part-clusters/part-identity-cluster.component.ts` | Part number, description, type identity |
-| `PartCostClusterComponent` | `features/parts/components/part-clusters/part-cost-cluster.component.ts` | Cost / pricing data |
-| `PartInventoryClusterComponent` | `features/parts/components/part-clusters/part-inventory-cluster.component.ts` | Stock levels, on-hand |
-| `PartFilesClusterComponent` | `features/parts/components/part-clusters/part-files-cluster.component.ts` | Attachments / drawings |
-| `PartActivityClusterComponent` | `features/parts/components/part-clusters/part-activity-cluster.component.ts` | Change / activity feed |
-| `PartAlternatesClusterComponent` | `features/parts/components/part-clusters/part-alternates-cluster/part-alternates-cluster.component.ts` | Alternate part substitutions |
-| `PartLandedCostComponent` | `features/parts/components/part-clusters/part-landed-cost.component.ts` | Landed cost breakdown |
-| `PartMaterialClusterComponent` | `features/parts/components/part-clusters/part-material-cluster/part-material-cluster.component.ts` | Raw material spec |
-| `PartMrpClusterComponent` | `features/parts/components/part-clusters/part-mrp-cluster/part-mrp-cluster.component.ts` | MRP planning parameters |
-| `PartPricingClusterComponent` | `features/parts/components/part-clusters/part-pricing-cluster/part-pricing-cluster.component.ts` | Sales pricing tiers |
-| `PartQualityClusterComponent` | `features/parts/components/part-clusters/part-quality-cluster/part-quality-cluster.component.ts` | Quality control settings |
-| `PartRoutingClusterComponent` | `features/parts/components/part-clusters/part-routing-cluster/part-routing-cluster.component.ts` | Manufacturing routing steps |
-| `PartUomClusterComponent` | `features/parts/components/part-clusters/part-uom-cluster/part-uom-cluster.component.ts` | Unit-of-measure conversions |
+All mounted in `PartDetailPanelComponent` and/or `PartWorkflowPageComponent`; renders-for Admin/Manager/Engineer/PM.
+
+| component / selector | file:line (@Component) | purpose |
+|----------------------|------------------------|---------|
+| `PartIdentityClusterComponent` / `app-part-identity-cluster` | `part-clusters/part-identity-cluster.component.ts:24` | Part number, description, procurement source |
+| `PartCostClusterComponent` / `app-part-cost-cluster` | `part-clusters/part-cost-cluster.component.ts:19` | Standard cost, cost roll-up |
+| `PartInventoryClusterComponent` / `app-part-inventory-cluster` | `part-clusters/part-inventory-cluster.component.ts:20` | On-hand, reserved, available quantities |
+| `PartFilesClusterComponent` / `app-part-files-cluster` | `part-clusters/part-files-cluster.component.ts:14` | Drawings / attachments via FileUploadZoneComponent |
+| `PartActivityClusterComponent` / `app-part-activity-cluster` | `part-clusters/part-activity-cluster.component.ts:10` | Wraps EntityActivitySectionComponent for part changes |
+| `PartAlternatesClusterComponent` / `app-part-alternates-cluster` | `part-clusters/part-alternates-cluster/part-alternates-cluster.component.ts:13` | Alternate part substitution list |
+| `PartLandedCostComponent` / `app-part-landed-cost` | `part-clusters/part-landed-cost.component.ts:25` | Landed cost breakdown; uses EntityLinkComponent for PO links |
+| `PartMaterialClusterComponent` / `app-part-material-cluster` | `part-clusters/part-material-cluster/part-material-cluster.component.ts:23` | Raw material spec (alloy, grade, finish) |
+| `PartMrpClusterComponent` / `app-part-mrp-cluster` | `part-clusters/part-mrp-cluster/part-mrp-cluster.component.ts:21` | MRP planning parameters (lead time, order qty, safety stock) |
+| `PartPricingClusterComponent` / `app-part-pricing-cluster` | `part-clusters/part-pricing-cluster/part-pricing-cluster.component.ts:46` | Sales pricing tiers |
+| `PartQualityClusterComponent` / `app-part-quality-cluster` | `part-clusters/part-quality-cluster/part-quality-cluster.component.ts:27` | Quality control settings; EntityPickerComponent for inspection plan |
+| `PartRoutingClusterComponent` / `app-part-routing-cluster` | `part-clusters/part-routing-cluster/part-routing-cluster.component.ts:14` | Manufacturing routing steps list |
+| `PartUomClusterComponent` / `app-part-uom-cluster` | `part-clusters/part-uom-cluster/part-uom-cluster.component.ts:19` | Unit-of-measure conversions |
+
+> All paths above are relative to `features/parts/components/`.
 
 ---
 
@@ -827,14 +915,21 @@ Tabs within InventoryComponent (in-component, NOT separate route components):
 | tab | purpose |
 |-----|---------|
 | `stock` | On-hand / available / reserved summary per part |
-| `locations` | Storage location list |
-| `movements` | Inventory movement history (transfers, adjustments) |
-| `receiving` | Receiving history (embeds ReceivingInspectionQueueComponent) |
-| `stockOps` | Stock adjustments + transfers via embedded forms |
+| `locations` | Storage location list; includes add-location dialog (lines 152-164) |
+| `movements` | Inventory movement history log |
+| `receiving` | Receiving history list + "Receive" dialog (lines 169-183); embeds ReceivingInspectionQueueComponent |
+| `stockOps` | Stock-ops hub: contains "Transfer" dialog (lines 185-198: `showTransferDialog` / `transferForm`) and "Adjust" dialog (lines 200-213: `showAdjustDialog` / `adjustForm`) |
 | `cycleCounts` | Cycle count list and management |
 | `reservations` | Active inventory reservations |
-| `replenishment` | Replenishment / reorder triggers |
+| `replenishment` | Replenishment / reorder suggestions |
 | `uom` | Unit-of-measure management (embeds UomManagementComponent) |
+
+> **Source note (inventory.component.ts:44,64,71):** The authoritative tab type is
+> `'stock' | 'locations' | 'movements' | 'receiving' | 'stockOps' | 'cycleCounts' | 'reservations' | 'replenishment' | 'uom'` (line 44).
+> `VALID_TABS` (line 64) guards the `activeTab` signal; any unrecognised slug — including
+> `transfers` and `adjustments` — falls back to `'stock'` (line 71).
+> `transfers` and `adjustments` are **NOT** tabs. They are in-component dialog forms
+> launched from within the `stockOps` tab. ✅ Source agrees with scout's live observation.
 
 ---
 
