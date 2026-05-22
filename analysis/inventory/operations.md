@@ -37,18 +37,40 @@ _Cross-link: Customer Returns → see [quote-to-cash.md §Segment 8](./quote-to-
 
 | Component | Path | Used by |
 |-----------|------|---------|
-| `app-kanban-column-header` | `shared/components/kanban-column-header/` | kanban board |
-| `app-entity-activity-section` | `shared/components/entity-activity-section/` | job detail panel |
-| `app-status-timeline` | `shared/components/status-timeline/` | job detail panel |
-| `app-barcode-info` | `shared/components/barcode-info/` | job detail panel |
-| TimerHubService | `shared/services/timer-hub.service.ts` | time-tracking |
-| KioskSessionService | `shared/services/kiosk-session.service.ts` | shop-floor display |
-| ClockEventTypeService | `shared/services/clock-event-type.service.ts` | shop-floor clock |
-| ScannerService | `shared/services/scanner.service.ts` | shop-floor, quality |
-| ScanActionService | `shared/services/scan-action.service.ts` | shop-floor scan |
-| WebHidRfidService | `shared/services/web-hid-rfid.service.ts` | shop-floor clock |
-| BoardHubService | `shared/services/board-hub.service.ts` | kanban |
-| `app-barcode-scan-input` | `shared/components/barcode-scan-input/` | shop-floor clock, inventory-scan |
+| `app-avatar` | `shared/components/avatar/` | K-03 (job-card) |
+| `app-barcode-info` | `shared/components/barcode-info/` | K-04 (job-detail-panel) |
+| `app-barcode-scan-input` | `shared/components/barcode-scan-input/` | SF-20 (clock), SF-21 (inventory-scan) |
+| `app-confirm-dialog` | `shared/components/confirm-dialog/` | TT-01 (delete entry), K-01 (delete job) |
+| `app-data-table` | `shared/components/data-table/` | B-01, Q-08–Q-11 (list tabs), A-01, MN-01 |
+| `app-date-range-picker` | `shared/components/date-range-picker/` | OE-01, TT-01 |
+| `app-datepicker` | `shared/components/datepicker/` | TT-02 (add-entry date), P-03 (cycle start/end), M-09 (schedule period) |
+| `app-dialog` | `shared/components/dialog/` | P-03, K-06/K-10/K-11, Q-02a/Q-03a, M-08–M-12, MN-02 (dialog shell) |
+| `app-empty-state` | `shared/components/empty-state/` | K-02, B-01, P-01, S-02–S-06, OE-01, Q-01 tabs, M-11/M-12 |
+| `app-entity-activity-section` | `shared/components/entity-activity-section/` | K-04 (job-detail), A-02 (asset-detail) |
+| `app-entity-link` | `shared/components/entity-link/` | K-04 (job refs), Q-01 tabs (part/lot refs) |
+| `app-entity-picker` | `shared/components/entity-picker/` | K-06 (customer/assignee), Q-02a (job/lot), M-09 (parts), A-04 (location) |
+| `app-file-upload-zone` | `shared/components/file-upload-zone/` | K-10 (cover-photo-upload-dialog) |
+| `app-input` | `shared/components/input/` | K-06, P-03, SF-02, TT-02, M-08–M-10 (form text fields) |
+| `app-kanban-column-header` | `shared/components/kanban-column-header/` | K-02 (board-column header) |
+| `app-kpi-chip` | `shared/components/kpi-chip/` | S-01 (KPI strip), OE-01 (KPI strip), M-02 (dashboard KPIs) |
+| `app-page-header` | `shared/components/page-header/` | all page components (title + action buttons) |
+| `app-page-layout` | `shared/components/page-layout/` | all page components (sidebar + content slot) |
+| `app-quick-action-panel` | `shared/components/quick-action-panel/` | K-04 (job actions), A-02 (asset actions) |
+| `app-select` | `shared/components/select/` | SF-02 (team select), S-03 (work-center), K-06 (track-type/priority), Q-02a (status) |
+| `app-status-timeline` | `shared/components/status-timeline/` | K-04 (job-detail-panel status history) |
+| `app-textarea` | `shared/components/textarea/` | TT-02 (notes), MN-02 (resolution notes), P-03 (cycle goals) |
+| `app-toggle` | `shared/components/toggle/` | K-01 (board/team view), B-01 (table/grid view), various inline forms |
+| `app-toolbar` | `shared/components/toolbar/` | all page components (tab-bar / action toolbar) |
+| `app-validation-button` | `shared/components/validation-button/` | P-03, TT-02, K-06, MN-02, M-08–M-10 (form submit with loading) |
+| `data-table` column-filter-popover | `shared/components/data-table/` (sub) | B-01, Q-08–Q-11, A-01, MN-01 (column filter popovers) |
+| `data-table` column-manager-panel | `shared/components/data-table/` (sub) | B-01, Q-08–Q-11, A-01 (column visibility selector) |
+| TimerHubService | `shared/services/timer-hub.service.ts` | TT-01 (active timer), K-04 (job time) |
+| KioskSessionService | `shared/services/kiosk-session.service.ts` | SF-01 (display), SF-20 (clock) |
+| ClockEventTypeService | `shared/services/clock-event-type.service.ts` | SF-20 (clock event types) |
+| ScannerService | `shared/services/scanner.service.ts` | SF-07 (scan-action-overlay), SF-21 (inventory-scan) |
+| ScanActionService | `shared/services/scan-action.service.ts` | SF-07, SF-12–SF-19 (scan flow actions) |
+| WebHidRfidService | `shared/services/web-hid-rfid.service.ts` | SF-20 (RFID reader for clock) |
+| BoardHubService | `shared/services/board-hub.service.ts` | K-01 (real-time board updates) |
 
 ---
 
@@ -239,10 +261,10 @@ Schema: component · type · route · file `path:line` · renders-for · states 
 | K-05 | `app-job-detail-dialog` / JobDetailDialogComponent | dialog | `/kanban` | `features/kanban/components/job-detail-dialog.component.ts:20` | all authenticated | **unreached — QUEUE OPS-Q-004** | Dialog wrapper around JobDetailPanelComponent (same content, modal variant) |
 | K-06 | `app-job-dialog` / JobDialogComponent (create) | form | `/kanban` | `features/kanban/components/job-dialog.component.ts:27` | all authenticated · CAP-MFG-WO-RELEASE gates button | form-populated(title/desc/track-type/customer/assignee/priority/due-date) | Create new job |
 | K-07 | `app-job-dialog` / JobDialogComponent (edit) | form | `/kanban` | `features/kanban/components/job-dialog.component.ts:27` | all authenticated | **unreached** — queue OPS-Q-004 | Edit existing job metadata |
-| K-08 | `app-job-cost-tab` / JobCostTabComponent | tab | `/kanban` (inside K-04) | `features/kanban/components/job-cost-tab.component.ts:15` | all authenticated | TODO:live | Job cost summary + material-issues table within detail panel |
-| K-09 | `app-operation-time-tab` / OperationTimeTabComponent | tab | `/kanban` (inside K-04) | `features/kanban/components/operation-time-tab.component.ts:14` | all authenticated | TODO:live | Est vs actual setup/run minutes per operation sequence |
-| K-10 | `app-cover-photo-upload-dialog` / CoverPhotoUploadDialogComponent | dialog | `/kanban` (from K-04) | `features/kanban/components/cover-photo-upload-dialog.component.ts:18` | all authenticated | TODO:live | Upload/view cover photo for a job |
-| K-11 | `app-dispose-job-dialog` / DisposeJobDialogComponent | dialog | `/kanban` (from K-04) | `features/kanban/components/dispose-job-dialog.component.ts:24` | all authenticated | TODO:live | Mark job as disposed (scrapped / cancelled / other) with reason |
+| K-08 | `app-job-cost-tab` / JobCostTabComponent | tab | `/kanban` (inside K-04) | `features/kanban/components/job-cost-tab.component.ts:15` | all authenticated | needs-live — trigger: Cost tab inside K-04 job-detail-panel · **QUEUE OPS-Q-004** | Job cost summary + material-issues table within detail panel |
+| K-09 | `app-operation-time-tab` / OperationTimeTabComponent | tab | `/kanban` (inside K-04) | `features/kanban/components/operation-time-tab.component.ts:14` | all authenticated | needs-live — trigger: Operation Time tab inside K-04 · **QUEUE OPS-Q-004** | Est vs actual setup/run minutes per operation sequence |
+| K-10 | `app-cover-photo-upload-dialog` / CoverPhotoUploadDialogComponent | dialog | `/kanban` (from K-04) | `features/kanban/components/cover-photo-upload-dialog.component.ts:18` | all authenticated | needs-live — trigger: action menu in job-detail-panel · **QUEUE OPS-Q-004** | Upload/view cover photo for a job |
+| K-11 | `app-dispose-job-dialog` / DisposeJobDialogComponent | dialog | `/kanban` (from K-04) | `features/kanban/components/dispose-job-dialog.component.ts:24` | all authenticated | needs-live — trigger: action menu in job-detail-panel · **QUEUE OPS-Q-004** | Mark job as disposed (scrapped / cancelled / other) with reason |
 | K-12 | KanbanService | service | `/kanban` | `features/kanban/services/kanban.service.ts:1` | n/a | n/a | Primary kanban data service (board, jobs, CRUD, BOM, files, parts) |
 | K-13 | JobCostService | service | `/kanban` | `features/kanban/services/job-cost.service.ts:1` | n/a | n/a | Job cost summary + operation-time data |
 
@@ -252,7 +274,7 @@ Schema: component · type · route · file `path:line` · renders-for · states 
 
 | # | component | type | route | file | renders-for | states | purpose |
 |---|-----------|------|-------|------|-------------|--------|---------|
-| B-01 | `app-backlog` / BacklogComponent | page | `/backlog` | `features/backlog/backlog.component.ts:1` | all authenticated | populated(J-1 in table) · filters(track/priority/assignee) · table-view · NEW JOB button | Unscheduled job queue — table + card-grid view modes, search/filter, open job detail |
+| B-01 | `app-backlog` / BacklogComponent | page | `/backlog` | `features/backlog/backlog.component.ts:41` | all authenticated | populated(J-1 in table) · filters(track/priority/assignee) · table-view · NEW JOB button | Unscheduled job queue — table + card-grid view modes, search/filter, open job detail |
 | B-02 | `app-backlog-card-grid` / BacklogCardGridComponent | cluster | `/backlog` | `features/backlog/components/backlog-card-grid/backlog-card-grid.component.ts:7` | all authenticated | **unreached — QUEUE OPS-Q-015** | Card-grid layout for backlog jobs (alternative to table view) |
 | B-03 | BacklogService | service | `/backlog` | `features/backlog/services/backlog.service.ts:1` | n/a | n/a | Backlog job list data |
 
@@ -314,18 +336,18 @@ Route is under `/display/` path with **no auth guard** — public kiosk terminal
 
 #### 5B — Scan Flows (rendered within SF-01 or SF-07)
 
-| # | component | type | file | purpose |
-|---|-----------|------|------|---------|
-| SF-12 | `app-scan-job-flow` / ScanJobFlowComponent | panel | `features/shop-floor/components/scan-job-flow/scan-job-flow.component.ts:14` | Report time/progress on a job |
-| SF-13 | `app-scan-move-flow` / ScanMoveFlowComponent | panel | `features/shop-floor/components/scan-move-flow/scan-move-flow.component.ts:16` | Move inventory to a different location |
-| SF-14 | `app-scan-receive-flow` / ScanReceiveFlowComponent | panel | `features/shop-floor/components/scan-receive-flow/scan-receive-flow.component.ts:16` | Receive PO items (cross-ref: Q2C PO-receiving) |
-| SF-15 | `app-scan-return-flow` / ScanReturnFlowComponent | panel | `features/shop-floor/components/scan-return-flow/scan-return-flow.component.ts:26` | Return material to stock |
-| SF-16 | `app-scan-ship-flow` / ScanShipFlowComponent | panel | `features/shop-floor/components/scan-ship-flow/scan-ship-flow.component.ts:19` | Ship outbound order items |
-| SF-17 | `app-scan-count-flow` / ScanCountFlowComponent | panel | `features/shop-floor/components/scan-count-flow/scan-count-flow.component.ts:13` | Physical inventory count |
-| SF-18 | `app-scan-inspect-flow` / ScanInspectFlowComponent | panel | `features/shop-floor/components/scan-inspect-flow/scan-inspect-flow.component.ts:12` | QC inspection on kiosk |
-| SF-19 | `app-scan-issue-flow` / ScanIssueFlowComponent | panel | `features/shop-floor/components/scan-issue-flow/scan-issue-flow.component.ts:13` | Issue material to a job |
+| # | component | type | file | renders-for | states | purpose |
+|---|-----------|------|------|-------------|--------|---------|
+| SF-12 | `app-scan-job-flow` / ScanJobFlowComponent | panel | `features/shop-floor/components/scan-job-flow/scan-job-flow.component.ts:14` | all (public) | needs-live — trigger: action-overlay phase `'job'` after job barcode scan · **QUEUE OPS-Q-003** | Report time/progress on a job |
+| SF-13 | `app-scan-move-flow` / ScanMoveFlowComponent | panel | `features/shop-floor/components/scan-move-flow/scan-move-flow.component.ts:16` | all (public) | needs-live — trigger: action-overlay phase `'move'` · **QUEUE OPS-Q-003** | Move inventory to a different location |
+| SF-14 | `app-scan-receive-flow` / ScanReceiveFlowComponent | panel | `features/shop-floor/components/scan-receive-flow/scan-receive-flow.component.ts:16` | all (public) | needs-live — trigger: action-overlay phase `'receive'` · **QUEUE OPS-Q-003** | Receive PO items (cross-ref: Q2C PO-receiving) |
+| SF-15 | `app-scan-return-flow` / ScanReturnFlowComponent | panel | `features/shop-floor/components/scan-return-flow/scan-return-flow.component.ts:26` | all (public) | needs-live — trigger: action-overlay phase `'return'` · **QUEUE OPS-Q-003** | Return material to stock |
+| SF-16 | `app-scan-ship-flow` / ScanShipFlowComponent | panel | `features/shop-floor/components/scan-ship-flow/scan-ship-flow.component.ts:19` | all (public) | needs-live — trigger: action-overlay phase `'ship'` · **QUEUE OPS-Q-003** | Ship outbound order items |
+| SF-17 | `app-scan-count-flow` / ScanCountFlowComponent | panel | `features/shop-floor/components/scan-count-flow/scan-count-flow.component.ts:13` | all (public) | needs-live — trigger: action-overlay phase `'count'` · **QUEUE OPS-Q-003** | Physical inventory count |
+| SF-18 | `app-scan-inspect-flow` / ScanInspectFlowComponent | panel | `features/shop-floor/components/scan-inspect-flow/scan-inspect-flow.component.ts:12` | all (public) | needs-live — trigger: action-overlay phase `'inspect'` · **QUEUE OPS-Q-003** | QC inspection on kiosk |
+| SF-19 | `app-scan-issue-flow` / ScanIssueFlowComponent | panel | `features/shop-floor/components/scan-issue-flow/scan-issue-flow.component.ts:13` | all (public) | needs-live — trigger: action-overlay phase `'issue'` · **QUEUE OPS-Q-003** | Issue material to a job |
 
-> All scan-flow components render for `all (public)` — they are inside the no-auth kiosk route. States: TODO:live-sweep with ProductionWorker (worker@, ForgeRun!2026).
+> All scan-flow components render for `all (public)` — inside the no-auth kiosk route. Trigger: scan barcode on `/display/shop-floor` → `ScanActionOverlayComponent` (SF-07) selects flow by action type.
 
 #### 5C — Sub-routes
 
@@ -412,11 +434,11 @@ Tabs (from `mrp.component.ts:55`): `dashboard` · `planned-orders` · `exception
 | M-05 | Runs tab (inline in M-01) | tab | `/mrp/runs` | `features/mrp/mrp.component.ts:59` | Admin · Manager | empty — **QUEUE OPS-Q-009** | MRP run history |
 | M-06 | Master-schedule tab (inline in M-01) | tab | `/mrp/master-schedule` | `features/mrp/mrp.component.ts:59` | Admin · Manager | empty — **QUEUE OPS-Q-009** | Master production schedule |
 | M-07 | Forecasts tab (inline in M-01) | tab | `/mrp/forecasts` | `features/mrp/mrp.component.ts:59` | Admin · Manager | empty — **QUEUE OPS-Q-009** | Demand forecasts |
-| M-08 | `ExecuteMrpRunDialogComponent` | dialog | `/mrp` | `features/mrp/components/execute-mrp-run-dialog.component.ts:1` | Admin · Manager | source-confirmed: run-type select, planning-horizon-days input, simulation hint, CANCEL/RUN MRP button · **QUEUE OPS-Q-009** live-trigger | Run-params dialog; triggered by `executeRun()` / `executeRun(true)` |
-| M-09 | `MasterScheduleDialogComponent` | dialog | `/mrp` | `features/mrp/components/master-schedule-dialog.component.ts:1` | Admin · Manager | source-confirmed: name/description/period-start/period-end/lines (add-line action) · **QUEUE OPS-Q-009** live-trigger | Create/edit master schedule |
-| M-10 | `GenerateForecastDialogComponent` | dialog | `/mrp` | `features/mrp/components/generate-forecast-dialog.component.ts:1` | Admin · Manager | source-confirmed: name/part/method/historical-periods fields · **QUEUE OPS-Q-009** live-trigger | Forecast generation params |
-| M-11 | `MrpRunDetailDialogComponent` | dialog | `/mrp` | `features/mrp/components/mrp-run-detail-dialog.component.ts:1` | Admin · Manager | **QUEUE OPS-Q-009** | Run detail + planned-order breakdown; triggered by run row click |
-| M-12 | `MpsVsActualDialogComponent` | dialog | `/mrp` | `features/mrp/components/mps-vs-actual-dialog.component.ts:1` | Admin · Manager | **QUEUE OPS-Q-009** | MPS vs actual comparison chart; triggered by master-schedule row action |
+| M-08 | `app-execute-mrp-run-dialog` / ExecuteMrpRunDialogComponent | dialog | `/mrp` | `features/mrp/components/execute-mrp-run-dialog.component.ts:30` | Admin · Manager | source-confirmed: run-type select, planning-horizon-days input, simulation hint, CANCEL/RUN MRP button · **QUEUE OPS-Q-009** live-trigger | Run-params dialog; triggered by `executeRun()` / `executeRun(true)` |
+| M-09 | `app-master-schedule-dialog` / MasterScheduleDialogComponent | dialog | `/mrp` | `features/mrp/components/master-schedule-dialog.component.ts:43` | Admin · Manager | source-confirmed: name/description/period-start/period-end/lines (add-line action; each line: part, qty, due-date) · **QUEUE OPS-Q-009** live-trigger | Create/edit master schedule; data.schedule optional — absent = create, present = edit |
+| M-10 | `app-generate-forecast-dialog` / GenerateForecastDialogComponent | dialog | `/mrp` | `features/mrp/components/generate-forecast-dialog.component.ts:20` | Admin · Manager | source-confirmed: name/part(entity-picker)/method(select)/historical-periods/smoothing-factor(ExponentialSmoothing only) fields · **QUEUE OPS-Q-009** live-trigger | Forecast generation params; smoothing-factor field shown/hidden based on method |
+| M-11 | `app-mrp-run-detail-dialog` / MrpRunDetailDialogComponent | dialog | `/mrp` | `features/mrp/components/mrp-run-detail-dialog.component.ts:31` | Admin · Manager | source-confirmed: run summary header + parts-touched list (part → time-bucket plan + pegging trail on select) · **QUEUE OPS-Q-009** | Run detail + planned-order breakdown; triggered by run row click |
+| M-12 | `app-mps-vs-actual-dialog` / MpsVsActualDialogComponent | dialog | `/mrp` | `features/mrp/components/mps-vs-actual-dialog.component.ts:23` | Admin · Manager | source-confirmed: per-part table (planned qty / actual completed qty / variance / variance-pct); negative = under-delivered, positive = over-delivered · **QUEUE OPS-Q-009** | MPS vs actuals per-part comparison; triggered by master-schedule row action |
 | M-13 | MrpService | service | `/mrp` | `features/mrp/services/mrp.service.ts:1` | n/a | n/a | MRP run execution, planned orders, exceptions, forecasts, master schedule |
 
 ---
@@ -427,7 +449,7 @@ Tabs (from `mrp.component.ts:55`): `dashboard` · `planned-orders` · `exception
 |---|-----------|------|-------|------|-------------|--------|---------|
 | A-01 | `app-assets` / AssetsComponent | page | `/assets` | `features/assets/assets.component.ts:27` | Admin · Manager | sweep D in progress — **QUEUE OPS-Q-011** | Asset list with search/type/status filters; ADD ASSET button |
 | A-02 | `app-asset-detail-panel` / AssetDetailPanelComponent | panel | `/assets` (slide-out) | `features/assets/components/asset-detail-panel/asset-detail-panel.component.ts:17` | Admin · Manager | **QUEUE OPS-Q-011** | Asset detail: status/location/manufacturer/model/serial/hours; tooling-details section; maintenance-log list; entity activity |
-| A-03 | `app-asset-detail-dialog` / AssetDetailDialogComponent | dialog | `/assets` | `features/assets/components/asset-detail-dialog/asset-detail-dialog.component.ts:1` | Admin · Manager | **QUEUE OPS-Q-011** | Dialog wrapper around AssetDetailPanelComponent |
+| A-03 | `app-asset-detail-dialog` / AssetDetailDialogComponent | dialog | `/assets` | `features/assets/components/asset-detail-dialog/asset-detail-dialog.component.ts:17` | Admin · Manager | **QUEUE OPS-Q-011** | Dialog wrapper around AssetDetailPanelComponent |
 | A-04 | Create/Edit Asset form (inline in A-01) | form | `/assets` | `features/assets/assets.component.ts:27` | Admin · Manager | source-confirmed: name/type/status/location/description fields · ADD ASSET button · **QUEUE OPS-Q-011** live-trigger | Asset fields |
 | A-05 | AssetsService | service | `/assets` | `features/assets/services/assets.service.ts:1` | n/a | n/a | Asset CRUD, downtime log, maintenance log, subcontract orders |
 
@@ -465,7 +487,7 @@ Tabs (from `mrp.component.ts:55`): `dashboard` · `planned-orders` · `exception
 
 ## Open Items / Queue Summary
 
-_This section tracks entries that need live-sweep confirmation. All TODO:live states are queued for ui-scout._
+_This section tracks entries that need live-sweep confirmation. All `needs-live` states are queued for ui-scout._
 
 ### Priority live-sweep targets
 
