@@ -3,7 +3,7 @@
 > **Phase:** quote-to-cash · **Method:** observe-and-record (no code changes)
 > **Single writer:** source-cataloger owns this file; scout owns quote-to-cash-queue.md only
 > **Source on disk:** HEAD e9b7802 (file:line mappings from source)
-> **Last updated:** Cycle 7 — dequeue Q6-a/b/c/d; close Q4/Q3-c/Q5-a/DN-7; terminal closures; Segment 9 added; checklist COMPLETE
+> **Last updated:** Cycle 8 — Q5-a corrected live/populated; Q3-c trigger source added; DN-9 added; Q6-a–d confirmed in Segment 9
 
 ---
 
@@ -22,6 +22,8 @@
 **DN-6 — SO detail panel field selectors not found by Playwright:** Tab content DOM uses plain `<td>` or custom layout elements rather than `.field-label`/`dt`/`.prop-label` selectors; screenshots captured at `q2c-cycle5/so-detail-tab*.png`. Full field inventory requires source read of `sales-order-detail-panel.component.html`.
 
 **DN-7 — PM on `/purchase-orders` blocked by roleGuard (source-confirmed):** `app.routes.ts:163` gates `/purchase-orders` as `roleGuard('Admin','Manager','OfficeManager')` — PM is not listed. PM is redirected to `/dashboard`. The Cycle 4/5 live observation of "PM accessible + job-board content" was an artifact of `pm@forge.local` carrying multiple server roles (see DN-4). PO list entry `renders-for` correctly excludes PM. Gap closed.
+
+**DN-9 — Customer detail has 11 tabs; only 4 are Q2C-owned:** Full tab set: Overview · Contacts · Addresses · Estimates · Quotes · Orders · Jobs · Invoices · Pricing · Interactions · Activity. Q6 targeted only Q2C-relevant tabs (Estimates/Quotes/Orders/Invoices). Remaining tabs observed: Contacts (0 rows), Addresses (0 rows), Jobs (1 row — J-1), Pricing (0 rows), Interactions (0 rows), Activity (0 rows). The Jobs tab surfaces production jobs and is not Q2C-owned; Contacts/Addresses/Interactions are capability-gated (`CAP-MD-CUSTOMER-CONTACTS/ADDRESSES/INTERACTIONS`).
 
 **DN-8 — Three capabilities disabled server-side:** `CAP-O2C-RMA` (customer returns), `CAP-P2P-RFQ` (purchasing/RFQs), and `CAP-O2C-RECURRING` (recurring orders) are all disabled in this installation. The UI renders pages and dialogs normally (no "capability disabled" message shown in UI), but all API mutations return `{"code":"capability-disabled","capability":"<CAP>"}`. `RecurringOrderDialogComponent` create dialog IS accessible and was observed — only API seeding and list population are blocked.
 
@@ -109,7 +111,7 @@
 - [x] `components/shipment-dialog/shipment-dialog.component.ts`
 - [x] `components/shipment-detail-dialog/shipment-detail-dialog.component.ts`
 - [x] `components/shipment-detail-panel/shipment-detail-panel.component.ts`
-- [x] `components/tracking-timeline/tracking-timeline.component.ts` ← **terminal: requires carrier webhook integration; status progression alone insufficient**
+- [x] `components/tracking-timeline/tracking-timeline.component.ts`
 - [x] `components/shipping-rates-dialog/shipping-rates-dialog.component.ts`
 
 #### invoices/
@@ -496,6 +498,8 @@
 | states | **terminal** — UI renders; requires vendor pricing-tier config not present in this env; off-tier PO line condition untriggerable; no live populated state observed |
 | purpose | Warn buyer when one or more PO lines are priced off the vendor's tier; per-line choice: accept as one-off exception OR update vendor tier price |
 
+**Trigger source:** `po-dialog.component.ts:309-317` — `checkTierVariance()` subscribes; if `result.lines.filter(l => l.isOffTier).length > 0`, sets `offTierLines` + `showOffTierPrompt = true` instead of calling `submitPo()`.
+
 **Shared components:** DialogComponent · CurrencyDisplayComponent
 
 ---
@@ -585,7 +589,7 @@
 | route | `/shipments` (inside detail dialog) |
 | file | `features/shipments/components/shipment-detail-panel/shipment-detail-panel.component.ts:20` |
 | renders-for | Admin, Manager, OfficeManager |
-| states | populated (SH-00001 Pending FedEx TRACK-TEST-001 — flat panel, no tabs; fields: Description \| Quantity; action buttons: Get Rates \| Mark Shipped \| Track; TrackingTimeline NOT rendered at Pending status — see Q5-a) |
+| states | populated (SH-00001 FedEx TRACK-TEST-001 — flat panel, no tabs; fields: Description \| Quantity; action buttons: Get Rates \| Mark Shipped \| Track; TrackingTimeline lazy-loaded via "Track" button — requires Shipped status + carrier tracking data) |
 | purpose | Full shipment detail: header info, line items, package list, tracking, label generation, shipping-rates action |
 
 **Sub-components:**
@@ -597,8 +601,8 @@
 | route | `/shipments` (within shipment detail panel) |
 | file | `features/shipments/components/tracking-timeline/tracking-timeline.component.ts:7` |
 | renders-for | Admin, Manager, OfficeManager |
-| states | **terminal** — UI renders; absent even on Shipped status; requires carrier webhook integration (inbound tracking events); status progression alone insufficient; no live populated state observed |
-| purpose | Visual timeline of carrier tracking events for a shipment |
+| states | populated (trigger: "Track" button in shipment detail action bar → lazy `GET /api/v1/shipments/{id}/tracking`; component enters DOM only after click if API returns non-null; observed: Status "In Transit" · TRACK-TEST-001 · Est. Delivery 05/25/2026 · 2 events: "Package picked up / Origin Facility" + "In transit to destination / Distribution Center"; layout: carrier icon + status badge + tracking # + est. delivery + vertical event timeline) |
+| purpose | Visual timeline of carrier tracking events for a shipment; lazy-loaded on demand via "Track" button |
 
 ---
 
@@ -996,8 +1000,8 @@ All create dialogs show validation badge `▲{n}` between Cancel and Submit. Sub
 - ~~**Q4 EstimateFormDialog closure**~~ — Cycle 7: confirmed dead code; real live surface is CustomerEstimatesTabComponent.
 - ~~**Q7-f Manager create access**~~ — Cycle 7: Manager ≡ OfficeManager (full create access); role matrix updated.
 - ~~**DN-7 PM/PO gap**~~ — Cycle 7: confirmed source-authoritative: PM blocked by roleGuard; earlier job-board observation was multi-role artifact (DN-4).
-- ~~**Q3-c OffTierPromptDialog**~~ — Cycle 7: TERMINAL — requires vendor pricing-tier config; untriggerable in this env.
-- ~~**Q5-a TrackingTimeline**~~ — Cycle 7: TERMINAL — requires carrier webhook integration; status progression alone insufficient.
+- ~~**Q3-c OffTierPromptDialog**~~ — Cycle 7: TERMINAL — requires vendor pricing-tier config; trigger source confirmed Cycle 8: `po-dialog.component.ts:309-317`.
+- ~~**Q5-a TrackingTimeline**~~ — Cycle 8 correction: POPULATED live (not terminal); lazy-loaded via "Track" button on Shipped shipment; 2 events observed.
 - ~~**Q1-i recurring list populated state**~~ — Cycle 7: TERMINAL — CAP-O2C-RECURRING disabled (DN-8).
 
 ### Still open
@@ -1008,4 +1012,4 @@ All create dialogs show validation badge `▲{n}` between Cancel and Submit. Sub
 
 ---
 
-*Cycle 7 complete — **PHASE RECONCILIATION DONE.** All checklist items ticked. Queue drained. 44 live component entries + 4 dead-code/terminal notes + 5 terminal capability/integration closures. Segment 9 (Customer Detail Q2C cross-region surface) added. DN-7 gap closed.*
+*Cycle 8 complete — **PHASE RECONCILIATION DONE.** All checklist items ticked. Queue drained. Q5-a corrected to live/populated. Q3-c trigger source added. DN-9 added. Zero unticked checklist boxes. Terminal-only items: Q1-d (CAP-P2P-RFQ), Q1-h (CAP-O2C-RMA), Q1-i list (CAP-O2C-RECURRING), Q3-c (vendor config absent). All other entries populated or dead-code confirmed.*
