@@ -1006,9 +1006,9 @@ All create dialogs show validation badge `▲{n}` between Cancel and Submit. Sub
 
 ### Still open
 
-**None.** All checklist items are ticked. Terminal closures written for Q1-d, Q1-h, Q1-i (list), Q3-c, Q5-a. Q4 closed as dead code. Queue drained.
+**None.** All checklist items are ticked. Terminal closures written for Q1-d, Q1-h, Q1-i (list), Q3-c. Q4 closed as dead code. Q5-a live/populated. Queue drained.
 
-> Remaining terminal entries (Q1-d, Q1-h, Q3-c, Q5-a) reflect integration/capability constraints in this environment — they are not gaps in the inventory, they are complete entries with known blocking conditions recorded.
+> Remaining terminal entries (Q1-d, Q1-h, Q3-c, Q1-i list) reflect capability/config constraints in this environment — they are not gaps in the inventory, they are complete entries with known blocking conditions recorded.
 
 ---
 
