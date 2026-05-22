@@ -3,7 +3,7 @@
 > **Phase:** quote-to-cash · **Method:** observe-and-record (no code changes)
 > **Single writer:** source-cataloger owns this file; scout owns quote-to-cash-queue.md only
 > **Source on disk:** HEAD e9b7802 (file:line mappings from source)
-> **Last updated:** Cycle 5 — cataloger reconciliation: scout live-state entries verified against source, role discrepancy flagged, metadata corrected
+> **Last updated:** Cycle 6 — dequeue Q1-b/e/f/g/i, Q3-a/b, Q5-b, terminal Q1-d/h; DN-6/7/8 added; 14 checklist items ticked
 
 ---
 
@@ -18,6 +18,12 @@
 **DN-4 — PM live access contradicts source route guards (investigate):** Live sweep observed PM reaching `/purchasing`, `/shipments`, `/invoices`, `/payments` with page-header rendered. Source `app.routes.ts:157,163,181,187,193` gates all five routes as `roleGuard('Admin','Manager','OfficeManager')` — PM is not listed. `roleGuard` calls `auth.hasAnyRole()` which is a pure `user.roles.includes()` check with no capability bypass (`auth.service.ts:96-99`). **Most likely cause: `pm@forge.local` was seeded with multiple server-side roles (PM + OfficeManager or similar).** `renders-for` fields in catalog entries use source-authoritative role lists; the role matrix records live observation. The discrepancy should be resolved by inspecting the JWT for `pm@forge.local`.
 
 **DN-5 — `/sales-orders/recurring` does not render app-page-header:** All four accessible roles (Admin, OfficeManager, Manager, PM) reach the route but `app-page-header` is absent (uses `PageLayoutComponent` + `ToolbarComponent` instead).
+
+**DN-6 — SO detail panel field selectors not found by Playwright:** Tab content DOM uses plain `<td>` or custom layout elements rather than `.field-label`/`dt`/`.prop-label` selectors; screenshots captured at `q2c-cycle5/so-detail-tab*.png`. Full field inventory requires source read of `sales-order-detail-panel.component.html`.
+
+**DN-7 — PM on `/purchase-orders/orders` renders job board:** PM navigates to `/purchase-orders/orders` but sees JOB BOARD content (production board with "Create your first job", focus mode, board view controls) rather than the PO list. Route guard allows access (PM passes live — see DN-4), but component or route behavior serves job-board context to PM. Source read needed to confirm mechanism.
+
+**DN-8 — Three capabilities disabled server-side:** `CAP-O2C-RMA` (customer returns), `CAP-P2P-RFQ` (purchasing/RFQs), and `CAP-O2C-RECURRING` (recurring orders) are all disabled in this installation. The UI renders pages and dialogs normally (no "capability disabled" message shown in UI), but all API mutations return `{"code":"capability-disabled","capability":"<CAP>"}`. `RecurringOrderDialogComponent` create dialog IS accessible and was observed — only API seeding and list population are blocked.
 
 ---
 
@@ -75,10 +81,10 @@
 #### sales-orders/
 - [x] `sales-orders.component.ts` (SalesOrdersComponent)
 - [x] `components/so-dialog/so-dialog.component.ts`
-- [ ] `components/sales-order-detail-dialog/sales-order-detail-dialog.component.ts`
-- [ ] `components/sales-order-detail-panel/sales-order-detail-panel.component.ts`
-- [ ] `components/schedule-timeline/schedule-timeline.component.ts`
-- [ ] `components/recurring-order-dialog/recurring-order-dialog.component.ts`
+- [x] `components/sales-order-detail-dialog/sales-order-detail-dialog.component.ts`
+- [x] `components/sales-order-detail-panel/sales-order-detail-panel.component.ts`
+- [x] `components/schedule-timeline/schedule-timeline.component.ts`
+- [x] `components/recurring-order-dialog/recurring-order-dialog.component.ts`
 - [x] `pages/recurring/recurring-orders.component.ts`
 
 #### purchase-orders/
@@ -95,35 +101,35 @@
 #### purchasing/
 - [x] `purchasing.component.ts` (PurchasingComponent)
 - [x] `components/rfq-dialog/rfq-dialog.component.ts`
-- [ ] `components/rfq-detail-dialog/rfq-detail-dialog.component.ts`
+- [x] `components/rfq-detail-dialog/rfq-detail-dialog.component.ts` ← **terminal: CAP-P2P-RFQ disabled (DN-8)**
 - [x] `components/rfq-list/rfq-list.component.ts`
 
 #### shipments/
 - [x] `shipments.component.ts` (ShipmentsComponent)
 - [x] `components/shipment-dialog/shipment-dialog.component.ts`
-- [ ] `components/shipment-detail-dialog/shipment-detail-dialog.component.ts`
-- [ ] `components/shipment-detail-panel/shipment-detail-panel.component.ts`
+- [x] `components/shipment-detail-dialog/shipment-detail-dialog.component.ts`
+- [x] `components/shipment-detail-panel/shipment-detail-panel.component.ts`
 - [ ] `components/tracking-timeline/tracking-timeline.component.ts`
-- [ ] `components/shipping-rates-dialog/shipping-rates-dialog.component.ts`
+- [x] `components/shipping-rates-dialog/shipping-rates-dialog.component.ts`
 
 #### invoices/
 - [x] `invoices.component.ts` (InvoicesComponent)
 - [x] `components/invoice-dialog/invoice-dialog.component.ts`
-- [ ] `components/invoice-detail-dialog/invoice-detail-dialog.component.ts`
-- [ ] `components/invoice-detail-panel/invoice-detail-panel.component.ts`
+- [x] `components/invoice-detail-dialog/invoice-detail-dialog.component.ts`
+- [x] `components/invoice-detail-panel/invoice-detail-panel.component.ts`
 - [x] `components/uninvoiced-jobs-panel/uninvoiced-jobs-panel.component.ts`
 
 #### payments/
 - [x] `payments.component.ts` (PaymentsComponent)
 - [x] `components/payment-dialog/payment-dialog.component.ts`
-- [ ] `components/payment-detail-dialog/payment-detail-dialog.component.ts`
-- [ ] `components/payment-detail-panel/payment-detail-panel.component.ts`
+- [x] `components/payment-detail-dialog/payment-detail-dialog.component.ts`
+- [x] `components/payment-detail-panel/payment-detail-panel.component.ts`
 
 #### customer-returns/
 - [x] `customer-returns.component.ts` (CustomerReturnsComponent)
 - [x] `components/customer-return-dialog/customer-return-dialog.component.ts`
-- [ ] `components/customer-return-detail-dialog/customer-return-detail-dialog.component.ts`
-- [ ] `components/customer-return-detail-panel/customer-return-detail-panel.component.ts`
+- [x] `components/customer-return-detail-dialog/customer-return-detail-dialog.component.ts` ← **terminal: CAP-O2C-RMA disabled (DN-8)**
+- [x] `components/customer-return-detail-panel/customer-return-detail-panel.component.ts` ← **terminal: CAP-O2C-RMA disabled (DN-8)**
 
 ### Shared components (usages noted in feature entries; ticked when usage documented)
 
@@ -276,7 +282,7 @@
 | route | `/sales-orders` |
 | file | `features/sales-orders/components/sales-order-detail-dialog/sales-order-detail-dialog.component.ts:17` |
 | renders-for | Admin, Manager, PM, OfficeManager |
-| states | unreached (no job-stage SO in env) |
+| states | populated (J-1 SO-00001 at Order Confirmed; dialog observed Cycle 5) |
 | purpose | Thin Mat dialog shell that hosts SalesOrderDetailPanelComponent; returns `{ action: 'edit', salesOrder }` on edit |
 
 ---
@@ -288,7 +294,7 @@
 | route | `/sales-orders` (inside detail dialog) |
 | file | `features/sales-orders/components/sales-order-detail-panel/sales-order-detail-panel.component.ts:27` |
 | renders-for | Admin, Manager, PM, OfficeManager |
-| states | unreached (no job-stage SO in env) |
+| states | populated (SO-00001 J-1 Order Confirmed — 8 tabs; status badges: Confirmed + Partially Shipped; action buttons: Copy \| Print \| Regenerate; DN-6: field detail extraction incomplete) |
 | purpose | Full SO detail: 8 tabs — overview · lines · schedule · shipments · returns · documents · invoices · activity |
 
 **Tabs (source-confirmed):** `'overview' | 'lines' | 'schedule' | 'shipments' | 'returns' | 'documents' | 'invoices' | 'activity'`
@@ -304,7 +310,7 @@
 | route | `/sales-orders` (within SO detail panel, schedule tab) |
 | file | `features/sales-orders/components/schedule-timeline/schedule-timeline.component.ts:16` |
 | renders-for | Admin, Manager, PM, OfficeManager |
-| states | unreached (within SO detail panel, schedule tab) |
+| states | populated (renders in Schedule tab of SO-00001 detail panel; Cycle 5 sweep confirmed) |
 | purpose | Visual timeline of schedule milestones for an SO |
 
 ---
@@ -332,7 +338,7 @@
 | route | `/sales-orders/recurring` |
 | file | `features/sales-orders/components/recurring-order-dialog/recurring-order-dialog.component.ts:16` |
 | renders-for | Admin, Manager, PM, OfficeManager (inherits route guard; no button-level role gate in template — confirmed cycle 2) |
-| states | unreached (no trigger pressed in sweep) |
+| states | populated (dialog observed: Template name \| Customer \| Next generation date \| Interval in days \| Notes \| line items (Part/Desc/Qty/Unit price); Cancel \| Save; populated list state blocked by CAP-O2C-RECURRING — see DN-8) |
 | purpose | Create a recurring SO template; fields include schedule config, customer, product lines via EntityPicker |
 
 **Shared components:** DialogComponent · InputComponent · TextareaComponent · DatepickerComponent · EntityPickerComponent · ValidationButtonComponent
@@ -394,7 +400,7 @@
 | route | `/purchasing` |
 | file | `features/purchasing/components/rfq-detail-dialog/rfq-detail-dialog.component.ts:34` |
 | renders-for | Admin, Manager, OfficeManager |
-| states | unreached (no RFQs seeded) |
+| states | **terminal** — CAP-P2P-RFQ disabled server-side; `/api/v1/purchasing/rfqs` returns `{"code":"capability-disabled","capability":"CAP-P2P-RFQ"}`; UI page renders normally (empty-state + New RFQ button) but seeding blocked; detail dialog unreachable (see DN-8) |
 | purpose | Full RFQ detail: vendor responses table, award action, status management; opens via RFQ row-click |
 
 **Shared components:** DialogComponent · InputComponent · SelectComponent · TextareaComponent · DatepickerComponent · DataTableComponent · ValidationButtonComponent · ConfirmDialogComponent · EntityLinkComponent · CurrencyDisplayComponent
@@ -501,7 +507,7 @@
 | route | `/purchase-orders/suggestions` |
 | file | `features/purchase-orders/components/auto-po-panel/auto-po-panel.component.ts:18` |
 | renders-for | Admin, Manager, OfficeManager |
-| states | empty (observed live — 0 suggestions; needs parts at reorder threshold) |
+| states | empty (observed live — "Run Analysis" button visible + "No auto-PO suggestions" empty-state text; 0 suggestions; no parts at reorder threshold) |
 | purpose | Table of Auto-PO suggestions (parts at/below reorder threshold); approve or dismiss individual suggestions; triggers PO creation |
 
 **Shared components:** DataTableComponent · SelectComponent · EntityLinkComponent · LoadingBlockDirective · ConfirmDialogComponent
@@ -518,8 +524,8 @@
 | type | panel |
 | route | `/purchase-orders/settings` |
 | file | `features/purchase-orders/components/auto-po-settings-panel/auto-po-settings-panel.component.ts:16` |
-| renders-for | Admin only (source: PurchaseOrdersComponent line 55 `isAdmin = this.auth.hasRole('Admin')`) |
-| states | populated (settings tab rendered for Admin; non-Admin content visibility unverified — see Q7-e in queue) |
+| renders-for | Admin, Manager, OfficeManager (route guard); content gated by `isAdmin` (`PurchaseOrdersComponent:55`) — Admin sees 4 fields, Manager/OfficeManager see 2 |
+| states | populated (Admin: Enable Auto-PO toggle \| Default Mode select \| Buffer Days input \| Send Chat Notifications toggle \| Save; Manager: Default Mode + Buffer Days only; Enable Auto-PO + Send Chat Notifications hidden from non-Admin; gate is in .ts logic — template has no `@if` conditionals) |
 | purpose | Configure Auto-PO global settings: reorder threshold mode, lead-time buffer, default vendor strategy, toggle on/off |
 
 **Shared components:** InputComponent · SelectComponent · ToggleComponent · ValidationButtonComponent · LoadingBlockDirective
@@ -567,7 +573,7 @@
 | route | `/shipments` |
 | file | `features/shipments/components/shipment-detail-dialog/shipment-detail-dialog.component.ts:17` |
 | renders-for | Admin, Manager, OfficeManager |
-| states | unreached (no shipments seeded) |
+| states | populated (SH-00001 Pending FedEx TRACK-TEST-001; dialog observed Cycle 5 as mat-dialog overlay hosting ShipmentDetailPanelComponent) |
 | purpose | Thin Mat dialog shell hosting ShipmentDetailPanelComponent; returns `{ action: 'edit', shipment }` |
 
 ---
@@ -579,7 +585,7 @@
 | route | `/shipments` (inside detail dialog) |
 | file | `features/shipments/components/shipment-detail-panel/shipment-detail-panel.component.ts:20` |
 | renders-for | Admin, Manager, OfficeManager |
-| states | unreached (no shipments seeded) |
+| states | populated (SH-00001 Pending FedEx TRACK-TEST-001 — flat panel, no tabs; fields: Description \| Quantity; action buttons: Get Rates \| Mark Shipped \| Track; TrackingTimeline NOT rendered at Pending status — see Q5-a) |
 | purpose | Full shipment detail: header info, line items, package list, tracking, label generation, shipping-rates action |
 
 **Sub-components:**
@@ -603,8 +609,8 @@
 | route | `/shipments` (launched from shipment detail panel) |
 | file | `features/shipments/components/shipping-rates-dialog/shipping-rates-dialog.component.ts:13` |
 | renders-for | Admin, Manager, OfficeManager |
-| states | unreached (trigger button in shipment detail not reached) |
-| purpose | Rate-shop: fetches live carrier rates for shipment dimensions/weight; user selects rate to book label |
+| states | populated (observed from SH-00001 Pending; trigger: "Get Rates" icon button in shipment detail action bar; dialog: Cancel \| Create Label) |
+| purpose | Shipping label creation dialog: initiates label generation for a shipment; Cancel \| Create Label actions |
 
 **Shared components:** DialogComponent · LoadingBlockDirective
 
@@ -665,7 +671,7 @@
 | route | `/invoices` |
 | file | `features/invoices/components/invoice-detail-dialog/invoice-detail-dialog.component.ts:17` |
 | renders-for | Admin, Manager, OfficeManager |
-| states | unreached (no invoices seeded) |
+| states | populated (INV-00001 Draft $135.625; dialog observed Cycle 5 as mat-dialog overlay hosting InvoiceDetailPanelComponent) |
 | purpose | Thin Mat dialog shell hosting InvoiceDetailPanelComponent; returns `{ action: 'edit', invoice }` |
 
 ---
@@ -677,7 +683,7 @@
 | route | `/invoices` (inside detail dialog) |
 | file | `features/invoices/components/invoice-detail-panel/invoice-detail-panel.component.ts:17` |
 | renders-for | Admin, Manager, OfficeManager |
-| states | unreached (no invoices seeded) |
+| states | populated (INV-00001 Draft $135.625 — flat panel, no tabs; line items: Part# \| Description \| Qty \| Unit Price \| Total; action buttons: Delete \| Void \| Send; activity filters: All \| Conversation \| Notes \| History) |
 | purpose | Full invoice detail: header, line items, payment applications, status actions (Send, Void, Mark Paid); entity links to SO/customer |
 
 **Shared components:** EntityActivitySectionComponent · EntityLinkComponent · CurrencyDisplayComponent · ConfirmDialogComponent · LoadingBlockDirective
@@ -725,7 +731,7 @@
 | route | `/payments` |
 | file | `features/payments/components/payment-detail-dialog/payment-detail-dialog.component.ts:11` |
 | renders-for | Admin, Manager, OfficeManager |
-| states | unreached (no payments seeded) |
+| states | populated (PMT-00001 Check $135.625; dialog observed Cycle 5 as mat-dialog overlay hosting PaymentDetailPanelComponent) |
 | purpose | Thin Mat dialog shell hosting PaymentDetailPanelComponent; returns `true` if payment changed |
 
 ---
@@ -737,7 +743,7 @@
 | route | `/payments` (inside detail dialog) |
 | file | `features/payments/components/payment-detail-panel/payment-detail-panel.component.ts:17` |
 | renders-for | Admin, Manager, OfficeManager |
-| states | unreached (no payments seeded) |
+| states | populated (PMT-00001 Check $135.625 — flat panel, no tabs; applications table: Invoice # \| Amount; no action buttons — read-only panel; close button only) |
 | purpose | Full payment detail: payment header, invoice applications list, void/refund actions, activity log |
 
 **Shared components:** EntityActivitySectionComponent · EntityLinkComponent · CurrencyDisplayComponent · ConfirmDialogComponent · LoadingBlockDirective
@@ -783,7 +789,7 @@
 | route | `/customer-returns` |
 | file | `features/customer-returns/components/customer-return-detail-dialog/customer-return-detail-dialog.component.ts:11` |
 | renders-for | Admin, Manager, PM, OfficeManager |
-| states | unreached (no returns seeded) |
+| states | **terminal** — CAP-O2C-RMA disabled server-side; `POST /api/v1/customer-returns` returns `{"code":"capability-disabled","capability":"CAP-O2C-RMA"}`; UI page renders normally but seeding blocked; detail dialog unreachable (see DN-8) |
 | purpose | Thin Mat dialog shell hosting CustomerReturnDetailPanelComponent; returns `true` if updated |
 
 ---
@@ -795,7 +801,7 @@
 | route | `/customer-returns` (inside detail dialog) |
 | file | `features/customer-returns/components/customer-return-detail-panel/customer-return-detail-panel.component.ts:18` |
 | renders-for | Admin, Manager, PM, OfficeManager |
-| states | unreached (no returns seeded) |
+| states | **terminal** — CAP-O2C-RMA disabled server-side; unreachable — blocked by same capability gate as dialog (see DN-8) |
 | purpose | Full return detail: header info, status transitions, inline notes edit, activity log |
 
 **Shared components:** EntityActivitySectionComponent · DialogComponent · TextareaComponent · ConfirmDialogComponent · LoadingBlockDirective
@@ -825,8 +831,8 @@
 
 **Notes:**
 - PM column shows ✓ for routes where source `roleGuard` does NOT include PM (`/purchasing`, `/purchase-orders/*`, `/shipments`, `/invoices`, `/payments`). This is live-observed behaviour, likely caused by `pm@forge.local` having multiple server roles. See DN-4. Catalog `renders-for` fields use source-authoritative lists (PM excluded from those routes).
-- `/purchase-orders/settings`: route guard allows Admin/Manager/OfficeManager (not PM per source). Within-page content guarded by `isAdmin` — non-Admin content visibility not yet verified (see Q7-e).
-- Capability-level differences (OM vs Manager vs PM: create button presence) not yet verified (see Q7-f).
+- `/purchase-orders/settings`: route guard allows Admin/Manager/OfficeManager (not PM per source). Within-page content guarded by `isAdmin` — Admin sees 4 fields, Manager/OfficeManager see 2 (Enable Auto-PO + Send Chat Notifications hidden; confirmed Cycle 5 Q7-e).
+- Capability-level differences (OM/Mgr/PM create buttons): OfficeManager has full create access; PM has New Quote + New Order only; confirmed Cycle 5 Q7-f.
 
 ---
 
@@ -897,27 +903,33 @@ All create dialogs show validation badge `▲{n}` between Cancel and Submit. Sub
 - ~~**shared/ tree coverage**~~ — 21 shared components + 3 directives documented.
 - ~~**All `states` fields**~~ — Cycle 4 live sweep: all states updated from `unconfirmed` to observed or `unreached`.
 - ~~**Scout metadata error**~~ — Cycle 5: corrected "Single writer" to source-cataloger; DN-4 expanded with roleGuard source analysis.
+- ~~**Q1-b SO detail (dialog/panel/schedule)**~~ — Cycle 6: SO-00001 J-1 populated; 8 tabs confirmed live; ScheduleTimeline confirmed in schedule tab.
+- ~~**Q1-e Invoice detail (dialog/panel)**~~ — Cycle 6: INV-00001 Draft $135.625 observed; flat panel, no tabs.
+- ~~**Q1-f Shipment detail (dialog/panel)**~~ — Cycle 6: SH-00001 Pending observed; flat panel, no tabs; TrackingTimeline still unreached (Q5-a).
+- ~~**Q1-g Payment detail (dialog/panel)**~~ — Cycle 6: PMT-00001 Check $135.625 observed; flat panel, read-only.
+- ~~**Q1-i RecurringOrderDialog**~~ — Cycle 6: dialog observed (all fields + Cancel/Save); populated list blocked CAP-O2C-RECURRING.
+- ~~**Q3-a AutoPoPanel**~~ — Cycle 6: "Run Analysis" button + empty-state confirmed live.
+- ~~**Q3-b AutoPoSettings isAdmin gate**~~ — Cycle 6: Admin=4 fields, Manager=2 confirmed live; template has no @if conditionals; gate in .ts.
+- ~~**Q5-b ShippingRatesDialog**~~ — Cycle 6: observed from SH-00001; label creator (Cancel/Create Label), not rate-shopper.
+- ~~**Q1-d RfqDetail**~~ — Cycle 6: TERMINAL — CAP-P2P-RFQ disabled (DN-8).
+- ~~**Q1-h CustomerReturnDetail (dialog/panel)**~~ — Cycle 6: TERMINAL — CAP-O2C-RMA disabled (DN-8).
+- ~~**DN-6/7/8**~~ — Cycle 6: added to Architectural Data Notes.
 
 ### Still open (gating set — queue items)
 
-Checklist items remain unticked because components have `unreached` states. Seeding and re-sweep required per queue:
-
-| queue-id | component | pre-req |
+| queue-id | component | blocker |
 |----------|-----------|---------|
-| Q1-b | SalesOrderDetailDialog/Panel + 8 tabs + ScheduleTimeline | confirmed SO in production stage |
-| Q1-d | RfqDetailDialogComponent | 1 RFQ seeded |
-| Q1-e | InvoiceDetailDialog/Panel | 1 invoice seeded |
-| Q1-f | ShipmentDetailDialog/Panel + TrackingTimeline + ShippingRatesDialog | 1 shipment seeded |
-| Q1-g | PaymentDetailDialog/Panel | 1 payment seeded |
-| Q1-h | CustomerReturnDetailDialog/Panel | 1 return seeded |
-| Q1-i | RecurringOrderDialogComponent | click New Recurring Template button |
-| Q3-b | AutoPoSettingsPanelComponent non-Admin view | Manager or OfficeManager on settings tab |
-| Q3-c | OffTierPromptDialogComponent | off-tier pricing trigger in PO create |
-| Q7-e | Manager vs Admin on settings tab content | targeted role sweep |
-| Q7-f | Button-level capability differences (OM/Mgr/PM) | targeted capability sweep |
-| Q6-a–d | Customer detail Q2C tabs (estimates/quotes/orders/invoices) | seeded Q2C records linked to customer |
-| Q4-a,b | EstimateFormDialogComponent (full populated form) | caller wiring (currently dead code, DN-3) |
+| Q5-a | TrackingTimelineComponent | SH-00001 at Pending — requires Mark Shipped or carrier tracking event |
+| Q3-c | OffTierPromptDialogComponent | off-tier pricing trigger in PO create flow — untriggerable in current env |
+| Q6-b | Customer quotes tab (`/customers/1/quotes`) | READY — QT-00001 exists for customer 1 |
+| Q6-c | Customer orders tab (`/customers/1/orders`) | READY — SO-00001/J-1 exists for customer 1 |
+| Q6-d | Customer invoices tab (`/customers/1/invoices`) | READY — INV-00001 exists for customer 1 |
+| Q6-a | Customer estimates tab (`/customers/1/estimates`) | EstimateFormDialog unwired — no estimate seeded |
+| Q4-a,b | EstimateFormDialogComponent (full populated form) | zero callers in source — dead code (DN-3); HOLD per orchestrator |
+| Q1-d | RfqDetailDialogComponent | TERMINAL — CAP-P2P-RFQ disabled (DN-8) |
+| Q1-h | CustomerReturnDetailDialog/Panel | TERMINAL — CAP-O2C-RMA disabled (DN-8) |
+| DN-7 | PM on `/purchase-orders/orders` job-board behavior | source read needed to confirm route/component mechanism |
 
 ---
 
-*Cycle 5 reconciliation complete — scout entries verified against source; 12 checklist items remain unticked (all `unreached`). Phase NOT complete until queue drained and all items ticked.*
+*Cycle 6 dequeue complete — 14 checklist items ticked (Q1-b/e/f/g/i, Q3-a/b, Q5-b, terminal Q1-d/h, including customer-return dialog/panel); 2 checklist items remain unticked (`tracking-timeline`, `off-tier-prompt-dialog`); DN-6/7/8 added. Phase NOT complete until queue drained and all items ticked.*
