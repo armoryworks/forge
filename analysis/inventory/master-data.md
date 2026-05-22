@@ -143,6 +143,8 @@
 - [ ] `workflow/part-shipping-step/part-shipping-step.component.ts`
 - [ ] `workflow/part-source-part-step/part-source-part-step.component.ts`
 - [ ] `workflow/part-tool-asset-step/part-tool-asset-step.component.ts`
+- [ ] `workflow/part-vendor-step/part-vendor-step.component.ts` ⚠️ _discovered via grep — not in original feature-dir list_
+- [ ] `workflow/part-inventory-step/part-inventory-step.component.ts` ⚠️ _discovered via grep — not in original feature-dir list_
 - [ ] `workflow/part-express-form/part-express-form.component.ts`
 - [ ] `components/bom-revision-history/bom-revision-history.component.ts`
 - [ ] `components/bom-tree/bom-tree.component.ts`
@@ -918,6 +920,218 @@ Tabs within InventoryComponent (in-component, NOT separate route components):
 
 ---
 
+---
+
+## Shared Component — Resolved Usage Sites
+
+> Source-grepped; line numbers are the `imports: [...]` array line in each consumer file.
+> Paths relative to `forge-ui/src/app/features/`.
+
+### DataTableComponent (`shared/components/data-table`)
+
+| consumer file | line |
+|---------------|------|
+| `leads/leads.component.ts` | 51 |
+| `leads/pages/campaigns/leads-campaigns.component.ts` | 24 |
+| `leads/pages/samples/leads-samples.component.ts` | 40 |
+| `leads/pages/accounts/leads-accounts.component.ts` | 40 |
+| `leads/pages/suppression/leads-suppression.component.ts` | 21 |
+| `customers/customers.component.ts` | 45 |
+| `customers/pages/contacts/customer-contacts.component.ts` | 18 |
+| `customers/pages/portal-access/customer-portal-access.component.ts` | 37 |
+| `customers/pages/customer-detail/tabs/customer-quotes-tab.component.ts` | 26 |
+| `customers/pages/customer-detail/tabs/customer-orders-tab.component.ts` | 26 |
+| `customers/pages/customer-detail/tabs/customer-jobs-tab.component.ts` | 27 |
+| `customers/pages/customer-detail/tabs/customer-invoices-tab.component.ts` | 27 |
+| `vendors/vendors.component.ts` | 35 |
+| `vendors/components/vendor-detail-panel/vendor-detail-panel.component.ts` | 41 |
+| `inventory/inventory.component.ts` | 49 |
+| `inventory/components/receiving-inspection-queue/receiving-inspection-queue.component.ts` | 15 |
+| `inventory/components/uom-management/uom-management.component.ts` | 25 |
+| `lots/lots.component.ts` | 25 |
+
+---
+
+### PageHeaderComponent (`shared/components/page-header`)
+
+| consumer file | line |
+|---------------|------|
+| `leads/leads.component.ts` | 49 |
+| `leads/pages/intake/leads-intake.component.ts` | 48 |
+| `leads/pages/queue/leads-queue.component.ts` | 48 |
+| `leads/pages/campaigns/leads-campaigns.component.ts` | 24 |
+| `leads/pages/suppression/leads-suppression.component.ts` | 21 |
+| `customers/customers.component.ts` | 43 |
+| `customers/pages/contacts/customer-contacts.component.ts` | 18 |
+| `customers/pages/segments/customer-segments.component.ts` | 22 |
+| `customers/pages/import/customer-import.component.ts` | 23 |
+| `vendors/vendors.component.ts` | 34 |
+| `parts/parts.component.ts` | 54 |
+| `inventory/inventory.component.ts` | 49 |
+| `lots/lots.component.ts` | 24 |
+
+---
+
+### PageLayoutComponent (`shared/components/page-layout`)
+
+| consumer file | line |
+|---------------|------|
+| `leads/pages/samples/leads-samples.component.ts` | 39 |
+| `leads/pages/accounts/leads-accounts.component.ts` | 39 |
+| `customers/pages/portal-access/customer-portal-access.component.ts` | 36 |
+
+---
+
+### DialogComponent (`shared/components/dialog`)
+
+| consumer file | line |
+|---------------|------|
+| `leads/leads.component.ts` | 49 |
+| `customers/customers.component.ts` | 43 |
+| `customers/components/customer-detail-dialog/customer-detail-dialog.component.ts` | 43 |
+| `customers/components/new-customer-fork-dialog/lead-picker-dialog.component.ts` | 23 |
+| `customers/components/credit-status-card/credit-status-card.component.ts` | 18 |
+| `parts/parts.component.ts` | 54 |
+| `parts/workflow/part-bom-step/part-bom-step.component.ts` | 57 |
+| `inventory/inventory.component.ts` | 49 |
+
+---
+
+### EntityPickerComponent (`shared/components/entity-picker`)
+
+| consumer file | line |
+|---------------|------|
+| `lots/components/lot-dialog/lot-dialog.component.ts` | 27 |
+| `vendors/components/guided-vendor-dialog/guided-vendor-dialog.component.ts` | 72 |
+| `customers/components/price-list-entries-cluster/price-list-entry-form-dialog.component.ts` | 47 |
+| `parts/parts.component.ts` | 57 |
+| `parts/workflow/part-bom-step/part-bom-step.component.ts` | 57 |
+| `parts/workflow/part-sourcing-step/part-sourcing-step.component.ts` | 29 |
+| `parts/workflow/part-source-part-step/part-source-part-step.component.ts` | 25 |
+| `parts/workflow/part-tool-asset-step/part-tool-asset-step.component.ts` | 28 |
+| `parts/workflow/part-vendor-step/part-vendor-step.component.ts` | 29 |
+| `parts/workflow/part-inventory-step/part-inventory-step.component.ts` | 28 |
+| `parts/components/vendor-sources-panel/vendor-sources-panel.component.ts` | 134 |
+| `parts/components/part-detail-panel/part-detail-panel.component.ts` | 90 |
+| `parts/components/vendor-parts-cluster/vendor-part-form-dialog.component.ts` | 49 |
+| `parts/components/part-clusters/part-quality-cluster/part-quality-cluster.component.ts` | 33 |
+| `parts/components/part-alternates-tab/part-alternates-tab.component.ts` | 39 |
+| `parts/components/operation-dialog/operation-dialog.component.ts` | 45 |
+
+---
+
+### EmptyStateComponent (`shared/components/empty-state`)
+
+| consumer file | line |
+|---------------|------|
+| `leads/pages/intake/leads-intake.component.ts` | 49 |
+| `leads/pages/queue/leads-queue.component.ts` | 49 |
+| `customers/components/price-list-entries-cluster/price-list-entries-table.component.ts` | 41 |
+| `customers/pages/customer-detail/tabs/customer-pricing-tab.component.ts` | 46 |
+| `vendors/components/vendor-scorecard-tab/vendor-scorecard-tab.component.ts` | 15 |
+| `vendors/components/vendor-detail-panel/vendor-detail-panel.component.ts` | 42 |
+| `inventory/inventory.component.ts` | 49 |
+| `inventory/components/uom-management/uom-management.component.ts` | 27 |
+| `inventory/components/receiving-inspection-queue/receiving-inspection-queue.component.ts` | 15 |
+
+---
+
+### LoadingBlockDirective (`shared/directives/loading-block`) — the loading-state primitive
+
+> Note: `shared/components/loading-overlay` directory exists but the primary loading pattern
+> used in master-data features is `LoadingBlockDirective` from `shared/directives/`. No
+> `LoadingOverlayComponent` import was found in any master-data feature file.
+
+| consumer file | line |
+|---------------|------|
+| `customers/customers.component.ts` | 46 |
+| `customers/pages/portal-access/customer-portal-access.component.ts` | 38 |
+| `customers/pages/contacts/customer-contacts.component.ts` | 19 |
+| `customers/components/price-list-entries-cluster/price-list-entries-table.component.ts` | 41 |
+| `customers/components/customer-detail-dialog/customer-detail-dialog.component.ts` | 43 |
+| `customers/components/customer-clusters/customer-interactions-cluster.component.ts` | 52 |
+| `customers/components/credit-status-card/credit-status-card.component.ts` | 18 |
+| `vendors/vendors.component.ts` | 36 |
+| `vendors/components/vendor-scorecard-tab/vendor-scorecard-tab.component.ts` | 15 |
+| `vendors/components/vendor-detail-panel/vendor-detail-panel.component.ts` | 42 |
+| `parts/workflow/part-vendor-step/part-vendor-step.component.ts` | 29 |
+| `parts/workflow/part-tool-asset-step/part-tool-asset-step.component.ts` | 28 |
+| `parts/workflow/part-sourcing-step/part-sourcing-step.component.ts` | 29 |
+| `parts/workflow/part-source-part-step/part-source-part-step.component.ts` | 25 |
+| `parts/workflow/part-inventory-step/part-inventory-step.component.ts` | 28 |
+| `parts/components/part-detail-panel/part-detail-panel.component.ts` | 90 |
+| `parts/components/part-clusters/part-landed-cost.component.ts` | 30 |
+| `inventory/inventory.component.ts` | 49 |
+| `inventory/components/uom-management/uom-management.component.ts` | 27 |
+| `inventory/components/receiving-inspection-queue/receiving-inspection-queue.component.ts` | 15 |
+| `lots/components/lot-detail-panel/lot-detail-panel.component.ts` | 16 |
+
+---
+
+### EntityLinkComponent (`shared/components/entity-link`)
+
+| consumer file | line |
+|---------------|------|
+| `parts/components/part-clusters/part-landed-cost.component.ts` | 30 |
+| `parts/components/part-detail-panel/part-detail-panel.component.ts` | 90 |
+
+---
+
+### EntityActivitySectionComponent (`shared/components/entity-activity-section`)
+
+| consumer file | line |
+|---------------|------|
+| `leads/components/lead-detail-panel/lead-detail-panel.component.ts` | 30 |
+| `customers/components/customer-clusters/customer-activity-cluster.component.ts` | 13 |
+| `vendors/components/vendor-detail-panel/vendor-detail-panel.component.ts` | 43 |
+| `parts/components/part-clusters/part-activity-cluster.component.ts` | 13 |
+| `lots/components/lot-detail-panel/lot-detail-panel.component.ts` | 16 |
+
+---
+
+### WorkflowComponent (`shared/components/workflow`)
+
+| consumer file | line |
+|---------------|------|
+| `parts/workflow/part-workflow-page/part-workflow-page.component.ts` | 31 |
+
+---
+
+### AddressFormComponent (`shared/components/address-form`)
+
+| consumer file | line |
+|---------------|------|
+| `leads/components/lead-convert-dialog/lead-convert-dialog.component.ts` | 49 |
+| `customers/components/guided-customer-dialog/guided-customer-dialog.component.ts` | 51 |
+| `vendors/components/vendor-dialog/vendor-dialog.component.ts` | 27 |
+| `vendors/components/guided-vendor-dialog/guided-vendor-dialog.component.ts` | 72 |
+
+---
+
+### FileUploadZoneComponent (`shared/components/file-upload-zone`)
+
+| consumer file | line |
+|---------------|------|
+| `parts/components/operation-dialog/operation-dialog.component.ts` | 45 |
+| `parts/components/part-clusters/part-files-cluster.component.ts` | 17 |
+
+---
+
+### EntityCompletenessBadgeComponent + EntityCompletenessChipComponent
+
+| consumer file | badge | chip | line |
+|---------------|-------|------|------|
+| `customers/customers.component.ts` | ✅ | ✅ | 47 |
+| `customers/pages/customer-detail/customer-detail.component.ts` | — | ✅ | 68 |
+| `vendors/vendors.component.ts` | ✅ | ✅ | 37 |
+| `vendors/components/vendor-detail-panel/vendor-detail-panel.component.ts` | — | ✅ | 45 |
+| `parts/parts.component.ts` | ✅ | ✅ | 60 |
+| `parts/components/part-detail-panel/part-detail-panel.component.ts` | — | ✅ | 100 |
+
+> Pattern: badge appears on the list page rows; chip appears in the detail panel header.
+
+---
+
 ## Open Items / Queue (to be resolved by scout or next cataloger cycle)
 
 > Items placed here until closed. Scout appends findings to `master-data-queue.md`.
@@ -933,9 +1147,18 @@ Tabs within InventoryComponent (in-component, NOT separate route components):
 9. **Role-gating accuracy** — renders-for values above come from `app.routes.ts` top-level guards; sub-surface capability gates may differ. Scout to flag mismatches.
 10. **`parts.component.ts` path** — explorer reports it at `features/parts/parts.component.ts:48`; verify a `PartsComponent` class exists (not a guard or model file named similarly).
 
+11. **Two additional parts workflow step files found via EntityPickerComponent grep — NOT in original checklist:**
+    - `features/parts/workflow/part-vendor-step/part-vendor-step.component.ts` — distinct from `part-sourcing-step`; add to checklist + get entry
+    - `features/parts/workflow/part-inventory-step/part-inventory-step.component.ts` — distinct from `part-inventory-cluster`; add to checklist + get entry
+    These must be inventoried before parts workflow reconciliation can be called complete.
+
+12. **`shared/components/loading-overlay` vs `LoadingBlockDirective`** — the checklist item was `loading-overlay` but no master-data feature imports that component class. The actual loading primitive used throughout is `LoadingBlockDirective` (from `shared/directives/`). Confirm whether `LoadingOverlayComponent` exists and is used anywhere in master-data, or if the checklist item should be retired.
+
+13. **`shared/components/detail-side-panel` and `shared/components/slideout`** — no master-data import found. Panels in leads/vendors/lots are feature-specific components. Confirm these shared components are intentionally not used in master-data (they may be used in other regions like sales-orders/kanban).
+
 ---
 
-_End of seed — cycle 1 complete. Queue drained next cycle after scout delivers `master-data-queue.md`._
+_Cycle 1: seed. Cycle 2: shared-cmp reconciliation complete (18 items resolved). Queue drained next cycle after scout delivers `master-data-queue.md`._
 
 ---
 
