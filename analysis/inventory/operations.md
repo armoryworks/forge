@@ -168,15 +168,15 @@ Route is under `/display/` path with **no auth guard** — public kiosk terminal
 |---|-----------|------|-------|------|-------------|--------|---------|
 | SF-01 | `app-shop-floor-display` / ShopFloorDisplayComponent | page | `/display/shop-floor` | `features/shop-floor/shop-floor-display.component.ts:52` | all (public) | TODO:live | Main kiosk display: phases = main/pin/actions/job-select/receiving/shipping |
 | SF-02 | `app-kiosk-setup` / KioskSetupComponent | panel | `/display/shop-floor` (phase=setup) | `features/shop-floor/components/kiosk-setup/kiosk-setup.component.ts:16` | all (public) | TODO:live | Admin-login + team/terminal config before kiosk goes live |
-| SF-03 | `app-kiosk-search-bar` / KioskSearchBarComponent | cluster | `/display/shop-floor` | `features/shop-floor/components/kiosk-search-bar/kiosk-search-bar.component.ts:1` | all (public) | TODO:live | Worker search/lookup bar on kiosk main screen |
-| SF-04 | `app-kiosk-session-bar` / KioskSessionBarComponent | cluster | `/display/shop-floor` | `features/shop-floor/components/kiosk-session-bar/kiosk-session-bar.component.ts:1` | all (public) | TODO:live | Logged-in worker session info bar |
-| SF-05 | `app-numeric-keypad` / NumericKeypadComponent | cluster | `/display/shop-floor` | `features/shop-floor/components/numeric-keypad/numeric-keypad.component.ts:1` | all (public) | TODO:live | Touch-friendly numeric entry (PIN, quantities) |
-| SF-06 | PinPromptDialogComponent | dialog | `/display/shop-floor` (phase=pin) | `features/shop-floor/components/pin-prompt-dialog/pin-prompt-dialog.component.ts:1` | all (public) | TODO:live | PIN entry dialog for worker auth on kiosk |
-| SF-07 | `app-scan-action-overlay` / ScanActionOverlayComponent | panel | `/display/shop-floor` + `/display/shop-floor/scan` | `features/shop-floor/components/scan-action-overlay/scan-action-overlay.component.ts:1` | all (public) | TODO:live | Action selection overlay after barcode scan |
-| SF-08 | `app-scan-undo-list` / ScanUndoListComponent | panel | `/display/shop-floor` | `features/shop-floor/components/scan-undo-list/scan-undo-list.component.ts:1` | all (public) | TODO:live | Recent scan history with undo capability |
-| SF-09 | `app-scan-devices-panel` / ScanDevicesPanelComponent | panel | `/display/shop-floor` | `features/shop-floor/components/scan-devices-panel/scan-devices-panel.component.ts:1` | all (public) | TODO:live | Connected scan device management panel |
-| SF-10 | `app-scan-location-view` / ScanLocationViewComponent | panel | `/display/shop-floor` | `features/shop-floor/components/scan-location-view/scan-location-view.component.ts:1` | all (public) | TODO:live | Current inventory location view on kiosk |
-| SF-11 | `app-training-mode-banner` / TrainingModeBannerComponent | state | `/display/shop-floor` | `features/shop-floor/components/training-mode-banner/training-mode-banner.component.ts:1` | all (public) | TODO:live | Banner shown when kiosk is in training mode |
+| SF-03 | `app-kiosk-search-bar` / KioskSearchBarComponent | cluster | `/display/shop-floor` | `features/shop-floor/components/kiosk-search-bar/kiosk-search-bar.component.ts:12` | all (public) | TODO:live | Worker search/lookup bar on kiosk main screen |
+| SF-04 | `app-kiosk-session-bar` / KioskSessionBarComponent | cluster | `/display/shop-floor` | `features/shop-floor/components/kiosk-session-bar/kiosk-session-bar.component.ts:9` | all (public) | TODO:live | Logged-in worker session info bar |
+| SF-05 | `app-numeric-keypad` / NumericKeypadComponent | cluster | `/display/shop-floor` | `features/shop-floor/components/numeric-keypad/numeric-keypad.component.ts:20` | all (public) | TODO:live | Touch-friendly numeric entry (PIN, quantities) |
+| SF-06 | `app-pin-prompt-dialog` / PinPromptDialogComponent | dialog | `/display/shop-floor` (phase=pin) | `features/shop-floor/components/pin-prompt-dialog/pin-prompt-dialog.component.ts:9` | all (public) | TODO:live | PIN entry dialog for worker auth on kiosk |
+| SF-07 | `app-scan-action-overlay` / ScanActionOverlayComponent | panel | `/display/shop-floor` + `/display/shop-floor/scan` | `features/shop-floor/components/scan-action-overlay/scan-action-overlay.component.ts:52` | all (public) | TODO:live | Action selection overlay after barcode scan; hosts all 8 scan-flow sub-components |
+| SF-08 | `app-scan-undo-list` / ScanUndoListComponent | panel | `/display/shop-floor` | `features/shop-floor/components/scan-undo-list/scan-undo-list.component.ts:12` | all (public) | TODO:live | Recent scan history with undo capability |
+| SF-09 | `app-scan-devices-panel` / ScanDevicesPanelComponent | panel | `/display/shop-floor` | `features/shop-floor/components/scan-devices-panel/scan-devices-panel.component.ts:13` | all (public) | TODO:live | Connected scan device management panel |
+| SF-10 | `app-scan-location-view` / ScanLocationViewComponent | panel | `/display/shop-floor` | `features/shop-floor/components/scan-location-view/scan-location-view.component.ts:7` | all (public) | TODO:live | Current inventory location view on kiosk |
+| SF-11 | `app-training-mode-banner` / TrainingModeBannerComponent | state | `/display/shop-floor` | `features/shop-floor/components/training-mode-banner/training-mode-banner.component.ts:4` | all (public) | TODO:live | Banner shown when kiosk is in training mode |
 
 #### 5B — Scan Flows (rendered within SF-01 or SF-07)
 
@@ -199,7 +199,7 @@ Route is under `/display/` path with **no auth guard** — public kiosk terminal
 |---|-----------|------|-------|------|-------------|--------|---------|
 | SF-20 | `app-shop-floor-clock` / ShopFloorClockComponent | page | `/display/shop-floor/clock` | `features/shop-floor/clock/shop-floor-clock.component.ts:29` | all (public) | TODO:live | Dedicated clock-in/out kiosk; phases: setup/dashboard/identifying/pin/job-scanned/manual-login/clock |
 | SF-21 | `app-inventory-scan` / InventoryScanComponent | page | `/display/shop-floor/scan` | `features/shop-floor/scan/inventory-scan.component.ts:12` | all (public) | TODO:live | Standalone barcode-scan terminal for inventory transactions |
-| SF-22 | `app-scan-daily-log` / ScanDailyLogComponent | page | `/display/shop-floor/scan-log` (also embedded in SF-01) | `features/shop-floor/components/scan-daily-log/scan-daily-log.component.ts:1` | all (public) | TODO:live | Daily scan activity log — shown inline on main display and at /scan-log route |
+| SF-22 | `app-scan-daily-log` / ScanDailyLogComponent | page | `/display/shop-floor/scan-log` (also embedded in SF-01) | `features/shop-floor/components/scan-daily-log/scan-daily-log.component.ts:27` | all (public) | TODO:live | Daily scan activity log — shown inline on main display and at /scan-log route |
 
 #### 5D — Services
 
@@ -325,10 +325,12 @@ _This section tracks entries that need live-sweep confirmation. All TODO:live st
 - ~~SPC components Q-04–Q-07: exact `path:line` selectors pending read.~~ **CLOSED** — all 4 confirmed.
 - ~~Asset detail panel A-02: exact `path:line` pending read.~~ **CLOSED** — `:17` confirmed.
 - ~~MN-02: exact `path:line` pending read.~~ **CLOSED** — `:16` confirmed.
+- ~~Kiosk sub-components SF-03–SF-11, SF-22: `path:line` stubs at `:1`.~~ **CLOSED** — all 10 confirmed.
 - Quality inline inspection/lot panel dialogs: may have additional dialog components inside QualityComponent not surfaced by source scan. **Pending live sweep.**
-- Kiosk sub-components SF-03–SF-11, SF-22: `path:line` stubs at `:1` — need targeted source read. **Queued.**
+
+**Source side carries zero `:1` placeholders as of this commit.**
 
 ---
 
-_Commit: source gaps closed — SF-12–SF-19, Q-04–Q-07, A-02, MN-02 path:line confirmed; 57-item live queue open_
+_Commit: all source stubs closed — zero `:1` placeholders remain; 57-item live queue open_
 _Next: dequeue ui-scout live results (states + dialog triggers) as they land_
