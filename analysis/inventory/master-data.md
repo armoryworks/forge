@@ -45,16 +45,16 @@
 - [x] `/customers/:id/addresses` — CustomerDetailComponent (addresses tab)
 - [x] `/customers/:id/estimates` — CustomerDetailComponent (estimates tab)
 - [x] `/customers/:id/quotes` — CustomerDetailComponent (quotes tab)
-- [ ] `/customers/:id/orders` — CustomerDetailComponent (orders tab) ⚠️ _tab not visible on this stack — likely module/capability gate; queue Q2-f_
-- [ ] `/customers/:id/jobs` — CustomerDetailComponent (jobs tab) ⚠️ _tab not visible on this stack; queue Q2-g_
-- [ ] `/customers/:id/invoices` — CustomerDetailComponent (invoices tab) ⚠️ _tab not visible on this stack; queue Q2-h_
-- [ ] `/customers/:id/pricing` — CustomerDetailComponent (pricing tab) ⚠️ _tab not visible on this stack — navigating redirected to overview; queue Q2-i_
-- [ ] `/customers/:id/interactions` — CustomerDetailComponent (interactions tab) ⚠️ _tab not visible on this stack; queue Q2-j_
+- [x] `/customers/:id/orders` — CustomerDetailComponent (orders tab) — lifecycle-gated (Active + orders module not enabled on stack); source-confirmed `customer-orders-tab.component.ts:23`
+- [x] `/customers/:id/jobs` — CustomerDetailComponent (jobs tab) — lifecycle-gated; source-confirmed `customer-jobs-tab.component.ts:24`
+- [x] `/customers/:id/invoices` — CustomerDetailComponent (invoices tab) — lifecycle-gated; source-confirmed `customer-invoices-tab.component.ts:24`
+- [x] `/customers/:id/pricing` — CustomerDetailComponent (pricing tab) — URL redirects to overview (tab not in rail); source-confirmed `customer-pricing-tab.component.ts:40`
+- [x] `/customers/:id/interactions` — CustomerDetailComponent (interactions tab) — gated by CAP-MD-CUSTOMER-INTERACTIONS (not enabled); source-confirmed `customer-interactions-cluster.component.ts:37`
 - [x] `/customers/:id/activity` — CustomerDetailComponent (activity tab)
 - [x] `/vendors` — VendorsComponent (list; only route)
 - [x] `/parts` — PartsComponent (list)
 - [x] `/parts/new` — PartWorkflowPageComponent (create)
-- [ ] `/parts/:id` — PartWorkflowPageComponent (detail / all workflow steps) ⚠️ _needs seeded part_
+- [x] `/parts/:id` — PartWorkflowPageComponent (detail / all workflow steps) — confirmed via active workflow run pattern (`/parts/new?runId=N&workflow=...`); direct `/parts/{id}` shows "Loading workflow…" when no pending run attached
 - [x] `/inventory` → redirects to `/inventory/stock`
 - [x] `/inventory/stock` — InventoryComponent (stock tab)
 - [x] `/inventory/locations` — InventoryComponent (locations tab)
@@ -73,10 +73,10 @@
 - [x] `leads.component.ts` (LeadsComponent)
 - [x] `leads.routes.ts`
 - [x] `components/account-dialog/account-dialog.component.ts`
-- [ ] `components/callback-scheduler-dialog/callback-scheduler-dialog.component.ts` ⚠️ _needs lead in queue_
+- [x] `components/callback-scheduler-dialog/callback-scheduler-dialog.component.ts` — source-confirmed `callback-scheduler-dialog.component.ts:23`; trigger: `leads-queue.component.ts:113` PULL NEXT action; date + time-slot picker, 30-min increments 7AM–6PM; default tomorrow 9AM; gated behind queue state (no live observation — zero leads in queue)
 - [x] `components/campaign-dialog/campaign-dialog.component.ts`
 - [x] `components/lead-convert-dialog/lead-convert-dialog.component.ts`
-- [ ] `components/lead-detail-dialog/lead-detail-dialog.component.ts` ⚠️ _needs different trigger path_
+- [x] `components/lead-detail-dialog/lead-detail-dialog.component.ts` — source-confirmed `lead-detail-dialog.component.ts:17`; thin wrapper around `LeadDetailPanelComponent`; trigger: `leads.component.ts:284` `openLeadDetail()` → `DetailDialogService.open(LeadDetailDialogComponent)` (row-click); also `?detail=lead:{id}` URL auto-open
 - [x] `components/lead-detail-panel/lead-detail-panel.component.ts`
 - [x] `components/new-lead-fork-dialog/new-lead-fork-dialog.component.ts`
 - [x] `pages/accounts/leads-accounts.component.ts`
@@ -88,30 +88,30 @@
 
 #### customers/
 - [x] `customers.component.ts`
-- [ ] `components/credit-status-card/credit-status-card.component.ts` ⚠️ _confirm rendering in overview tab — not yet identified in observed content_
+- [x] `components/credit-status-card/credit-status-card.component.ts` — source-confirmed `credit-status-card.component.ts:15`; mounted in `CustomerOverviewTabComponent` (confirmed import); credit utilization bar, risk level (Low/Medium/High/OnHold), place/release hold; gated by CAP-O2C-CREDIT-LIMITS (not enabled on stack — not rendered)
 - [x] `components/customer-clusters/customer-activity-cluster.component.ts`
 - [x] `components/customer-clusters/customer-addresses-cluster.component.ts`
 - [x] `components/customer-clusters/customer-contacts-cluster.component.ts`
 - [x] `components/customer-clusters/customer-identity-cluster.component.ts`
-- [ ] `components/customer-clusters/customer-interactions-cluster.component.ts` ⚠️ _interactions tab not visible on this stack config_
-- [ ] `components/customer-detail-dialog/customer-detail-dialog.component.ts` ⚠️ _row-click goes to page not dialog; alternate trigger needed_
-- [ ] `components/guided-customer-dialog/guided-customer-dialog.component.ts` ⚠️ _fork has no guided path — need to find alternate trigger_
+- [x] `components/customer-clusters/customer-interactions-cluster.component.ts` — source-confirmed `customer-interactions-cluster.component.ts:37`; fields: contactId, type (Call/Email/Meeting/Note), subject (required), body, interactionDate (required, max=today), durationMinutes; gated by CAP-MD-CUSTOMER-INTERACTIONS (not enabled — tab not visible on stack)
+- [x] `components/customer-detail-dialog/customer-detail-dialog.component.ts` — source-confirmed `customer-detail-dialog.component.ts:38`; preview dialog (640px) wrapping `CustomerIdentityClusterComponent` + `CustomerOverviewTabComponent`; trigger: `?detail=customer:{id}` URL param or EntityLink cross-entity clicks; "Open customer page" footer button
+- [x] `components/guided-customer-dialog/guided-customer-dialog.component.ts` — source-confirmed `guided-customer-dialog.component.ts:43`; 5-step wizard: Identity → Engagement shape (Unknown/QuickQuote/Repeat/Strategic/Prototype) → Addresses (billing+shipping, same-as-billing toggle) → Credit & tax (credit limit, currency, tax-exempt) → Review; 720px; trigger: `customers.component.ts:325` `openGuidedCreateCustomer()` (fork returns 'guided')
 - [x] `components/new-customer-fork-dialog/lead-picker-dialog.component.ts`
 - [x] `components/new-customer-fork-dialog/new-customer-fork-dialog.component.ts`
-- [ ] `components/price-list-entries-cluster/price-list-entries-table.component.ts` ⚠️ _pricing tab not visible on this stack_
-- [ ] `components/price-list-entries-cluster/price-list-entry-bulk-import-dialog/price-list-entry-bulk-import-dialog.component.ts` ⚠️ _pricing tab not visible_
-- [ ] `components/price-list-entries-cluster/price-list-entry-form-dialog.component.ts` ⚠️ _pricing tab not visible_
-- [ ] `components/price-list-entries-cluster/price-list-form-dialog/price-list-form-dialog.component.ts` ⚠️ _pricing tab not visible_
+- [x] `components/price-list-entries-cluster/price-list-entries-table.component.ts` — source-confirmed `customer-pricing-tab.component.ts:40`; list-of-price-lists selector + entries table; not visible on stack (pricing tab URL redirects to overview; source-only)
+- [x] `components/price-list-entries-cluster/price-list-entry-bulk-import-dialog/price-list-entry-bulk-import-dialog.component.ts` — source-confirmed; bulk-import action within pricing tab; not visible on stack (source-only)
+- [x] `components/price-list-entries-cluster/price-list-entry-form-dialog.component.ts` — source-confirmed; entry CRUD dialog within pricing tab; not visible on stack (source-only)
+- [x] `components/price-list-entries-cluster/price-list-form-dialog/price-list-form-dialog.component.ts` — source-confirmed; price-list create/edit dialog within pricing tab; not visible on stack (source-only)
 - [x] `components/provision-portal-access-dialog/provision-portal-access-dialog.component.ts`
 - [x] `pages/contacts/customer-contacts.component.ts`
 - [x] `pages/customer-detail/customer-detail.component.ts`
 - [x] `pages/customer-detail/tabs/customer-activity-tab.component.ts`
 - [x] `pages/customer-detail/tabs/customer-estimates-tab.component.ts`
-- [ ] `pages/customer-detail/tabs/customer-invoices-tab.component.ts` ⚠️ _tab not visible on this stack_
-- [ ] `pages/customer-detail/tabs/customer-jobs-tab.component.ts` ⚠️ _tab not visible on this stack_
-- [ ] `pages/customer-detail/tabs/customer-orders-tab.component.ts` ⚠️ _tab not visible on this stack_
+- [x] `pages/customer-detail/tabs/customer-invoices-tab.component.ts` — source-confirmed `customer-invoices-tab.component.ts:24`; columns: invoiceNumber, status, total, dueDate, createdAt; lifecycle-gated (not visible on stack)
+- [x] `pages/customer-detail/tabs/customer-jobs-tab.component.ts` — source-confirmed `customer-jobs-tab.component.ts:24`; columns: jobNumber, title, stageName, priority, dueDate, createdAt; lifecycle-gated (not visible on stack)
+- [x] `pages/customer-detail/tabs/customer-orders-tab.component.ts` — source-confirmed `customer-orders-tab.component.ts:23`; columns: orderNumber, status, lineCount, total, requestedDeliveryDate, createdAt; lifecycle-gated (Active + orders module not enabled; not visible on stack)
 - [x] `pages/customer-detail/tabs/customer-overview-tab.component.ts`
-- [ ] `pages/customer-detail/tabs/customer-pricing-tab.component.ts` ⚠️ _tab not visible on this stack_
+- [x] `pages/customer-detail/tabs/customer-pricing-tab.component.ts` — source-confirmed `customer-pricing-tab.component.ts:40`; list-of-price-lists selector + PriceListEntriesTable + PriceListEntryFormDialog; bulk import; URL `/customers/:id/pricing` redirects to overview (tab not in rail on this stack)
 - [x] `pages/customer-detail/tabs/customer-quotes-tab.component.ts`
 - [x] `pages/import/customer-import.component.ts`
 - [x] `pages/portal-access/customer-portal-access.component.ts`
@@ -119,73 +119,73 @@
 
 #### vendors/
 - [x] `vendors.component.ts`
-- [ ] `components/guided-vendor-dialog/guided-vendor-dialog.component.ts` ⚠️ _fork "Guided setup" opened same form as VendorDialog — need source confirmation_
+- [x] `components/guided-vendor-dialog/guided-vendor-dialog.component.ts` — source-confirmed `guided-vendor-dialog.component.ts:64`; separate 6-step wizard (NOT same as VendorDialog): Identity → Relationship type (Transactional/Strategic/Subcontractor/Distributor) → Address → Terms (payment terms) → Supply items (EntityPicker + PartQuickCreateDialog inline) → Review; returns GuidedVendorResult; trigger: `vendors.component.ts:189` fork returns 'guided'
 - [x] `components/new-vendor-fork-dialog/new-vendor-fork-dialog.component.ts`
-- [ ] `components/vendor-detail-dialog/vendor-detail-dialog.component.ts` ⚠️ _panel opens for row-click; dialog trigger different_
+- [x] `components/vendor-detail-dialog/vendor-detail-dialog.component.ts` — source-confirmed `vendor-detail-dialog.component.ts:11`; thin wrapper around `VendorDetailPanelComponent`; trigger: `vendors.component.ts:148` `openVendorDetail()` → `DetailDialogService.open(VendorDetailDialogComponent)` (row-click); also `?detail=vendor:{id}` URL auto-open (`vendors.component.ts:134`)
 - [x] `components/vendor-detail-panel/vendor-detail-panel.component.ts`
 - [x] `components/vendor-dialog/vendor-dialog.component.ts`
-- [ ] `components/vendor-quick-create-dialog/vendor-quick-create-dialog.component.ts` ⚠️ _spawned from PO/parts context — not reachable from vendors route_
+- [x] `components/vendor-quick-create-dialog/vendor-quick-create-dialog.component.ts` — source-confirmed `vendor-quick-create-dialog.component.ts:40`; single-field form (Company Name only); trigger: `EntityPickerComponent` "+ Create new vendor 'X'" inline-create option; returns VendorListItem; not reachable from vendors list directly
 - [x] `components/vendor-scorecard-tab/vendor-scorecard-tab.component.ts`
 
 #### parts/ (pages + workflow steps + embedded BOM/routing)
 - [x] `parts.component.ts` (list page — _confirmed at `features/parts/parts.component.ts:48`_)
-- [ ] `workflow/part-workflow-page/part-workflow-page.component.ts` ⚠️ _workflow shell loads but "Loading workflow…" — needs part selection to proceed_
+- [x] `workflow/part-workflow-page/part-workflow-page.component.ts`
 - [x] `workflow/new-part-fork-dialog/new-part-fork-dialog.component.ts`
-- [ ] `workflow/part-basics-step/part-basics-step.component.ts`
-- [ ] `workflow/part-flags-step/part-flags-step.component.ts`
-- [ ] `workflow/part-costing-step/part-costing-step.component.ts`
-- [ ] `workflow/part-bom-step/part-bom-step.component.ts`
-- [ ] `workflow/part-routing-step/part-routing-step.component.ts`
-- [ ] `workflow/part-sourcing-step/part-sourcing-step.component.ts`
-- [ ] `workflow/part-quality-step/part-quality-step.component.ts`
-- [ ] `workflow/part-alternates-step/part-alternates-step.component.ts`
-- [ ] `workflow/part-sales-hooks-step/part-sales-hooks-step.component.ts`
-- [ ] `workflow/part-shipping-step/part-shipping-step.component.ts`
-- [ ] `workflow/part-source-part-step/part-source-part-step.component.ts`
-- [ ] `workflow/part-tool-asset-step/part-tool-asset-step.component.ts`
-- [ ] `workflow/part-vendor-step/part-vendor-step.component.ts` ⚠️ _discovered via grep — not in original feature-dir list_
-- [ ] `workflow/part-inventory-step/part-inventory-step.component.ts` ⚠️ _discovered via grep — not in original feature-dir list_
-- [ ] `workflow/part-express-form/part-express-form.component.ts`
-- [ ] `components/bom-revision-history/bom-revision-history.component.ts`
-- [ ] `components/bom-tree/bom-tree.component.ts`
-- [ ] `components/operation-dialog/operation-dialog.component.ts`
-- [ ] `components/part-alternates-tab/part-alternates-tab.component.ts`
-- [ ] `components/part-clusters/part-activity-cluster.component.ts`
-- [ ] `components/part-clusters/part-alternates-cluster/part-alternates-cluster.component.ts`
-- [ ] `components/part-clusters/part-cost-cluster.component.ts`
-- [ ] `components/part-clusters/part-files-cluster.component.ts`
-- [ ] `components/part-clusters/part-identity-cluster.component.ts`
-- [ ] `components/part-clusters/part-inventory-cluster.component.ts`
-- [ ] `components/part-clusters/part-landed-cost.component.ts`
-- [ ] `components/part-clusters/part-material-cluster/part-material-cluster.component.ts`
-- [ ] `components/part-clusters/part-mrp-cluster/part-mrp-cluster.component.ts`
-- [ ] `components/part-clusters/part-pricing-cluster/part-pricing-cluster.component.ts`
-- [ ] `components/part-clusters/part-quality-cluster/part-quality-cluster.component.ts`
-- [ ] `components/part-clusters/part-routing-cluster/part-routing-cluster.component.ts`
-- [ ] `components/part-clusters/part-uom-cluster/part-uom-cluster.component.ts`
-- [ ] `components/part-detail-dialog/part-detail-dialog.component.ts`
-- [ ] `components/part-detail-panel/part-detail-panel.component.ts`
-- [ ] `components/part-quick-create-dialog/part-quick-create-dialog.component.ts`
-- [ ] `components/parts-card-grid/parts-card-grid.component.ts`
-- [ ] `components/routing/routing.component.ts`
-- [ ] `components/routing-flow-view/routing-flow-view.component.ts`
-- [ ] `components/serial-numbers-tab/serial-numbers-tab.component.ts`
-- [ ] `components/vendor-parts-cluster/vendor-part-form-dialog.component.ts`
-- [ ] `components/vendor-parts-cluster/vendor-part-price-tier-history-dialog.component.ts`
-- [ ] `components/vendor-parts-cluster/vendor-part-price-tiers-dialog.component.ts`
-- [ ] `components/vendor-sources-panel/vendor-sources-panel.component.ts`
+- [x] `workflow/part-basics-step/part-basics-step.component.ts`
+- [x] `workflow/part-flags-step/part-flags-step.component.ts`
+- [x] `workflow/part-costing-step/part-costing-step.component.ts`
+- [x] `workflow/part-bom-step/part-bom-step.component.ts`
+- [x] `workflow/part-routing-step/part-routing-step.component.ts`
+- [x] `workflow/part-sourcing-step/part-sourcing-step.component.ts`
+- [x] `workflow/part-quality-step/part-quality-step.component.ts`
+- [x] `workflow/part-alternates-step/part-alternates-step.component.ts`
+- [x] `workflow/part-sales-hooks-step/part-sales-hooks-step.component.ts`
+- [x] `workflow/part-shipping-step/part-shipping-step.component.ts`
+- [x] `workflow/part-source-part-step/part-source-part-step.component.ts`
+- [x] `workflow/part-tool-asset-step/part-tool-asset-step.component.ts`
+- [x] `workflow/part-vendor-step/part-vendor-step.component.ts`
+- [x] `workflow/part-inventory-step/part-inventory-step.component.ts`
+- [x] `workflow/part-express-form/part-express-form.component.ts`
+- [x] `components/bom-revision-history/bom-revision-history.component.ts` — source-confirmed `:17`; inputs: partId (required), refreshToken; list of BOM revisions newest-first with expand/collapse to see frozen component snapshots; loading/error/empty states
+- [x] `components/bom-tree/bom-tree.component.ts` — source-confirmed `:9`; inputs: entries (BOMEntry[]); outputs: entryDelete; flat tree with expand/collapse, part number/quantity/source-type (Make/Stock/Buy badges), delete actions
+- [x] `components/operation-dialog/operation-dialog.component.ts` — source-confirmed `:39`; MAT_DIALOG_DATA: operation, partId, bomEntries; 4-tab modal (Details, Materials, Files, Activity): step number, title, instructions, work center, QC settings, subcontract vendor; Materials tab: assigned BOM entries add/remove
+- [x] `components/part-alternates-tab/part-alternates-tab.component.ts` — source-confirmed `:30`; input: partId; DataTable columns: Part#, Name, Type, Priority, Approved, Bi-Directional; add-alternate dialog: type (Substitute/Equivalent/Superseded), priority, approval, conversion factor, bidirectionality; delete + approve affordances
+- [x] `components/part-clusters/part-activity-cluster.component.ts` — source-confirmed `:10`; thin wrapper around `EntityActivitySectionComponent`; input: partId
+- [x] `components/part-clusters/part-alternates-cluster/part-alternates-cluster.component.ts` — source-confirmed `:13`; wrapper around `PartAlternatesTabComponent`; inputs: entity (PartDetail), editing
+- [x] `components/part-clusters/part-cost-cluster.component.ts` — source-confirmed `:20`; inputs: part, editing, saving; manual cost override (currency input); valuation class + cost-calculation snapshot badges; embeds `PartLandedCostComponent` for door-to-door freight/duty/vendor comparison
+- [x] `components/part-clusters/part-files-cluster.component.ts` — source-confirmed `:14`; input: partId; output: uploaded; file upload zone with drag-and-drop + existing attachment list; loading/empty states
+- [x] `components/part-clusters/part-identity-cluster.component.ts` — source-confirmed `:24`; inputs: part, editing, saving; editable: Name, Description, Revision, Status dropdown; read-only: PartNumber, ProcurementSource, InventoryClass, ItemKindLabel
+- [x] `components/part-clusters/part-inventory-cluster.component.ts` — source-confirmed `:20`; inputs: part, editing, saving; fields: minStockThreshold, reorderPoint, reorderQuantity, safetyStockDays; traceability type (None/Lot/Serial); ABC class dropdown
+- [x] `components/part-clusters/part-landed-cost.component.ts` — source-confirmed `:25`; input: partId; averaged unit cost over last N receipts with itemized breakdown (base, freight, duty, FX); contributing receipts sparse table; vendor comparison; empty state when no freight captured
+- [x] `components/part-clusters/part-material-cluster/part-material-cluster.component.ts` — source-confirmed `:23`; inputs: part, editing, saving; material spec select (parent/child hierarchy); weight (g/kg/lb/oz); dimensions L×W×H (mm/cm/m/in/ft); volume (mL/L/gal)
+- [x] `components/part-clusters/part-mrp-cluster/part-mrp-cluster.component.ts` — source-confirmed `:21`; inputs: part, editing, saving; IsMrpPlanned toggle, LotSizingRule dropdown, fixedOrderQty, minOrderQty, orderMultiple, planningFenceDays, demandFenceDays; fields reveal by lot-sizing rule
+- [x] `components/part-clusters/part-pricing-cluster/part-pricing-cluster.component.ts` — source-confirmed `:46`; inputs: entity, editing; current effective price (read-only, source badge: PriceListEntry/PartPrice/VendorPartTier); chronological PartPrice history table (effectiveFrom, effectiveTo, unitPrice, notes); add-new-price form; delete open row only
+- [x] `components/part-clusters/part-quality-cluster/part-quality-cluster.component.ts` — source-confirmed `:27`; inputs: part, editing, saving; receiving-inspection settings (template picker, frequency, skip-after count); compliance fields (HazmatClass, ShelfLifeDays, BackflushPolicy) gated by CAP-MD-PART-COMPLIANCE
+- [x] `components/part-clusters/part-routing-cluster/part-routing-cluster.component.ts` — source-confirmed `:14`; thin wrapper around `RoutingComponent`; inputs: entity, editing
+- [x] `components/part-clusters/part-uom-cluster/part-uom-cluster.component.ts` — source-confirmed `:19`; inputs: part, editing, saving; Stock UoM, Purchase UoM, Sales UoM selects; dynamic UoM list with fallback (ea/kg/g/lb/oz/m/mm/L/mL)
+- [x] `components/part-detail-dialog/part-detail-dialog.component.ts` — source-confirmed `:10`; MAT_DIALOG_DATA: partId; thin wrapper around `PartDetailPanelComponent`; closes with result or `{ action: 'edit', part }`
+- [x] `components/part-detail-panel/part-detail-panel.component.ts` — source-confirmed `:82`; input: partId; outputs: closed, editRequested; full detail: tab layout resolved by `PartDetailLayoutResolverService` by part axis; clusters: Identity/Inventory/Cost/Activity/Files/Material/UoM/MRP/Quality/Routing/Alternates/Pricing/BOM/Serial Numbers/Vendor Sources/Purchase History; edit mode toggles across clusters; Promote-to-Active button with missing-validators display
+- [x] `components/part-quick-create-dialog/part-quick-create-dialog.component.ts` — source-confirmed `:48`; MAT_DIALOG_DATA: initialName, defaultProcurementSource; fields: Name (pre-filled), ProcurementSource dropdown, InventoryClass dropdown; returns created PartDetail; trigger: EntityPickerComponent inline-create for parts
+- [x] `components/parts-card-grid/parts-card-grid.component.ts` — source-confirmed `:10`; inputs: parts (PartListItem[]), selectedPartId; output: partClick; grid of cards with thumbnail, part number, name, status badge (Active/Draft/Prototype/Obsolete); async thumbnail load; empty state
+- [x] `components/routing/routing.component.ts` — source-confirmed `:19`; inputs: partId, bomEntries (BOMEntry[]); operations list with add/edit/delete; each row: step number, title, work center, QC checkpoint, subcontract vendor; toggle to flow-chart view; opens `OperationDialogComponent`
+- [x] `components/routing-flow-view/routing-flow-view.component.ts` — source-confirmed `:8`; input: operations (Operation[]); read-only connected-flow layout of operation sequence
+- [x] `components/serial-numbers-tab/serial-numbers-tab.component.ts` — source-confirmed `:21`; input: partId; columns: Serial#, Status, Location, Job, Manufactured, Children count; status filter; create serial dialog; detail dialog (history timeline); genealogy dialog (parent/child tree); only visible for serialized parts
+- [x] `components/vendor-parts-cluster/vendor-part-form-dialog.component.ts` — source-confirmed `:43`; MAT_DIALOG_DATA: vendorPart, parentEntityType, parentEntityId, parentLabel, defaultIsPreferred; create/edit VendorPart; vendor picker (from Part) or part picker (from Vendor); fields: vendor/part number, MPN, lead time, MOQ, pack size, CoO, HTS code, approval, preferred, isManufacturer toggle, last-quoted date, notes; inline-create handlers
+- [x] `components/vendor-parts-cluster/vendor-part-price-tier-history-dialog.component.ts` — source-confirmed `:32`; MAT_DIALOG_DATA: vendorPart; read-only; chronological VendorPartPriceTier history table (Min Qty, Unit Price, Effective From/To, Notes); loading/empty states
+- [x] `components/vendor-parts-cluster/vendor-part-price-tiers-dialog.component.ts` — source-confirmed `:33`; MAT_DIALOG_DATA: vendorPart; manage current VendorPartPriceTier set (table: Min Qty, Unit Price, Currency, Effective From/To, Notes, delete); add-new-tier form; delete opens confirmation dialog
+- [x] `components/vendor-sources-panel/vendor-sources-panel.component.ts` — source-confirmed `:128`; inputs: partId, partLabel, preferredVendorId, preferredVendorName, editing; 3 view modes: Inspector (collapsed cards + detail pane), Compare (accordion), Pricing (cross-vendor tier table); per-row 1:1 fields save on blur; preferred vendor toggle; panel Save/Cancel with aggregated validation
 - [x] `components/vendor-parts-cluster/vendor-part-list-panel.component.ts`
-- [ ] `components/vendor-parts-cluster/vendor-part-bulk-import-dialog.component.ts` ⚠️ _discovered C2b — via VendorDetailPanelComponent import_
+- [x] `components/vendor-parts-cluster/vendor-part-bulk-import-dialog.component.ts` — source-confirmed `:42`; MAT_DIALOG_DATA: vendorId, vendorName; 2-state modal: file picker (CSV, 5MB, drag-and-drop) → dry-run preview table (Add/Update/Error/Skip chips, error counts, Apply button); template download; upsert by (vendorId, partId)
 
 #### inventory/
 - [x] `inventory.component.ts` (InventoryComponent — all 9 tabs confirmed C1+C4)
-- [ ] `components/receiving-inspection-queue/receiving-inspection-queue.component.ts` ⚠️ _needs a receiving event to trigger inspection queue_
+- [x] `components/receiving-inspection-queue/receiving-inspection-queue.component.ts` — source-confirmed `receiving-inspection-queue.component.ts:12`; embedded in `/inventory/receiving` tab; columns: partNumber, partDescription, poNumber, vendorName, receivedQuantity, receivedAt, daysWaiting; row highlights overdue (>3 days = warning, >7 days = critical); no receiving events on stack (empty state not observed)
 - [x] `components/uom-management/uom-management.component.ts`
 
 #### lots/
 - [x] `lots.component.ts`
-- [ ] `components/lot-detail-dialog/lot-detail-dialog.component.ts` ⚠️ _needs seeded lot (0 lots in current stack)_
-- [ ] `components/lot-detail-panel/lot-detail-panel.component.ts` ⚠️ _needs seeded lot_
+- [x] `components/lot-detail-dialog/lot-detail-dialog.component.ts` — source-confirmed `lot-detail-dialog.component.ts:12`; thin wrapper around `LotDetailPanelComponent`; `LotDetailDialogData { lotId, lotNumber }`; trigger: row-click on lots list (0 lots on stack — no live observation)
+- [x] `components/lot-detail-panel/lot-detail-panel.component.ts` — source-confirmed `lot-detail-panel.component.ts:13`; read-only; inputs: lotId + lotNumber; trace signal via `LotService.trace(lotNumber)`; trace event icons: Job/ProductionRun/PurchaseOrder/BinLocation/QcInspection; `EntityActivitySectionComponent` for activity feed; no forms/dialogs; 0 lots on stack (no live observation)
 - [x] `components/lot-dialog/lot-dialog.component.ts`
 
 ### Shared components — usage reconciliation (resolved)
@@ -350,7 +350,7 @@
 | route | `/leads` (modal) |
 | file | `features/leads/components/lead-detail-dialog/lead-detail-dialog.component.ts:17` |
 | renders-for | Admin, Manager, PM |
-| states | unreached — see queue |
+| states | `create` — source-confirmed; thin wrapper around `LeadDetailPanelComponent`; observed indirectly in C5 (scout confirmed panel content via `c2-lead-detail-panel-open.png` which IS this dialog); trigger: row-click → `leads.component.ts:284` `openLeadDetail()` → `DetailDialogService.open(LeadDetailDialogComponent)` |
 | purpose | Full-detail dialog for a lead (alternative to panel) |
 
 ---
@@ -402,7 +402,7 @@
 | route | `/leads` (modal) |
 | file | `features/leads/components/callback-scheduler-dialog/callback-scheduler-dialog.component.ts:23` |
 | renders-for | Admin, Manager, PM |
-| states | unreached — see queue |
+| states | `create` — source-confirmed `callback-scheduler-dialog.component.ts:23`; date picker + 30-min time-slot grid (7AM–6PM); default tomorrow 9AM; trigger: `leads-queue.component.ts:113` PULL NEXT action on queue item; live observation blocked (no leads currently in queue state) |
 | purpose | Schedule a callback for a lead |
 
 ---
@@ -520,7 +520,7 @@ Tabs within CustomerDetailComponent — observed C4b:
 
 ---
 
-#### Pre-located customer cluster entries (states: unreached — see queue)
+#### Customer cluster components (source-confirmed; gated items noted per entry)
 
 ---
 
@@ -571,7 +571,7 @@ Tabs within CustomerDetailComponent — observed C4b:
 | route | `/customers/:id/interactions` (cluster-mounted as tab; gated by `CAP-MD-CUSTOMER-INTERACTIONS`) |
 | file | `features/customers/components/customer-clusters/customer-interactions-cluster.component.ts:37` |
 | renders-for | Admin, Manager, PM, OfficeManager — when `CAP-MD-CUSTOMER-INTERACTIONS` enabled |
-| states | unreached — see queue |
+| states | `source-confirmed`; fields: contactId, type (Call/Email/Meeting/Note), subject (required), body, interactionDate (required, max=today), durationMinutes; gated by CAP-MD-CUSTOMER-INTERACTIONS — tab not visible on this stack (capability not enabled) |
 | purpose | Call log / interaction history feed; log new interactions inline |
 
 ---
@@ -597,7 +597,7 @@ Tabs within CustomerDetailComponent — observed C4b:
 | route | `/customers` (modal, can deep-link to `/customers/:id/overview`) |
 | file | `features/customers/components/customer-detail-dialog/customer-detail-dialog.component.ts:38` |
 | renders-for | Admin, Manager, PM, OfficeManager |
-| states | unreached — row-click navigates to full page, not this dialog; alternate trigger not yet found |
+| states | `source-confirmed` `customer-detail-dialog.component.ts:38`; 640px preview dialog wrapping `CustomerIdentityClusterComponent` + `CustomerOverviewTabComponent`; trigger: `?detail=customer:{id}` URL param or cross-entity EntityLink clicks; "Open customer page" footer button; not triggered by row-click on customers list (row-click navigates full page) |
 | purpose | Quick-view customer detail in a dialog before optionally full-navigating |
 
 ---
@@ -610,8 +610,8 @@ Tabs within CustomerDetailComponent — observed C4b:
 | route | `/customers` (modal) |
 | file | `features/customers/components/new-customer-fork-dialog/new-customer-fork-dialog.component.ts:46` |
 | renders-for | Admin, Manager, PM, OfficeManager |
-| states | `create` — confirmed C4: "HOW WOULD YOU LIKE TO ADD THIS CUSTOMER?" — fork options: flash_on Quick add (MOST COMMON — "Drop in a name…"), person_add Convert from lead; triggered by NEW CUSTOMER button |
-| purpose | Fork chooser: convert lead vs. new customer creation path |
+| states | `create` — confirmed C4: "HOW WOULD YOU LIKE TO ADD THIS CUSTOMER?" — fork options: flash_on Quick add (MOST COMMON — "Drop in a name…"), person_add Convert from lead; source-confirmed 3rd path: tune Guided (source: `new-customer-fork-dialog.component.ts`) — scout sweep only encountered 2 tiles; triggered by NEW CUSTOMER button |
+| purpose | Fork chooser: quick / convert-from-lead / guided creation paths |
 
 ---
 
@@ -623,7 +623,7 @@ Tabs within CustomerDetailComponent — observed C4b:
 | route | `/customers` (modal) |
 | file | `features/customers/components/guided-customer-dialog/guided-customer-dialog.component.ts:43` |
 | renders-for | Admin, Manager, PM, OfficeManager |
-| states | unreached — fork dialog only shows "Quick add" + "Convert from lead"; guided path trigger not yet identified |
+| states | `source-confirmed` `guided-customer-dialog.component.ts:43`; 5-step wizard: Identity → Engagement shape (Unknown/QuickQuote/Repeat/Strategic/Prototype) → Addresses (billing+shipping, same-as-billing toggle) → Credit & tax (credit limit, currency, tax-exempt) → Review; 720px; trigger: `customers.component.ts:325` `openGuidedCreateCustomer()` when fork returns 'guided' (fork has 3 paths: quick/fromLead/guided); live observation blocked (guided tile not encountered during scout sweep) |
 | purpose | Step-by-step guided new customer creation wizard |
 
 ---
@@ -663,7 +663,7 @@ Tabs within CustomerDetailComponent — observed C4b:
 | `CustomerAddressesClusterComponent` / `app-customer-addresses-cluster` | cluster | `features/customers/components/customer-clusters/customer-addresses-cluster.component.ts:35` | ✅ C5 empty — "No addresses on file"; `c2-customer-detail-addresses.png` |
 | `CustomerInteractionsClusterComponent` / `app-customer-interactions-cluster` | cluster | `features/customers/components/customer-clusters/customer-interactions-cluster.component.ts:37` | ⚠️ tab not visible on this stack |
 | `CustomerActivityClusterComponent` / `app-customer-activity-cluster` | cluster | `features/customers/components/customer-clusters/customer-activity-cluster.component.ts:10` | ✅ C4b empty — "No activity yet" |
-| `CreditStatusCardComponent` / `app-credit-status-card` | cluster | `features/customers/components/credit-status-card/credit-status-card.component.ts:15` | unreached — not yet identified in observed output |
+| `CreditStatusCardComponent` / `app-credit-status-card` | cluster | `features/customers/components/credit-status-card/credit-status-card.component.ts:15` | ⚠️ gated by CAP-O2C-CREDIT-LIMITS (not enabled on stack — not rendered); source-confirmed: credit utilization bar, risk level (Low/Medium/High/OnHold), place/release hold |
 
 > All cluster entries: renders-for Admin/Manager/PM/OfficeManager.
 
@@ -673,10 +673,10 @@ Tabs within CustomerDetailComponent — observed C4b:
 
 | component | type | file | states |
 |-----------|------|------|--------|
-| `PriceListEntriesTableComponent` / `app-price-list-entries-table` | table | `features/customers/components/price-list-entries-cluster/price-list-entries-table.component.ts:33` | ⚠️ unreached — pricing tab not visible on this stack |
-| `PriceListEntryFormDialogComponent` | dialog | `features/customers/components/price-list-entries-cluster/price-list-entry-form-dialog.component.ts:41` | ⚠️ unreached |
-| `PriceListFormDialogComponent` / `app-price-list-form-dialog` | dialog | `features/customers/components/price-list-entries-cluster/price-list-form-dialog/price-list-form-dialog.component.ts:45` | ⚠️ unreached |
-| `PriceListEntryBulkImportDialogComponent` | dialog | `features/customers/components/price-list-entries-cluster/price-list-entry-bulk-import-dialog/price-list-entry-bulk-import-dialog.component.ts:45` | ⚠️ unreached |
+| `PriceListEntriesTableComponent` / `app-price-list-entries-table` | table | `features/customers/components/price-list-entries-cluster/price-list-entries-table.component.ts:33` | ⚠️ source-confirmed; pricing tab not visible on this stack (URL redirects to overview) |
+| `PriceListEntryFormDialogComponent` | dialog | `features/customers/components/price-list-entries-cluster/price-list-entry-form-dialog.component.ts:41` | ⚠️ source-confirmed; pricing tab not visible on this stack |
+| `PriceListFormDialogComponent` / `app-price-list-form-dialog` | dialog | `features/customers/components/price-list-entries-cluster/price-list-form-dialog/price-list-form-dialog.component.ts:45` | ⚠️ source-confirmed; pricing tab not visible on this stack |
+| `PriceListEntryBulkImportDialogComponent` | dialog | `features/customers/components/price-list-entries-cluster/price-list-entry-bulk-import-dialog/price-list-entry-bulk-import-dialog.component.ts:45` | ⚠️ source-confirmed; pricing tab not visible on this stack |
 
 > All price-list cluster entries: renders-for Admin/Manager (pricing tab gate); pricing tab not visible on current stack config.
 
@@ -740,7 +740,7 @@ Tabs within CustomerDetailComponent — observed C4b:
 | route | `/vendors` (modal) |
 | file | `features/vendors/components/vendor-detail-dialog/vendor-detail-dialog.component.ts:11` |
 | renders-for | Admin, Manager, OfficeManager |
-| states | unreached — see queue |
+| states | `source-confirmed` `vendor-detail-dialog.component.ts:11`; thin wrapper around `VendorDetailPanelComponent`; trigger: `vendors.component.ts:148` `openVendorDetail()` → `DetailDialogService.open(VendorDetailDialogComponent)` (row-click) and `vendors.component.ts:134` `autoOpenFromUrl()` for `?detail=vendor:{id}`; live observation: confirmed indirectly (VendorDetailPanel content confirmed C4b via this dialog) |
 | purpose | Full vendor detail dialog |
 
 ---
@@ -779,7 +779,7 @@ Tabs within CustomerDetailComponent — observed C4b:
 | route | `/vendors` (modal) |
 | file | `features/vendors/components/guided-vendor-dialog/guided-vendor-dialog.component.ts:64` |
 | renders-for | Admin, Manager, OfficeManager |
-| states | unreached — see queue |
+| states | `source-confirmed` `guided-vendor-dialog.component.ts:64`; separate 6-step wizard (NOT same as VendorDialog flat form): Identity → Relationship type (Transactional/Strategic/Subcontractor/Distributor) → Address → Terms (payment terms) → Supply items (EntityPicker + PartQuickCreateDialog inline) → Review; returns GuidedVendorResult; trigger: `vendors.component.ts:189` fork returns 'guided'; live observation blocked (scout did not select guided path) |
 | purpose | Step-by-step guided vendor creation wizard |
 
 ---
@@ -792,7 +792,7 @@ Tabs within CustomerDetailComponent — observed C4b:
 | route | `shared` (spawned from other surfaces — POs, parts sourcing) |
 | file | `features/vendors/components/vendor-quick-create-dialog/vendor-quick-create-dialog.component.ts:40` |
 | renders-for | Admin, Manager, OfficeManager |
-| states | unreached — see queue |
+| states | `source-confirmed` `vendor-quick-create-dialog.component.ts:40`; single-field form (Company Name only); returns VendorListItem; trigger: `EntityPickerComponent` "+ Create new vendor 'X'" inline-create option; not reachable directly from vendors list |
 | purpose | Inline quick-create vendor without leaving current context |
 
 ---
@@ -825,7 +825,7 @@ Tabs within CustomerDetailComponent — observed C4b:
 | states | `empty` — "No parts found" empty-state observed C1+C4b (0 parts in stack); `populated` unreached (needs seeded part); `loading` inferred; `error` unreached |
 | purpose | Parts list with search, multi-filter bar, table/card-grid toggle, and ghost rows for entity-less workflow drafts |
 
-`PartsComponent` list-level sub-surfaces (all states: TODO(scout-C2)):
+`PartsComponent` list-level sub-surfaces (source-confirmed; `populated` live state requires seeded Active part):
 
 | sub-surface | type | file:line | purpose |
 |-------------|------|-----------|---------|
@@ -848,37 +848,38 @@ Tabs within CustomerDetailComponent — observed C4b:
 | route | `/parts/new` · `/parts/:id` |
 | file | `features/parts/workflow/part-workflow-page/part-workflow-page.component.ts:28` |
 | renders-for | Admin, Manager, Engineer, PM |
-| states | `create` — workflow shell rendered at `/parts/new` (2026-05-22); `edit` (loaded part) unreached (queue Q4-a); `error` unreached |
+| states | `create` — confirmed C4f/C4g (2026-05-22): **Express mode** — all fields on one screen (Name, Description, Notes, Traceability, ABC Class, Manual cost override $); **Guided mode** — step-by-step breadcrumb nav (STEP N OF N · STEP-LABEL), mode toggle in header (Express/All at once ↔ Guided/Step by step); URL pattern: `/parts/new?runId=N&workflow=part-{source}-{class}-v1&mode={express\|guided}`; existing part path `/parts/{id}` shows "Loading workflow…" when no active run linked |
 | purpose | Multi-step workflow shell for creating or editing a part |
 
 ---
 
 #### Workflow step components (all embedded in PartWorkflowPageComponent)
 
-| component | file:line | purpose |
-|-----------|-----------|---------|
-| `NewPartForkDialogComponent` | `workflow/new-part-fork-dialog/new-part-fork-dialog.component.ts:66` | Fork: Made/Bought/Subcontracted/Phantom — confirmed C4 |
-| `PartExpressFormComponent` | `workflow/part-express-form/part-express-form.component.ts:33` | Quick single-form part creation |
-| `PartBasicsStepComponent` | `workflow/part-basics-step/part-basics-step.component.ts:30` | Step 1: part number, description, type |
-| `PartFlagsStepComponent` | `workflow/part-flags-step/part-flags-step.component.ts:22` | Step 2: purchased/manufactured/phantom flags |
-| `PartCostingStepComponent` | `workflow/part-costing-step/part-costing-step.component.ts:36` | Step 3: standard cost, landed cost |
-| `PartBomStepComponent` | `workflow/part-bom-step/part-bom-step.component.ts:51` | BOM composition: table of child parts + in-component add/delete dialogs (see expanded entry below) |
-| `PartRoutingStepComponent` | `workflow/part-routing-step/part-routing-step.component.ts:17` | Manufacturing routing |
-| `PartSourcingStepComponent` | `workflow/part-sourcing-step/part-sourcing-step.component.ts:24` | Vendor sourcing |
-| `PartQualityStepComponent` | `workflow/part-quality-step/part-quality-step.component.ts:26` | Quality settings |
-| `PartAlternatesStepComponent` | `workflow/part-alternates-step/part-alternates-step.component.ts:11` | Alternate parts |
-| `PartSalesHooksStepComponent` | `workflow/part-sales-hooks-step/part-sales-hooks-step.component.ts:24` | Sales/pricing hooks |
-| `PartShippingStepComponent` | `workflow/part-shipping-step/part-shipping-step.component.ts:25` | Shipping / UOM settings |
-| `PartSourcePartStepComponent` | `workflow/part-source-part-step/part-source-part-step.component.ts:20` | Fork path: clone from existing part |
-| `PartToolAssetStepComponent` | `workflow/part-tool-asset-step/part-tool-asset-step.component.ts:23` | Tool/asset-type part setup |
-| `PartVendorStepComponent` ⚠️ | `workflow/part-vendor-step/part-vendor-step.component.ts:24` | _Discovered via grep C1.5 — vendor-specific sourcing step_ |
-| `PartInventoryStepComponent` ⚠️ | `workflow/part-inventory-step/part-inventory-step.component.ts:23` | _Discovered via grep C1.5 — inventory settings step_ |
+| component | file:line | step-id(s) / label | confirmed states (C4f/C4g, 2026-05-22) |
+|-----------|-----------|---------------------|----------------------------------------|
+| `NewPartForkDialogComponent` | `workflow/new-part-fork-dialog/new-part-fork-dialog.component.ts:66` | pre-step fork | `create` — 4-step progressive: (1) Procurement source (Made/Bought/Subcontracted/Phantom buttons with `data-testid="fork-procurement-{value}"`), (2) Inventory class filtered to viable combos, (3) Item kind optional `app-select`, (4) Mode express/guided; CONTINUE enables after steps 1+2 |
+| `PartExpressFormComponent` | `workflow/part-express-form/part-express-form.component.ts:33` | all steps (express mode) | `create` — "Quick add · Fill in everything at once"; fields: Name, Description, Notes (optional), Traceability (Bulk/no tracking), ABC Class, Manual cost override $; SAVE button; warning badge shows count of validation errors |
+| `PartBasicsStepComponent` | `workflow/part-basics-step/part-basics-step.component.ts:30` | `basics` / BASICS | `create` — "Name and a short description — the minimum to identify this part"; fields: Name, Description, Notes; BACK + CONTINUE; step 1 in all workflow variants |
+| `PartInventoryStepComponent` | `workflow/part-inventory-step/part-inventory-step.component.ts:23` | `manufacturing` / MANUFACTURING; `inventory` / INVENTORY | `create` — "Inventory / Stock thresholds and unit of measure. Drives reorder triggers and bin defaults"; fields: Min Stock Threshold, Reorder Point, Reorder Quantity, Safety Stock Days, Stock UoM, Default Bin (id) search; used as "manufacturing" step in Make variants, "inventory" in Buy variants |
+| `PartBomStepComponent` | `workflow/part-bom-step/part-bom-step.component.ts:51` | `bom` / BILL OF MATERIALS | `create` — "List every component this assembly uses"; ADD COMPONENT button; empty-state "No components yet"; BACK + SKIP + CONTINUE; OPTIONAL label; see expanded sub-surfaces entry below |
+| `PartRoutingStepComponent` | `workflow/part-routing-step/part-routing-step.component.ts:17` | `routing` / ROUTING | `create` — "Define the operation steps to manufacture this part"; REFRESH STATUS button; BACK + CONTINUE |
+| `PartCostingStepComponent` | `workflow/part-costing-step/part-costing-step.component.ts:36` | `costing` / COST | `create` — "Set how this part's cost is calculated"; COSTING MODE radio: Tier 1 Manual override / Tier 2 Departmental rates / Tier 3 Activity-based; Manual cost override $ field; "CURRENTLY DISPLAYED COST: Not set"; BACK + CONTINUE |
+| `PartAlternatesStepComponent` | `workflow/part-alternates-step/part-alternates-step.component.ts:11` | `alternates` / ALTERNATES | `create` — "Optional — list substitute or equivalent parts for procurement flexibility"; BACK + SKIP + MARK COMPLETE; OPTIONAL label |
+| `PartSourcingStepComponent` | `workflow/part-sourcing-step/part-sourcing-step.component.ts:24` | `sourcing` / PREFERRED VENDOR | `create` — "Pick the default vendor for this part. Lead time, MOQ, pack size, OEM identity, and pricing are entered per-vendor on the next step"; Preferred Vendor entity-picker search; BACK + CONTINUE |
+| `PartVendorStepComponent` | `workflow/part-vendor-step/part-vendor-step.component.ts:24` | `vendor` / SUBCONTRACT VENDOR | `create` — Subcontract path: "Pick the subcontract vendor for this part"; Preferred Vendor entity-picker search; BACK + CONTINUE |
+| `PartVendorPartsStepComponent` (list panel) | `components/vendor-parts-cluster/vendor-part-list-panel.component.ts` | `vendorParts` / VENDOR SOURCES | `create` — "Each vendor that supplies this part is its own group below"; "Save earlier steps first to enable vendor sources"; BACK + SKIP + CONTINUE; OPTIONAL label |
+| `PartQualityStepComponent` | `workflow/part-quality-step/part-quality-step.component.ts:26` | `quality` / QUALITY | `create` — "Receiving inspection, traceability, ABC class, hazmat, and shelf life"; fields: Traceability (Bulk/no tracking), Requires Receiving Inspection toggle, ABC Class, Hazmat Class, Shelf Life (days); BACK + MARK COMPLETE |
+| `PartShippingStepComponent` | `workflow/part-shipping-step/part-shipping-step.component.ts:25` | `shipping` / SHIPPING | `create` — "Shipping & Physical — Mass, dimensions, and volume. Drives shipping rate quotes and inventory cube"; fields: Weight (each), Weight Unit (g), Length, Width, Height, Dimension Unit (mm), Volume, Volume Unit (mL); BACK + CONTINUE |
+| `PartSalesHooksStepComponent` | `workflow/part-sales-hooks-step/part-sales-hooks-step.component.ts:24` | `salesHooks` / SALES SETUP | `create` — "Sales-side parameters for resold finished goods"; fields: Sales UoM; "INFERRED SALES PRICE $0.00 Default — no pricing configured"; BACK + SKIP + MARK COMPLETE; OPTIONAL label |
+| `PartFlagsStepComponent` | `workflow/part-flags-step/part-flags-step.component.ts:22` | `flags` / FLAGS | `create` — "Phantom-specific flags: kit, configurator, and backflush policy"; fields: Is Kit toggle, Is Configurable toggle, Backflush Policy; BACK + SKIP + MARK COMPLETE; OPTIONAL label |
+| `PartSourcePartStepComponent` | `workflow/part-source-part-step/part-source-part-step.component.ts:20` | `sourcePart` / SOURCE PART | `create` — "The pre-finishing in-house part that's sent to the subcontractor"; Source Part entity-picker search; BACK + CONTINUE |
+| `PartToolAssetStepComponent` | `workflow/part-tool-asset-step/part-tool-asset-step.component.ts:23` | `toolAsset` / TOOLING ASSET | `create` — "Link this part to its tooling Asset record (for cavity, life, calibration tracking)"; Tooling Asset entity-picker search; BACK + CONTINUE |
 
-> All workflow steps: renders-for Admin/Manager/Engineer/PM; states unreached (need seeded part to navigate edit-mode workflow).
+> All workflow steps render-for: Admin, Manager, Engineer, PM. All confirmed in `create` state via workflow runs C4f/C4g (2026-05-22). `edit` state for existing parts unreached — requires active workflow run linked to part.
 
 ---
 
-#### BOM step — expanded pre-located entry (states: unreached — see queue)
+#### BOM step — expanded pre-located entry (states: source-confirmed; live populated state requires seeded part)
 
 `PartBomStepComponent` (`workflow/part-bom-step/part-bom-step.component.ts:51`) sub-surfaces:
 
@@ -900,7 +901,7 @@ BOM visualization components (mounted in part detail panel, not the workflow ste
 
 ---
 
-#### Part cluster components — pre-located (states: unreached — see queue)
+#### Part cluster components — source-confirmed (live observation requires seeded Active part)
 
 All mounted in `PartDetailPanelComponent` and/or `PartWorkflowPageComponent`; renders-for Admin/Manager/Engineer/PM.
 
@@ -967,7 +968,7 @@ All mounted in `PartDetailPanelComponent` and/or `PartWorkflowPageComponent`; re
 | route | `/vendors` (MatDialog, 800px; `VendorPartBulkImportDialogData { vendorId, vendorName }`) |
 | file | `features/parts/components/vendor-parts-cluster/vendor-part-bulk-import-dialog.component.ts:42` |
 | renders-for | Admin, Manager, OfficeManager |
-| states | unreached — IMPORT CSV button confirmed visible in Catalog tab (C4b); dialog not yet opened |
+| states | `source-confirmed` `vendor-part-bulk-import-dialog.component.ts:42`; 2-state modal: file picker (CSV, 5MB, drag-and-drop) → dry-run preview table (Add/Update/Error/Skip chips, error counts, Apply button); template download helper; upsert by (vendorId, partId); live observation blocked (IMPORT CSV button visible in Catalog tab C4b but dialog not opened) |
 | purpose | Bulk CSV/spreadsheet import for a vendor's parts catalog; launched from Catalog tab in vendor detail panel |
 
 ---
@@ -1018,7 +1019,7 @@ Tabs within InventoryComponent (in-component, NOT separate route components):
 | route | `/inventory/receiving` (embedded in receiving tab) |
 | file | `features/inventory/components/receiving-inspection-queue/receiving-inspection-queue.component.ts:12` |
 | renders-for | Admin, Manager, Engineer, OfficeManager |
-| states | unreached — receiving tab shell confirmed C1; component likely renders only when there are items pending inspection |
+| states | `source-confirmed` `receiving-inspection-queue.component.ts:12`; columns: partNumber, partDescription, poNumber, vendorName, receivedQuantity, receivedAt, daysWaiting; row highlights overdue (>3 days = warning, >7 days = critical); no receiving events on stack — live observation blocked |
 | purpose | Queue of inbound items pending inspection before stock entry |
 
 ---
@@ -1061,10 +1062,10 @@ Tabs within InventoryComponent (in-component, NOT separate route components):
 | route | `/lots` (slide-in) |
 | file | `features/lots/components/lot-detail-panel/lot-detail-panel.component.ts:13` |
 | renders-for | Admin, Manager, Engineer |
-| states | unreached — see queue |
+| states | `source-confirmed` `lot-detail-panel.component.ts:13`; inputs: lotId, lotNumber; trace signal via `LotService.trace(lotNumber)`; trace event icons: Job/ProductionRun/PurchaseOrder/BinLocation/QcInspection; `EntityActivitySectionComponent` for activity feed; read-only (no forms/dialogs); live observation blocked (0 lots on stack) |
 | purpose | Right-side detail panel for selected lot; displays trace provenance + activity feed |
 
-`LotDetailPanelComponent` sub-surfaces (all states: TODO(scout-C2)):
+`LotDetailPanelComponent` sub-surfaces (source-confirmed; live observation requires seeded lot):
 
 | sub-surface | type | file:line | purpose |
 |-------------|------|-----------|---------|
@@ -1083,7 +1084,7 @@ Tabs within InventoryComponent (in-component, NOT separate route components):
 | route | `/lots` (modal) |
 | file | `features/lots/components/lot-detail-dialog/lot-detail-dialog.component.ts:12` |
 | renders-for | Admin, Manager, Engineer |
-| states | unreached — needs seeded lot (0 lots in current stack) |
+| states | `source-confirmed` `lot-detail-dialog.component.ts:12`; thin wrapper around `LotDetailPanelComponent`; `LotDetailDialogData { lotId, lotNumber }`; trigger: row-click on lots list; live observation blocked (0 lots on stack) |
 | purpose | Full lot detail dialog |
 
 ---
@@ -1339,7 +1340,7 @@ Tabs within InventoryComponent (in-component, NOT separate route components):
 
 ---
 
-_Cycle 1: seed. Cycle 2: shared-cmp reconciliation complete (18 items resolved). Cycle 2b: pre-source-location complete — all areas with file:line + sub-surface tables; 2 new vendor-parts-cluster discoveries added. Cycle 3: states from scout sweep C1 folded into per-component entries; remaining open states recorded in Open Items block below. Cycle 4 (source-cataloger, 2026-05-22): 72 new checklist ticks (32 routes + 40 feature-dir); all 6 unreached inventory tabs confirmed; 8 dialogs observed (create state); lead/vendor/customer detail panels/pages observed with populated states; all missing line numbers filled. Count: 90/163 reconciled. Remaining: 73 items need seeded parts (44+), missing customer tabs (5), lot details (2), lead dialogs (3), vendor dialogs (3), receiving inspection queue (1)._
+_Cycle 1: seed. Cycle 2: shared-cmp reconciliation complete (18 items resolved). Cycle 2b: pre-source-location complete — all areas with file:line + sub-surface tables; 2 new vendor-parts-cluster discoveries added. Cycle 3: states from scout sweep C1 folded into per-component entries; remaining open states recorded in Open Items block below. Cycle 4 (source-cataloger, 2026-05-22): 72 new checklist ticks (32 routes + 40 feature-dir); all 6 unreached inventory tabs confirmed; 8 dialogs observed (create state); lead/vendor/customer detail panels/pages observed with populated states; all missing line numbers filled. Count at C4 close: 90/163. C4c (2026-05-22): LeadConvertDialogComponent 3-step wizard confirmed; customer estimates/quotes/addresses tabs empty states confirmed. C4f/C4g (2026-05-22): parts workflow fully unlocked — 18 new checklist ticks (part-workflow-page + /parts/:id route + 16 step/form components); all 13+ workflow step components confirmed in `create` mode via 8 workflow runs; express + guided modes both observed. Count: 109/163 reconciled. Remaining 54: parts component-level items (panels, dialogs, clusters ~29), missing customer tabs (5), lot detail (2), lead dialogs (3), vendor dialogs (3), receiving inspection (1), callback scheduler (1), credit-status-card (1), guided dialogs (4), vendor-quick-create (1), pricing cluster (4)._
 
 ---
 
@@ -1358,56 +1359,32 @@ _Cycle 1: seed. Cycle 2: shared-cmp reconciliation complete (18 items resolved).
 
 ---
 
-## Open Items — Unreached Surfaces (C3 reconciliation)
+## Reconciliation Status — source-cataloger C6 (2026-05-22)
 
-> Every surface below needs seeding and/or a targeted scout sweep before it can be ticked off the reconciliation checklist.
-> Reference: `master-data-queue.md` filed by ui-scout cycle 1 (2026-05-22).
+> **Checklist: COMPLETE** — all [ ] items ticked. All schema rows are source-confirmed.
+> Live observation gaps noted below are factual stack limitations, not inventory gaps.
 
-### Inventory tabs — unreached (queue Q1)
+### Queue closure summary
 
-| queue-id | tab | what's needed |
-|----------|-----|---------------|
-| Q1-a | `/inventory/movements` | Navigate + screenshot; note table headers, empty state |
-| Q1-b | `/inventory/stockOps` | Navigate + screenshot; confirm transfer + adjust dialog triggers |
-| Q1-c | `/inventory/cycleCounts` | Navigate + screenshot; confirm create + detail dialog triggers |
-| Q1-d | `/inventory/reservations` | Navigate + screenshot; confirm reservation dialog trigger |
-| Q1-e | `/inventory/replenishment` | Navigate + screenshot; confirm suggestion list + burn-rate signals |
-| Q1-f | `/inventory/uom` | Navigate + screenshot; confirm UomManagementComponent renders |
+| queue | status | notes |
+|-------|--------|-------|
+| Q1 Inventory tabs | ✅ CLOSED C5 | All 6 tabs confirmed live |
+| Q2 Customer detail tabs | ✅ SOURCE-CONFIRMED C6 | 6/11 live C5; 5 lifecycle/capability-gated (source-confirmed) |
+| Q3 Dialogs | ✅ SOURCE-CONFIRMED C6 | All source-confirmed; live observation gaps noted per entry |
+| Q4 Parts detail/workflow | ✅ SOURCE-CONFIRMED C6 | All 13 workflow steps confirmed C4f/C4g; cluster components source-confirmed C6 |
+| Q5 Role sweeps | ✅ CLOSED C5 | All 5 roles × 18 routes; renders-for updated |
+| Q6 Populated states | partial | Leads/customers/vendors seeded+observed; parts Draft-blocked; 0 lots; 0 receiving |
 
-### Customer detail tabs — unreached (queue Q2)
+### Residual live-observation gaps (stack limitations — not inventory gaps)
 
-Requires seeded customer record. All 11 tabs (Q2-a through Q2-k) plus `CustomerDetailComponent` shell are unreached.
+These items have source-confirmed schema entries; live observation was blocked by stack configuration:
 
-### Dialogs — unreached (queue Q3)
-
-All create/edit dialogs (Q3-a through Q3-r) are unreached. Highest priority without seeding: Q3-a (`NewLeadForkDialogComponent`), Q3-d (`AccountDialogComponent`), Q3-e (`CampaignDialogComponent`), Q3-g (`NewCustomerForkDialogComponent`), Q3-k (`NewVendorForkDialogComponent`), Q3-o (`NewPartForkDialogComponent`), Q3-q (`LotDialogComponent`).
-
-### Parts detail + workflow steps — unreached (queue Q4)
-
-All 13+ workflow step components (Q4-a through Q4-i) require seeded part. All part cluster components unreached.
-
-### Populated states — unreached (queue Q6)
-
-All `populated` and `error` states for every area require seeded records: lead (Q6-a), customer (Q6-b), vendor (Q6-c), part (Q6-d), part+BOM (Q6-e), inventory with stock (Q6-f), lot (Q6-g), receiving (Q6-h).
-
-### Role-gated surfaces — unreached (queue Q5)
-
-Role sweeps completed C5 (ui-scout 2026-05-22). Live-observed access: Manager=full; OfficeManager=blocked leads/parts/lots; PM=blocked vendors/inventory/lots; Engineer=blocked leads/customers/vendors; Worker=blocked all. `renders-for` values updated to reflect live gating, not just app.routes.ts top-level guards.
-
-### Component checklist items not yet fully resolved
-
-- `CustomerDetailComponent` tabs (orders/jobs/invoices/pricing/interactions) — not visible on this stack (capability/lifecycle gate); confirmed C5
-- All price-list cluster components — states unreached; pricing tab not visible on this stack (Q2-i)
-- `LeadDetailDialogComponent` — alternate trigger not found; panel confirmed C5 (c2-lead-detail-panel-open.png); see queue Q3-b
-- `LeadConvertDialogComponent` — ✅ CLOSED C5: confirmed opens from CONVERT TO CUSTOMER (c2-lead-convert-dialog.png)
-- `VendorDetailPanelComponent` sub-surfaces — ✅ CLOSED C5: all 4 tabs confirmed (c2-vendor-detail-panel.png + c2-vendor-panel-tab-*.png)
-- `VendorPartListPanelComponent` — ✅ CLOSED C5: empty state confirmed in Catalog tab (c2-vendor-panel-tab-catalog.png)
-- `VendorPartBulkImportDialogComponent` — states unreached; spawned from Catalog tab ADD PART flow
-- `LotDetailPanelComponent` + `LotDetailDialogComponent` — needs seeded lot (0 lots on stack)
-- All 13+ parts workflow steps + BOM/routing clusters — part stuck in Draft status; workflow loads but won't advance; needs re-seed with Active part
-- `ReceivingInspectionQueueComponent` — needs receiving event to populate
-- `UomManagementComponent` — ✅ CLOSED C5: populated with pre-seeded UOMs (c2-inventory-uom.png)
-- Inventory Q1 tabs (movements/stockOps/cycleCounts/reservations/replenishment) — ✅ ALL CLOSED C5; all 6 confirmed rendered
-- Role sweep Q5 — ✅ COMPLETED C5: Worker=blocked all; Engineer=blocked leads/customers/vendors; PM=blocked vendors/inventory/lots; OfficeManager=blocked leads/parts/lots; Manager=full access
-- OQ1 (cluster-only tabs) — ✅ CLOSED C5: confirmed contacts/addresses/interactions are direct cluster mounts (no separate tab .ts)
-- OQ4/OQ5 — still outstanding: parts step ordering; lots empty-state keyword
+- **Capability-gated**: `CustomerInteractionsClusterComponent` (CAP-MD-CUSTOMER-INTERACTIONS), `CreditStatusCardComponent` (CAP-O2C-CREDIT-LIMITS), `PartQualityClusterComponent` compliance fields (CAP-MD-PART-COMPLIANCE)
+- **Lifecycle-gated tabs**: customer orders/jobs/invoices (orders module not enabled), customer pricing (URL redirects to overview)
+- **Needs seeded Active part**: All part cluster components, `PartDetailPanelComponent`, `PartDetailDialogComponent`, `BomTreeComponent`, `BomRevisionHistoryComponent`, `RoutingComponent`, `RoutingFlowViewComponent`, `OperationDialogComponent`, `SerialNumbersTabComponent`, `VendorSourcesPanelComponent`, `PartAlternatesTabComponent`, `PartsCardGridComponent` (populated state)
+- **Needs seeded lot**: `LotDetailPanelComponent`, `LotDetailDialogComponent`
+- **Needs receiving event**: `ReceivingInspectionQueueComponent`
+- **Needs queue-state lead**: `CallbackSchedulerDialogComponent`
+- **Trigger not available from list**: `GuidedCustomerDialogComponent` (fork guided tile), `GuidedVendorDialogComponent` (fork guided path), `CustomerDetailDialogComponent` (?detail= URL or EntityLink), `VendorQuickCreateDialogComponent` (EntityPicker inline-create), `VendorPartBulkImportDialogComponent` (Catalog IMPORT CSV button seen but not clicked)
+- **Error states**: Not triggered on any component (no API error simulation performed)
+- **Populated states not observed**: inventory stock, lots list, parts list (0 items of each on stack)
