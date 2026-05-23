@@ -120,6 +120,8 @@ _These three trees are the completeness denominator. All items must be ticked or
 | approvals | `approvals/components/approval-inbox/approval-inbox.component.ts` | AP-02 | source-confirmed |
 | approvals | `approvals/components/approval-workflow-editor/approval-workflow-editor.component.ts` | AP-03 | source-confirmed |
 | calendar | `calendar/calendar.component.ts` | CA-01 | source-confirmed |
+| search | _(no `features/search/` dir)_ | SR-01·SR-02 | **SHELL-ONLY** — search UI is inline template logic inside `core/layout/app-header.component.ts`; no standalone `.component.ts` file exists; catalogued as SR-01 (search bar `:113`) and SR-02 (results dropdown `:114`) under the SEARCH inventory section; not counted in feature denominator |
+| events | _(no UI files in `features/events/`)_ | — | **SERVICE-ONLY** — `features/events/` contains only `event.model.ts` + `events.service.ts`; zero `.component.ts` files; admin-side event management route (`/admin/events`) is owned by admin region (D2 cross-link); no platform UI to catalogue |
 
 ### Tree 3 — Shared components used by platform (shared/ tree, 22 entries)
 
@@ -156,12 +158,12 @@ _Source tree + imports analysis 2026-05-22._
 
 - **Feature components**: 32 (dashboard 14 · reports 4 · notifications 1 · chat 9 · approvals 3 · calendar 1 · events 0)
 - **Shared components**: 22 (SH-01–SH-21 initial + SH-22 StatusBadge discovered via template grep)
-- **Shell search/bell cluster (AppHeader)**: 2 (SR-01 search bar, SR-02 notification bell; clusters in AppHeaderComponent, not standalone files)
-- **Total denominator**: 54 items (32 feature + 22 shared; SR items are sub-entries of AppHeader)
+- **Shell search cluster (AppHeader)**: SR-01 search bar + SR-02 search results dropdown — inline template logic in `AppHeaderComponent`; no standalone component files; not counted in feature denominator
+- **Total denominator**: 54 items (32 feature + 22 shared; SR-01/SR-02 are sub-entries of AppHeader, not independent files)
 
 _Chat denominator note (resolved 2026-05-22): C-06 CreateAnnouncementDialog is admin-owned (used by `features/admin/components/announcements-panel/`). C-07 ShareEntityDialog, C-08 EntityMentionPopover, C-12 ChatMessageAttachment, C-14 ThreadPanel are confirmed unused — no imports in any .ts or .html. Removed 5, leaving chat=9 active files (C-01–C-05, C-09–C-11, C-13). C-09/C-10/C-11/C-13 confirmed in ChatPopoutComponent (C-02) and features/mobile/pages/mobile-chat.component.ts (cross-region usage, component still owned here)._
 
-_Three-tree checklist pass (2026-05-22): routes 10/11 ticked ([ ] `/notifications` → PLT-Q-025 not yet swept); features 32/32 source-confirmed; shared 22/22 source-confirmed. All feature + shared file:line entries confirmed from source (`@Component` decorator grep); zero `:1` placeholders remain in active (non-struck-through) rows. Search and Events are correctly zero-feature: search is a shell cluster in AppHeaderComponent (no `features/search/` dir); events is service-only (`features/events/` has models + EventsService only, zero UI files). Admin-side events management cross-linked to admin region._
+_Three-tree checklist pass (2026-05-22): routes 10/11 ticked ([ ] `/notifications` → PLT-Q-025 not yet swept); features 32/32 source-confirmed; shared 22/22 source-confirmed. All feature + shared file:line entries confirmed from source (`@Component` decorator grep); zero `:1` placeholders remain in active (non-struck-through) rows. Search and Events scope areas explicitly accounted in feature tree: search has no `features/search/` dir — UI is inline template logic in AppHeaderComponent (catalogued SR-01/SR-02, not in feature denominator); events has no UI in `features/events/` — only `event.model.ts` + `events.service.ts` exist (verified by directory listing); admin route cross-linked to admin region (D2). Both areas now have explicit "SHELL-ONLY" / "SERVICE-ONLY" rows in Tree 2 — no scope area is blank._
 
 ---
 
