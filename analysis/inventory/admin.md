@@ -33,6 +33,26 @@ _Scope: admin (settings, users, reference-data, terminology, capabilities, disco
 | training, time-corrections, events, announcements | Admin + Manager | `compliance` |
 | compliance | Admin + Manager + OfficeManager | — |
 
+### Capability gate defaults relevant to this region (source: `forge-api/forge.api/Capabilities/CapabilityCatalog.cs`)
+
+_All tab/route-level gates above are role-only. Capabilities gate API responses, not UI routes. Defaults apply to a fresh installation before admin changes any toggle._
+
+| Capability code | Default | Admin surface gated |
+|-----------------|---------|---------------------|
+| CAP-EXT-AI-ASSISTANT | **OFF** (line ~175) | ADM-AI-01/02/03 — panel renders, API blocked when OFF |
+| CAP-IDEN-AUTH-MFA | **OFF** | ADM-MFA-01/02 (policy panel) · ACC-SEC-02/03 (user setup) |
+| CAP-HR-TRAINING | **OFF** | ADM-TRN-* (admin training tab) · TRN-* (LMS routes) |
+| CAP-CROSS-INTEG-EDI | **OFF** | ADM-EDI-01/02 (EDI panel) |
+| CAP-P2P-AUTOPO | **OFF** | ADM-APO-01/02 (auto-PO settings) |
+| CAP-EXT-ANNOUNCEMENTS | **OFF** | ADM-ANN-01/02 (announcements panel) |
+| CAP-CROSS-BI-EXPORT | **OFF** | ADM-BI-01/02 (BI API keys) |
+| CAP-EXT-EMAIL-SYNC | **OFF** | ACC-COMM-01/02/03 (communications sync) |
+| CAP-QC-COMPLIANCE-FORMS | **OFF** | ADM-CMP-02/03/04 (compliance templates) · ACC-TAX-01/02/03 |
+| CAP-IDEN-CAPABILITY-ADMIN | **ON** | ADM-CAP-01/02/03 (capabilities pages) · ADM-DISC-01 · ADM-PRE-* |
+| CAP-MD-CURRENCIES | **ON** | ADM-CUR-01/02/03 (currencies) |
+
+_Note: Tab shells (ADM-AI-01 etc.) always render for the correct role regardless of cap state — the tab access logic is role-only. API calls within the panel return empty/error when the cap is OFF. Live sweep needed to observe actual panel behavior per cap state._
+
 ---
 
 ## Denominator
@@ -125,8 +145,29 @@ _Every in-scope route and feature-tree node must be ticked or queued before phas
 ### Tree 2 — Feature component files (94 total)
 _(See component table below — all 94 need live confirmation of states)_
 
-### Tree 3 — Shared component usages in admin templates
-_(All admin-region templates that consume SH-01..SH-22 — cross-link entries filled in component table)_
+### Tree 3 — Shared component usages in admin/account/employees/training templates
+
+_Paths abbreviated relative to `forge-ui/src/app/features/`. First-occurrence line shown per template._
+
+| SH | selector | consuming templates (file:line) |
+|----|----------|---------------------------------|
+| SH-04 | `app-page-header` | `admin/admin.component.html:1` · `employees/pages/employee-list/employee-list.component.html:1` |
+| SH-05 | `app-data-table` | `admin/admin.component.html:16` · `admin/components/edi-panel/edi-panel.component.html:22` · `admin/components/user-compliance-panel/user-compliance-panel.component.html:128` · `admin/components/bi-api-keys-panel/bi-api-keys-panel.component.html:16` · `admin/components/announcements-panel/announcements-panel.component.html:27` · `admin/components/ai-assistants-panel/ai-assistants-panel.component.html:10` · `admin/lead-sources/lead-sources.component.html:15` · `admin/tariffs/tariffs.component.html:15` · `admin/assignment-rules/assignment-rules.component.html:15` · `admin/icp-rubrics/icp-rubrics.component.html:15` · `admin/entity-completeness/entity-completeness-admin.component.html:27` · `account/pages/tax-documents/account-tax-documents.component.html:5` · `account/pages/pay-stubs/account-pay-stubs.component.html:5` · employee tabs (compliance:2 · expenses:2 · jobs:2 · time:8 · training:2 · pay:2 · events:2) |
+| SH-06 | `app-select` | `admin/admin.component.html:629` · `admin/components/edi-panel/edi-panel.component.html:61` · `admin/components/user-compliance-panel/user-compliance-panel.component.html:270` · `admin/assignment-rules/assignment-rules.component.html:64` · `admin/entity-completeness/entity-capability-requirement-dialog/entity-capability-requirement-dialog.component.html:4` · `admin/components/compliance-template-dialog/compliance-template-dialog.component.html:106` · `admin/entity-completeness/entity-completeness-admin.component.html:7` · `admin/working-calendars/working-calendars.component.html:66` · `admin/capabilities/capabilities.component.html:8` · `account/pages/profile/account-profile.component.html:29` · `account/pages/emergency/account-emergency.component.html:12` · `employees/pages/employee-list/employee-list.component.html:15` · `training/training.component.html:29` |
+| SH-07 | `app-input` | `admin/admin.component.html:241` (×12 instances) · `admin/components/edi-panel/edi-panel.component.html:97` · `admin/lead-sources/lead-sources.component.html:63` · `admin/tariffs/tariffs.component.html:59` · `admin/assignment-rules/assignment-rules.component.html:61` · `admin/icp-rubrics/icp-rubrics.component.html:63` · `admin/entity-capability-requirement-dialog/entity-capability-requirement-dialog.component.html:10` · `admin/entity-completeness/entity-completeness-admin.component.html:11` · `admin/components/compliance-template-dialog/compliance-template-dialog.component.html:105` · `admin/components/bi-api-keys-panel/bi-api-keys-panel.component.html:63` · `admin/working-calendars/working-calendars.component.html:65` · `admin/capabilities/capabilities.component.html:3` · `account/pages/contact/account-contact.component.html:11` · `account/pages/profile/account-profile.component.html:22` · `account/pages/security/account-security.component.html:13` · `account/pages/emergency/account-emergency.component.html:10` · `account/components/mfa-setup-dialog/mfa-setup-dialog.component.html:39` · `account/pages/communications/connect-imap-dialog.component.html:31` · `account/pages/communications/connect-communication-dialog.component.html:22` · `employees/pages/employee-list/employee-list.component.html:12` · `training/training.component.html:28` |
+| SH-08 | `app-toolbar` | `admin/lead-sources/lead-sources.component.html:3` · `admin/tariffs/tariffs.component.html:3` · `admin/icp-rubrics/icp-rubrics.component.html:3` · `admin/assignment-rules/assignment-rules.component.html:3` · `admin/entity-completeness/entity-completeness-admin.component.html:6` |
+| SH-09 | `app-empty-state` | `admin/admin.component.html:193` · `admin/components/user-compliance-panel/user-compliance-panel.component.html:79` · `admin/working-calendars/working-calendars.component.html:19` · `account/pages/integrations/account-integrations.component.html:84` · `account/pages/communications/account-communications.component.html:142` · `training/training.component.html:34` · `training/training-path/training-path.component.html:36` |
+| SH-10 | `app-dialog` | `admin/admin.component.html:616` · `admin/components/edi-panel/edi-panel.component.html:95` · `admin/components/bi-api-keys-panel/bi-api-keys-panel.component.html:58` · `admin/entity-capability-requirement-dialog/entity-capability-requirement-dialog.component.html:1` · `admin/components/compliance-template-dialog/compliance-template-dialog.component.html:2` · `admin/lead-sources/lead-sources.component.html:58` · `admin/tariffs/tariffs.component.html:54` · `admin/assignment-rules/assignment-rules.component.html:56` · `admin/icp-rubrics/icp-rubrics.component.html:58` · `admin/components/announcements-panel/announcements-panel.component.html:76` · `account/components/mfa-recovery-codes-dialog/mfa-recovery-codes-dialog.component.html:1` · `account/components/mfa-setup-dialog/mfa-setup-dialog.component.html:1` · `account/pages/communications/connect-imap-dialog.component.html:1` · `account/pages/communications/connect-communication-dialog.component.html:1` · `account/pages/integrations/connect-integration-dialog.component.html:1` · `account/pages/tax-form-detail/account-tax-form-detail.component.html:337` |
+| SH-11 | `app-textarea` | `admin/components/edi-panel/edi-panel.component.html:110` · `admin/lead-sources/lead-sources.component.html:71` · `admin/assignment-rules/assignment-rules.component.html:102` · `admin/icp-rubrics/icp-rubrics.component.html:66` · `admin/entity-capability-requirement-dialog/entity-capability-requirement-dialog.component.html:25` · `admin/components/compliance-template-dialog/compliance-template-dialog.component.html:109` · `admin/discovery/discovery.component.html:232` · `account/pages/integrations/connect-integration-dialog.component.html:16` |
+| SH-12 | `app-drillable-chart` | _not used in this region_ |
+| SH-13 | `app-datepicker` | `admin/admin.component.html:305` · `admin/components/user-compliance-panel/user-compliance-panel.component.html:187` · `admin/tariffs/tariffs.component.html:72` · `admin/components/bi-api-keys-panel/bi-api-keys-panel.component.html:69` · `admin/working-calendars/working-calendars.component.html:105` · `account/pages/profile/account-profile.component.html:27` |
+| SH-14 | `app-sankey-chart` | _not used in this region_ |
+| SH-15 | `app-page-layout` | `admin/entity-completeness/entity-completeness-admin.component.html:1` · `admin/lead-sources/lead-sources.component.html:1` · `admin/tariffs/tariffs.component.html:1` · `admin/assignment-rules/assignment-rules.component.html:1` · `admin/icp-rubrics/icp-rubrics.component.html:1` · `admin/working-calendars/working-calendars.component.html:1` · `admin/capability-detail/capability-detail.component.html:1` · `admin/presets/preset-detail/preset-detail.component.html:1` · `admin/discovery/discovery.component.html:1` · `admin/capabilities/capabilities.component.html:1` · `account/account.component.html:1` · `training/training.component.html:1` |
+| SH-16 | `app-validation-button` | `admin/admin.component.html:791` · `admin/components/edi-panel/edi-panel.component.html:114` · `admin/components/compliance-template-dialog/compliance-template-dialog.component.html:142` · `admin/entity-capability-requirement-dialog/entity-capability-requirement-dialog.component.html:58` · `admin/lead-sources/lead-sources.component.html:83` · `admin/tariffs/tariffs.component.html:85` · `admin/assignment-rules/assignment-rules.component.html:117` · `admin/icp-rubrics/icp-rubrics.component.html:117` · `admin/components/bi-api-keys-panel/bi-api-keys-panel.component.html:80` · `admin/working-calendars/working-calendars.component.html:84` · `account/pages/contact/account-contact.component.html:23` · `account/pages/profile/account-profile.component.html:55` · `account/pages/security/account-security.component.html:25` · `account/pages/emergency/account-emergency.component.html:17` · `account/components/compliance-form-renderer/compliance-form-renderer.component.html:644` · `account/pages/communications/connect-imap-dialog.component.html:78` · `account/pages/communications/connect-communication-dialog.component.html:35` |
+| SH-17 | `app-avatar` | `admin/admin.component.html:18` · `account/account.component.html:13` · `account/pages/profile/account-profile.component.html:10` · `employees/pages/employee-list/employee-list.component.html:33` · `employees/pages/employee-detail/employee-detail.component.html:20` |
+| SH-18..22 | `app-entity-link` · `app-ai-help-panel` · `app-training-context-panel` · `app-chat-preview-popup` · `app-status-badge` | _not used in admin/account/employees/training feature templates_ |
+
+**Extra shared component (not yet in platform.md SH list):** `app-barcode-info` (`shared/components/barcode-info/`) — used at `admin/admin.component.html:741` (ADM-USR-07). ⚠️ Platform.md amendment needed.
 
 ---
 
@@ -146,7 +187,7 @@ _Abbreviations: A=Admin, M=Manager, OM=OfficeManager, E=Engineer, PM=PM; all-aut
 | ID | component | type | route | file:line | renders-for | states | purpose |
 |----|-----------|------|-------|-----------|-------------|--------|---------|
 | ADM-USR-01 | users tab panel | tab | `/admin/users` | `admin.component.html:6` | A only (ADMIN_ONLY_TABS) | TODO | User list with avatar, name, email, role, compliance progress, status columns |
-| ADM-USR-02 | user list `app-data-table` (SH-05) | shared-cmp | `/admin/users` | `admin.component.html:16` | A | empty/populated/TODO | Sortable/filterable table: avatar · name · email · role-chip · compliance-chip · status-dot · actions |
+| ADM-USR-02 | user list `app-data-table` (SH-05) | shared-cmp | `/admin/users` | `admin.component.html:16` | A | empty(source: emptyIcon="people", msg=admin.noUsersFound) · populated(TODO) · loading(TODO) | Sortable/filterable table: avatar · name · email · role-chip · compliance-chip · status-dot · actions |
 | ADM-USR-03 | user create/edit dialog `app-dialog` (SH-10) | dialog | `/admin/users` | `admin.component.html:616` | A | TODO | Create/edit user; fields: first/last name, email (create only), initials, role select, role template, work location, avatar color picker, active toggle |
 | ADM-USR-04 | scan identifiers cluster | cluster | `/admin/users` dialog | `admin.component.html:668` | A | TODO | RFID/NFC/barcode/biometric scan IDs per user; add/remove; WebHID RFID reader connect |
 | ADM-USR-05 | RFID reader cluster | cluster | `/admin/users` dialog | `admin.component.html:691` | A | TODO | WebHID RFID reader pair/unpair + relay setup script download |
@@ -168,7 +209,7 @@ _Abbreviations: A=Admin, M=Manager, OM=OfficeManager, E=Engineer, PM=PM; all-aut
 
 | ID | component | type | route | file:line | renders-for | states | purpose |
 |----|-----------|------|-------|-----------|-------------|--------|---------|
-| ADM-TERM-01 | terminology tab panel | tab | `/admin/terminology` | `admin.component.html:182` | A only | empty/populated/TODO | Inline-editable table of terminology overrides (key → custom label) |
+| ADM-TERM-01 | terminology tab panel | tab | `/admin/terminology` | `admin.component.html:182` | A only | empty(source: app-empty-state icon="translate", msg=admin.noTerminology) · populated(TODO) | Inline-editable table of terminology overrides (key → custom label) |
 
 ### ADMIN AREA — Settings tab (`/admin/settings`)
 
@@ -176,7 +217,7 @@ _Abbreviations: A=Admin, M=Manager, OM=OfficeManager, E=Engineer, PM=PM; all-aut
 |----|-----------|------|-------|-----------|-------------|--------|---------|
 | ADM-SET-01 | settings tab panel | tab | `/admin/settings` | `admin.component.html:222` | A only | TODO | Container for company profile, locations, pay-period locking, system settings, logo, brand lockups |
 | ADM-SET-02 | company profile section | cluster | `/admin/settings` | `admin.component.html:226` | A | TODO | Company name, phone, email, EIN, website form; Save Profile action |
-| ADM-SET-03 | company locations section | cluster | `/admin/settings` | `admin.component.html:254` | A | empty/populated/TODO | Locations table (name, address, state, phone, default chip); new/edit/delete/set-default actions |
+| ADM-SET-03 | company locations section | cluster | `/admin/settings` | `admin.component.html:254` | A | empty(source: emptyIcon="location_on", msg=admin.noLocations) · populated(TODO) | Locations table (name, address, state, phone, default chip); new/edit/delete/set-default actions |
 | ADM-SET-04 | CompanyLocationDialogComponent | dialog | `/admin/settings` | `features/admin/components/company-location-dialog/company-location-dialog.component.ts:1` | A | TODO | Create/edit company location |
 | ADM-SET-05 | pay-period locking section | cluster | `/admin/settings` | `admin.component.html:297` | A | TODO | Date picker + "Lock Period" action to lock time entries through a date |
 | ADM-SET-06 | system settings grid | cluster | `/admin/settings` | `admin.component.html:386` | A | TODO | Key/value settings grid: app name, company name, planning cycle, nudge hour, upload limit, job priority, auto-archive days, email notifications, primary/accent brand colors |
@@ -213,9 +254,9 @@ _Abbreviations: A=Admin, M=Manager, OM=OfficeManager, E=Engineer, PM=PM; all-aut
 
 | ID | component | type | route | file:line | renders-for | states | purpose |
 |----|-----------|------|-------|-----------|-------------|--------|---------|
-| ADM-AI-01 | ai-assistants tab panel | tab | `/admin/ai-assistants` | `admin.component.html:431` | A only + CAP-EXT-AI-ASSISTANT (D3: terminal closure — gate state documented in platform.md; tab renders regardless, API blocked when cap OFF) | TODO | Hosts AiAssistantsPanelComponent |
-| ADM-AI-02 | AiAssistantsPanelComponent | panel | `/admin/ai-assistants` | `features/admin/components/ai-assistants-panel/ai-assistants-panel.component.ts:27` | A + CAP-EXT-AI-ASSISTANT | empty/populated/TODO | Table of AI assistants (name, category, entity filters, status); create/edit/delete |
-| ADM-AI-03 | AiAssistantDialogComponent | dialog | `/admin/ai-assistants` | `features/admin/components/ai-assistant-dialog/ai-assistant-dialog.component.ts:1` | A + CAP-EXT-AI-ASSISTANT | TODO | Create/edit AI assistant (name, category, prompt, entity type filters) |
+| ADM-AI-01 | ai-assistants tab panel | tab | `/admin/ai-assistants` | `admin.component.html:431` | A only (role gate; tab shell always renders for Admin) | renders(source) | Hosts AiAssistantsPanelComponent; CAP-EXT-AI-ASSISTANT [default=OFF (source)] gates API — panel shows empty/error when cap OFF |
+| ADM-AI-02 | AiAssistantsPanelComponent | panel | `/admin/ai-assistants` | `features/admin/components/ai-assistants-panel/ai-assistants-panel.component.ts:27` | A; CAP-EXT-AI-ASSISTANT [default=OFF (source)] blocks API when cap OFF | empty(source: via app-data-table) · populated(TODO) · cap-OFF-error(TODO) | Table of AI assistants (name, category, entity filters, status); create/edit/delete |
+| ADM-AI-03 | AiAssistantDialogComponent | dialog | `/admin/ai-assistants` | `features/admin/components/ai-assistant-dialog/ai-assistant-dialog.component.ts:1` | A; CAP-EXT-AI-ASSISTANT [default=OFF (source)] | TODO | Create/edit AI assistant (name, category, prompt, entity type filters) |
 
 ### ADMIN AREA — Teams tab (`/admin/teams`)
 
@@ -319,7 +360,7 @@ _Abbreviations: A=Admin, M=Manager, OM=OfficeManager, E=Engineer, PM=PM; all-aut
 | ADM-CMP-03 | ComplianceTemplateDialogComponent | dialog | `/admin/compliance` | `features/admin/components/compliance-template-dialog/compliance-template-dialog.component.ts:1` | A,M,OM | TODO | Create/edit compliance template |
 | ADM-CMP-04 | CompleteI9DialogComponent | dialog | `/admin/compliance` | `features/admin/components/complete-i9-dialog/complete-i9-dialog.component.ts:1` | A,M,OM | TODO | Admin-side I-9 completion/verification dialog |
 | ADM-CMP-05 | user compliance picker | cluster | `/admin/compliance` | `admin.component.html:542` | A,M,OM | TODO | `app-select` to choose a user; feeds UserCompliancePanelComponent |
-| ADM-CMP-06 | UserCompliancePanelComponent | panel | `/admin/compliance` | `features/admin/components/user-compliance-panel/user-compliance-panel.component.ts:1` | A,M,OM | null-state/populated/TODO | Per-user compliance status detail (forms completed, missing items) |
+| ADM-CMP-06 | UserCompliancePanelComponent | panel | `/admin/compliance` | `features/admin/components/user-compliance-panel/user-compliance-panel.component.ts:1` | A,M,OM | no-user(source: app-empty-state icon="person_search") · no-submissions(source: icon="description") · no-identity-docs(source: icon="badge") · no-tax-docs(source: icon="receipt_long") · populated(TODO) | Per-user compliance status detail (forms completed, missing items) |
 
 ### ADMIN AREA — Reference Data tab (`/admin/reference-data`)
 
@@ -342,7 +383,7 @@ _Abbreviations: A=Admin, M=Manager, OM=OfficeManager, E=Engineer, PM=PM; all-aut
 | ADM-PRE-04 | PresetDetailComponent | page | `/admin/presets/:id` | `features/admin/presets/preset-detail/preset-detail.component.ts:1` | A | TODO | Preset detail: capability set grouped by area; apply action refreshes descriptor |
 | ADM-EC-01 | EntityCompletenessAdminComponent | page | `/admin/entity-completeness` | `features/admin/entity-completeness/entity-completeness-admin.component.ts:1` | A | TODO | CRUD over entity completeness requirement rows (drives completeness chip/badge) |
 | ADM-EC-02 | EntityCapabilityRequirementDialogComponent | dialog | `/admin/entity-completeness` | `features/admin/entity-completeness/entity-capability-requirement-dialog/entity-capability-requirement-dialog.component.ts:1` | A | TODO | Create/edit entity capability requirement row |
-| ADM-WC-01 | WorkingCalendarsComponent | page | `/admin/working-calendars` | `features/admin/working-calendars/working-calendars.component.ts:1` | A | TODO | Working calendar + holidays admin (bought-parts PR1; drives business-day calculations) |
+| ADM-WC-01 | WorkingCalendarsComponent | page | `/admin/working-calendars` | `features/admin/working-calendars/working-calendars.component.ts:1` | A | empty(source: app-empty-state icon="event_available" msg="No calendars yet") · populated(TODO) | Working calendar + holidays admin (bought-parts PR1; drives business-day calculations) |
 | ADM-TAR-01 | TariffsComponent | page | `/admin/tariffs` | `features/admin/tariffs/tariffs.component.ts:1` | A | TODO | HTS-code tariff rate admin (bought-parts PR4; feeds landed-cost duty) |
 | ADM-LS-01 | LeadSourcesComponent | page | `/admin/lead-sources` | `features/admin/lead-sources/lead-sources.component.ts:1` | A | TODO | Lead source catalog admin (Phase 1r/Batch 9) |
 | ADM-ICR-01 | IcpRubricsComponent | page | `/admin/icp-rubrics` | `features/admin/icp-rubrics/icp-rubrics.component.ts:1` | A | TODO | ICP scoring rubric admin (Phase 1r/Batch 10) |
@@ -355,7 +396,7 @@ _Abbreviations: A=Admin, M=Manager, OM=OfficeManager, E=Engineer, PM=PM; all-aut
 
 | ID | component | type | route | file:line | renders-for | states | purpose |
 |----|-----------|------|-------|-----------|-------------|--------|---------|
-| SI-01 | SetupIntegrationsComponent | page | `/setup/integrations` | `features/setup-integrations/setup-integrations.component.ts:1` | all-auth (authGuard; admin-only enforced in component) | TODO | Post-first-admin integration setup wizard (Phase 1m.7); walks initial QBO/integration config |
+| SI-01 | SetupIntegrationsComponent | page | `/setup/integrations` | `features/setup-integrations/setup-integrations.component.ts:1` | all-auth (authGuard); API enforces Admin: 401/403 → router.navigate('/dashboard') (source: setup-integrations.component.ts:110-114) | loading(source) · populated(TODO) | Post-first-admin integration setup wizard (Phase 1m.7); walks initial QBO/integration config |
 
 ---
 
@@ -378,9 +419,9 @@ _Abbreviations: A=Admin, M=Manager, OM=OfficeManager, E=Engineer, PM=PM; all-aut
 | ACC-SEC-02 | MfaSetupDialogComponent | dialog | `/account/security` | `features/account/components/mfa-setup-dialog/mfa-setup-dialog.component.ts:1` | all-auth | TODO | MFA enrollment: QR code / TOTP setup flow |
 | ACC-SEC-03 | MfaRecoveryCodesDialogComponent | dialog | `/account/security` | `features/account/components/mfa-recovery-codes-dialog/mfa-recovery-codes-dialog.component.ts:1` | all-auth | TODO | View/regenerate MFA recovery codes |
 | ACC-CUST-01 | AccountCustomizationComponent | page | `/account/customization` | `features/account/pages/customization/account-customization.component.ts:1` | all-auth | TODO | UI customization: theme, layout, notifications preferences |
-| ACC-ITGR-01 | AccountIntegrationsComponent | page | `/account/integrations` | `features/account/pages/integrations/account-integrations.component.ts:1` | all-auth | TODO | Personal integration connections (calendar, CRM, etc.) |
+| ACC-ITGR-01 | AccountIntegrationsComponent | page | `/account/integrations` | `features/account/pages/integrations/account-integrations.component.ts:1` | all-auth | empty(source: app-empty-state icon="extension" msg="No providers available") · populated(TODO) | Personal integration connections (calendar, CRM, etc.) |
 | ACC-ITGR-02 | ConnectIntegrationDialogComponent | dialog | `/account/integrations` | `features/account/pages/integrations/connect-integration-dialog.component.ts:1` | all-auth | TODO | OAuth/API key connect flow for personal integration |
-| ACC-COMM-01 | AccountCommunicationsComponent | page | `/account/communications` | `features/account/pages/communications/account-communications.component.ts:1` | all-auth | TODO | Email/IMAP sync account connections |
+| ACC-COMM-01 | AccountCommunicationsComponent | page | `/account/communications` | `features/account/pages/communications/account-communications.component.ts:1` | all-auth | empty(source: app-empty-state icon="inbox" msg=account.communications.empty) · populated(TODO) | Email/IMAP sync account connections |
 | ACC-COMM-02 | ConnectCommunicationDialogComponent | dialog | `/account/communications` | `features/account/pages/communications/connect-communication-dialog.component.ts:1` | all-auth | TODO | Picker: Google/Microsoft OAuth vs IMAP |
 | ACC-COMM-03 | ConnectImapDialogComponent | dialog | `/account/communications` | `features/account/pages/communications/connect-imap-dialog.component.ts:1` | all-auth | TODO | IMAP server credentials form |
 | ACC-COMM-04 | OauthCallbackComponent | page | `/account/communications/oauth-callback` | `features/account/pages/communications/oauth-callback.component.ts:1` | all-auth | TODO | OAuth redirect-back handler (Google/Microsoft email) |
@@ -410,10 +451,10 @@ _Abbreviations: A=Admin, M=Manager, OM=OfficeManager, E=Engineer, PM=PM; all-aut
 
 | ID | component | type | route | file:line | renders-for | states | purpose |
 |----|-----------|------|-------|-----------|-------------|--------|---------|
-| TRN-01 | TrainingComponent | page | `/training/:tab` | `features/training/training.component.ts:1` | all-auth | TODO | LMS shell tabs: my-learning, all-modules, paths, teams |
+| TRN-01 | TrainingComponent | page | `/training/:tab` | `features/training/training.component.ts:1` | all-auth | empty-modules(source: app-empty-state icon="school") · empty-paths(source: icon="school","route") · populated(TODO) | LMS shell tabs: my-learning, all-modules, paths, teams |
 | TRN-MOD-01 | TrainingModuleComponent | page | `/training/module/:id` | `features/training/training-module/training-module.component.ts:1` | all-auth | TODO | Training module viewer (article/video/quiz/quickref/walkthrough content) |
 | TRN-MOD-02 | TrainingModuleQuizComponent | panel | `/training/module/:id` | `features/training/training-module/training-module-quiz.component.ts:1` | all-auth | TODO | Quiz interaction within a training module |
-| TRN-PATH-01 | TrainingPathComponent | page | `/training/path/:id` | `features/training/training-path/training-path.component.ts:1` | all-auth | TODO | Training path viewer: ordered module list with progress |
+| TRN-PATH-01 | TrainingPathComponent | page | `/training/path/:id` | `features/training/training-path/training-path.component.ts:1` | all-auth | empty-modules(source: icon="school" msg="No modules in this path yet") · not-found(source: icon="route" msg="Learning path not found") · populated(TODO) | Training path viewer: ordered module list with progress |
 
 ---
 
@@ -421,20 +462,24 @@ _Abbreviations: A=Admin, M=Manager, OM=OfficeManager, E=Engineer, PM=PM; all-aut
 
 _Items needing live confirmation or role-specific sweep — filed here by source-cataloger; dequeued when ui-scout confirms states._
 
-All 94 components above carry `TODO` states — live confirmation needed for every entry.
+**Source-filled so far (cycle 2):** 13 states moved from TODO → source-confirmed (ADM-USR-02 empty, ADM-TERM-01 empty, ADM-SET-03 empty, ADM-CMP-06 four empty variants, ADM-WC-01 empty, ACC-ITGR-01 empty, ACC-COMM-01 empty, TRN-01 empty, TRN-PATH-01 empty+not-found, ADM-AI-01 renders). Capability defaults filled for 11 relevant caps. Shared component usages fully mapped (Tree 3).
+
+Remaining TODO states: ~81 items still need live sweep.
 
 Priority items for ui-scout first pass:
-1. `/admin/settings` — verify whether `AdminSettingsComponent` (ADM-SET-09) is embedded within the settings tab or an independent surface; states for all 5 sub-sections
-2. `/admin/compliance` — sweep as OfficeManager to confirm OfficeManager-only view
-3. `/admin/ai-assistants` — confirm renders with CAP-EXT-AI-ASSISTANT both ON and OFF (D3 trigger state)
-4. `/admin/integrations` — list all integration cards visible; integration config dialog states
-5. `/admin/mfa` — MFA policy panel options/states
-6. `ADM-TAX-04` StateWithholdingDialogComponent — which tab/context triggers this dialog
-7. `/account/security` — MFA setup dialog states (QR, verify, recovery codes)
-8. `/account/tax-forms/:formType` — confirm W-4/I-9/state/dynamic all render via ComplianceFormRendererComponent
-9. `/employees` — confirm tab set visible for Manager (vs Admin)
-10. Training LMS tabs: confirm actual tab slug names at `/training/:tab`
+1. `/admin/settings` — verify whether `AdminSettingsComponent` (ADM-SET-09) is embedded within the settings tab or an independent surface; states for all 5 sub-sections (company profile, locations, pay-period, system settings, logo/lockups)
+2. `/admin/compliance` — sweep as OfficeManager to confirm OfficeManager-only view (only compliance tab visible)
+3. `/admin/ai-assistants` — confirm panel behavior when CAP-EXT-AI-ASSISTANT is OFF (default) vs ON; D3 trigger state
+4. `/admin/integrations` — list all integration cards visible (QBO + others); integration config dialog states; IntegrationConfigDialogComponent structure
+5. `/admin/mfa` — MFA policy options (require/optional/disabled per role); confirm panel form fields
+6. `ADM-TAX-04` StateWithholdingDialogComponent — which tab/context triggers this dialog (not found in any obvious parent template); may be inside UserCompliancePanelComponent
+7. `/account/security` — MFA setup dialog states (step: QR code, step: verify code, step: recovery codes shown); confirm CAP-IDEN-AUTH-MFA=OFF behavior
+8. `/account/tax-forms/:formType` — confirm W-4/I-9/state/dynamic all render via ComplianceFormRendererComponent; confirm formType slug values
+9. `/employees` — confirm Manager sees same tab set as Admin; check for any tab visibility differences
+10. Training LMS tab slugs: `training.routes.ts` has `:tab` catch-all → confirm actual slugs rendered at `/training/my-learning`, `/training/all-modules`, `/training/paths`, `/training/teams`
+11. `AccountComponent` (`account.component.ts`) vs `AccountLayoutComponent` (`account-layout.component.ts`) — routes load AccountLayoutComponent as shell; account.component.html uses `app-page-layout` and has profile/password form inline. Is AccountComponent a legacy/unreachable surface or a separate routed entry point? Needs live check.
+12. `app-barcode-info` — add to platform.md SH list; confirm usage in admin user dialog (ADM-USR-07) renders correctly
 
 ---
 
-_Committed: initial source-map pass; denominator=94; rows filled from source=94; TODO states=94 (all need live sweep); queue depth=10 priority items + full states sweep_
+_Cycle 2 commit: D2 shared cross-links complete (Tree 3 fully mapped, 18 SH usages located); capability defaults source-filled for 11 gates; 13 states moved TODO→source-confirmed; denominator stable=94; remaining TODO=~81; queue=12 items_
