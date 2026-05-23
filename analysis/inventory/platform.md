@@ -157,6 +157,7 @@ _These three trees are the completeness denominator. All items must be ticked or
 _Source tree + imports analysis 2026-05-22._
 
 - **Feature components**: 32 (dashboard 14 · reports 4 · notifications 1 · chat 9 · approvals 3 · calendar 1 · events 0)
+  - _Reports note: 4 component files contain 28 report-type configs (ReportDef[]) + 10 Sankey flow configs (SankeyReportDef[]); configs are not components and do not count toward denominator. Architecture: config-driven single-component pattern, source-confirmed._
 - **Shared components**: 22 (SH-01–SH-21 initial + SH-22 StatusBadge discovered via template grep)
 - **Shell search cluster (AppHeader)**: SR-01 search bar + SR-02 search results dropdown — inline template logic in `AppHeaderComponent`; no standalone component files; not counted in feature denominator
 - **Total denominator**: 54 items (32 feature + 22 shared; SR-01/SR-02 are sub-entries of AppHeader, not independent files)
@@ -197,15 +198,20 @@ _Three-tree checklist pass (2026-05-22): routes 10/11 ticked ([ ] `/notification
 
 ### REPORTS
 
+_**Architecture: CONFIG-DRIVEN (source-confirmed).** `features/reports/` has exactly 4 `.component.ts` files (confirmed via glob). `ReportsComponent` defines a `ReportDef[]` array of 28 entries (`reports.component.ts:59–88`) and an `activeReport` signal that drives a `@switch` in the template — one component renders all 28 types; no per-type component file exists. `SankeyReportsComponent` defines a `SankeyReportDef[]` array of 10 entries (`sankey-reports.component.ts:35–46`) with the same pattern. The 28 report types and 10 Sankey flows are **config instances, not components**; they are enumerated below as data but do not contribute to the denominator._
+
+_**D2 cross-links — report data by region:** operations data — jobs-by-stage · overdue-jobs · job-completion-trend · on-time-delivery · average-lead-time · team-workload · my-work-history · time-in-stage · cycle-review · job-margin · my-cycle-summary · employee-productivity · maintenance · quality-scrap · rd; Q2C data — expense-summary · my-expense-history · lead-pipeline · quote-to-close · lead-sales · ar-aging · revenue · simple-pnl · customer-activity · shipping-summary; mixed/platform data — time-by-user · inventory-levels. Sankey flows draw from all regions. Platform claims only the 4 shell component files._
+
 | component | type | route | file | renders-for | states | purpose |
 |-----------|------|-------|------|-------------|--------|---------|
-| ReportsComponent | page | `/reports` | `features/reports/reports.component.ts:46` | Admin·Manager·PM | loading·populated·empty (per-report) | Left-nav report selector + chart+table view for 28 built-in report types with optional date-range filter |
-| ReportBuilderComponent | page | `/reports/builder` | `features/reports/components/report-builder/report-builder.component.ts:46` | Admin·Manager·PM | loading·populated·empty | Dynamic query builder — entity/field/filter/group-by/sort/chart-type selection; saved reports; CSV export |
-| SankeyReportsComponent | page | `/reports/sankey` | `features/reports/components/sankey-reports/sankey-reports.component.ts:22` | Admin·Manager·PM | loading·populated·empty | Sankey flow diagrams for process-flow analysis (flow report types with date range) |
+| ReportsComponent | page | `/reports` | `features/reports/reports.component.ts:46` | Admin·Manager·PM | loading·populated·empty (per-report) | Left-nav selector + chart+table view for 28 built-in report types; type chosen via `activeReport` signal switch; optional date-range filter |
+| ReportBuilderComponent | page | `/reports/builder` | `features/reports/components/report-builder/report-builder.component.ts:46` | Admin·Manager·PM | loading·populated·empty | Dynamic query builder — entity/field/filter/group-by/sort/chart-type; saved reports; CSV export |
+| SankeyReportsComponent | page | `/reports/sankey` | `features/reports/components/sankey-reports/sankey-reports.component.ts:22` | Admin·Manager·PM | loading·populated·empty | Left-nav selector + Sankey chart for 10 flow types; type chosen via `activeReport` signal |
 | SaveReportDialogComponent | dialog | `/reports/builder` | `features/reports/components/save-report-dialog/save-report-dialog.component.ts:25` | Admin·Manager·PM | active | Dialog to name + describe + share-flag a custom saved report |
 
-**Report types in ReportsComponent (28 built-in)**: jobs-by-stage · overdue-jobs · time-by-user · expense-summary · lead-pipeline · job-completion-trend · on-time-delivery · average-lead-time · team-workload · customer-activity · my-work-history · my-time-log · ar-aging · revenue · simple-pnl · my-expense-history · quote-to-close · shipping-summary · time-in-stage · employee-productivity · inventory-levels · maintenance · quality-scrap · cycle-review · job-margin · my-cycle-summary · lead-sales · rd  
-_(Each renders a chart + data table section inside ReportsComponent; no separate component files — all driven by `activeReport` signal switch.)_
+**28 built-in report type configs (ReportDef[], not components):** jobs-by-stage · overdue-jobs · time-by-user · expense-summary · lead-pipeline · job-completion-trend · on-time-delivery · average-lead-time · team-workload · customer-activity · my-work-history · my-time-log · ar-aging · revenue · simple-pnl · my-expense-history · quote-to-close · shipping-summary · time-in-stage · employee-productivity · inventory-levels · maintenance · quality-scrap · cycle-review · job-margin · my-cycle-summary · lead-sales · rd
+
+**10 Sankey flow type configs (SankeyReportDef[], not components):** quote-to-cash · job-stage-flow · material-to-product · worker-orders · expense-flow · vendor-supply-chain · quality-rejection · inventory-location · customer-revenue · training-completion
 
 ---
 
