@@ -288,7 +288,7 @@ _Abbreviations: A=Admin, M=Manager, OM=OfficeManager, E=Engineer, PM=PM; all-aut
 | ADM-TAX-01 | sales-tax tab panel | tab | `/admin/sales-tax` | `admin.component.html:452` | A only | TODO | Hosts SalesTaxPanelComponent |
 | ADM-TAX-02 | SalesTaxPanelComponent | panel | `/admin/sales-tax` | `features/admin/components/sales-tax-panel/sales-tax-panel.component.ts:1` | A | TODO | Sales tax rates list (jurisdiction + rate) |
 | ADM-TAX-03 | SalesTaxDialogComponent | dialog | `/admin/sales-tax` | `features/admin/components/sales-tax-dialog/sales-tax-dialog.component.ts:1` | A | TODO | Create/edit sales tax rate |
-| ADM-TAX-04 | StateWithholdingDialogComponent | dialog | `/admin/sales-tax` or `/admin/settings` | `features/admin/components/state-withholding-dialog/state-withholding-dialog.component.ts:1` | A | TODO | State payroll withholding config — needs live check to confirm which tab triggers it |
+| ADM-TAX-04 | StateWithholdingDialogComponent | dialog | `/admin/compliance` (via ComplianceTemplatesPanelComponent) | `features/admin/components/state-withholding-dialog/state-withholding-dialog.component.ts:1` | A,M,OM | TODO | Company state selector for payroll withholding — triggered from compliance-templates-panel.component.html:65 + ts:87,102; shows all 50 states in 4 categories (ready/needs-upload/uses-W4/no-tax); clicking a state sets company_state system setting |
 
 ### ADMIN AREA — Time Corrections tab (`/admin/time-corrections`)
 
@@ -497,3 +497,252 @@ _Cycle 2 commit: D2 shared cross-links complete (Tree 3 fully mapped, 18 SH usag
 _Cycle 3 (source-only): Queue items #11 + #12 resolved from source. AccountComponent confirmed dead code (not routed, zero instantiations in any template). app-barcode-info = cross-region shared utility; no SH#; catalogued as shared-cmp at ADM-USR-07; platform.md CLOSED rejected SH-24. Duplicate ADM-USR-09 (copy of ADM-TT-04) removed. Queue depth → 10 (items 1–10 remain, all live-dependent). Denominator anomaly flagged: Account file-count includes dead AccountComponent (22 files, 21 live) → proposed 94→93._
 
 _Cycle 4 (source verification): Fresh source-tree walk confirms denominator=93 is correct — 55 admin + 21 account (22 files −1 D6 dead code) + 12 employees + 4 training + 1 setup-integrations. All 93 live .component.ts files verified against component table; every file maps to a catalogued row. Key confirmations: (a) SH-24 app-barcode-info resolved — admin.component.html:741 confirmed as one of 7 cross-region consumers; catalogued at ADM-USR-07, no SH# assigned; (b) Gate structures from source confirmed: app.routes.ts:276 (admin roleGuard Admin/Manager/OfficeManager), :133 (employees Admin/Manager), :232 (account authGuard), :242 (training authGuard), :36 (setup/integrations authGuard+server-enforced Admin); (c) ADMIN_ONLY_TABS / MANAGER_AND_ADMIN_TABS constants at admin.component.ts:97-99 confirmed as gate source for all tab-level renders-for entries. Reconciliation Tree 3 (shared usages) remains fully mapped from Cycle 2. All 63 routes in Tree 1 still await live-sweep tick; 21 queue items in admin-queue.md remain open. No new components discovered — denominator stable. Next: ui-scout live sweep to drain TODO states and queue items._
+
+_Cycle 5 (source pre-extraction): Field lists, step sequences, and branch structures sourced for 5 priority dialogs/forms — see §Source-Extracted Detail below. States all remain TODO / source-only until ui-scout live confirmation. ADM-TAX-04 trigger location resolved from source: fired from ComplianceTemplatesPanelComponent (compliance-templates-panel.component.html:65 + ts:87,102). Queue items ADM-Q-001 (IntegrationConfigDialog), ADM-Q-021 (StateWithholdingDialog trigger), ADM-Q-011 (discovery branches) substantially pre-answered from source._
+
+---
+
+## Source-Extracted Detail
+
+_All entries below are SOURCE-ONLY. States remain TODO until ui-scout confirms live behavior. These are draft sub-entries to speed up the live-sweep pass — each will be ticked or corrected when ui-scout reports._
+
+---
+
+### ADM-INT-03 — IntegrationConfigDialogComponent field structure
+
+**Source:** `integration-config-dialog.component.ts:87-98` · `integration-config-dialog.component.html:29-58` · `forge.core/Settings/IntegrationDescriptorCatalog.cs`
+
+Dialog is **descriptor-driven**: fields are `IntegrationSettingField[]` from the API, not hardcoded in the template.
+
+**Field input types** (source: `integration-status.model.ts:12`):
+
+| inputType | rendered as | notes |
+|---|---|---|
+| `toggle` | `app-toggle` | boolean; value stored as `"true"/"false"` string |
+| `enum` | `app-select` with choices | choices array from `IntegrationSettingChoice[]` |
+| `password` | `app-input type=password` | isSensitive=true → placeholder "Enter a new value..." |
+| `text` / `url` / `email` | `app-input` with matching type | — |
+| `number` | `app-input type=number` | — |
+
+**Common field: mode** — present on every provider as an enum (`Mock / Real`; some add `Sandbox`). Controls IStorageService registration at process start — change requires API restart (source: `integration-config-dialog.component.ts:139-153`).
+
+**20 configured providers** (source: `IntegrationDescriptorCatalog.cs`):
+
+| provider | name | category | key fields (from FieldKeys) | OAuth-connectable |
+|---|---|---|---|---|
+| `gmail-oauth` | Gmail / Google Workspace | communications | redirect-uri, google-client-id\*, google-client-secret | — |
+| `microsoft-oauth` | Outlook / Microsoft 365 | communications | redirect-uri, microsoft-client-id\*, microsoft-client-secret | — |
+| `twilio` | Twilio Voice | communications | mode(enum), account-sid, auth-token\*, require-signature(toggle) | — |
+| `smtp` | SMTP Email | service | mode(enum), host\*, port, use-ssl(toggle), username, password, from-address, from-name | — |
+| `minio` | MinIO Storage | service | mode(enum), endpoint\*, public-endpoint, access-key, secret-key, bucket, use-ssl(toggle) | — |
+| `gdrive` | Google Drive | service | mode(enum), client-id\*, client-secret, scopes | — |
+| `usps` | USPS Address Validation | service | mode(enum), consumer-key\*, consumer-secret | — |
+| `docuseal` | DocuSeal Document Signing | service | mode(enum), api-url, public-base-url, api-key\*, webhook-secret, timeout-seconds | — |
+| `ai` | AI Assistant (Ollama) | service | mode(enum), base-url\*, chat-model, embedding-model, vision-model, timeout-seconds, vision-timeout-seconds, docs-path | — |
+| `ups` | UPS | shipping | mode(enum), client-id\*, client-secret, account-number | — |
+| `fedex` | FedEx | shipping | mode(enum), client-id\*, client-secret, account-number | — |
+| `dhl` | DHL Express | shipping | mode(enum), api-key\*, account-number | — |
+| `stamps` | Stamps.com | shipping | mode(enum), username, password, integration-id\* | — |
+| `quickbooks` | QuickBooks Online | accounting | mode(enum), client-id\*, client-secret | ✓ |
+| `xero` | Xero | accounting | mode(enum), client-id\*, client-secret, tenant-id | ✓ |
+| `freshbooks` | FreshBooks | accounting | mode(enum), client-id\*, client-secret, account-id | ✓ |
+| `sage` | Sage Business Cloud | accounting | mode(enum), client-id\*, client-secret, country-code | ✓ |
+| `netsuite` | NetSuite | accounting | mode(enum), account-id\*, consumer-key, consumer-secret, token-id, token-secret | — |
+| `wave` | Wave | accounting | mode(enum), access-token\*, business-id | — |
+| `zoho` | Zoho Books | accounting | mode(enum), client-id\*, client-secret, organization-id, data-center | ✓ |
+
+_\* = `IsConfiguredCheckKey` — the field whose presence marks this provider as "configured"_
+
+**Dialog chrome** (source: `integration-config-dialog.component.html:1-95`):
+- Title: "Configure {integration.name}"
+- Optional collapsible **Sandbox Guide** panel (only when `showSandboxGuides=true` AND provider has `sandboxSteps`): step list + link to developer portal
+- Dynamic field list (template-driven by descriptor)
+- Test result banner (success/error) below fields
+- Footer: **Test** button (all providers) · **Connect** button (OAuth providers only, visible when `canConnectOAuth=true`) · Cancel · Save
+
+**OAuth connect flow**: CONNECT button hits `/api/v1/{provider}/authorize` → full-page redirect to provider consent screen → provider callback lands at `/api/v1/{provider}/callback` → bounces to `/admin?tab=integrations&provider=connected` (source: `integration-config-dialog.component.ts:172-192`).
+
+_States: populated(source-confirmed field structure) · empty(no-fields edge: if fields.length===0, dialog shows only Close button) · test-result-success(source: success banner) · test-result-error(source: error banner) · connecting-spinner(source: OAuth flow) — all LIVE CONFIRMATION TODO_
+
+---
+
+### ADM-TAX-04 — StateWithholdingDialogComponent
+
+**Source:** `state-withholding-dialog.component.ts:1-127` · `state-withholding-dialog.component.html:1-110` · trigger: `compliance-templates-panel.component.ts:87,102-104` + `compliance-templates-panel.component.html:65`
+
+**Trigger location RESOLVED** (ADM-Q-021 closed from source): Opened from **ComplianceTemplatesPanelComponent** (`/admin/compliance` tab), not from sales-tax. Two trigger paths:
+1. Button click: `compliance-templates-panel.component.html:65` — icon button beside the state withholding section header
+2. Auto-open: `compliance-templates-panel.component.ts:87` — opens on init when state data is present
+
+**Purpose:** Admin selects the company's home state for payroll withholding; sets `company_state` system setting. Read-only state catalog view (admin picks, doesn't edit).
+
+**Content structure** (source: `state-withholding-dialog.component.html`):
+
+| Section | filter condition | state-card shows |
+|---|---|---|
+| Summary header | — | 4 stat chips: ready / needs-upload / uses-W4 / no-tax counts |
+| "Ready for e-Sign" | `category=state_form` AND `docuSealTemplateId ≠ null` | code · name · formName · `verified` chip |
+| "Needs PDF Upload" | `category=state_form` AND `docuSealTemplateId = null` | code · name · formName · `upload_file` chip |
+| "Accepts Federal W-4" | `category=federal` | code · name · `description` chip |
+| "No Income Tax" | `category=no_tax` | code · name · `block` chip |
+
+Each state card is a `<button>` that fires `selectState(state.code)` → `adminService.setCompanyState()` → closes dialog on success. Active state card styled with `.state-card--active` class.
+
+_States: loading(source: appLoadingBlock directive) · populated(source-confirmed structure above) · saving(source: button [disabled]="saving()") — LIVE CONFIRMATION TODO_
+
+---
+
+### ACC-SEC-02 — MfaSetupDialogComponent step sequence
+
+**Source:** `mfa-setup-dialog.component.ts:25-89` · `mfa-setup-dialog.component.html:1-91`
+
+**Step signal:** `step = signal<'loading' | 'scan' | 'verify' | 'complete'>('loading')`
+
+_Note: `verify` is a declared union type but `this.step.set('verify')` is never called in the component — it's effectively unused. The actual flow is `loading → scan → [API call] → complete` (or stays on `scan` with error message on bad code)._
+
+| step | what renders | actions |
+|---|---|---|
+| `loading` | spinner + "Preparing authenticator setup…" | none (auto-advances on API response) |
+| `scan` | QR code (`app-qr-code`, 200px, M error correction) · manual key toggle (show/hide + copy button) · 6-digit code input field (`app-input`, maxlength=6, pattern `/^\d{6}$/`) · error message div (if verifyError signal set) | Cancel · **Verify & Enable** (disabled when code invalid or verifying) |
+| `complete` | `verified_user` icon · "Two-Factor Authentication Enabled" heading · "You'll need your authenticator app each time you sign in." · recovery-codes hint with `info` icon | **Done** (closes dialog, returns `true` to caller) |
+
+**Error path on `scan` step:** invalid code → `verifyError.set('Invalid code. Please try again.')` + `codeControl.reset()` — stays on `scan` step.
+
+**Dialog close behavior:** `dialogRef.close(this.step() === 'complete')` — returns `true` only if enrollment completed; `false` on cancel/error. Caller (`AccountSecurityComponent`) uses the result to refresh MFA status.
+
+_States: loading(source-confirmed spinner) · scan-qr(source-confirmed structure) · scan-verify-error(source-confirmed error path) · complete(source-confirmed) — LIVE CONFIRMATION TODO_
+
+---
+
+### ACC-TAX-03 — ComplianceFormRendererComponent dispatch model
+
+**Source:** `compliance-form-renderer.component.ts:1-301` · `compliance-form-definition.model.ts:1-128`
+
+**Dispatch architecture:** `AccountTaxFormDetailComponent` loads a `ComplianceFormDefinition` from the API (keyed by `formType` slug) and passes it to `<app-compliance-form-renderer [definition]="def">`. The renderer is form-type-agnostic — all layout and fields come from the definition JSON.
+
+**ComplianceFormDefinition structure:**
+- `formType` — slug used to fetch (e.g., `'w4'`, `'i9'`, `'state'`, `'dynamic'`)
+- `formLayout` — `'default'` (Material wrappers) | `'government'` (IRS-style native rendering, pixel-matched to PDF)
+- `pages[]` — multi-page forms (each page → one tab/nav step)
+- `sections[]` — flat legacy (wrapped into single page)
+- `maxWidth` — optional centering (W-4 uses `"850px"`)
+- `formStyles` — CSS custom-property overrides from PDF extraction metrics
+
+**Field types** (source: `FormFieldDefinition.type`):
+`text | textarea | number | currency | ssn | date | select | radio | checkbox | signature | heading | paragraph | html`
+
+**Government-layout field roles** (`fieldLayout`):
+`amount-line | amount-line-inner | amount-line-total | grid-cell | checkbox-dots | signature-field | signature-date | filing-status | worksheet-line`
+
+**Section layout types** (government forms):
+`default | section | form-header | step | step-amounts | tip | exempt | sign | employers-only | form-footer | worksheet | instructions`
+
+**Conditional fields:** `dependsOn: { field, value, operator: 'eq'|'neq'|'truthy' }` — `shouldShowField()` evaluated on every render.
+
+**Special behaviors:**
+- SSN fields: auto-formatted `XXX-XX-XXXX` via `formatSsn()` handler
+- `signature-date` fields: auto-set to today's date if `initialData` doesn't provide one
+- Multi-page: single FormGroup spans all pages (source: `compliance-form-renderer.component.ts:158`) — validation runs across all pages simultaneously
+- Submit only available on last page (`isLastPage` computed)
+
+**Known form types confirmed from backend/templates** (source: compliance-templates-panel + account-tax-form-detail route):
+- `w4` — Federal W-4 (IRS 2024 revision), `government` layout, multi-step (5 steps + worksheet)
+- `i9` — I-9 Employment Eligibility, `government` layout, multi-page (Section 1 employee / Section 2 employer)
+- State forms — per-state; some `government` layout (CA DE 4, NY IT-2104); formType slug = state code or form number
+- Dynamic forms — admin-created via ComplianceTemplatesPanelComponent; typically `default` layout
+
+_States: populated-default-layout(source-confirmed Material rendering) · populated-government-layout(source-confirmed IRS-style rendering) · readonly-mode(source: `readonly` input) · multi-page-nav(source: `pages.length > 1`) · single-page(source: sections-only fallback) — LIVE CONFIRMATION TODO_
+
+---
+
+### ADM-DISC-01 — Discovery wizard question catalog & branch map
+
+**Source:** `DiscoveryQuestionCatalog.cs:1-586` · `discovery.service.ts:50-131` · `discovery-question.model.ts`
+
+**Total catalog:** 28 self-serve + 12 consultant-deepdive = 40 questions
+
+**Per-user flow (self-serve, products path):** Q-S1 + 6 opening + 4 branch (one of A/B/C) + 2 override + 6 diagnostic + 1 exit = ~20 questions answered. User sees only their branch's 4 questions.
+
+**Q-S1 — Top-of-funnel (SingleChoice):** "What does your business primarily sell?"
+- `products` → full 22-question manufacturing flow
+- `services` → short-circuit to PRESET-08 (Pro Services)
+- `both` → short-circuit to PRESET-09 (Hybrid)
+
+**Opening questions Q-O1..Q-O6:**
+
+| ID | type | question (abbreviated) | choices / notes |
+|---|---|---|---|
+| Q-O1 | Bucketed | "Roughly how many people work in your business?" | 1-2 · 3-10 · 11-25 · 26-50 · 51-200 · 200+ |
+| Q-O2 | FreeText | "Walk me through quote-to-cash…" | optional textarea |
+| Q-O3 | MultiChoice | "What does your business actually do?" | services · make · resell |
+| Q-O4 | MultiChoice | "Are you in a regulated industry?" | no · medical · aerospace · automotive · food · pharma · other |
+| Q-O5 | SingleChoice | "How many physical locations?" | 1 · 2 · 3+ |
+| Q-O6 | FreeText | "If an auditor walked in tomorrow…" | optional textarea |
+
+**Branch routing** (source: `discovery.service.ts:50-88`):
+
+| headcount answer | sites answer | → branch |
+|---|---|---|
+| 1-2, 3-10, 11-25 | any | A (small) |
+| 26-50, 51-200 | 1 | B (mid) |
+| 26-50, 51-200 | 2 or 3+ | C (large/multi-site) |
+| 200+ | any | C (large) |
+
+**Branch A questions (Q-A1..Q-A4):**
+
+| ID | type | question (abbreviated) | choices |
+|---|---|---|---|
+| Q-A1 | SingleChoice | "Do you currently use accounting software?" | none · quickbooks · xero · other |
+| Q-A2 | SingleChoice | "Is anyone full-time on production scheduling?" | same-person · split-roles · dedicated |
+| Q-A3 | SingleChoice | "Single machine or multi-step?" | single-step · two-three · multi-step |
+| Q-A4 | SingleChoice | "Shipped from warehouse or drop-ship?" — _SKIPPED if mode='production'_ | warehouse · some-dropship · mostly-dropship |
+
+**Branch B questions (Q-B1..Q-B4):**
+
+| ID | type | question (abbreviated) | choices |
+|---|---|---|---|
+| Q-B1 | SingleChoice | "Do you compare actual vs quoted job cost?" | no · informal · formal |
+| Q-B2 | SingleChoice | "Formal inspection / NCR?" | visual · informal · formal-ncr · capa-loop |
+| Q-B3 | YesNo | "PO approval step for large amounts?" | yes · no |
+| Q-B4 | YesNo | "Send out to subcontract (heat treat, plating)?" | yes · no |
+
+**Branch C questions (Q-C1..Q-C4):**
+
+| ID | type | question (abbreviated) | choices |
+|---|---|---|---|
+| Q-C1 | SingleChoice | "How often do you move inventory between locations?" | daily · weekly · monthly · rarely |
+| Q-C2 | SingleChoice | "Fixed or configurable products?" | fixed · some-config · cto-eto |
+| Q-C3 | YesNo | "Customers require EDI (850/855/856/810)?" | yes · no |
+| Q-C4 | YesNo | "Multi-currency operations?" | yes · no |
+
+**Override questions Q-V1, Q-V2 (always shown):**
+
+| ID | type | question (abbreviated) |
+|---|---|---|
+| Q-V1 | FreeText | "Worst thing a regulator/customer could ask you to prove?" |
+| Q-V2 | FreeText | "Anything unusual about how your business runs?" |
+
+**Diagnostic questions Q-D1..Q-D6 (always shown):**
+
+| ID | type | question (abbreviated) | choices |
+|---|---|---|---|
+| Q-D1 | MultiChoice | "How do you track parts for traceability?" | lots · serials |
+| Q-D2 | YesNo | "Handle hazardous materials?" | yes · no |
+| Q-D3 | SingleChoice | "Preventive maintenance schedule?" | breakfix · informal-pm · formal · iot |
+| Q-D4 | MultiChoice | "Shop-floor access patterns?" | kiosk · shifts |
+| Q-D5 | MultiChoice | "IT/integration capability?" | none · bi · chat · api |
+| Q-D6 | SingleChoice | "Repeat vs custom production?" | repeat · mix · custom |
+
+**Exit Q-X1 (always available):**
+- YesNo: "None of these match — skip discovery and configure manually." Also triggered by "Skip discovery" link and `exitToCustom()` button throughout wizard.
+
+**Recommendation step** (step index = `visibleQuestions().length`):
+- Displays: preset name, description, confidence label (high/medium/low), rationale, driving factors (expandable), capability deltas list (enable/disable), alternatives picker
+- Actions: Back · Apply (opens PresetApplyDialogComponent for review+confirm)
+- Live recommendation sidebar updates after Q-O1+Q-O3 answered (`canPreview` signal)
+
+**Consultant mode** (toggled by button in progress bar):
+- Adds 12 deepdive questions (4 per branch: Q-A5..Q-A8, Q-B5..Q-B8, Q-C5..Q-C8)
+- All YesNo or SingleChoice; each targets a specific capability gap signal
+
+_States: loading(source: appLoadingBlock) · question-bucketed/single-choice/yesno/multichoice/freetext (source-confirmed per type) · recommendation(source-confirmed structure) · empty-recommendation(source: "Answer the opening questions" sidebar) — LIVE CONFIRMATION TODO_
