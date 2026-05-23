@@ -1,0 +1,61 @@
+{
+  "addrOk": true,
+  "addrState": {
+    "url": "http://localhost:4200/customers/2/addresses",
+    "bodyText": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nCUSTOMERS\nchevron_right\nALL CUSTOMERS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\nlist\ncontacts\nvpn_key\nfilter_alt\nupload_file\nstorefront\nsettings\nchevron_left\nCustomers\nedit\nEDIT\narchive\nAcme Corp\nACTIVE\ncheck_circle\nReady\nemail\ncontact@acme.com\nphone\n555-100-2000\n1\nOPEN ESTIMATES\n0\nOPEN QUOTES\n0\nOPEN ORDERS\n0\nACTIVE JOBS\n$0.00\nOUTSTANDING\n$0.00\nYTD REVENUE\nOverview\nContacts\nAddresses\nEstimates\nQuotes\nOrders\nJobs\nInvoices\nPricing\nInteractions\nActivity\n\n400 Renaissance Ctr\n\nDetroit, MI\n\nUS",
+    "hasAddrCluster": true
+  },
+  "lotDetail": {
+    "bodyText": "Skip to main content\nHOME\nchevron_right\nPRODUCTION\nchevron_right\nPRODUCTION LOTS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\ncategory\nhub\nevent_available\nbatch_prediction\nspeed\nstorefront\nsettings\nPRODUCTION LOTS\nTrack production lot traceability\nSearch lot number or part\nsearch\nSEARCH\nadd\nNEW LOT\nLOT NUMBER\nmore_vert\n\t\nPART NUMBER\nmore_vert\n\t\nDESCRIPTION\nmore_vert\n\t\nQUANTITY\nmore_vert\n\t\nJOB\nmore_vert\n\t\nSUPPLIER LOT\nmore_vert\n\t\nEXPIRES\nmore_vert\n\t\nCREATED\nmore_vert\n\t\ndownload\ngrid_on\nsettings\n\nLOT-20260522-001\tPRT-00001\tTest widget\t50\t—\tSUP-LOT-001\t\t05/22/2026 01:14 AM\t\nLOT-20260522-001\nclose\nPART NUMBER\nPRT-00001\nQUANTITY\nTRACEABILITY HISTORY\nHISTORY\n\nNo activity yet.",
+    "hasPanel": true,
+    "appComps": [
+      "app-root",
+      "app-header",
+      "app-chat",
+      "app-ai-help-panel",
+      "app-training-context-panel",
+      "app-connection-banner",
+      "app-announcement-overlay",
+      "app-onboarding-banner",
+      "app-sidebar",
+      "app-lots",
+      "app-page-header",
+      "app-input",
+      "app-data-table",
+      "app-offline-banner",
+      "app-loading-overlay",
+      "app-toast-container",
+      "app-keyboard-shortcuts-help",
+      "app-chat-preview-popup",
+      "app-demo-marker",
+      "app-lot-detail-dialog"
+    ]
+  },
+  "queuePull": {
+    "status": 500,
+    "body": "{\"type\":\"about:blank\",\"title\":\"An error occurred\",\"status\":500}"
+  },
+  "partsState": {
+    "hasPRT": true
+  },
+  "ccState": {
+    "bodyText": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nCUSTOMERS\nchevron_right\nCONTACTS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\nlist\ncontacts\nvpn_key\nfilter_alt\nupload_file\nstorefront\nsettings\nALL CONTACTS\nFlat cross-customer view of every contact — \"who do I know at company X?\".\nCONTACT NAME\nmore_vert\n\t\nCUSTOMERS\nmore_vert\n\t\nROLE\nmore_vert\n\t\nEMAIL\nmore_vert\n\t\nPHONE\nmore_vert\n\t\nSUPPRESSION\nmore_vert\n\t\nPRIMARY\nmore_vert\n\t\ndownload\ngrid_on\nsettings\n\nMitchell, Sarah\tAcme Corp\tPurchasing Manager\tsarah.mitchell@acme.com\t555-0401\t\t\nPRIMARY\n\t",
+    "appComps": [
+      "app-root",
+      "app-header",
+      "app-chat",
+      "app-ai-help-panel",
+      "app-training-context-panel",
+      "app-connection-banner",
+      "app-announcement-overlay",
+      "app-onboarding-banner",
+      "app-sidebar",
+      "app-customer-contacts-page",
+      "app-page-header",
+      "app-data-table",
+      "app-offline-banner",
+      "app-loading-overlay",
+      "app-toast-container"
+    ]
+  }
+}

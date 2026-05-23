@@ -1,0 +1,239 @@
+{
+  "addrSeed": {
+    "status": 400
+  },
+  "addrSeed2": {
+    "status": 400
+  },
+  "contactsState": {
+    "url": "http://localhost:4200/customers/2/contacts",
+    "bodyText": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nCUSTOMERS\nchevron_right\nALL CUSTOMERS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\nlist\ncontacts\nvpn_key\nfilter_alt\nupload_file\nstorefront\nsettings\nchevron_left\nCustomers\nedit\nEDIT\narchive\nAcme Corp\nACTIVE\ncheck_circle\nReady\nemail\ncontact@acme.com\nphone\n555-100-2000\n1\nOPEN ESTIMATES\n0\nOPEN QUOTES\n0\nOPEN ORDERS\n0\nACTIVE JOBS\n$0.00\nOUTSTANDING\n$0.00\nYTD REVENUE\nOverview\nContacts\nAddresses\nEstimates\nQuotes\nOrders\nJobs\nInvoices\nPricing\nInteractions\nActivity\nadd\nADD CONTACT\nSM\nMitchell, Sarah\nPRIMARY\nPurchasing Manager\nemail\nsarah.mitchell@acme.com\nphone\n555-0401\nedit\ndelete",
+    "hasContactsCluster": true,
+    "appComps": [
+      "app-root",
+      "app-header",
+      "app-chat",
+      "app-ai-help-panel",
+      "app-training-context-panel",
+      "app-connection-banner",
+      "app-announcement-overlay",
+      "app-onboarding-banner",
+      "app-sidebar",
+      "app-customer-detail",
+      "app-entity-completeness-chip",
+      "app-currency-display",
+      "app-customer-contacts-cluster",
+      "app-avatar",
+      "app-offline-banner",
+      "app-loading-overlay",
+      "app-toast-container",
+      "app-keyboard-shortcuts-help",
+      "app-chat-preview-popup",
+      "app-demo-marker"
+    ]
+  },
+  "addrState": {
+    "url": "http://localhost:4200/customers/2/addresses",
+    "bodyText": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nCUSTOMERS\nchevron_right\nALL CUSTOMERS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\nlist\ncontacts\nvpn_key\nfilter_alt\nupload_file\nstorefront\nsettings\nchevron_left\nCustomers\nedit\nEDIT\narchive\nAcme Corp\nACTIVE\ncheck_circle\nReady\nemail\ncontact@acme.com\nphone\n555-100-2000\n1\nOPEN ESTIMATES\n0\nOPEN QUOTES\n0\nOPEN ORDERS\n0\nACTIVE JOBS\n$0.00\nOUTSTANDING\n$0.00\nYTD REVENUE\nOverview\nContacts\nAddresses\nEstimates\nQuotes\nOrders\nJobs\nInvoices\nPricing\nInteractions\nActivity\nlocation_off\n\nNo addresses on file",
+    "hasAddrCluster": true,
+    "appComps": [
+      "app-root",
+      "app-header",
+      "app-chat",
+      "app-ai-help-panel",
+      "app-training-context-panel",
+      "app-connection-banner",
+      "app-announcement-overlay",
+      "app-onboarding-banner",
+      "app-sidebar",
+      "app-customer-detail",
+      "app-entity-completeness-chip",
+      "app-currency-display",
+      "app-customer-addresses-cluster",
+      "app-offline-banner",
+      "app-loading-overlay",
+      "app-toast-container",
+      "app-keyboard-shortcuts-help",
+      "app-chat-preview-popup",
+      "app-demo-marker"
+    ]
+  },
+  "actState": {
+    "url": "http://localhost:4200/customers/2/activity",
+    "bodyText": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nCUSTOMERS\nchevron_right\nALL CUSTOMERS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\nlist\ncontacts\nvpn_key\nfilter_alt\nupload_file\nstorefront\nsettings\nchevron_left\nCustomers\nedit\nEDIT\narchive\nAcme Corp\nACTIVE\ncheck_circle\nReady\nemail\ncontact@acme.com\nphone\n555-100-2000\n1\nOPEN ESTIMATES\n0\nOPEN QUOTES\n0\nOPEN ORDERS\n0\nACTIVE JOBS\n$0.00\nOUTSTANDING\n$0.00\nYTD REVENUE\nOverview\nContacts\nAddresses\nEstimates\nQuotes\nOrders\nJobs\nInvoices\nPricing\nInteractions\nActivity\nACTIVITY\nALL\nCONVERSATION\nNOTES\n1\nHISTORY\nFA\nNOTE\n05/22/2026 01:14 AM\n\nCalled Sarah re: Q2 order forecast. Expects 200 units by June.",
+    "hasActivityCluster": true,
+    "appComps": [
+      "app-root",
+      "app-header",
+      "app-chat",
+      "app-ai-help-panel",
+      "app-training-context-panel",
+      "app-connection-banner",
+      "app-announcement-overlay",
+      "app-onboarding-banner",
+      "app-sidebar",
+      "app-customer-detail",
+      "app-entity-completeness-chip",
+      "app-currency-display",
+      "app-customer-activity-cluster",
+      "app-entity-activity-section",
+      "app-avatar",
+      "app-rich-text-display",
+      "app-offline-banner",
+      "app-loading-overlay",
+      "app-toast-container",
+      "app-keyboard-shortcuts-help"
+    ]
+  },
+  "ccPage": {
+    "url": "http://localhost:4200/customers/contacts",
+    "bodyText": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nCUSTOMERS\nchevron_right\nCONTACTS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\nlist\ncontacts\nvpn_key\nfilter_alt\nupload_file\nstorefront\nsettings\nALL CONTACTS\nFlat cross-customer view of every contact — \"who do I know at company X?\".\nCONTACT NAME\nmore_vert\n\t\nCUSTOMERS\nmore_vert\n\t\nROLE\nmore_vert\n\t\nEMAIL\nmore_vert\n\t\nPHONE\nmore_vert\n\t\nSUPPRESSION\nmore_vert\n\t\nPRIMARY\nmore_vert\n\t\ndownload\ngrid_on\nsettings\n\nMitchell, Sarah\tAcme Corp\tPurchasing Manager\tsarah.mitchell@acme.com\t555-0401\t\t\nPRIMARY\n\t",
+    "appComps": [
+      "app-root",
+      "app-header",
+      "app-chat",
+      "app-ai-help-panel",
+      "app-training-context-panel",
+      "app-connection-banner",
+      "app-announcement-overlay",
+      "app-onboarding-banner",
+      "app-sidebar",
+      "app-customer-contacts-page",
+      "app-page-header",
+      "app-data-table",
+      "app-offline-banner",
+      "app-loading-overlay",
+      "app-toast-container"
+    ]
+  },
+  "portalSeed": {
+    "status": 201
+  },
+  "portalState": {
+    "url": "http://localhost:4200/customers/portal-access",
+    "bodyText": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nCUSTOMERS\nchevron_right\nPORTAL ACCESS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\nlist\ncontacts\nvpn_key\nfilter_alt\nupload_file\nstorefront\nsettings\nPORTAL ACCESS\nAdmin oversight of which contacts can sign in to the customer portal.\nadd\nPROVISION ACCESS\nCONTACT NAME\nmore_vert\n\t\nCUSTOMERS\nmore_vert\n\t\nEMAIL\nmore_vert\n\t\nLAST LOGIN\nmore_vert\n\t\nPROVISIONED\nmore_vert\n\t\nENABLED\nmore_vert\n\t\ndownload\ngrid_on\nsettings\n\nMitchell, Sarah\tAcme Corp\tsarah.mitchell@acme.com\tNever signed in\t05/22/2026\t\n\t",
+    "appComps": [
+      "app-root",
+      "app-header",
+      "app-chat",
+      "app-ai-help-panel",
+      "app-training-context-panel",
+      "app-connection-banner",
+      "app-announcement-overlay",
+      "app-onboarding-banner",
+      "app-sidebar",
+      "app-customer-portal-access-page",
+      "app-page-layout",
+      "app-toolbar",
+      "app-data-table",
+      "app-offline-banner",
+      "app-loading-overlay"
+    ]
+  },
+  "importFull": {
+    "url": "http://localhost:4200/customers/import",
+    "bodyText": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nCUSTOMERS\nchevron_right\nIMPORT\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\nlist\ncontacts\nvpn_key\nfilter_alt\nupload_file\nstorefront\nsettings\nBULK IMPORT\nUpload a CSV of customers + contacts, dedup against existing rows.\nconstruction\nComing soon — preview only\nSame dedup-wizard pattern as Leads bulk intake — upload CSV, preview matches, gate quality before commit. Differs in that customers carry billing/shipping addresses + credit terms + contacts as a hierarchy.\nWIZARD FLOW\nupload_file\n1\nUpload CSV\nDrag-and-drop or browse to select a CSV. Header row required; column aliases auto-detected.\ncompare_arrows\n2\nMatch against existing rows\nServer runs the same dedupe pipeline as leads bulk intake — by email, then phone, then companyName + state.\nrule\n3\nReview per-row status\nEach row gets a chip: Created / DuplicateExisting / Invalid / MissingRequiredField. Operator chooses to skip or override.\ncloud_don",
+    "inputs": [
+      {
+        "type": "text",
+        "placeholder": "Search jobs, parts, people...",
+        "name": ""
+      }
+    ],
+    "textareas": [],
+    "buttons": [
+      "school",
+      "notifications_none",
+      "light_mode",
+      "Admin, Forge\nmenu",
+      "arrow_back",
+      "settings"
+    ],
+    "appComps": [
+      "app-root",
+      "app-header",
+      "app-chat",
+      "app-ai-help-panel",
+      "app-training-context-panel",
+      "app-connection-banner",
+      "app-announcement-overlay",
+      "app-onboarding-banner",
+      "app-sidebar",
+      "app-customer-import-page",
+      "app-page-header",
+      "app-offline-banner",
+      "app-loading-overlay",
+      "app-toast-container",
+      "app-keyboard-shortcuts-help",
+      "app-chat-preview-popup",
+      "app-demo-marker"
+    ]
+  },
+  "queueState": {
+    "bodyText": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nLEADS\nchevron_right\nWORKER QUEUE\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\nlist\nupload_file\nspeed\ncampaign\nblock\ncard_giftcard\nbusiness\nstorefront\nsettings\nWORKER QUEUE\nPull-based queue for high-volume outreach. Single-keystroke dispositions, J/K to advance.\nspeed\nReady to work\n\nPull a slice of leads and the queue serves them one at a time. Two reps pulling at the same time get disjoint slices — no overlap.\n\nPULL SIZE\nplay_arrow\nPULL NEXT 5\nerror\nServer Error (500)\n\nAn error occurred\n\n{\n  \"type\": \"about:blank\",\n  \"title\": \"An error occurred\",\n  \"status\": 500\n}\ncontent_copy\nclose",
+    "appComps": [
+      "app-root",
+      "app-header",
+      "app-chat",
+      "app-ai-help-panel",
+      "app-training-context-panel",
+      "app-connection-banner",
+      "app-announcement-overlay",
+      "app-onboarding-banner",
+      "app-sidebar",
+      "app-leads-queue",
+      "app-page-header",
+      "app-offline-banner",
+      "app-loading-overlay",
+      "app-toast-container",
+      "app-keyboard-shortcuts-help",
+      "app-chat-preview-popup",
+      "app-demo-marker"
+    ]
+  },
+  "intakeState": {
+    "bodyText": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nLEADS\nchevron_right\nBULK INTAKE\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\nlist\nupload_file\nspeed\ncampaign\nblock\ncard_giftcard\nbusiness\nstorefront\nsettings\nBULK INTAKE\nUpload a list, dedup against existing leads + suppression, gate quality before commit.\n1\nPick the strategy\nStrategy\nCold Call\nCampaign tag (optional)\n\nThe strategy drives which fields are required and which suppression channel is checked. Cold-call needs phone; cold-email needs email; trade-show follow-up accepts either.\n\n2\nProvide the data\n\nHeader row required. Recognized columns: companyName, contactName, email, phone, source, notes (case-insensitive, common variants accepted).\n\nExpected CSV columns\n\nColumn matching is case-insensitive and the listed aliases all map to the same field. Only `companyName` is required; the rest can be left blank without blocking the upload.\n\nHEADER\tREQUIRED?\tALSO ACCEPTED\ncompanyName\t\nREQUIRED\n\tco",
+    "appComps": [
+      "app-root",
+      "app-header",
+      "app-chat",
+      "app-ai-help-panel",
+      "app-training-context-panel",
+      "app-connection-banner",
+      "app-announcement-overlay",
+      "app-onboarding-banner",
+      "app-sidebar",
+      "app-leads-intake",
+      "app-page-header",
+      "app-select",
+      "app-input",
+      "app-textarea",
+      "app-offline-banner",
+      "app-loading-overlay",
+      "app-toast-container",
+      "app-keyboard-shortcuts-help",
+      "app-chat-preview-popup",
+      "app-demo-marker"
+    ]
+  },
+  "segsFull": {
+    "bodyText": "Skip to main content\nHOME\nchevron_right\n…\nchevron_right\nCUSTOMERS\nchevron_right\nSEGMENTS\nsearch\nCtrl+K\nschool\nnotifications_none\nlight_mode\nAdmin, Forge\nmenu\narrow_back\nlist\ncontacts\nvpn_key\nfilter_alt\nupload_file\nstorefront\nsettings\nSEGMENTS\nSaved cross-customer filter sets for marketing + reporting.\nconstruction\nComing soon — preview only\nDefine a filter (e.g. \"open AR > $10K AND industry = aerospace AND last order < 90 days\"), save it as a named segment, and reuse across reports, marketing campaigns, and dashboards.\nEXAMPLE SEGMENTS\nfilter_alt\nHigh-Value Aerospace\n~12\n\nAS9100-certified customers with > $10K open AR. Useful for the quarterly account-review cadence.\n\nisAerospace = true AND openInvoiceTotal > $10K\nfilter_alt\nITAR-cleared Reference Pool\n~4\n\nDefense customers cleared for ITAR work who have also opted in as references for similar prospects.\n\nisItarControlled = true AND isReferenceOk = true\nfilter_alt\nDormant > 90 Days\n~27\n\nActive customers with no order in the last quarte",
+    "appComps": [
+      "app-root",
+      "app-header",
+      "app-chat",
+      "app-ai-help-panel",
+      "app-training-context-panel",
+      "app-connection-banner",
+      "app-announcement-overlay",
+      "app-onboarding-banner",
+      "app-sidebar",
+      "app-customer-segments-page",
+      "app-page-header",
+      "app-offline-banner",
+      "app-loading-overlay",
+      "app-toast-container",
+      "app-keyboard-shortcuts-help"
+    ]
+  }
+}
