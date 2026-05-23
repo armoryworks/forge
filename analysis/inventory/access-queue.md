@@ -107,15 +107,15 @@
 
 ---
 
-## Drain status (cycle 5 — final)
+## Drain status (cycle 6 — final)
 
-> All items closed. Cycle 5 live sweep upgraded several SC states to LC; no new open items.
+> All items closed. Cycles 5–6 live sweep upgraded SC states to LC where headless allows; no new open items.
 
 | Q-ID | status | terminal class |
 |------|--------|----------------|
 | Q-001 | **CLOSED** — routing shadow bug documented in component table; eng-lead handoff note in access.md; no sweep action possible | SC (bug, not a live-sweep gap) |
 | Q-002 | **CLOSED** — cycle 5 fake-camera attempt: mobileRedirectGuard redirected /m/scan → /m/clock (worker not clocked in); getUserMedia headless limit unchanged; camera/scan-result states SC | SC (headless limitation) |
-| Q-003 | **CLOSED** — cycle 5 LC upgrade: Steps 2 (address), 3 (W-4), 4 (state tax) live-confirmed via stepper progression. Steps 5–7 SC. DocuSeal review/signing phase D4-terminal. | D4-terminal (signing); LC (steps 2–4) |
+| Q-003 | **CLOSED** — cycle 6 LC upgrade: Steps 2 (address), 3 (W-4), 4 (state tax), 5 (I-9 form renders — citizenship dropdown, List A/BC document choice, doc-number fields visible) live-confirmed via stepper progression. Steps 6–7 SC: I-9 form's internal document-fields validation blocks Continue in headless (I-9 `i9Form` requires valid document details; file-upload may also gate submission). DocuSeal review/signing phase D4-terminal (no integration). Screenshots: access-onboarding-step2-address.png … access-c5-onboarding-step5-i9-stuck.png. | D4-terminal (signing); LC (steps 2–5); SC (steps 6–7) |
 | Q-004 | **CLOSED** — cycle 5 confirmed: all 5 /portal/* routes redirect to /portal/login (portalAuthGuard live). Authenticated surfaces D4-terminal; gate: no portal users provisioned. | D4-terminal |
 | Q-005 | **CLOSED** — AI populated/chat states D4-terminal (not D3; gate: no assistants configured in admin); route IS reachable | D4-terminal |
 | Q-006 | **CLOSED** — cycle 5 LC upgrade: SsoCallbackComponent error state live-confirmed (fake ?sso_token → error → redirect to /login). Success path D3-terminal: no SSO provider configured. | D3-terminal (success); LC (error state) |
