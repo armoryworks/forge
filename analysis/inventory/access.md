@@ -88,9 +88,12 @@
 - [x] `ai/ai.component.ts` — AiComponent
 - [x] `ai/ai.routes.ts` — routes (no component)
 
-### features/render
+### features/render — headless PDF
 - [x] `render/headless-form-render.component.ts` — HeadlessFormRenderComponent
 - [x] `render/render.routes.ts` — routes (no component)
+
+### shared — render (3D)
+- [x] `shared/components/stl-viewer/stl-viewer.component.ts` — StlViewerComponent (three.js WebGL STL viewer; this phase's "render (3D)" scope item; hosted in parts surfaces — cross-ref parts region)
 
 ### features/dev-tools
 - [x] `dev-tools/loading-demo.component.ts` — LoadingDemoComponent
@@ -229,12 +232,18 @@
 |-----------|------|-------|-----------|-------------|--------|---------|--------|
 | AiComponent | page | `/ai/:assistantId` | `features/ai/ai.component.ts:39` | authGuard | loading, populated, empty | AI assistant chat: assistant list sidebar (by category, icon, name, description, active-indicator) + right chat panel (messages log, typing-dots, starter questions, textarea input + send); uses AiService (`features/ai/ai.component.ts:39` — AiService, AiHelpMessage, AiAssistantListItem, ChatMessage interfaces). Populated/chat states source-confirmed: AiAssistantCard (sidebar row), AiStarterQuestions (pre-chat welcome), ChatMessage bubbles (user/assistant roles), typing indicator. | **LC** (empty state) + **D4-terminal for populated states** — Q-005-CLOSED: route IS reachable, no capability gate; empty state LC-confirmed. Populated states blocked because no assistants are configured in non-seeded env (not a cap flag — gate is admin AI assistant config). |
 
-### RENDER
+### RENDER — headless PDF
 
 | component | type | route | file:line | renders-for | states | purpose | status |
 |-----------|------|-------|-----------|-------------|--------|---------|--------|
 | HeadlessFormRenderComponent | page | `/__render-form` | `features/render/headless-form-render.component.ts:29` | no auth (headless/tooling) | loading, populated | Headless compliance-form renderer for PDF capture; wraps ComplianceFormRendererComponent in readonly mode; "Waiting for form definition…" until definition() signal populated via window.__FORM_DEFINITION__ injection; no employee session required | **LC** (waiting-state confirmed — screenshot: access-render-form-waiting.png; "Waiting for form definition..." text visible; no chrome/shell) |
 | ComplianceFormRendererComponent | shared-cmp | `/__render-form` (inner) + `/onboarding` review phase | `features/account/components/compliance-form-renderer/compliance-form-renderer.component.ts:40` | no auth (render route) · all (onboarding review) | loading, populated | Dynamic compliance-form renderer; takes ComplianceFormDefinition input; converts sections to DynamicFormControlModel via sectionsToModels adapter; renders DynamicQbFormControlComponent per field; multi-page (normalizeFormPages); ValidationButton for submit. Used by HeadlessFormRenderComponent (headless PDF capture) and OnboardingWizardComponent review phase (PDF preview before DocuSeal signing). | **SC** (populated state requires window injection in render path; D4-terminal in onboarding — DocuSeal not configured) |
+
+### RENDER (3D)
+
+| component | type | route | file:line | renders-for | states | purpose | status |
+|-----------|------|-------|-----------|-------------|--------|---------|--------|
+| StlViewerComponent | shared-cmp | shared (parts surfaces) | `shared/components/stl-viewer/stl-viewer.component.ts:20` | all (authGuard — via parts host pages) | loading, populated, error | three.js WebGL STL model viewer; inputs: `url` (required STL file URL), `height` (default `'400px'`); WebGLRenderer + STLLoader + OrbitControls (orbit/zoom/damping) + PerspectiveCamera + ambient/directional/back lighting + grid helper + requestAnimationFrame loop + ResizeObserver. States: loading (signal:24, initial true), populated (mesh added after STLLoader success, `loading.set(false)`:142), error (`signal`:25 — "Failed to load 3D model" on loader error:147; "Failed to initialize 3D viewer" on init-catch:171). Hosted in `features/parts/components/part-detail-panel` + `features/parts/workflow/part-express-form` (parts-region cross-ref — those host pages are NOT in this phase). | **D4-terminal** (populated 3D render blocked: no seeded parts with STL model attachments on non-seeded stack; gate: part record with a 3D model file URL) |
 
 ### DEV-TOOLS
 
@@ -303,3 +312,4 @@
 | 5 | 2026-05-23 | 0 new rows (LC upgrades only) | — | ui-scout cycle 5: drove onboarding Steps 2–5 rendering LC (filled Step 1 fields → advanced through Address/W-4/State-Tax/I-9; I-9 form rendered but Continue-btn disabled due to file-upload requirement → Steps 6–7 remain SC). Cycle 5b: SsoCallbackComponent status corrected from pre-written LC to SC(template)/LC(redirect) — ngOnInit always redirects before template is visible; redirect paths confirmed via headless (no-params, ?error=sso_failed, ?error=no_account all → /login; ?sso_token → handleSsoToken+navigate). 10 screenshots added. |
 | 6 | 2026-05-23 | 2 new rows | 2 items added to features/account checklist | Source-cataloger: found + added AccountLayoutComponent (account-layout.component.ts:48) and AccountSidebarComponent (account-sidebar.component.ts:37) — both render for all /account/security visits, were missing from inventory; added to checklist, component table, and route table. Added WorkerComponent + welcome to "checked and excluded" boundary note. Upgraded 7/10 shared-cmp statuses SC→LC (by presence in confirmed LC pages); QrCodeComponent + DialogComponent marked D3 (TOTP-wall only); AddressFormComponent remains SC (SetupComponent is D4). |
 | 7 | 2026-05-23 | 2 new rows (ComplianceFormRenderer + 5 shared-cmp rows) | 6 items added to shared checklist; 1 to features/account | Source-cataloger: full feature-tree walk confirmed all 30 in-scope .component.ts files; found ComplianceFormRendererComponent (account/components/compliance-form-renderer:40) missing — added to checklist + component table under RENDER (used by HeadlessFormRenderComponent + onboarding review phase). Found 5 additional shared components via import scan not previously listed: SelectComponent (:32), DatepickerComponent (:49), ToggleComponent (:26), CurrencyInputComponent (:46), DynamicQbFormControlComponent (:24) — added to shared checklist + audit table (all SC; used in onboarding steps/compliance-form-renderer). Checklist now 63 items, all [x]. |
+| 7b | 2026-05-23 | 1 new row | 1 item added (shared — render 3D) | Source-cataloger: added StlViewerComponent (shared/components/stl-viewer:20) — the "render (3D)" scope item; three.js WebGL STL viewer with loading/populated/error states; D4-terminal (no seeded parts with STL attachments); parts-region cross-ref noted; RENDER section split into "headless PDF" + "3D" subsections. Checklist now 64 items, all [x]. Queue drained. Reconciliation clean. |
