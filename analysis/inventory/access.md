@@ -154,79 +154,79 @@
 
 | component | type | route | file:line | renders-for | states | purpose | status |
 |-----------|------|-------|-----------|-------------|--------|---------|--------|
-| LoginComponent | page | `/login` | `features/auth/login.component.ts:30` | all (public) | loading, populated, error | Email+password login form; conditionally renders MfaChallengeComponent on MFA-required response | SC |
-| MfaChallengeComponent | panel | `/login` (embedded) | `features/auth/mfa-challenge.component.ts:19` | MFA-enabled users | loading, populated, error | Inline TOTP/recovery-code challenge after credential verify; embedded in LoginComponent, not a separate route | SC |
-| SetupComponent | page | `/setup` | `features/auth/setup.component.ts:30` | public (first-run only) | populated | First-run org setup: company name, address, admin account; guarded by setupRequiredGuard (redirects to /login once complete) | SC |
-| TokenSetupComponent | page | `/setup/:token` | `features/auth/token-setup.component.ts:27` | invited users (token required) | loading, populated, error | Invite-token account setup (set password, first-time login); doubles as password-set for new users | SC |
-| SsoCallbackComponent | page | `/sso/callback` | `features/auth/sso-callback.component.ts:18` | SSO users | loading, error | Receives SSO redirect with `?sso_token=`; exchanges for session; redirects to app or shows error | SC |
+| LoginComponent | page | `/login` | `features/auth/login.component.ts:30` | all (public) | loading, populated, error | Email+password login form; Forge MES/MRP/ERP marquee logo; email field, password field (show/hide toggle), validation-button (violation badge), "SIGN IN" button; "HAVE A SETUP CODE?" link below; already-authenticated panel (account_circle + Go-to-Dashboard / Sign-Out buttons) | **LC** (screenshot: access-login-unauthenticated.png, access-login-already-authenticated.png) |
+| MfaChallengeComponent | panel | `/login` (embedded) | `features/auth/mfa-challenge.component.ts:19` | MFA-enabled users | loading, populated, error | Inline TOTP/recovery-code challenge after credential verify; 6-digit code input, remember-device checkbox, Verify button; "Use a recovery code instead" toggle; Back to login cancel; embedded in LoginComponent, not a separate route | **D3-terminal** (TOTP wall: shared-stack, no MFA-enrolled users; gate: no TOTP issuer configured) |
+| SetupComponent | page | `/setup` | `features/auth/setup.component.ts:30` | public (first-run only) | populated | First-run org setup: company name, address, admin account; guarded by setupRequiredGuard (redirects to /login once complete) | **D4-terminal** (setupRequired=false; guard confirmed redirecting to /login — screenshot: access-setup-first-admin-redirected.png) |
+| TokenSetupComponent | page | `/setup/:token` | `features/auth/token-setup.component.ts:27` | invited users (token required) | loading, populated, error | Invite-token account setup (set password, first-time login); also activated by `/setup/integrations` URL due to routing shadow (Q-001) | **LC** (error state live-confirmed with invalid token — screenshot: access-token-setup-error.png; "Invalid or expired setup code. Please contact your administrator." + error_outline icon) |
+| SsoCallbackComponent | page | `/sso/callback` | `features/auth/sso-callback.component.ts:18` | SSO users | loading, error | Receives SSO redirect with `?sso_token=`; exchanges for session; redirects to app or shows error | **SC** (no SSO provider configured) |
 
 ### ACCOUNT SECURITY (user-side MFA + password)
 
 | component | type | route | file:line | renders-for | states | purpose | status |
 |-----------|------|-------|-----------|-------------|--------|---------|--------|
-| AccountSecurityComponent | page | `/account/security` | `features/account/pages/security/account-security.component.ts:28` | all (authGuard) | loading, populated | Change password, change PIN, list/manage MFA devices; opens MfaSetupDialogComponent + MfaRecoveryCodesDialogComponent | SC |
-| MfaSetupDialogComponent | dialog | `/account/security` (dialog) | `features/account/components/mfa-setup-dialog/mfa-setup-dialog.component.ts:20` | all (authGuard) | loading, populated | TOTP MFA enroll: shows QR code (QrCodeComponent), TOTP code verify; D3-terminal pending live (TOTP wall from phase 05 carry-forward) | D3-terminal (TOTP enroll blocked on shared stack — intentional; gate: no TOTP issuer configured) |
-| MfaRecoveryCodesDialogComponent | dialog | `/account/security` (dialog) | `features/account/components/mfa-recovery-codes-dialog/mfa-recovery-codes-dialog.component.ts:17` | MFA-enrolled users | loading, populated | View/regenerate TOTP recovery codes; only reachable after MFA is enrolled | D3-terminal (requires prior MFA enrollment — same TOTP wall) |
+| AccountSecurityComponent | page | `/account/security` | `features/account/pages/security/account-security.component.ts:28` | all (authGuard) | loading, populated | Change password, change PIN, list/manage MFA devices; opens MfaSetupDialogComponent + MfaRecoveryCodesDialogComponent | **SC** (account section not in this phase's live sweep scope; cross-ref admin.md for MFA admin config) |
+| MfaSetupDialogComponent | dialog | `/account/security` (dialog) | `features/account/components/mfa-setup-dialog/mfa-setup-dialog.component.ts:20` | all (authGuard) | loading, populated | TOTP MFA enroll: shows QR code (QrCodeComponent), TOTP code verify | **D3-terminal** (TOTP enroll blocked on shared stack — intentional; gate: no TOTP issuer configured) |
+| MfaRecoveryCodesDialogComponent | dialog | `/account/security` (dialog) | `features/account/components/mfa-recovery-codes-dialog/mfa-recovery-codes-dialog.component.ts:17` | MFA-enrolled users | loading, populated | View/regenerate TOTP recovery codes; only reachable after MFA is enrolled | **D3-terminal** (requires prior MFA enrollment — same TOTP wall) |
 
 ### SETUP INTEGRATIONS
 
 | component | type | route | file:line | renders-for | states | purpose | status |
 |-----------|------|-------|-----------|-------------|--------|---------|--------|
-| SetupIntegrationsComponent | page | `/setup/integrations` | `features/setup-integrations/setup-integrations.component.ts:56` | authGuard (Admin enforced internally) | loading, populated | Post-first-setup integrations wizard: card-per-integration with Set up / Skip choices | SC |
+| SetupIntegrationsComponent | page | `/setup/integrations` ⚠️ | `features/setup-integrations/setup-integrations.component.ts:56` | authGuard (Admin enforced internally) | loading, populated | Post-first-setup integrations wizard: card-per-integration with Set up / Skip choices; grouped by category, stats row (configured/remaining/skipped), Finish button | **SC** — **ROUTING SHADOW (Q-001)**: URL `/setup/integrations` is matched by `{ path: 'setup/:token' }` (token="integrations") before reaching this route; only reachable via programmatic `router.navigate()` from setup completion flow. Direct URL renders TokenSetupComponent error page. |
 
 ### ONBOARDING
 
 | component | type | route | file:line | renders-for | states | purpose | status |
 |-----------|------|-------|-----------|-------------|--------|---------|--------|
-| OnboardingWizardComponent | page | `/onboarding` | `features/onboarding/onboarding-wizard.component.ts:194` | all (authGuard; new hires) | loading, populated | 7-step employee onboarding (step 0–6): Step 1 Personal Info, Step 2 Address, Step 3 W-4 Federal Withholding, Step 4 State Withholding, Step 5 I-9 Eligibility, Step 6 Direct Deposit, Step 7 Acknowledgments. Followed by review flow (PDF preview + DocuSeal signing embed). URL-param-driven (?step=0..6, ?review=preview\|signing&formIdx=N). Auto-saves draft. | SC |
+| OnboardingWizardComponent | page | `/onboarding` | `features/onboarding/onboarding-wizard.component.ts:194` | all (authGuard; new hires) | loading, populated | 7-step employee onboarding (step 0–6): Step 1 Personal Info, Step 2 Address, Step 3 W-4 Federal Withholding, Step 4 State Withholding, Step 5 I-9 Eligibility, Step 6 Direct Deposit, Step 7 Acknowledgments. Followed by review flow (PDF preview + DocuSeal signing embed). URL-param-driven (?step=0..6). | **LC** (Step 1 live-confirmed: horizontal linear mat-stepper, worker "Sam Worker" name pre-filled, all Step 1 fields visible — screenshot: access-onboarding-step1.png; steps 2–7 and review/sign phases source-confirmed) |
 
 ### PORTAL
 
 | component | type | route | file:line | renders-for | states | purpose | status |
 |-----------|------|-------|-----------|-------------|--------|---------|--------|
-| PortalLoginComponent | page | `/portal/login` | `features/portal/pages/portal-login.component.ts:23` | public (no auth) | populated | Magic-link request: customer submits email; API sends one-time link; dev installs return link in response body | SC |
-| PortalAuthCallbackComponent | page | `/portal/auth/callback` | `features/portal/pages/portal-auth-callback.component.ts:21` | public (token in URL) | loading, error | Exchanges `?token=` for portal session; redirects to /portal/dashboard on success; shows error + back-link on failure (expired/used) | SC |
-| PortalLayoutComponent | page-shell | `/portal/*` (authed) | `features/portal/portal-layout.component.ts:21` | portalAuthGuard (customer) | populated | Portal shell: customer name header, logout, horizontal tab-nav (Dashboard / Orders / Quotes / Invoices / Shipments) | SC |
-| PortalDashboardComponent | page | `/portal/dashboard` | `features/portal/pages/portal-dashboard.component.ts:17` | portalAuthGuard (customer) | loading, populated, empty | Summary stats: open orders, quote count, unpaid invoices, recent shipments. D4-terminal expected (non-seeded portal customer) | D4-terminal (populated-blocked: no seeded portal customer on shared stack) |
-| PortalOrdersComponent | page | `/portal/orders` | `features/portal/pages/portal-orders.component.ts:18` | portalAuthGuard (customer) | loading, populated, empty | List of customer's sales orders; empty-state via EmptyStateComponent | D4-terminal (populated-blocked: non-seeded) |
-| PortalQuotesComponent | page | `/portal/quotes` | `features/portal/pages/portal-quotes.component.ts:19` | portalAuthGuard (customer) | loading, populated, empty | List of customer's quotes; accept action emits snackbar | D4-terminal (populated-blocked: non-seeded) |
-| PortalInvoicesComponent | page | `/portal/invoices` | `features/portal/pages/portal-invoices.component.ts:18` | portalAuthGuard (customer) | loading, populated, empty | List of customer's invoices with amount/status | D4-terminal (populated-blocked: non-seeded) |
-| PortalShipmentsComponent | page | `/portal/shipments` | `features/portal/pages/portal-shipments.component.ts:18` | portalAuthGuard (customer) | loading, populated, empty | List of customer's shipments | D4-terminal (populated-blocked: non-seeded) |
+| PortalLoginComponent | page | `/portal/login` | `features/portal/pages/portal-login.component.ts:23` | public (no auth) | populated, sent-state | Magic-link request: "Sign in to your portal" title, 15-min expiry hint, email input, "Send" button; post-submit "Check your inbox" state (mark_email_read icon); dev-link block only when API returns devLink (non-seeded: devLink not returned for unknown email) | **LC** (email-form state + sent state confirmed — screenshots: access-portal-login.png, access-portal-login-sent.png) |
+| PortalAuthCallbackComponent | page | `/portal/auth/callback` | `features/portal/pages/portal-auth-callback.component.ts:21` | public (token in URL) | loading, error | Exchanges `?token=` for portal session; redirects to /portal/dashboard on success | **SC** (no portal users provisioned; magic-link not obtainable in non-seeded env) |
+| PortalLayoutComponent | page-shell | `/portal/*` (authed) | `features/portal/portal-layout.component.ts:21` | portalAuthGuard (customer) | populated | Portal shell: "QB·ENG" brand + "Customer Portal" title; horizontal tab-nav (Dashboard / Orders / Quotes / Invoices / Shipments); user avatar initials + contact name + customer name; logout button | **D4-terminal** (non-seeded: portalAuthGuard redirects to /portal/login; no portal session obtainable) |
+| PortalDashboardComponent | page | `/portal/dashboard` | `features/portal/pages/portal-dashboard.component.ts:17` | portalAuthGuard (customer) | loading, populated, empty | Summary stats: open orders, quote count, unpaid invoices, in-transit shipments | **D4-terminal** (populated-blocked: no seeded portal customer on shared stack) |
+| PortalOrdersComponent | page | `/portal/orders` | `features/portal/pages/portal-orders.component.ts:18` | portalAuthGuard (customer) | loading, populated, empty | List of customer's sales orders | **D4-terminal** (populated-blocked: non-seeded) |
+| PortalQuotesComponent | page | `/portal/quotes` | `features/portal/pages/portal-quotes.component.ts:19` | portalAuthGuard (customer) | loading, populated, empty | List of customer's quotes | **D4-terminal** (populated-blocked: non-seeded) |
+| PortalInvoicesComponent | page | `/portal/invoices` | `features/portal/pages/portal-invoices.component.ts:18` | portalAuthGuard (customer) | loading, populated, empty | List of customer's invoices with amount/status | **D4-terminal** (populated-blocked: non-seeded) |
+| PortalShipmentsComponent | page | `/portal/shipments` | `features/portal/pages/portal-shipments.component.ts:18` | portalAuthGuard (customer) | loading, populated, empty | List of customer's shipments | **D4-terminal** (populated-blocked: non-seeded) |
 
 ### MOBILE
 
 | component | type | route | file:line | renders-for | states | purpose | status |
 |-----------|------|-------|-----------|-------------|--------|---------|--------|
-| MobileLayoutComponent | page-shell | `/m/*` | `features/mobile/mobile-layout.component.ts:25` | authGuard (mobile devices) | populated | Mobile shell: bottom tab bar (Clock / Jobs / Scan / Time / Chat / Notifications / Account); role-conditional tabs; clock-state-aware | SC |
-| MobileClockComponent | page | `/m/clock` | `features/mobile/pages/mobile-clock.component.ts:27` | authGuard | loading, populated | Clock in/out with configurable event types (ClockEventTypeDef); shows current status + time-on-task; default landing for /m/ | SC |
-| MobileJobsComponent | page | `/m/jobs` | `features/mobile/pages/mobile-jobs.component.ts:28` | authGuard | loading, populated, empty | List of assigned/active jobs; job card shows priority, stage, overdue flag, active-timer indicator | SC |
-| MobileJobDetailComponent | page | `/m/jobs/:jobId` | `features/mobile/pages/mobile-job-detail.component.ts:37` | authGuard | loading, populated, error | Job detail: description, stage, operations, time-log actions | SC |
-| MobileScanComponent | page | `/m/scan` | `features/mobile/pages/mobile-scan.component.ts:32` | authGuard | populated | Camera QR/barcode scanner (html5-qrcode); routes scan result to job/part/asset; shows scan result overlay | SC |
-| MobileHoursComponent | page | `/m/time` | `features/mobile/pages/mobile-hours.component.ts:41` | authGuard | loading, populated, empty | Weekly time log: daily hours breakdown, entry list per day | SC |
-| MobileChatComponent | page | `/m/chat` | `features/mobile/pages/mobile-chat.component.ts:37` | authGuard | loading, populated, empty | Channel list with search; opens to mobile-chat-thread; uses ChatHubService + ChatService | SC |
-| MobileChatThreadComponent | page | `/m/chat/thread/:messageId` | `features/mobile/pages/mobile-chat-thread/mobile-chat-thread.component.ts:20` | authGuard | loading, populated | Thread message list + reply input; renders mention-formatted messages via MentionRenderPipe | SC |
-| MobileChatChannelInfoComponent | page | `/m/chat/channel-info/:channelId` | `features/mobile/pages/mobile-chat-channel-info/mobile-chat-channel-info.component.ts:23` | authGuard | loading, populated | Channel metadata: member list, leave-channel action (confirm-dialog) | SC |
-| MobileNotificationsComponent | page | `/m/notifications` | `features/mobile/pages/mobile-notifications.component.ts:15` | authGuard | loading, populated, empty | In-app notification list; empty-state via EmptyStateComponent | SC |
-| MobileAccountComponent | page | `/m/account` | `features/mobile/pages/mobile-account.component.ts:16` | authGuard | populated | User avatar, name, role; theme toggle; logout; link to desktop site (sets preferDesktop) | SC |
-| MobileHomeComponent | page | **UNROUTED** | `features/mobile/pages/mobile-home.component.ts:35` | — | — | Exists in source + spec only; NOT in mobile.routes.ts; orphan/dead component | source-confirmed (orphan — not routed; omit from live sweep) |
+| MobileLayoutComponent | page-shell | `/m/*` | `features/mobile/mobile-layout.component.ts:25` | authGuard (mobile devices) | populated | Mobile shell: "Forge" header + notifications bell button; clock-gate banner (when !isClockedIn()); router-outlet; bottom tab bar (CHAT / MY JOBS / SCAN center-ring / CLOCK / ACCOUNT) | **LC** (screenshot: access-mobile-clock.png; shell, clock-gate banner, bottom nav all visible) |
+| MobileClockComponent | page | `/m/clock` | `features/mobile/pages/mobile-clock.component.ts:27` | authGuard | loading, populated | Circular dial showing "Clocked Out" / "Clocked In" state; "Clock In" CTA card; LOADING… spinner during clock-state check; default landing for /m/ | **LC** (screenshot: access-mobile-clock.png; "Clocked Out" state with Clock In card + LOADING spinner) |
+| MobileJobsComponent | page | `/m/jobs` | `features/mobile/pages/mobile-jobs.component.ts:28` | authGuard | loading, populated, empty | List of assigned/active jobs; job card shows priority, stage, overdue flag, active-timer indicator | **LC** (route navigated; screenshot: access-mobile-jobs.png) |
+| MobileJobDetailComponent | page | `/m/jobs/:jobId` | `features/mobile/pages/mobile-job-detail.component.ts:37` | authGuard | loading, populated, error | Job detail: description, stage, operations, time-log actions | **D4-terminal** (non-seeded: no jobs to navigate into) |
+| MobileScanComponent | page | `/m/scan` | `features/mobile/pages/mobile-scan.component.ts:32` | authGuard | populated | Camera QR/barcode scanner (html5-qrcode); routes scan result to job/part/asset | **LC** (route navigated — screenshot: access-mobile-scan.png; camera prompt not fired in headless) |
+| MobileHoursComponent | page | `/m/time` | `features/mobile/pages/mobile-hours.component.ts:41` | authGuard | loading, populated, empty | Weekly time log: daily hours breakdown, entry list per day | **LC** (route navigated — screenshot: access-mobile-hours.png) |
+| MobileChatComponent | page | `/m/chat` | `features/mobile/pages/mobile-chat.component.ts:37` | authGuard | loading, populated, empty | Channel list with search; opens to mobile-chat-thread | **LC** (route navigated — screenshot: access-mobile-chat.png) |
+| MobileChatThreadComponent | page | `/m/chat/thread/:messageId` | `features/mobile/pages/mobile-chat-thread/mobile-chat-thread.component.ts:20` | authGuard | loading, populated | Thread message list + reply input; mention-formatted messages | **D4-terminal** (non-seeded: no chat messages) |
+| MobileChatChannelInfoComponent | page | `/m/chat/channel-info/:channelId` | `features/mobile/pages/mobile-chat-channel-info/mobile-chat-channel-info.component.ts:23` | authGuard | loading, populated | Channel metadata: member list, leave-channel action | **D4-terminal** (non-seeded: no chat channels) |
+| MobileNotificationsComponent | page | `/m/notifications` | `features/mobile/pages/mobile-notifications.component.ts:15` | authGuard | loading, populated, empty | In-app notification list; empty-state via EmptyStateComponent | **LC** (route navigated — screenshot: access-mobile-notifications.png) |
+| MobileAccountComponent | page | `/m/account` | `features/mobile/pages/mobile-account.component.ts:16` | authGuard | populated | User avatar, name, role; theme toggle; logout; link to desktop site | **LC** (route navigated — screenshot: access-mobile-account.png) |
+| MobileHomeComponent | page | **UNROUTED** | `features/mobile/pages/mobile-home.component.ts:35` | — | — | Exists in source + spec only; NOT in mobile.routes.ts; orphan/dead component | **SC** (orphan — not routed; confirmed via mobile.routes.ts read) |
 
 ### AI ASSISTANT
 
 | component | type | route | file:line | renders-for | states | purpose | status |
 |-----------|------|-------|-----------|-------------|--------|---------|--------|
-| AiComponent | page | `/ai/:assistantId` | `features/ai/ai.component.ts:39` | authGuard (cap-gated) | loading, populated, empty | AI assistant chat: assistant list sidebar (by assistantId), chat thread (user+assistant messages), starter questions, textarea input; uses AiService. Cap-gate expected (AI capability flag) | D3-terminal (cap-gated-OFF expected; gate: AI assistant capability not enabled on shared stack — to be confirmed by live sweep) |
+| AiComponent | page | `/ai/:assistantId` | `features/ai/ai.component.ts:39` | authGuard | loading, populated, empty | AI assistant chat: sidebar (assistant list) + right chat panel (messages, starter questions, text input); uses AiService | **LC** (empty-state live-confirmed — screenshot: access-ai-runtime.png; "No assistants available" sidebar + "Select an assistant to start chatting" right panel; no assistants configured in non-seeded env; populated/chat states are D3-terminal pending assistant config) |
 
 ### RENDER
 
 | component | type | route | file:line | renders-for | states | purpose | status |
 |-----------|------|-------|-----------|-------------|--------|---------|--------|
-| HeadlessFormRenderComponent | page | `/__render-form` | `features/render/headless-form-render.component.ts:29` | no auth (headless/tooling) | loading, populated | Headless compliance-form renderer for PuppeteerSharp visual comparison; receives form def via `window.__FORM_DEFINITION__` event injection; signals `window.__RENDER_READY__`; no chrome | source-confirmed (tooling route; not reachable by normal nav; window-injection protocol) |
+| HeadlessFormRenderComponent | page | `/__render-form` | `features/render/headless-form-render.component.ts:29` | no auth (headless/tooling) | loading, populated | Headless compliance-form renderer for PDF capture; wraps app-compliance-form-renderer in readonly mode; "Waiting for form definition…" until definition() signal populated; no employee session required | **LC** (waiting-state confirmed — screenshot: access-render-form-waiting.png; "Waiting for form definition..." text visible; no chrome/shell) |
 
 ### DEV-TOOLS
 
 | component | type | route | file:line | renders-for | states | purpose | status |
 |-----------|------|-------|-----------|-------------|--------|---------|--------|
-| LoadingDemoComponent | page | `/dev-tools/loading` | `features/dev-tools/loading-demo.component.ts:15` | authGuard (any role) | populated | Dev-tools demo for LoadingService + LoadingBlockDirective; toggles global + block loading states; no role guard | SC |
+| LoadingDemoComponent | page | `/dev-tools/loading` | `features/dev-tools/loading-demo.component.ts:15` | no auth (any user) | populated | Dev-tools demo for LoadingService + LoadingBlockDirective; 3 sections: Global Overlay (5 trigger buttons), Component-Level Loading (Block A/B toggles + demo blocks), Route Navigation Loading description | **LC** (all 3 sections + active overlay confirmed — screenshots: access-dev-tools-loading.png, access-dev-tools-loading-active.png) |
 
 ---
 
@@ -249,16 +249,22 @@
 
 ## Open items / queue feed
 
-- **Q-pending-1:** Live confirm LoginComponent states (loading + error on bad creds + MFA trigger). Needs ui-scout login sweep.
-- **Q-pending-2:** MfaChallengeComponent — confirm it renders inline within LoginComponent (not a dialog). States: loading (fetching challenge), populated (TOTP input shown), recovery-code toggle shown/hidden.
-- **Q-pending-3:** SetupIntegrationsComponent — confirm route accessible post-login; list integration cards shown. Needs admin user sweep.
-- **Q-pending-4:** OnboardingWizardComponent — confirm step navigation, auto-save, review flow (PDF preview + DocuSeal embed). Needs new-hire-equivalent user or seeded onboarding draft.
-- **Q-pending-5:** AiComponent — confirm cap-gate state (should show empty/locked or redirect). If D3-terminal confirmed, note exact gate.
-- **Q-pending-6:** HeadlessFormRenderComponent (`/__render-form`) — confirm route loads without auth; verify window injection protocol is the only population path.
-- **Q-pending-7:** LoadingDemoComponent — confirm it's accessible without admin role; verify block-loading toggle works.
-- **Q-pending-8:** MobileScanComponent — confirm camera access prompt and scan result overlay.
-- **Q-pending-9:** Portal login → callback → dashboard flow — confirm magic-link email flow or dev-response token path. All portal pages expected D4-terminal (non-seeded customer).
-- **Q-pending-10:** MobileHomeComponent — confirm it is truly unrouted (not reachable via any nav or redirect). Can be closed source-only.
+> Items resolved in cycle 2 by ui-scout live sweep are crossed out. Remaining items for access-queue.md.
+
+- ~~**Q-pending-1:** Live confirm LoginComponent~~ → **RESOLVED**: LC — email+password form, validation badge, "HAVE A SETUP CODE?" link; already-authenticated panel (account_circle + Go-to-Dashboard / Sign-Out). Error state on bad creds not separately triggered but form renders correctly.
+- ~~**Q-pending-2:** MfaChallengeComponent~~ → **D3-terminal confirmed**: TOTP wall, shared stack, no enrolled MFA users — gate noted.
+- ~~**Q-pending-3:** SetupIntegrationsComponent route~~ → **ROUTING SHADOW BUG (Q-001)**: URL `/setup/integrations` is shadowed by `setup/:token` route (Angular matches "integrations" as a token value). Component only reachable programmatically. See access-queue.md Q-001.
+- ~~**Q-pending-4:** OnboardingWizardComponent~~ → **PARTIAL LC**: Step 1 live-confirmed (stepper, worker name pre-filled, all Step 1 fields). Steps 2–7 + review/signing phases source-confirmed (require form progression to trigger).
+- ~~**Q-pending-5:** AiComponent cap-gate~~ → **RESOLVED**: Not a cap-gate — AI runtime IS reachable; empty-state "No assistants available" live-confirmed. No assistants configured in non-seeded env. Populated/chat states D3-terminal pending admin AI config.
+- ~~**Q-pending-6:** HeadlessFormRenderComponent~~ → **RESOLVED**: LC — route loads without auth; "Waiting for form definition…" state confirmed. Window injection is the population path.
+- ~~**Q-pending-7:** LoadingDemoComponent~~ → **RESOLVED**: LC — no auth guard needed; all 3 sections + active overlay state confirmed.
+- **Q-pending-8:** MobileScanComponent camera prompt — headless Playwright cannot trigger getUserMedia; camera/scan result overlay states remain source-confirmed. → See access-queue.md Q-002.
+- ~~**Q-pending-9:** Portal flow~~ → **RESOLVED**: /portal/login (email form + sent state) LC; /portal/auth/callback and all portal authenticated pages D4-terminal (no portal users provisioned in non-seeded env).
+- ~~**Q-pending-10:** MobileHomeComponent~~ → **RESOLVED SC**: Confirmed unrouted via mobile.routes.ts read; dead orphan component.
+
+**New item from cycle 2:**
+- **Q-001 (ROUTING SHADOW BUG):** `/setup/integrations` route in app.routes.ts is unreachable via URL because `{ path: 'setup/:token' }` precedes it and matches "integrations" as a token value. Angular renders TokenSetupComponent with token="integrations" → error page. SetupIntegrationsComponent only accessible via programmatic `router.navigate()`. Needs eng-lead attention; see access-queue.md.
+- **Q-002 (MOBILE SCAN STATE):** MobileScanComponent camera permission prompt and scan-result overlay cannot be triggered in headless Playwright; these states remain source-confirmed. Manual/real-device sweep needed.
 
 ---
 
@@ -267,3 +273,4 @@
 | cycle | date | rows added | tree items ticked | notes |
 |-------|------|------------|-------------------|-------|
 | 1 | 2026-05-23 | 33 (all source) | 54/54 feature files, 10/10 shared cmps | Initial source-only pass; awaiting live sweep from ui-scout |
+| 2 | 2026-05-23 | 0 new rows (status updates only) | — | ui-scout live sweep: 61 observations, 21 LC upgrades, 5 D3/D4 confirmed, 1 routing-shadow bug found; Q-items resolved below |
