@@ -69,7 +69,7 @@ _These three trees are the completeness denominator. All items must be ticked or
 ### Tree 1 — Routes (11 routes in scope)
 - [x] `/dashboard` — live swept as admin + worker + engineer; 10 widgets, getting-started banner, focus/ambient/edit modes
 - [x] `/reports` — live swept; 30 nav items confirmed, empty states, ProductionWorker redirect confirmed
-- [x] `/reports/builder` — live swept; entity select + empty state; save dialog unreached → PLT-Q-028
+- [x] `/reports/builder` — live swept; entity select + empty state; cascade source-confirmed (PLT-Q-028 closed)
 - [x] `/reports/sankey` — live swept; 10 diagram types confirmed, date filter, empty state
 - [x] `/notifications` — N-01 source-confirmed; single component file; no sub-components; 2-tab layout + preferences toggles all inline (signals :99); PLT-Q-025 dequeued
 - [x] `/chat` — live swept; renders ChatComponent in page mode; DM+Channels empty states; CAP-EXT-CHAT disables API
@@ -222,7 +222,7 @@ _**D2 cross-links — report data by region:** operations data — jobs-by-stage
 | component | type | route | file | renders-for | states | purpose |
 |-----------|------|-------|------|-------------|--------|---------|
 | Global Search Bar | cluster | all authenticated routes (AppHeader) | `core/layout/app-header.component.ts:113` | all authenticated | idle·focused·searching·results-shown | Full-text search input (Ctrl+K shortcut); debounce 300ms; pipes to SearchService + AiService |
-| Search Results Dropdown | panel | all authenticated routes (AppHeader) | `core/layout/app-header.component.ts:114` | all authenticated | empty·populated·ai-loading | Dropdown showing entity matches (SearchResult[]), AI suggestions (AiSearchSuggestion[]), RAG results (RagSearchResult[]) + generated answer; navigates to entity detail on click |
+| Search Results Dropdown | panel | all authenticated routes (AppHeader) | `core/layout/app-header.component.ts:114` | all authenticated; AI/RAG columns gated by `CAP-EXT-AI-ASSISTANT` (`ai.service.ts:78` — `AiService.available()` signal; hides RAG answer + AI suggestions when disabled) | empty·populated·ai-loading | Dropdown showing entity matches (SearchResult[]); AI suggestions (AiSearchSuggestion[]) + RAG answer (RagSearchResult[]) shown only when `CAP-EXT-AI-ASSISTANT` enabled; navigates to entity detail on click |
 
 ---
 
@@ -265,11 +265,11 @@ _**D2 cross-links — report data by region:** operations data — jobs-by-stage
 
 | component | type | route | file | renders-for | states | purpose |
 |-----------|------|-------|------|-------------|--------|---------|
-| ApprovalsComponent | page | `/approvals/:tab` (→inbox) | `features/approvals/approvals.component.ts:15` | Admin·Manager·PM·OfficeManager | active | Tab shell with two tabs: Inbox (all approvers) + Workflows (Admin/Manager only via `canManageWorkflows` computed) |
-| ApprovalInboxComponent | tab | `/approvals/inbox` | `features/approvals/components/approval-inbox/approval-inbox.component.ts:19` | Admin·Manager·PM·OfficeManager | loading·empty·populated | Pending approval requests table (entity type, summary, workflow, step, amount, requester, date); approve/reject actions; reject requires comment via dialog |
-| Reject Approval Dialog | dialog | `/approvals/inbox` | `features/approvals/components/approval-inbox/approval-inbox.component.ts:40` | Admin·Manager·PM·OfficeManager | active | Inline dialog (showRejectDialog signal) — requires rejection comments textarea; SUBMIT REJECT action |
-| ApprovalWorkflowEditorComponent | tab | `/approvals/workflows` | `features/approvals/components/approval-workflow-editor/approval-workflow-editor.component.ts:22` | Admin·Manager (canManageWorkflows) | loading·empty·populated | Workflow definitions table + create/edit dialog; configures entity type, threshold, multi-step approver chain (SpecificUser, Role, Manager) |
-| Workflow Create/Edit Dialog | dialog | `/approvals/workflows` | `features/approvals/components/approval-workflow-editor/approval-workflow-editor.component.ts:44` | Admin·Manager | active | Dialog (showDialog signal) — workflow name, entity type, description, amount threshold, dynamic steps array (add/remove steps) |
+| ApprovalsComponent | page | `/approvals/:tab` (→inbox) | `features/approvals/approvals.component.ts:15` | Admin·Manager·PM·OfficeManager; approve/reject/workflow-create actions gated by `CAP-P2P-APPROVALS` (backend gate — UI routes render regardless; API returns 403 when cap disabled) | active | Tab shell with two tabs: Inbox (all approvers) + Workflows (Admin/Manager only via `canManageWorkflows` computed) |
+| ApprovalInboxComponent | tab | `/approvals/inbox` | `features/approvals/components/approval-inbox/approval-inbox.component.ts:19` | Admin·Manager·PM·OfficeManager (`CAP-P2P-APPROVALS` gates approve/reject API calls) | loading·empty·populated | Pending approval requests table (entity type, summary, workflow, step, amount, requester, date); approve/reject actions; reject requires comment via dialog |
+| Reject Approval Dialog | dialog | `/approvals/inbox` | `features/approvals/components/approval-inbox/approval-inbox.component.ts:40` | Admin·Manager·PM·OfficeManager (`CAP-P2P-APPROVALS` gates submit) | active | Inline dialog (showRejectDialog signal) — requires rejection comments textarea; SUBMIT REJECT action |
+| ApprovalWorkflowEditorComponent | tab | `/approvals/workflows` | `features/approvals/components/approval-workflow-editor/approval-workflow-editor.component.ts:22` | Admin·Manager (canManageWorkflows); `CAP-P2P-APPROVALS` gates workflow CRUD API | loading·empty·populated | Workflow definitions table + create/edit dialog; configures entity type, threshold, multi-step approver chain (SpecificUser, Role, Manager) |
+| Workflow Create/Edit Dialog | dialog | `/approvals/workflows` | `features/approvals/components/approval-workflow-editor/approval-workflow-editor.component.ts:44` | Admin·Manager (`CAP-P2P-APPROVALS` gates save) | active | Dialog (showDialog signal) — workflow name, entity type, description, amount threshold, dynamic steps array (add/remove steps) |
 
 ---
 
