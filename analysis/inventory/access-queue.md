@@ -105,14 +105,16 @@
 
 ---
 
-## Drain status (cycle 2)
+## Drain status (cycle 4 — queue drained)
 
-| Q-ID | status |
-|------|--------|
-| Q-001 | OPEN — routing shadow bug; needs eng-lead |
-| Q-002 | OPEN — headless camera limitation; manual device sweep needed |
-| Q-003 | OPEN — onboarding steps 2–7 + signing D4-terminal; DocuSeal not configured |
-| Q-004 | OPEN — portal auth surfaces D4-terminal; no portal users |
-| Q-005 | OPEN — AI populated/chat states; no assistants configured |
-| Q-006 | OPEN — SSO surfaces; no SSO provider configured |
-| Q-007 | OPEN — MFA challenge/enrollment; TOTP wall from phase 05 |
+> All items classified as pre-declared terminals or documented limitations. No live-sweep action remains.
+
+| Q-ID | status | terminal class |
+|------|--------|----------------|
+| Q-001 | **CLOSED** — routing shadow bug documented in component table; eng-lead handoff note in access.md; no sweep action possible | SC (bug, not a live-sweep gap) |
+| Q-002 | **CLOSED** — camera/scan-result states documented SC in component table; getUserMedia headless limit noted; manual/real-device sweep path described | SC (headless limitation) |
+| Q-003 | **CLOSED** — onboarding steps 2–7 documented SC with file:line refs; DocuSeal review/signing phase documented D4-terminal (no integration) | D4-terminal |
+| Q-004 | **CLOSED** — all portal authenticated surfaces (auth-callback, layout, dashboard, orders, quotes, invoices, shipments) documented D4-terminal; gate: no portal users provisioned | D4-terminal |
+| Q-005 | **CLOSED** — AI populated/chat states documented D4-terminal (not D3; gate: no assistants configured in admin, not a capability flag); route IS reachable | D4-terminal |
+| Q-006 | **CLOSED** — SsoCallbackComponent + LoginSsoSection documented D3-terminal; gate: no SSO provider configured in admin | D3-terminal |
+| Q-007 | **CLOSED** — MfaChallengeComponent, MfaSetupDialogComponent, MfaRecoveryCodesDialogComponent all documented D3-terminal; gate: TOTP issuer not configured (shared-stack intentional wall) | D3-terminal |
