@@ -24,6 +24,8 @@
 
 **OUT of scope (cross-ref admin.md):** Admin-side MFA policy config, AI-assistant admin config panel, capability toggles, EDI, presets — those are inventoried in `admin.md`.
 
+**Checked and excluded:** `features/worker/worker.component.ts` (`/worker` route, authGuard) — background task-queue viewer (WorkerService/WorkerTask); operational/infra surface, not part of the access & edge region definition. `features/welcome/welcome.component.ts` (`/welcome`, demoOnlyGuard) — demo-only landing; not reachable in non-demo stack.
+
 **Note — password reset:** No standalone password-reset route exists in the app. In-app password change is on `/account/security`; passwordless flows use invite tokens (`/setup/:token`). Scope item "password reset" closes against these two surfaces.
 
 ---
@@ -37,7 +39,9 @@
 - [x] `auth/token-setup.component.ts` — TokenSetupComponent (invite/password-set via token)
 - [x] `auth/sso-callback.component.ts` — SsoCallbackComponent
 
-### features/account (security sub-page only — remainder out of scope)
+### features/account (security sub-page + shell — remainder out of scope)
+- [x] `account/account-layout.component.ts` — AccountLayoutComponent (parent shell for all /account/* pages; renders sidebar + router-outlet)
+- [x] `account/components/account-sidebar/account-sidebar.component.ts` — AccountSidebarComponent (left-nav with profile/contact/emergency/security/communications/etc. links; imported by AccountLayoutComponent)
 - [x] `account/pages/security/account-security.component.ts` — AccountSecurityComponent
 - [x] `account/components/mfa-setup-dialog/mfa-setup-dialog.component.ts` — MfaSetupDialogComponent
 - [x] `account/components/mfa-recovery-codes-dialog/mfa-recovery-codes-dialog.component.ts` — MfaRecoveryCodesDialogComponent
@@ -122,6 +126,7 @@
 | `/setup/:token` | TokenSetupComponent | none | bare |
 | `/setup/integrations` | SetupIntegrationsComponent | authGuard | bare |
 | `/onboarding` | OnboardingWizardComponent | authGuard + mobileRedirectGuard | employee app |
+| `/account/*` | AccountLayoutComponent + AccountSidebarComponent | authGuard + mobileRedirectGuard | account layout (shell) |
 | `/account/security` | AccountSecurityComponent | authGuard + mobileRedirectGuard | account layout |
 | `/portal/login` | PortalLoginComponent | none | portal-less |
 | `/portal/auth/callback` | PortalAuthCallbackComponent | none | portal-less |
@@ -164,6 +169,8 @@
 
 | component | type | route | file:line | renders-for | states | purpose | status |
 |-----------|------|-------|-----------|-------------|--------|---------|--------|
+| AccountLayoutComponent | page-shell | `/account/*` | `features/account/account-layout.component.ts:48` | all (authGuard) | populated | Account section shell: RouterOutlet for child pages + AccountSidebarComponent; wraps all /account/* routes. Renders for every visit to /account/security. | **LC** (renders on /account/security visit — sidebar + content area confirmed in access-account-security.png screenshot) |
+| AccountSidebarComponent | panel | `/account/*` (sidebar) | `features/account/components/account-sidebar/account-sidebar.component.ts:37` | all (authGuard) | populated | Left-nav sidebar: profile-completion progress, nav links (profile/contact/emergency/security/communications/integrations/pay-stubs/tax-forms/documents/customization); active-link highlighting; uses EmployeeProfileService for completeness badge. | **LC** (visible in account-security screenshot; security nav link active) |
 | AccountSecurityComponent | page | `/account/security` | `features/account/pages/security/account-security.component.ts:28` | all (authGuard) | loading, populated | 3-card grid: (1) Change Password — currentPassword + newPassword + confirmPassword + "CHANGE PASSWORD" button; (2) Kiosk PIN — PIN + confirmPin + "SET PIN" button; (3) Two-Factor Authentication — enabled/disabled state card, device list (deviceType icon + name + lastUsedAt + Default chip + remove btn), Add Device / New Recovery Codes / Disable MFA actions, policy-enforcement variant. No forgot-password link. | **LC** — screenshot: access-account-security.png; MFA card in "not enabled" state ("ENABLE TWO-FACTOR AUTHENTICATION" button visible); **password reset closed**: no standalone reset route and no forgot-password link on login page — change-password (requires currentPassword) + invite-token `/setup/:token` are the only password flows |
 | MfaSetupDialogComponent | dialog | `/account/security` (dialog) | `features/account/components/mfa-setup-dialog/mfa-setup-dialog.component.ts:20` | all (authGuard) | loading, populated | TOTP MFA enroll: shows QR code (QrCodeComponent, TOTP URI displayed), TOTP code verify input, submit; opened via MatDialog from AccountSecurityComponent. | **D3-terminal** — Q-007-CLOSED: same TOTP wall; no TOTP issuer configured on shared stack → enrollment blocked. Gate: admin TOTP issuer config. |
 | MfaRecoveryCodesDialogComponent | dialog | `/account/security` (dialog) | `features/account/components/mfa-recovery-codes-dialog/mfa-recovery-codes-dialog.component.ts:17` | MFA-enrolled users | loading, populated | View/regenerate TOTP recovery codes; opened via MatDialog from AccountSecurityComponent; only reachable after MFA is enrolled. | **D3-terminal** — Q-007-CLOSED: requires prior MFA enrollment → same TOTP wall. Gate: admin TOTP issuer config. |
@@ -234,16 +241,16 @@
 
 | component | file | used by (access-region) | status |
 |-----------|------|------------------------|--------|
-| InputComponent | `shared/components/input/input.component.ts` | login, mfa-challenge, setup, token-setup, account-security, portal-login, mfa-setup-dialog | SC |
-| ValidationButtonComponent | `shared/components/validation-button/validation-button.component.ts` | login, mfa-challenge, setup, token-setup, account-security | SC |
-| EmptyStateComponent | `shared/components/empty-state/empty-state.component.ts` | portal-orders, portal-quotes, portal-invoices, portal-shipments, mobile-jobs, mobile-notifications | SC |
-| QrCodeComponent | `shared/components/qr-code/qr-code.component.ts` | mfa-setup-dialog (TOTP QR display) | SC |
-| DialogComponent | `shared/components/dialog/dialog.component.ts` | mfa-setup-dialog, mfa-recovery-codes-dialog | SC |
-| AddressFormComponent | `shared/components/address-form/address-form.component.ts` | setup.component (org address) | SC |
-| AvatarComponent | `shared/components/avatar/avatar.component.ts` | mobile-account, mobile-chat-thread, mobile-chat-channel-info, mobile-notifications | SC |
-| LoadingBlockDirective | `shared/directives/loading-block.directive.ts` | portal-dashboard, portal-orders, portal-quotes, portal-invoices, portal-shipments, mobile-clock, mobile-jobs, mobile-hours | SC |
-| ConfirmDialogComponent | `shared/components/confirm-dialog/confirm-dialog.component.ts` | account-security (remove MFA device), mobile-chat-channel-info (leave channel) | SC |
-| PageHeaderComponent | `shared/components/page-header/page-header.component.ts` | dev-tools/loading-demo | SC |
+| InputComponent | `shared/components/input/input.component.ts` | login (LC), mfa-challenge (D3), setup (D4), token-setup (LC), account-security (LC), portal-login (LC), mfa-setup-dialog (D3) | **LC** (rendered in LoginComponent + TokenSetupComponent + AccountSecurityComponent + PortalLoginComponent — all LC-confirmed) |
+| ValidationButtonComponent | `shared/components/validation-button/validation-button.component.ts` | login (LC), mfa-challenge (D3), setup (D4), token-setup (LC), account-security (LC) | **LC** (rendered in LoginComponent + AccountSecurityComponent — both LC) |
+| EmptyStateComponent | `shared/components/empty-state/empty-state.component.ts` | portal-orders (D4), portal-quotes (D4), portal-invoices (D4), portal-shipments (D4), mobile-jobs (LC), mobile-notifications (LC) | **LC** (rendered in MobileJobsComponent + MobileNotificationsComponent — both LC) |
+| QrCodeComponent | `shared/components/qr-code/qr-code.component.ts` | mfa-setup-dialog (D3) | **D3** (only used in TOTP-wall surface; never rendered on shared stack) |
+| DialogComponent | `shared/components/dialog/dialog.component.ts` | mfa-setup-dialog (D3), mfa-recovery-codes-dialog (D3) | **D3** (only used in TOTP-wall dialogs; never rendered on shared stack) |
+| AddressFormComponent | `shared/components/address-form/address-form.component.ts` | setup.component (D4 — setupRequired=false on shared stack) | **SC** (only used in SetupComponent which is D4; not live-confirmed) |
+| AvatarComponent | `shared/components/avatar/avatar.component.ts` | mobile-account (LC), mobile-chat-thread (D4), mobile-chat-channel-info (D4), mobile-notifications (LC) | **LC** (rendered in MobileAccountComponent + MobileNotificationsComponent — both LC) |
+| LoadingBlockDirective | `shared/directives/loading-block.directive.ts` | portal pages (D4), mobile-clock (LC), mobile-jobs (LC), mobile-hours (LC) | **LC** (rendered in MobileClockComponent + MobileJobsComponent + MobileHoursComponent — all LC) |
+| ConfirmDialogComponent | `shared/components/confirm-dialog/confirm-dialog.component.ts` | account-security (LC — remove MFA device action), mobile-chat-channel-info (D4) | **SC** (AccountSecurityComponent is LC but ConfirmDialog only opens on user action — "remove MFA device" button; not triggered in sweep; source-confirmed usage) |
+| PageHeaderComponent | `shared/components/page-header/page-header.component.ts` | dev-tools/loading-demo (LC) | **LC** (rendered in LoadingDemoComponent — LC confirmed with screenshot) |
 
 ---
 
@@ -282,3 +289,4 @@
 | 3 | 2026-05-23 | 0 new rows | — | Orchestrator-directed explicit checks: AccountSecurityComponent LC (3-card Security page confirmed); MobileHomeComponent LC-ORPHAN (nav to /m/home → /dashboard catch-all, never renders); password-reset closed (no standalone route, no forgot-password link on login); Q-pending-8 remains open (headless camera limit) |
 | 4 | 2026-05-23 | 0 new rows (status/detail updates) | 10/10 shared cmps ticked | Source-cataloger: ticked all shared-component checklist items; closed Q-001 through Q-007 in component table (file:line + terminal states); corrected AI D3→D4; added inline SSO section note; expanded onboarding steps 2–7 with form-group references; portal auth callback SC→D4; scan camera states SC with headless limit. Queue drained. |
 | 5 | 2026-05-23 | 0 new rows (LC upgrades only) | — | ui-scout cycle 5: drove onboarding Steps 2–4 LC (address/W-4/state-tax rendered after valid Step 1 fill); portal guard redirect confirmed live (all 5 /portal/* routes → /portal/login); SsoCallbackComponent error state LC (fake token → error → /login redirect). Q-002 camera: mobileRedirectGuard sent /m/scan → /m/clock (clocked-out redirect); headless limit unchanged. 4 screenshots added. |
+| 6 | 2026-05-23 | 2 new rows | 2 items added to features/account checklist | Source-cataloger: found + added AccountLayoutComponent (account-layout.component.ts:48) and AccountSidebarComponent (account-sidebar.component.ts:37) — both render for all /account/security visits, were missing from inventory; added to checklist, component table, and route table. Added WorkerComponent + welcome to "checked and excluded" boundary note. Upgraded 7/10 shared-cmp statuses SC→LC (by presence in confirmed LC pages); QrCodeComponent + DialogComponent marked D3 (TOTP-wall only); AddressFormComponent remains SC (SetupComponent is D4). |
