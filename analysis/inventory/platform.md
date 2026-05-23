@@ -25,7 +25,8 @@ _Cross-link: dashboard widgets that render O2C/operations data → cross-linked 
 | Dashboard | `features/dashboard/` | `dashboard.routes.ts` | `/dashboard` | none — all authenticated |
 | Reports | `features/reports/` | `reports.routes.ts` | `/reports`, `/reports/builder`, `/reports/sankey` | `roleGuard('Admin','Manager','PM')` (`app.routes.ts:139`) — ⚠️ live discrepancy: ui-scout observed Engineer accessing `/reports` with no redirect (PLT-Q-004); source blocks all non-Admin/Manager/PM; `engineer@forge.local` has single role `"Engineer"` (ENV-READY.md); re-verify — guard cache or wrong role provisioning suspected |
 | Notifications | `features/notifications/` | `notifications.routes.ts` | `/notifications` | none — all authenticated |
-| Chat | `features/chat/` | `chat.routes.ts` | `/chat`, `/chat/popout` | none — all authenticated; `CAP-EXT-CHAT` gates bell in header |
+| Chat | `features/chat/` | `chat.routes.ts` | `/chat` | none — all authenticated; `CAP-EXT-CHAT` gates bell in header |
+| Chat (popout) | `features/chat/` | `app.routes.ts:42` | `/chat/popout` | none — all authenticated; top-level standalone `loadComponent`, not nested in chat.routes.ts |
 | Approvals | `features/approvals/` | `approvals.routes.ts` | `/approvals/:tab` (→ inbox) | `roleGuard('Admin','Manager','PM','OfficeManager')` |
 | Calendar | `features/calendar/` | `calendar.routes.ts` | `/calendar` | none — all authenticated |
 | Events | `features/events/` | — | — | service-only; no UI routes |
@@ -60,7 +61,6 @@ _Template file:line = first occurrence in each consuming template; abbreviated p
 | SH-21 | `app-chat-preview-popup` | `shared/components/chat-preview-popup/` | `app.component.html:28` |
 | SH-22 | `app-status-badge` | `shared/components/status-badge/` | `todays-tasks-widget.component.html:19` — **added**: discovered during template grep; not in initial list |
 | SH-23 | `app-toggle` | `shared/components/toggle/` | `reports/components/save-report-dialog/save-report-dialog.component.html:5` — **added**: found in selector diff; missed in initial sweep |
-| SH-24 | `app-barcode-info` | `shared/components/barcode-info/` | `admin/admin.component.html:741` · `assets/components/asset-detail-panel/asset-detail-panel.component.html:111` · `kanban/components/job-detail-panel.component.html:320` · `inventory/inventory.component.html:305` · `parts/components/part-detail-panel/part-detail-panel.component.html:84` · `purchase-orders/components/po-detail-panel/po-detail-panel.component.html:158` · `sales-orders/components/sales-order-detail-panel/sales-order-detail-panel.component.html:197` — **added**: discovered in admin region inventory (cycle 3) |
 
 ---
 
@@ -152,7 +152,6 @@ _These three trees are the completeness denominator. All items must be ticked or
 | `shared/components/chat-preview-popup/chat-preview-popup.component.ts` | SH-21 | source-confirmed (app.component) |
 | `shared/components/status-badge/status-badge.component.ts` | SH-22 | source-confirmed (todays-tasks-widget.component.html:19) — discovered in template grep |
 | `shared/components/toggle/toggle.component.ts` | SH-23 | source-confirmed (save-report-dialog.component.html:5) — discovered in selector diff |
-| `shared/components/barcode-info/barcode-info.component.ts` | SH-24 | source-confirmed (admin/admin.component.html:741 + 6 further feature templates) — discovered in admin region inventory (cycle 3) |
 
 ---
 
@@ -162,15 +161,15 @@ _Source tree + imports analysis 2026-05-22._
 
 - **Feature components**: 32 (dashboard 14 · reports 4 · notifications 1 · chat 9 · approvals 3 · calendar 1 · events 0)
   - _Reports note: 4 component files contain 28 report-type configs (ReportDef[]) + 10 Sankey flow configs (SankeyReportDef[]); configs are not components and do not count toward denominator. Architecture: config-driven single-component pattern, source-confirmed._
-- **Shared components**: 24 (SH-01–SH-21 initial + SH-22 StatusBadge discovered via template grep + SH-23 ToggleComponent discovered via selector diff + SH-24 BarcodeInfoComponent discovered in admin region inventory)
+- **Shared components**: 23 (SH-01–SH-21 initial + SH-22 StatusBadge discovered via template grep + SH-23 ToggleComponent discovered via selector diff; SH-24 `app-barcode-info` removed — all consumers are non-platform regions: admin/kanban/inventory/parts/purchase-orders/sales-orders; out of platform scope)
 - **Shell search cluster (AppHeader)**: SR-01 search bar + SR-02 search results dropdown — inline template logic in `AppHeaderComponent`; no standalone component files; not counted in feature denominator
-- **Total denominator**: 56 items (32 feature + 24 shared; SR-01/SR-02 are sub-entries of AppHeader, not independent files)
+- **Total denominator**: 55 items (32 feature + 23 shared; SR-01/SR-02 are sub-entries of AppHeader, not independent files)
 
 _Chat denominator note (resolved 2026-05-22): C-06 CreateAnnouncementDialog is admin-owned (used by `features/admin/components/announcements-panel/`). C-07 ShareEntityDialog, C-08 EntityMentionPopover, C-12 ChatMessageAttachment, C-14 ThreadPanel are confirmed unused — no imports in any .ts or .html. Removed 5, leaving chat=9 active files (C-01–C-05, C-09–C-11, C-13). C-09/C-10/C-11/C-13 confirmed in ChatPopoutComponent (C-02) and features/mobile/pages/mobile-chat.component.ts (cross-region usage, component still owned here)._
 
 _Three-tree checklist pass (2026-05-22): routes 10/11 ticked ([ ] `/notifications` → PLT-Q-025 not yet swept); features 32/32 source-confirmed; shared 22/22 source-confirmed. All feature + shared file:line entries confirmed from source (`@Component` decorator grep); zero `:1` placeholders remain in active (non-struck-through) rows. Search and Events scope areas explicitly accounted in feature tree: search has no `features/search/` dir — UI is inline template logic in AppHeaderComponent (catalogued SR-01/SR-02, not in feature denominator); events has no UI in `features/events/` — only `event.model.ts` + `events.service.ts` exist (verified by directory listing); admin route cross-linked to admin region (D2). Both areas now have explicit "SHELL-ONLY" / "SERVICE-ONLY" rows in Tree 2 — no scope area is blank._
 
-**RECONCILE OPEN — awaiting ui-scout selector-diff cross-check:** SH-23 `app-toggle` added (selector diff, 2026-05-23) · SH-24 `app-barcode-info` added (admin region inventory cycle 3, 2026-05-22) — shared tree now 24/24; denominator revised to 56. Routes 11/11 ticked · Feature tree 32/32 source-confirmed · Shared tree 24/24 located with consuming template file:line · Zero rows carrying `unreached`/`TODO`/`needs-live` status · D3 capability gates confirmed for all gated surfaces: `CAP-EXT-CHAT`, `CAP-P2P-APPROVALS`, `CAP-EXT-AI-ASSISTANT` · PLT queue depth = 0. Final reconcile=0 confirmation HELD pending ui-scout independent cross-check completion.
+**RECONCILE = 0 (2026-05-23, CLOSED):** ui-scout independent `<app-*>` selector diff confirms SH-23 `app-toggle` is the sole missing platform-scoped shared component — added. SH-24 `app-barcode-info` removed (all consumers non-platform; out of scope). 8 remaining uncatalogued selectors (announcement-overlay, connection-banner, demo-marker, keyboard-shortcuts-help, loading-overlay, offline-banner, onboarding-banner, toast-container) + app-header/app-sidebar are `app.component.html` app-root shell concerns — out of platform scope, deferred to core/shared phase. Route `/chat/popout` routes-file corrected to `app.routes.ts:42` (top-level standalone registration). Routes 11/11 ticked · Feature tree 32/32 source-confirmed · Shared tree 23/23 located with consuming template file:line · Zero rows carrying `unreached`/`TODO`/`needs-live` status · D3 capability gates confirmed: `CAP-EXT-CHAT`, `CAP-P2P-APPROVALS`, `CAP-EXT-AI-ASSISTANT` · PLT queue depth = 0 · **Denominator 55 final and closed** (32 feature + 23 shared).
 
 ---
 
