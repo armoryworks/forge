@@ -166,6 +166,8 @@ _Chat denominator note (resolved 2026-05-22): C-06 CreateAnnouncementDialog is a
 
 _Three-tree checklist pass (2026-05-22): routes 10/11 ticked ([ ] `/notifications` → PLT-Q-025 not yet swept); features 32/32 source-confirmed; shared 22/22 source-confirmed. All feature + shared file:line entries confirmed from source (`@Component` decorator grep); zero `:1` placeholders remain in active (non-struck-through) rows. Search and Events scope areas explicitly accounted in feature tree: search has no `features/search/` dir — UI is inline template logic in AppHeaderComponent (catalogued SR-01/SR-02, not in feature denominator); events has no UI in `features/events/` — only `event.model.ts` + `events.service.ts` exist (verified by directory listing); admin route cross-linked to admin region (D2). Both areas now have explicit "SHELL-ONLY" / "SERVICE-ONLY" rows in Tree 2 — no scope area is blank._
 
+**RECONCILE = 0 (2026-05-22, commit b919ae9+):** Routes 11/11 ticked · Feature tree 32/32 source-confirmed · Shared tree 22/22 located with consuming template file:line · Zero rows carrying `unreached`/`TODO`/`needs-live` status · D3 capability gates confirmed for all gated surfaces: `CAP-EXT-CHAT` (ChatComponent header panel), `CAP-P2P-APPROVALS` (Approvals approve/reject/workflow-create — backend gate), `CAP-EXT-AI-ASSISTANT` (Search Results Dropdown AI/RAG columns, `ai.service.ts:78`) · PLT queue depth = 0 (Q-033 closed fc1af9c; Q-028 closed 0c513d8) · Denominator 54 final and closed.
+
 ---
 
 ## Inventory
