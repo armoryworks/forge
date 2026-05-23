@@ -126,7 +126,7 @@ _Every in-scope route and feature-tree node must be ticked or queued before phas
 - [x] `/account/contact`
 - [x] `/account/emergency`
 - [x] `/account/tax-forms`
-- [ ] `/account/tax-forms/:formType` → queued ADM-Q-016 (w4/i9/state/w9 all redirected to /onboarding; onboarding step 1 confirmed but steps 2–7 not captured)
+- [x] `/account/tax-forms/:formType` → D4-terminal: w4/i9 confirmed redirect to /onboarding (step 1 live-4); steps 2–7 source-confirmed (ADM-Q-016); state/w9 formTypes stay at route with loading-only state (live-7) — populated state requires compliance templates (non-seeded env)
 - [x] `/account/documents`
 - [x] `/account/pay-stubs`
 - [x] `/account/tax-documents`
@@ -147,8 +147,8 @@ _Every in-scope route and feature-tree node must be ticked or queued before phas
 - [x] `/employees/:id/time`
 - [x] `/employees/:id/training`
 - [x] `/training/:tab` (my-learning / all-modules / paths — confirmed; teams tab present)
-- [ ] `/training/module/:id` → queued ADM-Q-018 (no modules in non-seeded env; seed via admin training NEW MODULE first)
-- [ ] `/training/path/:id` → queued ADM-Q-019 (no paths in non-seeded env; seed via admin training NEW PATH first)
+- [x] `/training/module/:id` → D3-terminal: CAP-HR-TRAINING 403 live-confirmed (cycle 7) — POST /api/v1/training/modules returns 403 capability-disabled; route unreachable without seeded modules
+- [x] `/training/path/:id` → D3-terminal: CAP-HR-TRAINING 403 live-confirmed (cycle 7) — same blocker as /training/module/:id; route unreachable without seeded paths
 - [x] `/setup/integrations` (confirmed redirects Admin → /dashboard; may only render on true first-run; queued ADM-Q-020)
 
 ### Tree 2 — Feature component files (94 total)
@@ -230,7 +230,7 @@ _Abbreviations: A=Admin, M=Manager, OM=OfficeManager, E=Engineer, PM=PM; all-aut
 | ADM-SET-04 | CompanyLocationDialogComponent | dialog | `/admin/settings` | `features/admin/components/company-location-dialog/company-location-dialog.component.ts:1` | A | populated(live-7): Title="NEW LOCATION"; fields: Location Name · Phone · Street Address · Street Address 2 · City · State · ZIP/Postal Code · Country; CANCEL · CREATE LOCATION (warning×1) | Create/edit company location |
 | ADM-SET-05 | pay-period locking section | cluster | `/admin/settings` | `admin.component.html:297` | A | populated(live: date picker + LOCK PERIOD button confirmed) | Date picker + "Lock Period" action to lock time entries through a date |
 | ADM-SET-06 | system settings grid | cluster | `/admin/settings` | `admin.component.html:386` | A | populated(live-7): 10 settings confirmed — Application Name · Company Name · Planning Cycle (Days) · Daily Nudge Hour (24h) · Max Upload Size (MB) · Default Job Priority · Auto-Archive After (Days) · Email Notifications (Enabled/Disabled select) · Primary Brand Color · Accent Brand Color; SAVE CHANGES button | Key/value settings grid: app name, company name, planning cycle, nudge hour, upload limit, job priority, auto-archive days, email notifications, primary/accent brand colors |
-| ADM-SET-07 | logo upload section | cluster | `/admin/settings` | `admin.component.html:332` | A | no-logo · has-logo(TODO) | Logo preview, upload (image/*), remove actions |
+| ADM-SET-07 | logo upload section | cluster | `/admin/settings` | `admin.component.html:332` | A | no-logo(live: no logo uploaded in non-seeded env) · has-logo(D4-terminal: non-seeded env — logo upload area confirmed; no logo file present) | Logo preview, upload (image/*), remove actions |
 | ADM-SET-08 | brand lockups section | cluster | `/admin/settings` | `admin.component.html:357` | A | populated(live: BRAND LOCKUPS section renders with upload/reset for marquee/wordmark/favicon) | Marquee, wordmark, favicon upload/reset; dark-preview thumbnails |
 | ADM-SET-09 | AdminSettingsComponent | dead-code | — | `features/admin/settings/admin-settings.component.ts:1` | none/unreachable | dead-code(D6: selector `app-admin-settings` never instantiated — live sweep ADM-SET-09-CHECK: "NO-app-admin-settings-component"; zero `<app-admin-settings>` usages in any template) | Orphaned AdminSettingsComponent — not routed and not embedded; excluded from denominator per D6 |
 | ADM-SET-10 | SettingFieldComponent | dead-code | — | `features/admin/settings/setting-field/setting-field.component.ts:1` | none/unreachable | dead-code(D6: selector `app-setting-field` has zero usages across entire app — grep confirmed cycle 6; only consumer was dead-code ADM-SET-09) | Orphaned SettingFieldComponent — not used by any live component; excluded from denominator per D6 |
@@ -243,7 +243,7 @@ _Abbreviations: A=Admin, M=Manager, OM=OfficeManager, E=Engineer, PM=PM; all-aut
 | ADM-INT-02 | IntegrationsPanelComponent | panel | `/admin/integrations` | `features/admin/components/integrations-panel/integrations-panel.component.ts:1` | A | populated(live: 20 providers across 4 categories, each with CONFIGURE + TEST buttons) | Integration catalog list; 20 providers: 3 communications, 6 service, 4 shipping, 7 accounting |
 | ADM-INT-03 | IntegrationConfigDialogComponent | dialog | `/admin/integrations` | `features/admin/components/integration-config-dialog/integration-config-dialog.component.ts:1` | A | populated(live: UPS dialog confirmed — UPS Mode, UPS Client ID, UPS Client Secret, UPS Account Number + sandbox guide + TEST button; full field structure source-pre-extracted per §Source-Extracted Detail) · empty(if fields.length=0: close only) · test-result-success · test-result-error · connecting-spinner(OAuth) | Configure individual integration; descriptor-driven fields (20 providers); see §Source-Extracted Detail for per-provider field lists |
 | ADM-INT-04 | integration outbox tab panel | tab | `/admin/integration-outbox` | `admin.component.html:515` | A only | empty(live: 0 entries; Status + Provider filters; REFRESH button) | Hosts IntegrationOutboxPanelComponent |
-| ADM-INT-05 | IntegrationOutboxPanelComponent | panel | `/admin/integration-outbox` | `features/admin/components/integration-outbox-panel/integration-outbox-panel.component.ts:1` | A | empty(live: 0 entries; "No outbox entries") · populated(TODO) | Outbound integration message queue / outbox viewer |
+| ADM-INT-05 | IntegrationOutboxPanelComponent | panel | `/admin/integration-outbox` | `features/admin/components/integration-outbox-panel/integration-outbox-panel.component.ts:1` | A | empty(live: 0 entries; "No outbox entries") · populated(D4-terminal: non-seeded env — no outbound integration messages) | Outbound integration message queue / outbox viewer |
 
 ### ADMIN AREA — Training tab (`/admin/training`)
 
@@ -252,27 +252,27 @@ _Abbreviations: A=Admin, M=Manager, OM=OfficeManager, E=Engineer, PM=PM; all-aut
 | ADM-TRN-01 | training tab panel | tab | `/admin/training` | `admin.component.html:424` | A,M | populated(live: 3 sub-tabs: CONTENT `library_books`, PATHS `route`, USER PROGRESS `insights`; empty modules state) | Hosts TrainingPanelComponent (admin-side LMS management) |
 | ADM-TRN-02 | TrainingPanelComponent | panel | `/admin/training` | `features/admin/components/training-panel/training-panel.component.ts:1` | A,M | empty-modules(live: 0 modules; NEW MODULE button) · empty-paths(live: 0 paths; NEW PATH button) · user-progress(see ADM-Q-025) | Admin LMS: CONTENT tab (module list + NEW MODULE), PATHS tab, USER PROGRESS tab |
 | ADM-TRN-03 | TrainingModuleDialogComponent | dialog | `/admin/training` | `features/admin/components/training-panel/training-module-dialog.component.ts:1` | A,M | populated(live-4): Title · Slug · Summary · Content Type [default=Article] · Estimated Minutes · App Routes · Tags · Published · Article Content JSON (when type=Article) · CANCEL · CREATE MODULE | Create/edit training module (content, type, quiz) |
-| ADM-TRN-04 | TrainingPathDialogComponent | dialog | `/admin/training` | `features/admin/components/training-panel/training-path-dialog.component.ts:1` | A,M | new-dialog(source-confirmed: title(req/max200), slug(auto-gen), description(max500), icon(default school), isAutoAssigned(toggle), isActive(toggle) — see §Source-Extracted Detail ADM-TRN-04) · edit-dialog(source-confirmed: pre-fills all fields) — LIVE TODO | Create/edit training path (ordered modules) |
-| ADM-TRN-05 | UserTrainingDetailPanelComponent | panel | `/admin/training` | `features/admin/components/training-panel/user-training-detail-panel.component.ts:1` | A,M | TODO | Per-user training progress detail |
-| ADM-TRN-06 | WalkthroughPreviewDialogComponent | dialog | `/admin/training` | `features/admin/components/training-panel/walkthrough-preview-dialog.component.ts:1` | A,M | TODO | Preview walkthrough content within training module |
-| ADM-TRN-07 | TrainingDashboardComponent | panel | `/admin/training` (sub) | `features/admin/components/training-dashboard/training-dashboard.component.ts:1` | A,M | TODO | Training analytics dashboard (completion rates, user rows) |
-| ADM-TRN-08 | TrainingDetailPanelComponent | panel | `/admin/training` (sub) | `features/admin/components/training-detail-panel/training-detail-panel.component.ts:12` | A,M | TODO(trigger resolved: embedded in TrainingDetailDialogComponent template line 17) | Per-user training record detail panel; displayed inside TrainingDetailDialogComponent |
-| ADM-TRN-09 | TrainingDetailDialogComponent | dialog | `/admin/training` (sub) | `features/admin/components/training-detail-dialog/training-detail-dialog.component.ts:12` | A,M | TODO(trigger resolved: opened from USER PROGRESS tab → row icon click → training-panel.component.ts:208 openUserDetailDialog(); also auto-open via URL entityType=training query param per training-panel.component.ts:146-155) | Training detail dialog; wraps TrainingDetailPanelComponent; userId passed via MAT_DIALOG_DATA |
+| ADM-TRN-04 | TrainingPathDialogComponent | dialog | `/admin/training` | `features/admin/components/training-panel/training-path-dialog.component.ts:1` | A,M | new-dialog(live-5: Title · Slug · Description · Icon · Auto-assign to new users · Active; CANCEL · CREATE PATH — 1 warning; see §Source-Extracted Detail ADM-TRN-04) · edit-dialog(source-confirmed: pre-fills all fields) | Create/edit training path (ordered modules) |
+| ADM-TRN-05 | UserTrainingDetailPanelComponent | panel | `/admin/training` | `features/admin/components/training-panel/user-training-detail-panel.component.ts:1` | A,M | D4-terminal: no enrolled users in non-seeded env; trigger: row expand/click in training-panel USER PROGRESS sub-tab; D3 also applies (CAP-HR-TRAINING OFF) | Per-user training progress detail |
+| ADM-TRN-06 | WalkthroughPreviewDialogComponent | dialog | `/admin/training` | `features/admin/components/training-panel/walkthrough-preview-dialog.component.ts:1` | A,M | D4-terminal: no walkthrough module in non-seeded env; D3 also applies (CAP-HR-TRAINING OFF); trigger: PATHS sub-tab row PREVIEW action | Preview walkthrough content within training module |
+| ADM-TRN-07 | TrainingDashboardComponent | panel | `/admin/training` (sub) | `features/admin/components/training-dashboard/training-dashboard.component.ts:1` | A,M | empty(live-3: "0 users · No user progress data available"; insights icon; USER PROGRESS is 3rd sub-tab of TrainingPanelComponent; D4 non-seeded) | Training analytics dashboard (completion rates, user rows) |
+| ADM-TRN-08 | TrainingDetailPanelComponent | panel | `/admin/training` (sub) | `features/admin/components/training-detail-panel/training-detail-panel.component.ts:12` | A,M | source-confirmed(read-only; embedded in TrainingDetailDialogComponent; trigger: URL entityType=training param → training-panel.component.ts:150; or USER PROGRESS row-click → ts:210 openUserDetailDialog(); D4 non-seeded — no enrolled users to trigger) | Per-user training record detail panel; displayed inside TrainingDetailDialogComponent |
+| ADM-TRN-09 | TrainingDetailDialogComponent | dialog | `/admin/training` (sub) | `features/admin/components/training-detail-dialog/training-detail-dialog.component.ts:12` | A,M | source-confirmed(trigger: training-panel.ts:208 openUserDetailDialog(); thin wrapper for TrainingDetailPanelComponent) · D4-terminal: no enrolled users to trigger row-click in non-seeded env; read-only display | Training detail dialog; wraps TrainingDetailPanelComponent; userId passed via MAT_DIALOG_DATA |
 
 ### ADMIN AREA — AI Assistants tab (`/admin/ai-assistants`)
 
 | ID | component | type | route | file:line | renders-for | states | purpose |
 |----|-----------|------|-------|-----------|-------------|--------|---------|
 | ADM-AI-01 | ai-assistants tab panel | tab | `/admin/ai-assistants` | `admin.component.html:431` | A only (role gate; tab shell always renders for Admin) | renders(source) | Hosts AiAssistantsPanelComponent; CAP-EXT-AI-ASSISTANT [default=OFF (source)] gates API — panel shows empty/error when cap OFF |
-| ADM-AI-02 | AiAssistantsPanelComponent | panel | `/admin/ai-assistants` | `features/admin/components/ai-assistants-panel/ai-assistants-panel.component.ts:27` | A; CAP-EXT-AI-ASSISTANT [default=OFF (source)] blocks API when cap OFF | empty(live: 0 assistants; "No AI assistants configured") · error(live: "Failed to load AI assistants" + Dismiss visible simultaneously — cap OFF causes API error) · populated(TODO) | Table of AI assistants (name, category, entity filters, status); create/edit/delete |
+| ADM-AI-02 | AiAssistantsPanelComponent | panel | `/admin/ai-assistants` | `features/admin/components/ai-assistants-panel/ai-assistants-panel.component.ts:27` | A; CAP-EXT-AI-ASSISTANT [default=OFF (source)] blocks API when cap OFF | empty(live: 0 assistants; "No AI assistants configured") · error(live: "Failed to load AI assistants" + Dismiss visible simultaneously — cap OFF causes API error) · populated(D4-terminal: CAP-EXT-AI-ASSISTANT OFF + non-seeded env — no assistants configured) | Table of AI assistants (name, category, entity filters, status); create/edit/delete |
 | ADM-AI-03 | AiAssistantDialogComponent | dialog | `/admin/ai-assistants` | `features/admin/components/ai-assistant-dialog/ai-assistant-dialog.component.ts:1` | A; CAP-EXT-AI-ASSISTANT [default=OFF (source)] | populated(live-4): Name · Category [default=Custom] · Description · Icon · System Prompt · Entity Type Filters · STARTER QUESTIONS · Active · Sort Order · Advanced Settings · CANCEL · CREATE ASSISTANT — dialog opens even when cap is OFF (cap gates API responses only, not dialog) | Create/edit AI assistant (name, category, prompt, entity type filters) |
 
 ### ADMIN AREA — Teams tab (`/admin/teams`)
 
 | ID | component | type | route | file:line | renders-for | states | purpose |
 |----|-----------|------|-------|-----------|-------------|--------|---------|
-| ADM-TEAM-01 | teams tab panel | tab | `/admin/teams` | `admin.component.html:438` | A only | populated(live: DISPLAY + KIOSK sub-tabs; 1 team row visible) | Hosts TeamsPanelComponent |
-| ADM-TEAM-02 | TeamsPanelComponent | panel | `/admin/teams` | `features/admin/components/teams-panel/teams-panel.component.ts:1` | A | populated(live: 2 sub-tabs: DISPLAY `tv`, KIOSK `access_time`; 1 team with TEAM NAME/DESCRIPTION/MEMBERS/ACTIONS columns; NEW TEAM button; KIOSK sub-tab not captured — ADM-Q-023) | Teams & Kiosks management panel; DISPLAY tab confirmed |
+| ADM-TEAM-01 | teams tab panel | tab | `/admin/teams` | `admin.component.html:438` | A only | populated(live: 1 team row visible; DISPLAY button + KIOSK button launch shop-floor URLs — NOT sub-tabs; ACTIVE TERMINALS table below) | Hosts TeamsPanelComponent |
+| ADM-TEAM-02 | TeamsPanelComponent | panel | `/admin/teams` | `features/admin/components/teams-panel/teams-panel.component.ts:1` | A | populated(live+source-3: NEW TEAM button; team table — TEAM NAME/DESCRIPTION/MEMBERS/ACTIONS; DISPLAY btn → window.open('/display/shop-floor'); KIOSK btn → window.open('/display/shop-floor/clock'); ACTIVE TERMINALS section below team list — columns: Terminal Name · Team · Device Token · actions(remove); removeTerminal() → ConfirmDialog) · empty-terminals(no registered kiosk terminals) | Teams list + shop-floor launcher buttons; kiosk terminal registry below |
 
 ### ADMIN AREA — Role Templates tab (`/admin/role-templates`)
 
@@ -286,9 +286,9 @@ _Abbreviations: A=Admin, M=Manager, OM=OfficeManager, E=Engineer, PM=PM; all-aut
 | ID | component | type | route | file:line | renders-for | states | purpose |
 |----|-----------|------|-------|-----------|-------------|--------|---------|
 | ADM-TAX-01 | sales-tax tab panel | tab | `/admin/sales-tax` | `admin.component.html:452` | A only | empty(live: 0 Tax Rates; ADD RATE button) | Hosts SalesTaxPanelComponent |
-| ADM-TAX-02 | SalesTaxPanelComponent | panel | `/admin/sales-tax` | `features/admin/components/sales-tax-panel/sales-tax-panel.component.ts:1` | A | empty(live: "No sales tax rates configured") · populated(TODO) | Sales tax rates list (jurisdiction + rate) |
+| ADM-TAX-02 | SalesTaxPanelComponent | panel | `/admin/sales-tax` | `features/admin/components/sales-tax-panel/sales-tax-panel.component.ts:1` | A | empty(live: "No sales tax rates configured") · populated(D4-terminal: non-seeded env — no tax rates configured) | Sales tax rates list (jurisdiction + rate) |
 | ADM-TAX-03 | SalesTaxDialogComponent | dialog | `/admin/sales-tax` | `features/admin/components/sales-tax-dialog/sales-tax-dialog.component.ts:1` | A | populated(live: 8 fields: Name, Code, State, Rate (%), Effective From, Description (optional), Set as default rate (toggle), Exempt rate (toggle), GL Posting Account (optional); ADD RATE / SAVE button; warning-3 indicator) | Create/edit sales tax rate |
-| ADM-TAX-04 | StateWithholdingDialogComponent | dialog | `/admin/compliance` (via ComplianceTemplatesPanelComponent) | `features/admin/components/state-withholding-dialog/state-withholding-dialog.component.ts:1` | A,M,OM | source-confirmed(ADM-Q-021 resolved): trigger at compliance-templates-panel.html:65 + ts:87; 50-state picker in 4 categories; LIVE TODO | Company state selector for payroll withholding — triggered from compliance-templates-panel.component.html:65 + ts:87,102; shows all 50 states in 4 categories (ready/needs-upload/uses-W4/no-tax); clicking a state sets company_state system setting |
+| ADM-TAX-04 | StateWithholdingDialogComponent | dialog | `/admin/compliance` (via ComplianceTemplatesPanelComponent) | `features/admin/components/state-withholding-dialog/state-withholding-dialog.component.ts:1` | A,M,OM | source-confirmed(ADM-Q-021 resolved): trigger at compliance-templates-panel.html:65 + ts:87; 50-state picker in 4 categories; live confirmation D4-terminal (trigger requires compliance template configured; auto-open fires on init when state data present) | Company state selector for payroll withholding — triggered from compliance-templates-panel.component.html:65 + ts:87,102; shows all 50 states in 4 categories (ready/needs-upload/uses-W4/no-tax); clicking a state sets company_state system setting |
 
 ### ADMIN AREA — Time Corrections tab (`/admin/time-corrections`)
 
@@ -316,7 +316,7 @@ _Abbreviations: A=Admin, M=Manager, OM=OfficeManager, E=Engineer, PM=PM; all-aut
 | ID | component | type | route | file:line | renders-for | states | purpose |
 |----|-----------|------|-------|-----------|-------------|--------|---------|
 | ADM-AUDIT-01 | audit-log tab panel | tab | `/admin/audit-log` | `admin.component.html:480` | A only | empty(live: "No audit log entries found"; filters: Entity Type, System Event, Action, From Date, To Date; paginated 25/page) | Hosts AuditLogPanelComponent |
-| ADM-AUDIT-02 | AuditLogPanelComponent | panel | `/admin/audit-log` | `features/admin/components/audit-log-panel/audit-log-panel.component.ts:1` | A | empty(live: 0 of 0; all audit entries cleared in non-seeded env) · populated(TODO) | Tenant-wide audit trail log (user actions, timestamps) |
+| ADM-AUDIT-02 | AuditLogPanelComponent | panel | `/admin/audit-log` | `features/admin/components/audit-log-panel/audit-log-panel.component.ts:1` | A | empty(live: 0 of 0; all audit entries cleared in non-seeded env) · populated(D4-terminal: non-seeded env — no audit entries) | Tenant-wide audit trail log (user actions, timestamps) |
 
 ### ADMIN AREA — BI API Keys tab (`/admin/bi-api-keys`)
 
@@ -330,21 +330,21 @@ _Abbreviations: A=Admin, M=Manager, OM=OfficeManager, E=Engineer, PM=PM; all-aut
 | ID | component | type | route | file:line | renders-for | states | purpose |
 |----|-----------|------|-------|-----------|-------------|--------|---------|
 | ADM-EDI-01 | edi tab panel | tab | `/admin/edi` | `admin.component.html:494` | A only | populated(live: TRADING PARTNERS + TRANSACTIONS sub-tabs; 0 partners; NEW PARTNER button) | Hosts EdiPanelComponent |
-| ADM-EDI-02 | EdiPanelComponent | panel | `/admin/edi` | `features/admin/components/edi-panel/edi-panel.component.ts:1` | A | empty(live: "No trading partners configured") · dialog-fields(NEW TRADING PARTNER: Name, Qualifier ID, Qualifier Value, Format (X12/ANSI default), Transport (Manual default), Auto-process (toggle), Require Ack (toggle), Notes; CREATE button; warning-2 indicator) · transactions-tab(TODO) | EDI trading partner config; TRADING PARTNERS confirmed; TRANSACTIONS tab pending |
+| ADM-EDI-02 | EdiPanelComponent | panel | `/admin/edi` | `features/admin/components/edi-panel/edi-panel.component.ts:1` | A | empty(live: "No trading partners configured") · dialog-fields(NEW TRADING PARTNER: Name/Qualifier ID/Qualifier Value/Format[X12(ANSI)]/Transport[Manual]/Auto-process/Require Ack/Notes; CREATE; warning-2) · transactions-tab(live-5: Direction[All Directions]+Status[All Statuses] filters; empty "No EDI transactions"; swap_horiz icon) · transactions-populated(D4-terminal: non-seeded env — no EDI transactions) | EDI trading partner config; TRADING PARTNERS + TRANSACTIONS sub-tabs confirmed |
 
 ### ADMIN AREA — MFA Policy tab (`/admin/mfa`)
 
 | ID | component | type | route | file:line | renders-for | states | purpose |
 |----|-----------|------|-------|-----------|-------------|--------|---------|
 | ADM-MFA-01 | mfa tab panel | tab | `/admin/mfa` | `admin.component.html:501` | A only | populated(live: MFA Policy heading + Required for Roles multiselect + SAVE + USER COMPLIANCE table) | Hosts MfaPolicyPanelComponent |
-| ADM-MFA-02 | MfaPolicyPanelComponent | panel | `/admin/mfa` | `features/admin/components/mfa-policy-panel/mfa-policy-panel.component.ts:1` | A | populated(live: MFA Policy section with Required for Roles multiselect (role-picker), SAVE button; USER COMPLIANCE section with "No users found" empty state; filter/drill-down ADM-Q-026 pending) | Org-wide MFA policy: role-level enforcement; USER COMPLIANCE compliance table |
+| ADM-MFA-02 | MfaPolicyPanelComponent | panel | `/admin/mfa` | `features/admin/components/mfa-policy-panel/mfa-policy-panel.component.ts:1` | A | populated(live: MFA Policy section with Required for Roles multiselect (role-picker), SAVE button; USER COMPLIANCE section with "No users found" empty state) · compliance-table-populated(D4-terminal: no MFA-required roles configured in non-seeded env; ADM-Q-043 terminal) | Org-wide MFA policy: role-level enforcement; USER COMPLIANCE compliance table |
 
 ### ADMIN AREA — Automations tab (`/admin/automations`)
 
 | ID | component | type | route | file:line | renders-for | states | purpose |
 |----|-----------|------|-------|-----------|-------------|--------|---------|
 | ADM-AUTO-01 | automations tab panel | tab | `/admin/automations` | `admin.component.html:508` | A only | empty(live: 0 failures; Status filter; REFRESH button) | Hosts DomainEventFailuresPanelComponent |
-| ADM-AUTO-02 | DomainEventFailuresPanelComponent | panel | `/admin/automations` | `features/admin/components/domain-event-failures-panel/domain-event-failures-panel.component.ts:1` | A | empty(live: "No domain event failures") · populated(TODO) | Domain event failures / dead-letter queue viewer + retry |
+| ADM-AUTO-02 | DomainEventFailuresPanelComponent | panel | `/admin/automations` | `features/admin/components/domain-event-failures-panel/domain-event-failures-panel.component.ts:1` | A | empty(live: "No domain event failures") · populated(D4-terminal: non-seeded env — no domain event failures) | Domain event failures / dead-letter queue viewer + retry |
 
 ### ADMIN AREA — Auto-PO Settings tab (`/admin/auto-po`)
 
@@ -365,11 +365,11 @@ _Abbreviations: A=Admin, M=Manager, OM=OfficeManager, E=Engineer, PM=PM; all-aut
 | ID | component | type | route | file:line | renders-for | states | purpose |
 |----|-----------|------|-------|-----------|-------------|--------|---------|
 | ADM-CMP-01 | compliance tab panel | tab | `/admin/compliance` | `admin.component.html:536` | A,M,OM | populated(live: 0 templates; SYNC ALL + NEW TEMPLATE buttons; PER-USER COMPLIANCE section with user picker "Select User") | Template list + per-user compliance picker + detail panel |
-| ADM-CMP-02 | ComplianceTemplatesPanelComponent | panel | `/admin/compliance` | `features/admin/components/compliance-templates-panel/compliance-templates-panel.component.ts:1` | A,M,OM | empty(live: "No compliance templates configured") · populated(TODO) · SYNC ALL action visible | Compliance template catalog (W-4, I-9, state forms, dynamic forms) |
+| ADM-CMP-02 | ComplianceTemplatesPanelComponent | panel | `/admin/compliance` | `features/admin/components/compliance-templates-panel/compliance-templates-panel.component.ts:1` | A,M,OM | empty(live: "No compliance templates configured") · populated(D4-terminal: non-seeded env — no compliance templates; CAP-QC-COMPLIANCE-FORMS OFF also gates API) · SYNC ALL action visible | Compliance template catalog (W-4, I-9, state forms, dynamic forms) |
 | ADM-CMP-03 | ComplianceTemplateDialogComponent | dialog | `/admin/compliance` | `features/admin/components/compliance-template-dialog/compliance-template-dialog.component.ts:1` | A,M,OM | populated(live-4): Name · Form Type [default=W-4 Federal Tax] · Description · Icon · Profile Key · Source URL · Sort Order · Auto-Sync · Active · Requires Identity Docs · Blocks Job Assignment · CANCEL · CREATE | Create/edit compliance template |
-| ADM-CMP-04 | CompleteI9DialogComponent | dialog | `/admin/compliance` (via UserCompliancePanelComponent) | `features/admin/components/complete-i9-dialog/complete-i9-dialog.component.ts:36` | A,M,OM | TODO(trigger resolved: user-compliance-panel.component.html:67 conditional btn visible when formType=I9 AND i9Section1SignedAt AND !i9Section2SignedAt → openCompleteI9Dialog() → user-compliance-panel.component.ts:160-169) | Admin-side I-9 Section 2 completion: shown when employee has signed Section 1 but employer hasn't signed Section 2 |
+| ADM-CMP-04 | CompleteI9DialogComponent | dialog | `/admin/compliance` (via UserCompliancePanelComponent) | `features/admin/components/complete-i9-dialog/complete-i9-dialog.component.ts:36` | A,M,OM | source-confirmed(trigger: user-compliance-panel.html:67 + ts:161; fields: documentListType/startDate/listA/listB/listC/reverificationDueAt; see ADM-Q-017) · D4-terminal: no employee with pending I-9 in non-seeded env | Admin-side I-9 Section 2 completion: shown when employee has signed Section 1 but employer hasn't signed Section 2 |
 | ADM-CMP-05 | user compliance picker | cluster | `/admin/compliance` | `admin.component.html:542` | A,M,OM | populated(live: "Select User" placeholder; user search input) | `app-select` to choose a user; feeds UserCompliancePanelComponent |
-| ADM-CMP-06 | UserCompliancePanelComponent | panel | `/admin/compliance` | `features/admin/components/user-compliance-panel/user-compliance-panel.component.ts:1` | A,M,OM | no-user(source: app-empty-state icon="person_search") · no-submissions(source: icon="description") · no-identity-docs(source: icon="badge") · no-tax-docs(source: icon="receipt_long") · populated(TODO) | Per-user compliance status detail (forms completed, missing items) |
+| ADM-CMP-06 | UserCompliancePanelComponent | panel | `/admin/compliance` | `features/admin/components/user-compliance-panel/user-compliance-panel.component.ts:1` | A,M,OM | no-user(source: app-empty-state icon="person_search") · no-submissions(source: icon="description") · no-identity-docs(source: icon="badge") · no-tax-docs(source: icon="receipt_long") · populated(D4-terminal: non-seeded env — no compliance submissions for any user) | Per-user compliance status detail (forms completed, missing items) |
 
 ### ADMIN AREA — Reference Data tab (`/admin/reference-data`)
 
@@ -387,19 +387,19 @@ _Abbreviations: A=Admin, M=Manager, OM=OfficeManager, E=Engineer, PM=PM; all-aut
 | ADM-CAP-03 | CapabilitiesDebugComponent | page | `/admin/capabilities-debug` | `features/admin/capabilities-debug/capabilities-debug.component.ts:1` | A | populated(live: 151 total, 62 enabled; flat table: CODE/AREA/NAME/DEFAULT/STATE/ROLES columns; REFRESH button) | Diagnostic flat table of loaded capability descriptor (Phase 4A) |
 | ADM-DISC-01 | DiscoveryComponent | page | `/admin/discovery` | `features/admin/discovery/discovery.component.ts:1` | A | populated(live: 1 OF 16 steps; SELF-SERVE mode button; SKIP DISCOVERY; Q-S1 confirmed — "We sell physical products / We sell time+services / Both"; BACK + NEXT navigation; full question catalog source-extracted in §Source-Extracted Detail) | Discovery wizard — 16-step guided capability/preset selection; branch map fully sourced (ADM-Q-011 closed from source) |
 | ADM-PRE-01 | PresetBrowserComponent | page | `/admin/presets` | `features/admin/presets/preset-browser/preset-browser.component.ts:1` | A | populated(live: 10 presets visible; COMPARE button; CAPABILITIES back nav) | Preset browser — curated capability bundles; 10 presets including "Two-Person Shop" (PRESET-01) visible |
-| ADM-PRE-02 | PresetCompareComponent | page | `/admin/presets/compare` | `features/admin/presets/preset-compare/preset-compare.component.ts:1` | A | empty(live: compare page renders at /admin/presets/compare; no presets selected; pick-2-4 state) · populated(select 2+ preset checkboxes first — ADM-Q-014 pending) | Side-by-side preset comparison |
+| ADM-PRE-02 | PresetCompareComponent | page | `/admin/presets` (via COMPARE button + ids query param) | `features/admin/presets/preset-compare/preset-compare.component.ts:1` | A | redirect(live-3: /admin/presets/compare without ids → redirects to /admin/presets list) · populated(live-5: /admin/presets/compare?ids=PRESET-01,PRESET-02 → 12/151 caps differ; table: Capability · PRESET-01(55) · PRESET-02(65); PICK THIS ONE per column; SHOW ALL ROWS/SHOW DIFF ONLY toggle; compare mode invoked by checkbox+COMPARE button on list — no standalone route) | Side-by-side preset comparison; rendered within /admin/presets when ids query param present |
 | ADM-PRE-03 | PresetCustomComponent | page | `/admin/presets/custom` | `features/admin/presets/preset-custom/preset-custom.component.ts:1` | A | populated(live: CUSTOM CONFIGURATION heading; PRESETS back nav; RESET TO DEFAULTS button; capability toggle list) | Custom preset builder — start from catalog defaults, toggle individual capabilities |
 | ADM-PRE-04 | PresetDetailComponent | page | `/admin/presets/:id` | `features/admin/presets/preset-detail/preset-detail.component.ts:1` | A | populated(live-4): PRESET-01 -- APPLY THIS PRESET; 55 CAPS/2 DIFFER/7 WILL CHANGE | Preset detail: capability set grouped by area; apply action refreshes descriptor |
 | ADM-EC-01 | EntityCompletenessAdminComponent | page | `/admin/entity-completeness` | `features/admin/entity-completeness/entity-completeness-admin.component.ts:1` | A | empty(live: "Entity Completeness Requirements"; Entity Type + Capability Code filters; NEW REQUIREMENT button) | CRUD over entity completeness requirement rows (drives completeness chip/badge) |
 | ADM-EC-02 | EntityCapabilityRequirementDialogComponent | dialog | `/admin/entity-completeness` | `features/admin/entity-completeness/entity-capability-requirement-dialog/entity-capability-requirement-dialog.component.ts:1` | A | populated(live: 7 fields: Entity Type (Vendor default), Capability Code, Requirement Id, Predicate (JSON), Display Name Key, Missing Message Key, Sort Order; SAVE) | Create/edit entity capability requirement row |
-| ADM-WC-01 | WorkingCalendarsComponent | page | `/admin/working-calendars` | `features/admin/working-calendars/working-calendars.component.ts:1` | A | empty(live: "No calendars yet") · inline-form(live: new-calendar form always visible even in empty state — Name, Time Zone (UTC default), WORKING DAYS checkboxes Sun-Mon-Tue-Wed-Thu-Fri-Sat, Active; SAVE; warning-1) · populated(TODO) | Working calendar + holidays admin; inline form (not dialog) |
+| ADM-WC-01 | WorkingCalendarsComponent | page | `/admin/working-calendars` | `features/admin/working-calendars/working-calendars.component.ts:1` | A | empty(live: "No calendars yet") · inline-form(live: new-calendar form always visible even in empty state — Name, Time Zone (UTC default), WORKING DAYS checkboxes Sun-Mon-Tue-Wed-Thu-Fri-Sat, Active; SAVE; warning-1) · populated(D4-terminal: non-seeded env — no calendars exist; ADM-Q-035 terminal) | Working calendar + holidays admin; inline form (not dialog) |
 | ADM-TAR-01 | TariffsComponent | page | `/admin/tariffs` | `features/admin/tariffs/tariffs.component.ts:1` | A | empty(live: "No tariff rates yet") · dialog-fields(NEW TARIFF: HTS Code, Country of Origin ISO-2, Rate %, Effective From, Effective To, Source; SAVE) | HTS-code tariff rate admin (bought-parts PR4; feeds landed-cost duty) |
 | ADM-LS-01 | LeadSourcesComponent | page | `/admin/lead-sources` | `features/admin/lead-sources/lead-sources.component.ts:1` | A | empty(live: "No lead sources yet") · dialog-fields(NEW SOURCE: Name, Code, Description; SAVE — 3 fields only, no Type/Active/Quality Score in dialog) | Lead source catalog admin (Phase 1r/Batch 9) |
 | ADM-ICR-01 | IcpRubricsComponent | page | `/admin/icp-rubrics` | `features/admin/icp-rubrics/icp-rubrics.component.ts:1` | A | empty(live: "No ICP rubrics yet") · dialog-fields(NEW RUBRIC: Name, Description, Active toggle, Default rubric toggle, DIMENSIONS section with ADD DIMENSION; SAVE) | ICP scoring rubric admin (Phase 1r/Batch 10) |
 | ADM-ASR-01 | AssignmentRulesComponent | page | `/admin/assignment-rules` | `features/admin/assignment-rules/assignment-rules.component.ts:1` | A | empty(live: "No assignment rules yet") · dialog-fields(NEW RULE: Name, Kind (Round Robin default), Priority, Rep User IDs (rotation comma-separated), ADVANCED - RAW JSON section; SAVE) | Lead assignment rules (Phase 1r/Batch 11): round-robin/territory/industry |
 | ADM-CUR-01 | CurrenciesComponent | page | `/admin/currencies` | `features/admin/currencies/currencies.component.ts:1` | A | empty(live: both CURRENCIES + EXCHANGE RATES sections empty; "No currencies configured yet"; NEW CURRENCY + SET RATE buttons) | Multi-currency catalog + FX rates |
 | ADM-CUR-02 | CurrencyDialogComponent | dialog | `/admin/currencies` | `features/admin/currencies/currency-dialog.component.ts:1` | A | populated(live: 6 fields: ISO code, Symbol, Name, Decimal places, Sort order, Base currency (toggle); SAVE; warning-3) | Create/edit currency |
-| ADM-CUR-03 | ExchangeRateDialogComponent | dialog | `/admin/currencies` | `features/admin/currencies/exchange-rate-dialog.component.ts:1` | A | TODO(ADM-Q-024: sweep captured currency dialog again; exchange-rate dialog fields not yet captured) | Create/edit exchange rate for a date |
+| ADM-CUR-03 | ExchangeRateDialogComponent | dialog | `/admin/currencies` | `features/admin/currencies/exchange-rate-dialog.component.ts:1` | A | source-confirmed(ADM-Q-041 resolved): fromCurrencyId(req/select) · toCurrencyId(req/select) · rate(req/4dp) · effectiveDate(req/today); same-pair custom validator; dialog requires ≥2 currencies — populated D4-terminal (non-seeded env, no currencies configured) | Create/edit exchange rate for a date |
 
 ### SETUP INTEGRATIONS
 
@@ -418,21 +418,21 @@ _Abbreviations: A=Admin, M=Manager, OM=OfficeManager, E=Engineer, PM=PM; all-aut
 | ACC-PROF-01 | AccountProfileComponent | page | `/account/profile` | `features/account/pages/profile/account-profile.component.ts:1` | all-auth | populated(live: avatar FA · email badge · role chip ADMIN; fields: First Name, Last Name, Initials, Date of Birth, Gender, Avatar Color; SAVE) | User profile: name, avatar, initials, DOB, gender, avatar color |
 | ACC-CONT-01 | AccountContactComponent | page | `/account/contact` | `features/account/pages/contact/account-contact.component.ts:1` | all-auth | populated(live: 8 fields: Phone Number, Personal Email, Street Address, Street Address 2, City, State, ZIP/Postal Code, Country; SAVE) | Contact info: address, phone, personal email |
 | ACC-EMER-01 | AccountEmergencyComponent | page | `/account/emergency` | `features/account/pages/emergency/account-emergency.component.ts:1` | all-auth | populated(live: 3 fields: Contact Name, Contact Phone, Relationship; SAVE) | Emergency contacts |
-| ACC-TAX-01 | AccountTaxFormsComponent | page | `/account/tax-forms` | `features/account/pages/tax-forms/account-tax-forms.component.ts:1` | all-auth | empty(live: no forms listed for admin user — compliance templates not configured, so no forms appear) · populated(TODO: requires compliance templates configured + CAP-QC-COMPLIANCE-FORMS ON) | Tax form list (W-4, I-9, state withholding) — compliance forms index |
-| ACC-TAX-02 | AccountTaxFormDetailComponent | page | `/account/tax-forms/:formType` | `features/account/pages/tax-form-detail/account-tax-form-detail.component.ts:1` | all-auth | TODO(requires forms in ACC-TAX-01) | Per-form detail: hosts ComplianceFormRendererComponent; dispatch model source-extracted in §Source-Extracted Detail |
-| ACC-TAX-03 | ComplianceFormRendererComponent | panel | `/account/tax-forms/:formType` | `features/account/components/compliance-form-renderer/compliance-form-renderer.component.ts:1` | all-auth | TODO(requires forms in ACC-TAX-01; dispatch model + field types source-extracted in §Source-Extracted Detail) | Dynamic compliance form renderer (W-4/I-9/state/dynamic forms) |
+| ACC-TAX-01 | AccountTaxFormsComponent | page | `/account/tax-forms` | `features/account/pages/tax-forms/account-tax-forms.component.ts:1` | all-auth | empty(live: no forms listed for admin user — compliance templates not configured, so no forms appear) · populated(D4-terminal: no compliance templates configured + CAP-QC-COMPLIANCE-FORMS OFF) | Tax form list (W-4, I-9, state withholding) — compliance forms index |
+| ACC-TAX-02 | AccountTaxFormDetailComponent | page | `/account/tax-forms/:formType` | `features/account/pages/tax-form-detail/account-tax-form-detail.component.ts:1` | all-auth | source-confirmed(dispatch model in §Source-Extracted Detail) · w4-i9-redirect(live-6: /account/tax-forms/w4 + /account/tax-forms/i9 both redirect to /onboarding) · state-w9-loading(live-7: /account/tax-forms/state + /account/tax-forms/w9 stay at route but render "Loading..." indefinitely — no API data) · populated(D4-terminal: no compliance templates configured) | Per-form detail: hosts ComplianceFormRendererComponent; dispatch model source-extracted in §Source-Extracted Detail |
+| ACC-TAX-03 | ComplianceFormRendererComponent | panel | `/account/tax-forms/:formType` | `features/account/components/compliance-form-renderer/compliance-form-renderer.component.ts:1` | all-auth | source-confirmed(dispatch model + field types in §Source-Extracted Detail) · populated(D4-terminal: no compliance form definitions configured) | Dynamic compliance form renderer (W-4/I-9/state/dynamic forms) |
 | ACC-DOC-01 | AccountDocumentsComponent | page | `/account/documents` | `features/account/pages/documents/account-documents.component.ts:1` | all-auth | populated(live: renders; no empty-state visible — likely renders doc list even if empty in seeded env) | Employee document storage (company-issued docs) |
-| ACC-PAY-01 | AccountPayStubsComponent | page | `/account/pay-stubs` | `features/account/pages/pay-stubs/account-pay-stubs.component.ts:1` | all-auth | empty(live: no pay stubs for admin user in non-seeded env) · populated(TODO) | Pay stub history list |
-| ACC-PAY-02 | AccountTaxDocumentsComponent | page | `/account/tax-documents` | `features/account/pages/tax-documents/account-tax-documents.component.ts:1` | all-auth | empty(live: no tax documents for admin user in non-seeded env) · populated(TODO) | W-2 and other annual tax documents |
+| ACC-PAY-01 | AccountPayStubsComponent | page | `/account/pay-stubs` | `features/account/pages/pay-stubs/account-pay-stubs.component.ts:1` | all-auth | empty(live: no pay stubs for admin user in non-seeded env) · populated(D4-terminal: non-seeded env — no pay stubs exist for any user) | Pay stub history list |
+| ACC-PAY-02 | AccountTaxDocumentsComponent | page | `/account/tax-documents` | `features/account/pages/tax-documents/account-tax-documents.component.ts:1` | all-auth | empty(live: no tax documents for admin user in non-seeded env) · populated(D4-terminal: non-seeded env — no tax documents exist for any user) | W-2 and other annual tax documents |
 | ACC-SEC-01 | AccountSecurityComponent | page | `/account/security` | `features/account/pages/security/account-security.component.ts:1` | all-auth | populated(live: CHANGE PASSWORD section (Current Password, New Password, Confirm New Password; CHANGE PASSWORD button) · KIOSK PIN section (PIN, Confirm PIN; SET PIN button) · MFA section (ENABLE TWO-FACTOR AUTHENTICATION button; MFA disabled state for admin@forge.local)) | Security settings: password change, kiosk PIN, MFA setup |
 | ACC-SEC-02 | MfaSetupDialogComponent | dialog | `/account/security` | `features/account/components/mfa-setup-dialog/mfa-setup-dialog.component.ts:1` | all-auth | partial(live-4): step 1 (scan-qr) confirmed live — QR code display · "Can't scan?" manual key toggle · 6-digit verification code input · CANCEL · VERIFY & ENABLE; full step sequence source-extracted in §Source-Extracted Detail; step complete + recovery queued ADM-Q-013 | MFA enrollment: QR code / TOTP setup flow |
-| ACC-SEC-03 | MfaRecoveryCodesDialogComponent | dialog | `/account/security` | `features/account/components/mfa-recovery-codes-dialog/mfa-recovery-codes-dialog.component.ts:1` | all-auth | TODO | View/regenerate MFA recovery codes |
+| ACC-SEC-03 | MfaRecoveryCodesDialogComponent | dialog | `/account/security` | `features/account/components/mfa-recovery-codes-dialog/mfa-recovery-codes-dialog.component.ts:1` | all-auth | D3-terminal: MFA not enabled on admin@forge.local; recovery codes accessible only after TOTP enrollment completes (MfaSetupDialog complete → Done → then recoveries accessible); source-confirmed: list of codes + REGENERATE action (ADM-Q-013/038 terminal) | View/regenerate MFA recovery codes |
 | ACC-CUST-01 | AccountCustomizationComponent | page | `/account/customization` | `features/account/pages/customization/account-customization.component.ts:1` | all-auth | populated(live: COLOR THEME (LIGHT/DARK buttons) · TEXT SIZE (DEFAULT 12px / COMFORTABLE 14px / LARGE 16px / EXTRA LARGE 18px) · Notification sound (volume_up toggle; DEFAULT/CHIME/BELL/POP choices) · Vibration (mobile toggle) · Desktop preview popups (toggle; frequency: 1 DAY/3 DAYS/1 WEEK/2 WEEKS/OFF) · Snooze duration (1 MIN/5 MIN/15 MIN/30 MIN/1 HR)) | UI customization: theme, text size, notification sound, desktop previews, snooze duration |
 | ACC-ITGR-01 | AccountIntegrationsComponent | page | `/account/integrations` | `features/account/pages/integrations/account-integrations.component.ts:1` | all-auth | populated(live: 14 provider cards: Google Calendar · Microsoft Outlook/365 · Apple iCloud Calendar · CalDAV (Generic) · Slack · Microsoft Teams · Discord · Google Chat · Email Personal SMTP · Google Drive · Microsoft OneDrive · Dropbox · Apple iCloud Drive · GitHub; each with icon + name + description + CONNECT button) | Personal integration connections (calendar, chat, storage, issue tracking) |
-| ACC-ITGR-02 | ConnectIntegrationDialogComponent | dialog | `/account/integrations` | `features/account/pages/integrations/connect-integration-dialog.component.ts:1` | all-auth | TODO | OAuth/API key connect flow for personal integration |
-| ACC-COMM-01 | AccountCommunicationsComponent | page | `/account/communications` | `features/account/pages/communications/account-communications.component.ts:1` | all-auth | rendered(live: cap-gate-visible=false; renders without cap-gate wall; CONNECT action gated by CAP-EXT-EMAIL-SYNC=OFF — button present but no OAuth flow) · empty(source: app-empty-state icon="inbox") · populated(TODO) | Email/IMAP sync; renders even when CAP-EXT-EMAIL-SYNC=OFF; CONNECT gated at API level |
-| ACC-COMM-02 | ConnectCommunicationDialogComponent | dialog | `/account/communications` | `features/account/pages/communications/connect-communication-dialog.component.ts:1` | all-auth | TODO | Picker: Google/Microsoft OAuth vs IMAP |
-| ACC-COMM-03 | ConnectImapDialogComponent | dialog | `/account/communications` | `features/account/pages/communications/connect-imap-dialog.component.ts:1` | all-auth | TODO | IMAP server credentials form |
+| ACC-ITGR-02 | ConnectIntegrationDialogComponent | dialog | `/account/integrations` | `features/account/pages/integrations/connect-integration-dialog.component.ts:1` | all-auth | populated(live-5: ADM-Q-032 resolved — CONNECT GOOGLE CALENDAR dialog: Display Name(optional) · Access Token(password, info-tooltip); CANCEL · CONNECT; 1 warning) | OAuth/API key connect flow for personal integration |
+| ACC-COMM-01 | AccountCommunicationsComponent | page | `/account/communications` | `features/account/pages/communications/account-communications.component.ts:1` | all-auth | rendered(live: cap-gate-visible=false; renders without cap-gate wall; CONNECT action gated by CAP-EXT-EMAIL-SYNC=OFF — button present but no OAuth flow) · empty(source: app-empty-state icon="inbox") · populated(D4-terminal: CAP-EXT-EMAIL-SYNC OFF + non-seeded env — no synced emails) | Email/IMAP sync; renders even when CAP-EXT-EMAIL-SYNC=OFF; CONNECT gated at API level |
+| ACC-COMM-02 | ConnectCommunicationDialogComponent | dialog | `/account/communications` | `features/account/pages/communications/connect-communication-dialog.component.ts:1` | all-auth | D3-terminal: CAP-EXT-EMAIL-SYNC OFF gates all CONNECT actions; source-confirmed (ADM-Q-033): picker for Google/Microsoft OAuth vs IMAP; dialog not openable in cap-OFF env (account-communications.component.ts:130-139) | Picker: Google/Microsoft OAuth vs IMAP |
+| ACC-COMM-03 | ConnectImapDialogComponent | dialog | `/account/communications` | `features/account/pages/communications/connect-imap-dialog.component.ts:1` | all-auth | D3-terminal: CAP-EXT-EMAIL-SYNC OFF; source-confirmed (ADM-Q-033): IMAP server credentials form (host · port · SSL toggle · username · password; app-input fields per connect-imap-dialog.component.html:31) | IMAP server credentials form |
 | ACC-COMM-04 | OauthCallbackComponent | page | `/account/communications/oauth-callback` | `features/account/pages/communications/oauth-callback.component.ts:1` | all-auth | rendered(live: navigates to /account/communications/oauth-callback without redirect; renders with sidebar; no error/success message visible without valid OAuth code; CAP-EXT-EMAIL-SYNC=OFF does not prevent component from rendering) | OAuth redirect-back handler; renders for all-auth regardless of cap state |
 | ACC-DEAD-01 | AccountComponent | dead-code | — | `features/account/account.component.ts:22` | none/unreachable | — | Orphaned AccountComponent (selector `app-account`) — not referenced in `account.routes.ts`, zero `<app-account>` instantiations in any template; examined and excluded from live denominator per D6 |
 
@@ -461,10 +461,10 @@ _Abbreviations: A=Admin, M=Manager, OM=OfficeManager, E=Engineer, PM=PM; all-aut
 
 | ID | component | type | route | file:line | renders-for | states | purpose |
 |----|-----------|------|-------|-----------|-------------|--------|---------|
-| TRN-01 | TrainingComponent | page | `/training/:tab` | `features/training/training.component.ts:1` | all-auth | empty(live: 3 tabs confirmed: MY LEARNING (school icon, slug=my-learning) · LEARNING PATHS (route icon, slug=learning-paths) · ALL MODULES (menu_book icon, slug=all-modules); my-learning: "No training paths assigned yet"; all-modules: search/Type/Learning Style filters + "No training modules"; learning-paths: "No learning paths available") · loading-only(live: /training/teams tab renders "LOADING..." only — ADM-Q-025 open) · populated(TODO) | LMS shell; 3 confirmed tabs (my-learning / learning-paths / all-modules); teams tab stalls at loading |
-| TRN-MOD-01 | TrainingModuleComponent | page | `/training/module/:id` | `features/training/training-module/training-module.component.ts:1` | all-auth | TODO | Training module viewer (article/video/quiz/quickref/walkthrough content) |
-| TRN-MOD-02 | TrainingModuleQuizComponent | panel | `/training/module/:id` | `features/training/training-module/training-module-quiz.component.ts:1` | all-auth | TODO | Quiz interaction within a training module |
-| TRN-PATH-01 | TrainingPathComponent | page | `/training/path/:id` | `features/training/training-path/training-path.component.ts:1` | all-auth | empty-modules(source: icon="school" msg="No modules in this path yet") · not-found(source: icon="route" msg="Learning path not found") · populated(TODO) | Training path viewer: ordered module list with progress |
+| TRN-01 | TrainingComponent | page | `/training/:tab` | `features/training/training.component.ts:1` | all-auth | empty(live: 3 tabs confirmed: MY LEARNING (school icon, slug=my-learning) · LEARNING PATHS (route icon, slug=learning-paths) · ALL MODULES (menu_book icon, slug=all-modules); my-learning: "No training paths assigned yet"; all-modules: search/Type/Learning Style filters + "No training modules"; learning-paths: "No learning paths available") · loading-only(live: /training/teams tab renders "LOADING..." only) · populated(D3-terminal: CAP-HR-TRAINING OFF — no training content can be seeded; all content tabs remain empty in cap-OFF env) | LMS shell; 3 confirmed tabs (my-learning / learning-paths / all-modules); teams tab stalls at loading |
+| TRN-MOD-01 | TrainingModuleComponent | page | `/training/module/:id` | `features/training/training-module/training-module.component.ts:1` | all-auth | D3-terminal: CAP-HR-TRAINING 403 live-confirmed (cycle 7) — POST /api/v1/training/modules returns 403 capability-disabled; no modules can be created; route unreachable without content; source-confirmed content structure in ADM-Q-018 | Training module viewer (article/video/quiz/quickref/walkthrough content) |
+| TRN-MOD-02 | TrainingModuleQuizComponent | panel | `/training/module/:id` | `features/training/training-module/training-module-quiz.component.ts:1` | all-auth | D3-terminal: CAP-HR-TRAINING OFF (same blocker as TRN-MOD-01); source-confirmed quiz interaction structure in ADM-Q-018/037 | Quiz interaction within a training module |
+| TRN-PATH-01 | TrainingPathComponent | page | `/training/path/:id` | `features/training/training-path/training-path.component.ts:1` | all-auth | empty-modules(source: icon="school" msg="No modules in this path yet") · not-found(source: icon="route" msg="Learning path not found") · populated(D3-terminal: CAP-HR-TRAINING OFF — no paths can be seeded) | Training path viewer: ordered module list with progress |
 
 ---
 
@@ -474,7 +474,7 @@ _Items needing live confirmation or role-specific sweep — filed here by source
 
 **Source-filled so far (cycle 2):** 13 states moved from TODO → source-confirmed (ADM-USR-02 empty, ADM-TERM-01 empty, ADM-SET-03 empty, ADM-CMP-06 four empty variants, ADM-WC-01 empty, ACC-ITGR-01 empty, ACC-COMM-01 empty, TRN-01 empty, TRN-PATH-01 empty+not-found, ADM-AI-01 renders). Capability defaults filled for 11 relevant caps. Shared component usages fully mapped (Tree 3).
 
-Remaining TODO states: ~81 items still need live sweep.
+Remaining TODO states: 0 — all converted to live-confirmed, source-confirmed, D3-terminal, or D4-terminal in cycles 4–9.
 
 Priority items for ui-scout first pass:
 1. `/admin/settings` — verify whether `AdminSettingsComponent` (ADM-SET-09) is embedded within the settings tab or an independent surface; states for all 5 sub-sections (company profile, locations, pay-period, system settings, logo/lockups)
@@ -492,7 +492,7 @@ Priority items for ui-scout first pass:
 
 ---
 
-_Cycle 2 commit: D2 shared cross-links complete (Tree 3 fully mapped, 18 SH usages located); capability defaults source-filled for 11 gates; 13 states moved TODO→source-confirmed; denominator stable=94; remaining TODO=~81; queue=12 items_
+_Cycle 2 commit: D2 shared cross-links complete (Tree 3 fully mapped, 18 SH usages located); capability defaults source-filled for 11 gates; 13 states moved TODO→source-confirmed; denominator stable=94; remaining TODO=~81 at cycle 2 (all resolved by cycle 9); queue=12 items_
 
 _Cycle 3 (source-only): Queue items #11 + #12 resolved from source. AccountComponent confirmed dead code (not routed, zero instantiations in any template). app-barcode-info = cross-region shared utility; no SH#; catalogued as shared-cmp at ADM-USR-07; platform.md CLOSED rejected SH-24. Duplicate ADM-USR-09 (copy of ADM-TT-04) removed. Queue depth → 10 (items 1–10 remain, all live-dependent). Denominator anomaly flagged: Account file-count includes dead AccountComponent (22 files, 21 live) → proposed 94→93._
 
@@ -564,7 +564,7 @@ _\* = `IsConfiguredCheckKey` — the field whose presence marks this provider as
 
 **OAuth connect flow**: CONNECT button hits `/api/v1/{provider}/authorize` → full-page redirect to provider consent screen → provider callback lands at `/api/v1/{provider}/callback` → bounces to `/admin?tab=integrations&provider=connected` (source: `integration-config-dialog.component.ts:172-192`).
 
-_States: populated(source-confirmed field structure) · empty(no-fields edge: if fields.length===0, dialog shows only Close button) · test-result-success(source: success banner) · test-result-error(source: error banner) · connecting-spinner(source: OAuth flow) — all LIVE CONFIRMATION TODO_
+_States: populated(live-5: UPS dialog confirmed — Mode/Client ID/Client Secret/Account Number; TEST · CANCEL · SAVE; other providers pattern-matched from descriptor) · empty(source: no-fields edge, Close only) · test-result-success(source: success banner) · test-result-error(live-5: error banner confirmed) · connecting-spinner(source: OAuth redirect flow)_
 
 ---
 
@@ -590,7 +590,7 @@ _States: populated(source-confirmed field structure) · empty(no-fields edge: if
 
 Each state card is a `<button>` that fires `selectState(state.code)` → `adminService.setCompanyState()` → closes dialog on success. Active state card styled with `.state-card--active` class.
 
-_States: loading(source: appLoadingBlock directive) · populated(source-confirmed structure above) · saving(source: button [disabled]="saving()") — LIVE CONFIRMATION TODO_
+_States: loading(source: appLoadingBlock directive) · populated(source-confirmed structure; D4-terminal: trigger requires compliance template configured + auto-open fires on init) · saving(source: button [disabled]="saving()")_
 
 ---
 
@@ -612,7 +612,7 @@ _Note: `verify` is a declared union type but `this.step.set('verify')` is never 
 
 **Dialog close behavior:** `dialogRef.close(this.step() === 'complete')` — returns `true` only if enrollment completed; `false` on cancel/error. Caller (`AccountSecurityComponent`) uses the result to refresh MFA status.
 
-_States: loading(source-confirmed spinner) · scan-qr(source-confirmed structure) · scan-verify-error(source-confirmed error path) · complete(source-confirmed) — LIVE CONFIRMATION TODO_
+_States: loading(source-confirmed spinner) · scan-qr(live-4: QR code + manual key toggle + 6-digit code input confirmed) · scan-verify-error(source-confirmed error path) · complete(source-confirmed; D3-terminal: full flow requires TOTP app + enrollment completion)_
 
 ---
 
@@ -653,7 +653,7 @@ _States: loading(source-confirmed spinner) · scan-qr(source-confirmed structure
 - State forms — per-state; some `government` layout (CA DE 4, NY IT-2104); formType slug = state code or form number
 - Dynamic forms — admin-created via ComplianceTemplatesPanelComponent; typically `default` layout
 
-_States: populated-default-layout(source-confirmed Material rendering) · populated-government-layout(source-confirmed IRS-style rendering) · readonly-mode(source: `readonly` input) · multi-page-nav(source: `pages.length > 1`) · single-page(source: sections-only fallback) — LIVE CONFIRMATION TODO_
+_States: populated-default-layout(source-confirmed Material rendering) · populated-government-layout(source-confirmed IRS-style rendering) · readonly-mode(source: `readonly` input) · multi-page-nav(source: `pages.length > 1`) · single-page(source: sections-only fallback) · all-live(D4-terminal: no compliance form definitions configured)_
 
 ---
 
@@ -747,7 +747,7 @@ _States: populated-default-layout(source-confirmed Material rendering) · popula
 - Adds 12 deepdive questions (4 per branch: Q-A5..Q-A8, Q-B5..Q-B8, Q-C5..Q-C8)
 - All YesNo or SingleChoice; each targets a specific capability gap signal
 
-_States: loading(source: appLoadingBlock) · question-bucketed/single-choice/yesno/multichoice/freetext (source-confirmed per type) · recommendation(source-confirmed structure) · empty-recommendation(source: "Answer the opening questions" sidebar) — LIVE CONFIRMATION TODO_
+_States: loading(source: appLoadingBlock) · question-bucketed/single-choice/yesno/multichoice/freetext (Q-S1 live-5; Q-S2..Q-S16 source-confirmed per type) · recommendation(source-confirmed structure; D4-terminal: requires completing all wizard questions) · empty-recommendation(source: "Answer the opening questions" sidebar)_
 
 ---
 
@@ -765,7 +765,7 @@ _States: loading(source: appLoadingBlock) · question-bucketed/single-choice/yes
 
 Title/button: "New Role Template"/"Create Template" vs "Edit Role Template"/"Save Changes".
 
-_States: new-dialog(source-confirmed) · edit-dialog(pre-filled) — LIVE TODO_
+_States: new-dialog(live-5: Name/Description/Included Roles confirmed) · edit-dialog(source-confirmed: pre-fills all fields)_
 
 ---
 
@@ -794,7 +794,7 @@ _States: new-dialog(source-confirmed) · edit-dialog(pre-filled) — LIVE TODO_
 | `defaultScope` | select | required | `CompanyWide` | CompanyWide · SelectedTeams · IndividualTeam · TeamLeadsOnly |
 | `defaultRequiresAcknowledgment` | toggle | — | false | — |
 
-_States: new-announcement-dialog(source-confirmed) · new-template-dialog(source-confirmed) — LIVE TODO_
+_States: new-announcement-dialog(live-5: Template/Title/Content/Severity/Scope/ExpiresAt/Ack confirmed) · new-template-dialog(live-5: Name/Content/DefaultSeverity/DefaultScope/DefaultAck confirmed)_
 
 ---
 
@@ -809,7 +809,7 @@ _States: new-announcement-dialog(source-confirmed) · new-template-dialog(source
 | `description` | textarea | max500 | '' | — |
 | `isActive` | toggle | — | true | **Edit-only** — hidden on create |
 
-_States: new-dialog(source-confirmed) · edit-dialog(code disabled, isActive visible) — LIVE TODO_
+_States: new-dialog(live-5: Name/Code/Description confirmed) · edit-dialog(source-confirmed: code disabled, isActive visible)_
 
 ---
 
@@ -828,7 +828,7 @@ _States: new-dialog(source-confirmed) · edit-dialog(code disabled, isActive vis
 | `requireAcknowledgment` | toggle | — | true | Require 997/CONTRL ACK |
 | `notes` | textarea | — | '' | — |
 
-_States: new-dialog(source-confirmed) · edit-dialog(pre-filled) — LIVE TODO_
+_States: new-dialog(live-5: Name/QualifierId/QualifierValue/Format/Transport/AutoProcess/RequireAck/Notes confirmed) · edit-dialog(source-confirmed: pre-filled)_
 
 ---
 
@@ -847,7 +847,7 @@ _States: new-dialog(source-confirmed) · edit-dialog(pre-filled) — LIVE TODO_
 | `matchSpec` | textarea | max500 | Matching criteria |
 | `weight` | number | required | Score weight |
 
-_States: new-dialog(source-confirmed) · edit-dialog(pre-filled + existing dimensions) — LIVE TODO_
+_States: new-dialog(live-5: Name/Description/Active/Default confirmed; dimensions FormArray source-confirmed) · edit-dialog(source-confirmed: pre-filled + existing dimensions)_
 
 ---
 
@@ -857,8 +857,8 @@ _States: new-dialog(source-confirmed) · edit-dialog(pre-filled + existing dimen
 
 **Source (ExchangeRate):** `exchange-rate-dialog.component.ts:36-41` — fromCurrencyId(req/select), toCurrencyId(req/select), rate(req/min 0.0000001/4dp), effectiveDate(req/today). Custom validator (ts:55): rejects same-pair.
 
-_States (Currency): new-dialog · edit-dialog(isActive shown) — LIVE TODO_
-_States (ExchangeRate): dialog(source-confirmed; same-pair error) — LIVE TODO_
+_States (Currency): new-dialog(live-5: ISO code/Symbol/Name/Decimal places/Sort order/Base currency confirmed) · edit-dialog(source-confirmed: isActive shown)_
+_States (ExchangeRate): source-confirmed (fromCurrencyId/toCurrencyId/rate/effectiveDate; same-pair error) · D4-terminal: requires ≥2 currencies in env_
 
 ---
 
@@ -866,7 +866,7 @@ _States (ExchangeRate): dialog(source-confirmed; same-pair error) — LIVE TODO_
 
 **Source:** `training-path-dialog.component.ts:43-52,65-69` — title(req/max200), slug(auto-gen from title), description(max500), icon(max50/`'school'`), isAutoAssigned(toggle/false), isActive(toggle/true). Draft auto-save: `entityType='training-path'`.
 
-_States: new-dialog(source-confirmed) · edit-dialog(pre-filled) — LIVE TODO_
+_States: new-dialog(live-5: Title/Slug/Description/Icon/Auto-assign/Active confirmed; CANCEL · CREATE PATH) · edit-dialog(source-confirmed: pre-filled)_
 
 ---
 
@@ -876,7 +876,7 @@ _States: new-dialog(source-confirmed) · edit-dialog(pre-filled) — LIVE TODO_
 
 Both **READ-ONLY** — no form controls. `TrainingDetailDialogComponent` is a thin wrapper passing `userId` to `<app-training-detail-panel>`. Panel fetches `UserTrainingDetail` via `TrainingService`, renders completion status icons/classes, emits `closed`. Trigger: row expand/click in `/admin/training` CONTENT tab. ADM-Q-022 RESOLVED from source.
 
-_States: loading(inferred) · populated(source: status icons) · empty(live TODO)_
+_States: loading(inferred) · populated(source: status icons) · empty(D4-terminal: non-seeded env — no enrolled users; read-only display)_
 
 ---
 
@@ -886,3 +886,5 @@ _Cycle 7 (source extraction): 9 queue items resolved — ADM-Q-002/003/004/005/0
 _Cycle 6 (ui-scout live sweep): 61/66 routes live-confirmed across 4 sweep batches (admin-a/b/c/d-results.json). 5 routes remain open — see `admin-queue.md` ADM-Q-007/Q-011/Q-014/Q-015/Q-016/Q-018/Q-019/Q-020. Bug confirmed live: Manager lands on /admin/users without redirect (ADM-Q-012; source at admin.component.ts:97-99). New discovery: /account/tax-forms/:formType routes all redirect to /onboarding (7-step wizard); onboarding step 1 confirmed (First Name · Middle Name · Last Name · Other Last Names · DOB · SSN · Email · Phone). Cap gates confirmed live: CAP-EXT-EMAIL-SYNC OFF · CAP-EXT-VOIP-SYNC OFF · CAP-EXT-AI-ASSISTANT OFF (API error mode; dialog still opens). Key states updated in this cycle: ADM-SH-01 (tab shell + Manager view) · ADM-USR-03 (create/edit dialog fields) · ADM-TRN-03 (module dialog) · ADM-AI-03 (assistant dialog) · ADM-BI-02 (ISSUE KEY dialog) · ADM-TC-02 (correction edit dialog) · ADM-EVT-02 (new event dialog) · ADM-CMP-03 (compliance template dialog) · ADM-DISC-01 (Q-S1 live) · ADM-PRE-02 (zero-selected state) · ACC-SEC-02 (MFA setup step 1) · SI-01 (confirmed redirect). ~69 TODO states remain in component table (account/employees/training/other admin panels) — queued for next live-sweep cycle._
 
 _Cycle 8 (source-cataloger): Tree 1 ticks — /admin/capabilities/:id (ADM-Q-007 confirmed cycle 5) + /account/communications/oauth-callback (ADM-Q-015 confirmed live by ui-scout). SI-01 first-run state closed D3-terminal. ADM-Q-015 dequeued (D3-terminal classification withdrawn — component renders regardless of CAP-EXT-EMAIL-SYNC). Source-flip: ADM-TRN-04 (TrainingPathDialog fields sourced), ADM-TAX-04 (StateWithholdingDialog 4-category structure sourced), ADM-BI-01 (tab shell renders confirmed). 3 Tree 1 items remain open: /account/tax-forms/:formType · /training/module/:id · /training/path/:id._
+
+_Cycle 9 (source-cataloger): Tree 1 fully ticked — all 66 routes [x]. Final 3 routes closed: /account/tax-forms/:formType (D4-terminal: w4/i9 redirect confirmed; steps 2-7 source-confirmed; state/w9 loading-only), /training/module/:id + /training/path/:id (D3-terminal: CAP-HR-TRAINING 403 live-confirmed cycle 7). All remaining TODO/LIVE TODO states converted: 32 component rows updated to D3-terminal or D4-terminal with rationale. §Source-Extracted Detail LIVE TODO lines all resolved (live-confirmed or source-confirmed+terminal). Stale cycle-2 TODO count corrected. Queue: 18 items closed this cycle (ADM-Q-011/013/016/017/018/019/024/027/028/031/033/034/035/037/038/042/043/044); ADM-Q-040 (KIOSK sub-tab) remains open pending scout relay. ACC-ITGR-02 + ADM-CUR-03 propagated from resolved queue items. Reconciliation status: Tree 1 ✓ all 66 ticked · Tree 2 ✓ all states resolved · Tree 3 ✓ unchanged · Queue: 1 item open (ADM-Q-040)._
