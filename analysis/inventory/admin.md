@@ -3,6 +3,14 @@
 _Phase 05 · Sole writer: source-cataloger · 2026-05-22_
 _Scope: admin (settings, users, reference-data, terminology, capabilities, discovery, presets, EDI, MFA, AI-assistants, events, time-corrections + all other admin tabs), setup-integrations, employees, payroll (pay-stubs, tax-documents), compliance forms (W-4/I-9/state, dynamic forms), training/LMS, account (security, customization)_
 
+**Inventory decisions (D1–D6):**
+- **D1** — renders-for is source-authoritative (file:line + role/cap gate determines the column; live state confirms `states` only)
+- **D2** — shared components located in `platform.md` (SH-01..SH-23) are cross-linked, not re-catalogued in this denominator
+- **D3** — cap-gated-OFF + no live trigger = terminal closure; mark D3 terminal in states column
+- **D4** — seed-first: live sweep uses seeded demo env; state observations are seed-dependent
+- **D5** — role/capability sweep: each role's visible surface must be confirmed by ui-scout
+- **D6** — dead-code exclusion: component files confirmed unreachable (not routed, no instantiating template) are excluded from the live denominator but receive one explicit `dead-code` row for audit completeness; denominator adjusted accordingly
+
 ---
 
 ## Cross-links
@@ -61,13 +69,13 @@ _Note: Tab shells (ADM-AI-01 etc.) always render for the correct role regardless
 | Area | Feature component files | Source paths |
 |------|------------------------|-------------|
 | Admin | 55 | `features/admin/**/*.component.ts` |
-| Account | 22 | `features/account/**/*.component.ts` |
+| Account | 21 | `features/account/**/*.component.ts` (22 files; 1 excluded per D6: `account.component.ts` dead code) |
 | Employees | 12 | `features/employees/**/*.component.ts` |
 | Training | 4 | `features/training/**/*.component.ts` |
 | Setup Integrations | 1 | `features/setup-integrations/*.component.ts` |
-| **TOTAL** | **94** | |
+| **TOTAL** | **93** | |
 
-Shared components (SH-01–SH-23) from `platform.md` are excluded from this denominator per D2. `app-barcode-info` is a cross-region shared utility (not in SH list); row ADM-USR-07 accounts for it in admin scope.
+Shared components (SH-01–SH-23) from `platform.md` are excluded from this denominator per D2. `app-barcode-info` is a cross-region shared utility (not in SH list); row ADM-USR-07 accounts for it in admin scope. Dead-code files excluded per D6; each has an explicit `dead-code` row for audit trail.
 
 ---
 
@@ -426,6 +434,7 @@ _Abbreviations: A=Admin, M=Manager, OM=OfficeManager, E=Engineer, PM=PM; all-aut
 | ACC-COMM-02 | ConnectCommunicationDialogComponent | dialog | `/account/communications` | `features/account/pages/communications/connect-communication-dialog.component.ts:1` | all-auth | TODO | Picker: Google/Microsoft OAuth vs IMAP |
 | ACC-COMM-03 | ConnectImapDialogComponent | dialog | `/account/communications` | `features/account/pages/communications/connect-imap-dialog.component.ts:1` | all-auth | TODO | IMAP server credentials form |
 | ACC-COMM-04 | OauthCallbackComponent | page | `/account/communications/oauth-callback` | `features/account/pages/communications/oauth-callback.component.ts:1` | all-auth | TODO | OAuth redirect-back handler (Google/Microsoft email) |
+| ACC-DEAD-01 | AccountComponent | dead-code | — | `features/account/account.component.ts:22` | none/unreachable | — | Orphaned AccountComponent (selector `app-account`) — not referenced in `account.routes.ts`, zero `<app-account>` instantiations in any template; examined and excluded from live denominator per D6 |
 
 ---
 
