@@ -108,7 +108,7 @@ _Every in-scope route and feature-tree node must be ticked or queued before phas
 - [x] `/admin/expenses` (tab)
 - [x] `/admin/bi-api-keys` (tab)
 - [x] `/admin/capabilities`
-- [ ] `/admin/capabilities/:id` → queued ADM-Q-007 (session expired; navigate to /admin/capabilities, click any cap, capture CapabilityDetailComponent)
+- [x] `/admin/capabilities/:id` — confirmed live (ADM-Q-007 resolved cycle 5): CapabilityDetailComponent renders; see ADM-CAP-02 states
 - [x] `/admin/capabilities-debug`
 - [x] `/admin/discovery` (Q-S1 live-confirmed; Q-S2..Q-S16 queued ADM-Q-011)
 - [x] `/admin/presets`
@@ -134,7 +134,7 @@ _Every in-scope route and feature-tree node must be ticked or queued before phas
 - [x] `/account/customization`
 - [x] `/account/integrations`
 - [x] `/account/communications`
-- [ ] `/account/communications/oauth-callback` → queued ADM-Q-015 (CAP-EXT-EMAIL-SYNC confirmed OFF; cap must be ON to trigger OAuth flow)
+- [x] `/account/communications/oauth-callback` — confirmed live (ADM-Q-015 resolved cycle 8): OauthCallbackComponent renders for all-auth regardless of CAP-EXT-EMAIL-SYNC state; no OAuth state without valid exchange
 - [x] `/employees`
 - [x] `/employees/:id/overview`
 - [x] `/employees/:id/activity`
