@@ -31,7 +31,8 @@
 ## 1. Components
 
 > Root: `forge-ui/src/app/shared/components/`  
-> 65 component directories total.
+> **77 top-level component directories** (all cataloged below) + 3 nested dirs: `data-table/column-filter-popover`, `data-table/column-manager-panel`, `dynamic-form/controls` (11 control files, cataloged as group entry).  
+> Count was reported as "65" by the initial Explore agent — that was an undercount. Actual `ls -1d` = 77. All 77 have catalog entries in this section.
 
 ---
 
