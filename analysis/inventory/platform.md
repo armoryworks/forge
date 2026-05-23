@@ -59,6 +59,7 @@ _Template file:line = first occurrence in each consuming template; abbreviated p
 | SH-20 | `app-training-context-panel` | `shared/components/training-context-panel/` | `core/layout/app-header.component.html:213` |
 | SH-21 | `app-chat-preview-popup` | `shared/components/chat-preview-popup/` | `app.component.html:28` |
 | SH-22 | `app-status-badge` | `shared/components/status-badge/` | `todays-tasks-widget.component.html:19` — **added**: discovered during template grep; not in initial list |
+| SH-23 | `app-toggle` | `shared/components/toggle/` | `reports/components/save-report-dialog/save-report-dialog.component.html:5` — **added**: found in selector diff; missed in initial sweep |
 
 ---
 
@@ -123,7 +124,7 @@ _These three trees are the completeness denominator. All items must be ticked or
 | search | _(no `features/search/` dir)_ | SR-01·SR-02 | **SHELL-ONLY** — search UI is inline template logic inside `core/layout/app-header.component.ts`; no standalone `.component.ts` file exists; catalogued as SR-01 (search bar `:113`) and SR-02 (results dropdown `:114`) under the SEARCH inventory section; not counted in feature denominator |
 | events | _(no UI files in `features/events/`)_ | — | **SERVICE-ONLY** — `features/events/` contains only `event.model.ts` + `events.service.ts`; zero `.component.ts` files; admin-side event management route (`/admin/events`) is owned by admin region (D2 cross-link); no platform UI to catalogue |
 
-### Tree 3 — Shared components used by platform (shared/ tree, 22 entries)
+### Tree 3 — Shared components used by platform (shared/ tree, 23 entries)
 
 | shared component | inv ID | status |
 |-----------------|--------|--------|
@@ -149,6 +150,7 @@ _These three trees are the completeness denominator. All items must be ticked or
 | `shared/components/training-context-panel/training-context-panel.component.ts` | SH-20 | source-confirmed (AppHeader) |
 | `shared/components/chat-preview-popup/chat-preview-popup.component.ts` | SH-21 | source-confirmed (app.component) |
 | `shared/components/status-badge/status-badge.component.ts` | SH-22 | source-confirmed (todays-tasks-widget.component.html:19) — discovered in template grep |
+| `shared/components/toggle/toggle.component.ts` | SH-23 | source-confirmed (save-report-dialog.component.html:5) — discovered in selector diff |
 
 ---
 
@@ -158,15 +160,15 @@ _Source tree + imports analysis 2026-05-22._
 
 - **Feature components**: 32 (dashboard 14 · reports 4 · notifications 1 · chat 9 · approvals 3 · calendar 1 · events 0)
   - _Reports note: 4 component files contain 28 report-type configs (ReportDef[]) + 10 Sankey flow configs (SankeyReportDef[]); configs are not components and do not count toward denominator. Architecture: config-driven single-component pattern, source-confirmed._
-- **Shared components**: 22 (SH-01–SH-21 initial + SH-22 StatusBadge discovered via template grep)
+- **Shared components**: 23 (SH-01–SH-21 initial + SH-22 StatusBadge discovered via template grep + SH-23 ToggleComponent discovered via selector diff)
 - **Shell search cluster (AppHeader)**: SR-01 search bar + SR-02 search results dropdown — inline template logic in `AppHeaderComponent`; no standalone component files; not counted in feature denominator
-- **Total denominator**: 54 items (32 feature + 22 shared; SR-01/SR-02 are sub-entries of AppHeader, not independent files)
+- **Total denominator**: 55 items (32 feature + 23 shared; SR-01/SR-02 are sub-entries of AppHeader, not independent files)
 
 _Chat denominator note (resolved 2026-05-22): C-06 CreateAnnouncementDialog is admin-owned (used by `features/admin/components/announcements-panel/`). C-07 ShareEntityDialog, C-08 EntityMentionPopover, C-12 ChatMessageAttachment, C-14 ThreadPanel are confirmed unused — no imports in any .ts or .html. Removed 5, leaving chat=9 active files (C-01–C-05, C-09–C-11, C-13). C-09/C-10/C-11/C-13 confirmed in ChatPopoutComponent (C-02) and features/mobile/pages/mobile-chat.component.ts (cross-region usage, component still owned here)._
 
 _Three-tree checklist pass (2026-05-22): routes 10/11 ticked ([ ] `/notifications` → PLT-Q-025 not yet swept); features 32/32 source-confirmed; shared 22/22 source-confirmed. All feature + shared file:line entries confirmed from source (`@Component` decorator grep); zero `:1` placeholders remain in active (non-struck-through) rows. Search and Events scope areas explicitly accounted in feature tree: search has no `features/search/` dir — UI is inline template logic in AppHeaderComponent (catalogued SR-01/SR-02, not in feature denominator); events has no UI in `features/events/` — only `event.model.ts` + `events.service.ts` exist (verified by directory listing); admin route cross-linked to admin region (D2). Both areas now have explicit "SHELL-ONLY" / "SERVICE-ONLY" rows in Tree 2 — no scope area is blank._
 
-**RECONCILE = 0 (2026-05-22, commit b919ae9+):** Routes 11/11 ticked · Feature tree 32/32 source-confirmed · Shared tree 22/22 located with consuming template file:line · Zero rows carrying `unreached`/`TODO`/`needs-live` status · D3 capability gates confirmed for all gated surfaces: `CAP-EXT-CHAT` (ChatComponent header panel), `CAP-P2P-APPROVALS` (Approvals approve/reject/workflow-create — backend gate), `CAP-EXT-AI-ASSISTANT` (Search Results Dropdown AI/RAG columns, `ai.service.ts:78`) · PLT queue depth = 0 (Q-033 closed fc1af9c; Q-028 closed 0c513d8) · Denominator 54 final and closed.
+**RECONCILE OPEN — awaiting ui-scout selector-diff cross-check:** SH-23 `app-toggle` added (selector diff, 2026-05-23) — shared tree now 23/23; denominator revised to 55. Routes 11/11 ticked · Feature tree 32/32 source-confirmed · Shared tree 23/23 located with consuming template file:line · Zero rows carrying `unreached`/`TODO`/`needs-live` status · D3 capability gates confirmed for all gated surfaces: `CAP-EXT-CHAT`, `CAP-P2P-APPROVALS`, `CAP-EXT-AI-ASSISTANT` · PLT queue depth = 0. Final reconcile=0 confirmation HELD pending ui-scout independent cross-check completion.
 
 ---
 
@@ -319,6 +321,7 @@ _No UI components. `features/events/` contains models (`event.model.ts`) and `Ev
 | TrainingContextPanelComponent | shared-cmp | AppHeader (all authenticated) | `shared/components/training-context-panel/training-context-panel.component.ts:17` | all authenticated | active | Training context/hints panel; app-header.component.html:213 |
 | ChatPreviewPopupComponent | panel | all authenticated routes | `shared/components/chat-preview-popup/chat-preview-popup.component.ts:16` | all authenticated | empty·populated | Shell-level chat preview popup; app.component.html:28 |
 | StatusBadgeComponent | shared-cmp | `/dashboard` (todays-tasks widget) | `shared/components/status-badge/status-badge.component.ts:3` | all authenticated | — | Job/task status badge pill; todays-tasks-widget.component.html:19 — SH-22 |
+| ToggleComponent | shared-cmp | `/reports/builder` (save-report-dialog R-04) | `shared/components/toggle/toggle.component.ts:12` | Admin·Manager·PM (within R-04) | source-confirmed (live render shares PLT-Q-028 headless env constraint) | Toggle control (share-flag field) in SaveReportDialogComponent; save-report-dialog.component.html:5 — SH-23 |
 
 ---
 

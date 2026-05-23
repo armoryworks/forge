@@ -76,7 +76,7 @@ Seed first before driving platform routes.
 
 ## Notes
 
-- **Denominator corrected**: 38 → 32 feature + 21 shared = 53 total (5 chat components removed: C-06 admin-owned, C-07/C-08/C-12/C-14 unused).
+- **Denominator corrected**: 38 → 32 feature + 23 shared = 55 total (5 chat components removed: C-06 admin-owned, C-07/C-08/C-12/C-14 unused; SH-22 StatusBadge + SH-23 ToggleComponent added via post-commit selector diffs).
 - C-09/C-10/C-11/C-13 also used by `features/mobile/pages/mobile-chat.component.ts` (cross-region usage; components owned by platform/chat).
 - The `chat-preview-popup` (SH-21) is always mounted in app.component — verify when it renders (entity share from within chat → inline popup?).
 - Dashboard KPI chips in the page header (not widget KPIs) — confirm `KpiChipComponent` usage in dashboard.component.html (imported at line 24).
