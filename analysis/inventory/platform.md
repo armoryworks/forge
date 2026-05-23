@@ -23,7 +23,7 @@ _Cross-link: dashboard widgets that render O2C/operations data → cross-linked 
 | Area | Features path | Routes file | Route(s) | Role guard (source) |
 |------|--------------|-------------|----------|---------------------|
 | Dashboard | `features/dashboard/` | `dashboard.routes.ts` | `/dashboard` | none — all authenticated |
-| Reports | `features/reports/` | `reports.routes.ts` | `/reports`, `/reports/builder`, `/reports/sankey` | `roleGuard('Admin','Manager','PM')` |
+| Reports | `features/reports/` | `reports.routes.ts` | `/reports`, `/reports/builder`, `/reports/sankey` | `roleGuard('Admin','Manager','PM')` (`app.routes.ts:139`) — ⚠️ live discrepancy: ui-scout observed Engineer accessing `/reports` with no redirect (PLT-Q-004); source blocks all non-Admin/Manager/PM; `engineer@forge.local` has single role `"Engineer"` (ENV-READY.md); re-verify — guard cache or wrong role provisioning suspected |
 | Notifications | `features/notifications/` | `notifications.routes.ts` | `/notifications` | none — all authenticated |
 | Chat | `features/chat/` | `chat.routes.ts` | `/chat`, `/chat/popout` | none — all authenticated; `CAP-EXT-CHAT` gates bell in header |
 | Approvals | `features/approvals/` | `approvals.routes.ts` | `/approvals/:tab` (→ inbox) | `roleGuard('Admin','Manager','PM','OfficeManager')` |
@@ -199,6 +199,8 @@ _Three-tree checklist pass (2026-05-22): routes 10/11 ticked ([ ] `/notification
 ### REPORTS
 
 _**Architecture: CONFIG-DRIVEN (source-confirmed).** `features/reports/` has exactly 4 `.component.ts` files (confirmed via glob). `ReportsComponent` defines a `ReportDef[]` array of 28 entries (`reports.component.ts:59–88`) and an `activeReport` signal that drives a `@switch` in the template — one component renders all 28 types; no per-type component file exists. `SankeyReportsComponent` defines a `SankeyReportDef[]` array of 10 entries (`sankey-reports.component.ts:35–46`) with the same pattern. The 28 report types and 10 Sankey flows are **config instances, not components**; they are enumerated below as data but do not contribute to the denominator._
+
+_**Route guard (source):** `roleGuard('Admin','Manager','PM')` registered at `app.routes.ts:139`; `hasAnyRole` = plain `Array.includes()` against JWT roles. `renders-for` is set to `Admin·Manager·PM` throughout. ⚠️ **Live discrepancy (PLT-Q-004):** ui-scout observed Engineer (`engineer@forge.local`, single role `"Engineer"` per ENV-READY.md) accessing `/reports` with no redirect — contradicts the guard. Suspected cause: engineer@ provisioned with extra role in JWT, or Angular guard response was cached from a prior admin session. Needs re-verification; if confirmed broken, raises a security finding._
 
 _**D2 cross-links — report data by region:** operations data — jobs-by-stage · overdue-jobs · job-completion-trend · on-time-delivery · average-lead-time · team-workload · my-work-history · time-in-stage · cycle-review · job-margin · my-cycle-summary · employee-productivity · maintenance · quality-scrap · rd; Q2C data — expense-summary · my-expense-history · lead-pipeline · quote-to-close · lead-sales · ar-aging · revenue · simple-pnl · customer-activity · shipping-summary; mixed/platform data — time-by-user · inventory-levels. Sankey flows draw from all regions. Platform claims only the 4 shell component files._
 
