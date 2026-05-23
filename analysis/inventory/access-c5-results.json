@@ -1,0 +1,65 @@
+[
+  {
+    "q": "Q-003",
+    "step": "step1",
+    "state": "live"
+  },
+  {
+    "q": "Q-003",
+    "step": "step2",
+    "state": "LC-address"
+  },
+  {
+    "q": "Q-003",
+    "step": "step3",
+    "state": "LC-w4"
+  },
+  {
+    "q": "Q-003",
+    "step": "step4",
+    "state": "LC-stateTax"
+  },
+  {
+    "q": "Q-004",
+    "route": "/portal/dashboard",
+    "redirectedTo": "http://localhost:4200/portal/login",
+    "guarded": true
+  },
+  {
+    "q": "Q-004",
+    "route": "/portal/orders",
+    "redirectedTo": "http://localhost:4200/portal/login",
+    "guarded": true
+  },
+  {
+    "q": "Q-004",
+    "route": "/portal/quotes",
+    "redirectedTo": "http://localhost:4200/portal/login",
+    "guarded": true
+  },
+  {
+    "q": "Q-004",
+    "route": "/portal/invoices",
+    "redirectedTo": "http://localhost:4200/portal/login",
+    "guarded": true
+  },
+  {
+    "q": "Q-004",
+    "route": "/portal/shipments",
+    "redirectedTo": "http://localhost:4200/portal/login",
+    "guarded": true
+  },
+  {
+    "q": "Q-006",
+    "finalUrl": "http://localhost:4200/login",
+    "hasSpinner": true,
+    "hasError": true,
+    "redirectedToLogin": true
+  },
+  {
+    "q": "Q-002",
+    "hasCameraEl": true,
+    "hasError": false,
+    "url": "http://localhost:4200/m/clock"
+  }
+]

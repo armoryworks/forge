@@ -43,9 +43,10 @@
 | route | `/onboarding` steps 2–7 + review + signing phases |
 | file | `features/onboarding/onboarding-wizard.component.ts` |
 | what's blocking | Wizard is linear (`[linear]="true"`); steps 2–7 are only accessible after all required fields in prior steps are filled and validated. The review and signing phases only activate after step 7 (Acknowledge) is submitted. DocuSeal signing embed requires a real DocuSeal integration with a signing URL. |
-| suspected terminal | **D4-terminal for review/signing**: DocuSeal integration not configured in non-seeded env. Steps 2–6 reachable with data entry; step 7 and signing flow require DocuSeal. |
-| states still source-confirmed | Address (step 2), W-4 (step 3), State Withholding (step 4), I-9 + document upload (step 5), Direct Deposit (step 6), Acknowledgments (step 7), Review/PDF-preview, DocuSeal signing embed, Completion screen |
-| recommended approach | Fill Step 1 + navigate through stepper with valid data to confirm steps 2–7 render correctly. DocuSeal embed will be D4-terminal (no integration). |
+| suspected terminal | **D4-terminal for review/signing**: DocuSeal integration not configured in non-seeded env. Steps 2–4 now LC (c5 sweep). Steps 5–7 and signing remain SC/D4-terminal. |
+| **LC (c5 sweep)** | Step 2 Address form (access-c5-onboarding-step2-address.png, access-c5-onboarding-step2-filled.png), Step 3 W-4 form (access-c5-onboarding-step3-w4.png), Step 4 State Withholding form (access-c5-onboarding-step4-state-tax.png) |
+| states still source-confirmed | I-9 + document upload (step 5), Direct Deposit (step 6), Acknowledgments (step 7), Review/PDF-preview, DocuSeal signing embed, Completion screen |
+| recommended approach | Steps 5–7: fill preceding steps with valid data and continue. DocuSeal embed will remain D4-terminal (no integration configured). |
 
 ---
 
@@ -85,9 +86,10 @@
 | route | `/sso/callback` + `/login` SSO buttons |
 | file | `features/auth/sso-callback.component.ts` |
 | what's blocking | No SSO providers configured in non-seeded env; SSO section on login page not rendered (ssoProviders().length = 0); /sso/callback is reachable but only processes `?sso_token=` params which require a real SSO exchange. |
-| suspected terminal | **D3-terminal** (no SSO configured; gate: admin SSO provider config) |
-| states still source-confirmed | LoginSsoSection (divider + provider buttons), SsoCallbackComponent (loading spinner, error state on token failure) |
-| recommended approach | Configure an SSO provider in Admin → Integrations. Or inject a mock `?sso_token=` to reach the error state of SsoCallbackComponent. |
+| suspected terminal | **D3-terminal for LoginSsoSection** (gate: no SSO providers configured). **SsoCallbackComponent error state: LC** (c5 sweep — fake token injected). |
+| **LC (c5 sweep)** | SsoCallbackComponent: navigated `/sso/callback?sso_token=fake-invalid` → spinner rendered → error state displayed → redirected to /login (screenshot: access-c5-sso-callback-fake-token.png) |
+| states still source-confirmed | LoginSsoSection (divider + provider buttons) — only renders when `ssoProviders().length > 0`; no providers configured in this env |
+| recommended approach | LoginSsoSection: configure an SSO provider in Admin → Integrations. SsoCallbackComponent error state is already live-confirmed via fake token injection. |
 
 ---
 
@@ -105,16 +107,16 @@
 
 ---
 
-## Drain status (cycle 4 — queue drained)
+## Drain status (cycle 5 — final)
 
-> All items classified as pre-declared terminals or documented limitations. No live-sweep action remains.
+> All items closed. Cycle 5 live sweep upgraded several SC states to LC; no new open items.
 
 | Q-ID | status | terminal class |
 |------|--------|----------------|
 | Q-001 | **CLOSED** — routing shadow bug documented in component table; eng-lead handoff note in access.md; no sweep action possible | SC (bug, not a live-sweep gap) |
-| Q-002 | **CLOSED** — camera/scan-result states documented SC in component table; getUserMedia headless limit noted; manual/real-device sweep path described | SC (headless limitation) |
-| Q-003 | **CLOSED** — onboarding steps 2–7 documented SC with file:line refs; DocuSeal review/signing phase documented D4-terminal (no integration) | D4-terminal |
-| Q-004 | **CLOSED** — all portal authenticated surfaces (auth-callback, layout, dashboard, orders, quotes, invoices, shipments) documented D4-terminal; gate: no portal users provisioned | D4-terminal |
-| Q-005 | **CLOSED** — AI populated/chat states documented D4-terminal (not D3; gate: no assistants configured in admin, not a capability flag); route IS reachable | D4-terminal |
-| Q-006 | **CLOSED** — SsoCallbackComponent + LoginSsoSection documented D3-terminal; gate: no SSO provider configured in admin | D3-terminal |
-| Q-007 | **CLOSED** — MfaChallengeComponent, MfaSetupDialogComponent, MfaRecoveryCodesDialogComponent all documented D3-terminal; gate: TOTP issuer not configured (shared-stack intentional wall) | D3-terminal |
+| Q-002 | **CLOSED** — cycle 5 fake-camera attempt: mobileRedirectGuard redirected /m/scan → /m/clock (worker not clocked in); getUserMedia headless limit unchanged; camera/scan-result states SC | SC (headless limitation) |
+| Q-003 | **CLOSED** — cycle 5 LC upgrade: Steps 2 (address), 3 (W-4), 4 (state tax) live-confirmed via stepper progression. Steps 5–7 SC. DocuSeal review/signing phase D4-terminal. | D4-terminal (signing); LC (steps 2–4) |
+| Q-004 | **CLOSED** — cycle 5 confirmed: all 5 /portal/* routes redirect to /portal/login (portalAuthGuard live). Authenticated surfaces D4-terminal; gate: no portal users provisioned. | D4-terminal |
+| Q-005 | **CLOSED** — AI populated/chat states D4-terminal (not D3; gate: no assistants configured in admin); route IS reachable | D4-terminal |
+| Q-006 | **CLOSED** — cycle 5 LC upgrade: SsoCallbackComponent error state live-confirmed (fake ?sso_token → error → redirect to /login). Success path D3-terminal: no SSO provider configured. | D3-terminal (success); LC (error state) |
+| Q-007 | **CLOSED** — MfaChallengeComponent, MfaSetupDialogComponent, MfaRecoveryCodesDialogComponent all D3-terminal; gate: TOTP issuer not configured (shared-stack intentional wall) | D3-terminal |
