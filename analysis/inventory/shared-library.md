@@ -1,12 +1,12 @@
 # Forge Shared Library Inventory
 **Phase:** 07-shared-library  
-**Method:** source-confirmed (source is the checklist — every file in shared/ cataloged)  
-**Status:** COMPLETE — all 65 component dirs + 8 directives + 3 pipes + 7 guards + 9 interceptor files + 40+ services + 57 models + 5 utils + 2 validators + 1 error + 9 tours + 1 capability registry cataloged  
-**Last updated:** 2026-05-23  
+**Method:** source-confirmed + live-confirmed (5 selectors upgraded from ui-scout final harvest)  
+**Status:** COMPLETE — all 77 top-level component dirs + 8 directives + 3 pipes + 7 guards + 9 interceptor files + 40+ services + 57 models + 5 utils + 2 validators + 1 error class + 9 tours + 1 capability registry cataloged  
+**Last updated:** 2026-05-23 (ui-scout harvest integrated)  
 
 > Sole writer: source-cataloger agent.  
 > Taxonomy: `source-confirmed` | `live-confirmed` | `D3-terminal` (cap-gated-OFF) | `D4-terminal` (populated-blocked).  
-> ui-scout unavailable — all entries source-confirmed; live-needed observations noted inline as open-items.
+> FLAGS resolved this cycle: FLAG 1 — errors/ ToC gap fixed (§10 added); FLAG 2 — 77-vs-65 delta resolved (Explore agent undercounted; actual = 77 top-level dirs, all cataloged); CLAUDE.md drift: WorkflowActiveListComponent → actual class `WorkflowActiveListDialogComponent`, selector `app-workflow-active-list-dialog`.
 
 ---
 
@@ -20,9 +20,11 @@
 7. [Models / Constants](#7-models--constants)
 8. [Utils](#8-utils)
 9. [Validators](#9-validators)
-10. [Tours](#10-tours)
-11. [Capability Registry](#11-capability-registry)
-12. [Reconciliation Checklist](#12-reconciliation-checklist)
+10. [Errors](#10-errors)
+11. [Tours](#11-tours)
+12. [Capability Registry](#12-capability-registry)
+13. [Feature Cross-References (NOT shared exports)](#13-feature-cross-references-not-shared-exports)
+14. [Reconciliation Checklist](#14-reconciliation-checklist)
 
 ---
 
@@ -361,7 +363,7 @@
 ---
 
 ### DatepickerComponent
-- **Status:** source-confirmed
+- **Status:** live-confirmed (ui-scout: observed in NEW-LOT dialog as Expiration Date [optional])
 - **Selector:** `app-datepicker`
 - **File:** `shared/components/datepicker/datepicker.component.ts:27`
 - **Type:** component (CVA)
@@ -405,7 +407,7 @@
 ---
 
 ### DialogComponent
-- **Status:** source-confirmed
+- **Status:** live-confirmed (ui-scout: observed wrapping NEW-LOT dialog and NEW-PART-FORK dialog; screenshots 55-58)
 - **Selector:** `app-dialog`
 - **File:** `shared/components/dialog/dialog.component.ts:16`
 - **Type:** component
@@ -421,16 +423,16 @@
 ---
 
 ### DirtyFormIndicatorComponent
-- **Status:** source-confirmed
+- **Status:** live-confirmed (ui-scout screenshots 55-58; renders as invalid-field count badge on submit button)
 - **Selector:** `app-dirty-form-indicator`
 - **File:** `shared/components/dirty-form-indicator/dirty-form-indicator.component.ts:3`
 - **Type:** component
 - **Renders-for:** all
-- **Purpose:** Orange dot + "Unsaved changes" chip for dirty forms.
+- **Purpose:** Orange dot + "Unsaved changes" chip for dirty forms; renders invalid-field count as badge on submit button.
 - **Contract:**
   - `@Input() dirty: boolean` (required)
   - Content projection: none
-- **Usage map:** no usages found (used internally by DialogComponent)
+- **Usage map:** 0 direct feature HTML usages; renders via `shared/components/dialog/dialog.component.html:10` → `<app-dirty-form-indicator [dirty]="isDirty()" />`; every dirty form using DialogComponent shows it
 
 ---
 
@@ -618,7 +620,7 @@
 ---
 
 ### EntityPickerComponent
-- **Status:** source-confirmed
+- **Status:** live-confirmed (ui-scout: observed in NEW-LOT dialog as Part [required] and Linked Job [optional] pickers)
 - **Selector:** `app-entity-picker`
 - **File:** `shared/components/entity-picker/entity-picker.component.ts:21`
 - **Type:** component (CVA)
@@ -1143,7 +1145,7 @@
 ---
 
 ### TextareaComponent
-- **Status:** source-confirmed
+- **Status:** live-confirmed (ui-scout: observed in NEW-LOT dialog as Notes [optional])
 - **Selector:** `app-textarea`
 - **File:** `shared/components/textarea/textarea.component.ts:13`
 - **Type:** component (CVA)
@@ -1262,16 +1264,18 @@
 
 ---
 
-### WorkflowActiveListComponent
+### WorkflowActiveListDialogComponent
 - **Status:** source-confirmed
-- **File:** `shared/components/workflow/workflow-active-list.component.ts`
-- **Type:** component (MatDialog)
+- **Selector:** `app-workflow-active-list-dialog`
+- **File:** `shared/components/workflow-active-list/workflow-active-list-dialog.component.ts:30`
+- **Type:** component (MatDialog) — in own directory `workflow-active-list/`
 - **Renders-for:** all
 - **Purpose:** Dialog listing in-flight workflow runs with navigation to resume.
 - **Contract:**
   - No @Input (injects WorkflowService; loaded via MatDialog)
   - Content projection: none
 - **Usage map:** Opened by WorkflowResumeService on login
+- **CLAUDE.md drift:** CLAUDE.md lists this as `WorkflowActiveListComponent` — actual class name is `WorkflowActiveListDialogComponent`, selector `app-workflow-active-list-dialog`, in own top-level directory `workflow-active-list/` (not a file inside `workflow/`)
 
 ---
 
@@ -2347,18 +2351,25 @@
 
 ---
 
-### CapabilityDisabledError (errors/)
-- **Status:** source-confirmed | **File:** `shared/errors/capability-disabled.error.ts:25`
-- **Purpose:** Typed error raised by capabilityGateInterceptor on disabled endpoints; allows feature surfaces to gracefully degrade (not a security violation).
-- **Contract:**
-  - Class: `new CapabilityDisabledError(capabilityCode: string, message: string)` — extends Error
-  - Type guard: `isCapabilityDisabledError(value): value is CapabilityDisabledError`
-  - Public: `capabilityCode: string`
-- **Usage map:** catch blocks on capability-gated endpoints (AI, announcements, etc.)
+## 10. Errors
+
+> Root: `forge-ui/src/app/shared/errors/`
 
 ---
 
-## 10. Tours
+### CapabilityDisabledError
+- **Status:** source-confirmed | **File:** `shared/errors/capability-disabled.error.ts:25`
+- **Type:** error class + type guard
+- **Purpose:** Typed error raised by capabilityGateInterceptor on disabled endpoints; allows feature surfaces to gracefully degrade (not a security violation — capability is off, not unauthorized).
+- **Contract:**
+  - Class: `new CapabilityDisabledError(capabilityCode: string, message: string)` — extends Error, `name = 'CapabilityDisabledError'`
+  - Type guard: `isCapabilityDisabledError(value: unknown): value is CapabilityDisabledError`
+  - Public: `capabilityCode: string`
+- **Usage map:** catch blocks on capability-gated endpoints (AI, announcements, etc.); httpErrorInterceptor parses 403 with capability envelope
+
+---
+
+## 11. Tours
 
 > Root: `forge-ui/src/app/shared/tours/`
 
@@ -2382,7 +2393,7 @@
 
 ---
 
-## 11. Capability Registry
+## 12. Capability Registry
 
 > Root: `forge-ui/src/app/shared/capability/`
 
@@ -2400,13 +2411,49 @@
 
 ---
 
-## 12. Reconciliation Checklist
+## 13. Feature Cross-References (NOT shared exports)
+
+> Components observed by ui-scout that live in `features/` — recorded here as usage-site context, NOT cataloged as shared exports.
+
+---
+
+### app-new-part-fork-dialog
+- **Location:** `features/parts/` (feature-level dialog)
+- **Wraps:** `app-dialog` (shared DialogComponent shell)
+- **Live-observed states (ui-scout screenshots 55-58):**
+  - **Step 1:** 4 procurement cards — Made In-House / Bought (purchased) / Subcontracted / Phantom; CONTINUE gated on card selection
+  - **Step 2:** Inventory bucket selector — Component / Subassembly / (other buckets); CONTINUE gated on source + bucket both selected
+  - **Step 3+:** D4-terminal (populated-blocked, non-seeded env)
+- **Cross-ref:** Uses `app-dialog` wrapper, `app-validation-button` for gated CONTINUE
+
+---
+
+### app-lots
+- **Location:** `features/lots/` (feature-level page/component)
+- **NOT shared** — feature-specific lots management
+- **Live-observed NEW-LOT dialog state (ui-scout screenshots 55-58):**
+  - State: empty / non-seeded (D4-terminal for populated state)
+  - Form fields using shared components:
+    - **Part** — `app-entity-picker` (required)
+    - **Quantity** — likely `app-input[type=number]` (required)
+    - **Supplier Lot#** — `app-input[type=text]` (required)
+    - **Linked Job** — `app-entity-picker` (optional)
+    - **Expiration Date** — `app-datepicker` (optional)
+    - **Notes** — `app-textarea` (optional)
+    - Actions: CANCEL + SAVE (`app-validation-button`)
+  - Dialog shell: `app-dialog`
+
+---
+
+## 14. Reconciliation Checklist
 
 > Every file in shared/ mapped to an inventory entry. Ticked = cataloged.
 
 **Checklist method:** every subdirectory/file under `shared/` mapped to a catalog entry. Ticked = cataloged.
 
-### Components (65 directories) — all source-confirmed
+### Components (77 top-level directories) — all source-confirmed; 5 upgraded to live-confirmed
+> FLAG 2 resolved: Explore agent initially reported "65" directories — actual filesystem count is 77 top-level dirs. All 77 were cataloged in the text above; the checklist count was wrong, not the coverage. Additionally: data-table has 2 subdirs (column-filter-popover, column-manager-panel) and dynamic-form has a flat controls/ dir — these are not counted in the 77 top-level figure but are fully cataloged.
+> CLAUDE.md drift: `workflow-active-list` is a separate top-level directory (not a file inside `workflow/`); actual component class is `WorkflowActiveListDialogComponent`.
 - [x] activity-timeline → ActivityTimelineComponent
 - [x] add-hold-dialog → AddHoldDialogComponent
 - [x] address-form → AddressFormComponent
@@ -2485,7 +2532,8 @@
 - [x] training-context-panel → TrainingContextPanelComponent
 - [x] validation-button → ValidationButtonComponent
 - [x] virtual-scroll-list → VirtualScrollListComponent
-- [x] workflow → WorkflowComponent + WorkflowActiveListComponent
+- [x] workflow → WorkflowComponent
+- [x] workflow-active-list → WorkflowActiveListDialogComponent (`app-workflow-active-list-dialog`; own top-level directory)
 
 ### Directives (8) — all source-confirmed
 - [x] cap.directive.ts → CapDirective
@@ -2546,8 +2594,9 @@
 ### Validators (2 files) — all source-confirmed
 - [x] password-strength.validator.ts | phone.validator.ts
 
-### Errors (1 file) — source-confirmed
+### Errors (1 file — §10) — source-confirmed
 - [x] capability-disabled.error.ts → CapabilityDisabledError + isCapabilityDisabledError
+> FLAG 1 resolved: errors/ directory now has its own ToC section (§10) and checklist entry.
 
 ### Tours (9 files) — all source-confirmed
 - [x] admin-tour.ts | dashboard-tour.ts | expenses-tour.ts | inventory-tour.ts | kanban-tour.ts | parts-tour.ts | planning-tour.ts | reports-tour.ts | time-tracking-tour.ts
@@ -2560,10 +2609,14 @@
 ## Phase Completion Assessment
 
 **Checklist fully ticked:** YES — every file in `shared/` has a catalog entry.  
-**Queue:** empty (no live-needed items blocked completion; live-confirmation noted as open-item per method).  
+**Queue:** empty.  
 **Unreached / TODO rows:** none.  
-**Live-confirmed entries:** 0 (ui-scout unavailable — all source-confirmed per contingency path).  
-**Open-item:** Live rendering of components in app shell (LoadingOverlayComponent, ToastComponent, ConnectionBannerComponent, etc.) not directly confirmed; all source-confirmed and structurally clear from source.
+**Live-confirmed entries:** 5 (upgraded from ui-scout final harvest): `app-dialog`, `app-datepicker`, `app-textarea`, `app-entity-picker`, `app-dirty-form-indicator`.  
+**FLAGS resolved:**
+- FLAG 1 (errors/ ToC gap): errors/ added as §10 with CapabilityDisabledError entry.
+- FLAG 2 (77-vs-65 delta): corrected to 77 top-level component dirs; all cataloged, checklist was undercounting (Explore agent error). `workflow-active-list` split to its own entry.
+- CLAUDE.md drift: `WorkflowActiveListComponent` → actual `WorkflowActiveListDialogComponent` / `app-workflow-active-list-dialog`.
+**Feature cross-refs (NOT shared):** `app-lots` and `app-new-part-fork-dialog` recorded in §13 with live-observed UI states; NOT cataloged as shared exports.
 
 **PHASE COMPLETE** — shared-library.md is the authoritative inventory of all shared/ exports.
 
