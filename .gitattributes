@@ -1,0 +1,8 @@
+# Keep line endings sane across OSes. Shell scripts MUST be LF or they fail on
+# Linux servers ("bad interpreter: /usr/bin/env bash^M"). PowerShell stays CRLF.
+*.sh           text eol=lf
+*.bash         text eol=lf
+docker-compose*.yml text eol=lf
+*.yml          text eol=lf
+*.yaml         text eol=lf
+*.ps1          text eol=crlf
