@@ -31,7 +31,27 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PROJECT="${FORGE_PROJECT:-forge}"
-BASE=(-p "${PROJECT}" -f "${REPO_ROOT}/docker-compose.yml")
+
+# Compose file set, in priority order:
+#   1. FORGE_COMPOSE_FILES (explicit, space-separated) if set, else
+#   2. the files the running project was created with — so cohost/prod overlays
+#      are honored on a shared box (read from `docker compose ls`), else
+#   3. the stock docker-compose.yml.
+detect_compose_files() {
+  if [[ -n "${FORGE_COMPOSE_FILES:-}" ]]; then
+    printf '%s\n' ${FORGE_COMPOSE_FILES}
+    return
+  fi
+  local line
+  line="$(docker compose ls --all 2>/dev/null | awk -v p="${PROJECT}" '$1==p')"
+  if [[ -n "${line}" ]] && grep -oE '/[^ ,]+\.ya?ml' <<<"${line}"; then
+    return
+  fi
+  printf '%s\n' "${REPO_ROOT}/docker-compose.yml"
+}
+mapfile -t COMPOSE_FILES < <(detect_compose_files)
+BASE=(-p "${PROJECT}")
+for _f in "${COMPOSE_FILES[@]}"; do BASE+=(-f "${_f}"); done
 
 ALL_SERVICES="forge-ui forge-api forge forge-storage forge-backup forge-ai forge-ai-init forge-tts forge-logs forge-signing"
 
