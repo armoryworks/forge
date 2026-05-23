@@ -147,3 +147,34 @@ All items below were PARTIAL or needs-live at time of sweep and subsequently clo
 **All 90 operations-region items (64 feature + 26 shared) have source-confirmed or better status in operations.md.**
 
 _Updated: 2026-05-22 · source-cataloger cycle 2 complete_
+
+---
+
+## Final sweep live confirmations — ui-scout 2026-05-22
+
+Seeded: work-center CNC-01, team "Floor Team A", asset "CNC Mill #1" via API. These live confirmations upgraded source-confirmed items to catalogued:
+
+| item | what was confirmed live |
+|------|------------------------|
+| SF-01 paired state | 0 WORKING/ON BREAK/UNASSIGNED/DONE TODAY, employee avatar grid (8 users), scan-badge footer, controls |
+| SF-02 configure (team) | "Floor Team A (0 members)" in team select — team seeding confirmed |
+| SF-03/SF-04/SF-11 | confirmed present in DOM on paired display |
+| SF-20 clock paired | "FLOOR TEAM A" header, team-status/active-jobs sections, CLOCK IN MANUALLY footer |
+| K-05 JobDetailDialog | CDK MatDialog wrapper confirmed (DetailDialogService → MatDialog.open → mat-dialog-container) |
+| K-07 edit dialog | Title/Description/Customer/Assignee/Priority/Due Date + SAVE CHANGES — pre-populated from J-1 |
+| Q-02a–Q-11 create dialogs | All 7 quality create dialogs confirmed live with full field lists from .cdk-overlay-container |
+| A-01 table + live row | NAME/TYPE/LOCATION/MANUFACTURER/STATUS/HOURS columns, CNC Mill #1 ACTIVE row |
+| A-02 detail panel | STATUS/HOURS/barcode AST-CNC Mill #1/SET STATUS menu/MAINTENANCE HISTORY/ACTIVITY tabs |
+| A-03 dialog wrapper | components: app-asset-detail-dialog + app-asset-detail-panel + app-barcode-info + app-entity-activity-section |
+| A-04 ADD ASSET dialog | Name/Type/Location/Manufacturer/Model/Serial/Notes + Acquisition&Depreciation collapsible |
+| TT-03 running state | STOP TIMER (0M) button, RUNNING badge in table row |
+| TT-04 stop dialog | static "Timer running for Xm", Notes textarea, STOP TIMER button |
+| OE-02 work center card | CNC-01: 0.0% OEE, AVAILABILITY 100.0%, PERFORMANCE 0.0%, QUALITY 0.0%, 0/0/0 counts |
+| OE-03 trend chart | in detail panel, Granularity select (Daily/Weekly/Monthly), OEE TREND empty state |
+| OE-04 losses chart | in detail panel, "No losses recorded for this period" |
+| app-barcode-info | barcode "AST-CNC Mill #1", COPY + PRINT + REGENERATE buttons |
+| app-entity-activity-section | ALL/CONVERSATION/NOTES/HISTORY tabs, "No activity yet" empty state |
+
+Scan flows SF-05–SF-19 remain source-confirmed closure (require barcode/RFID hardware). MRP M-01–M-12 remain source-confirmed closure (Playwright blocked). Q-03b/Q-05/P-02/MN-02 remain source-confirmed closure (no data / ENV-DATA).
+
+_Updated: 2026-05-22 · ui-scout final sweep complete_

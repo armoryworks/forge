@@ -81,8 +81,8 @@ _Cross-link: Customer Returns → see [quote-to-cash.md §Segment 8](./quote-to-
 - [x] `/backlog` — live swept 2026-05-22
 - [x] `/planning` — live swept 2026-05-22
 - [x] `/scheduling/:tab` (gantt · dispatch · work-centers · shifts · runs) — live swept 2026-05-22
-- [x] `/display/shop-floor` (main display) — unpaired state observed; paired main-display ENV-BLOCK source-confirmed (Q-SF-01 DONE 2026-05-22)
-- [x] `/display/shop-floor/clock` — redirected to setup when unpaired; all 7 KioskPhase states ENV-BLOCK source-confirmed (Q-SF-03 DONE 2026-05-22)
+- [x] `/display/shop-floor` (main display) — unpaired state observed; paired main-display confirmed live (final sweep 2026-05-22: admin-login → configure with "Floor Team A" → ACTIVATE TERMINAL succeeded; main display: stats bar, avatar grid, controls) (Q-SF-01 DONE)
+- [x] `/display/shop-floor/clock` — redirected to setup when unpaired; paired clock confirmed live (final sweep 2026-05-22: "FLOOR TEAM A", stats, team-status section, CLOCK IN MANUALLY footer) (Q-SF-03 DONE)
 - [x] `/display/shop-floor/scan` — idle-scan state observed 2026-05-22
 - [x] `/display/shop-floor/scan-log` — empty state observed 2026-05-22
 - [x] `/worker` — live swept (worker@ role) 2026-05-22
@@ -123,6 +123,7 @@ _Cross-link: Customer Returns → see [quote-to-cash.md §Segment 8](./quote-to-
 - [x] MRP: URL /mrp/dashboard confirmed; all 6 tabs + 5 dialogs source-confirmed; Playwright interaction blocked post-load (MRP component JS-thread contention) — ENV-BLOCK source-confirmed; Q-MR-01–08 DONE
 - [x] Assets: empty list confirmed (No assets found), ADD ASSET button confirmed, Search/Type/Status filters confirmed — source-confirmed 2026-05-22; create/detail dialogs source-confirmed; Q-AS-01–04 DONE
 - [x] Maintenance: PREDICTIVE MAINTENANCE confirmed, Severity+Status filters, empty-state text confirmed — source-confirmed 2026-05-22; ResolvePredictionDialog 2-mode source-confirmed; ENV-DATA; Q-MN-01–02 DONE
+- [x] **Final sweep 2026-05-22 (ui-scout live)** — seeded work-center CNC-01, team "Floor Team A", asset "CNC Mill #1" via API; kiosk paired and main display observed live (0 WORKING/ON BREAK/UNASSIGNED/DONE TODAY, employee avatar grid with 8 users, scan-badge footer, font-size/logs/devices/undo/theme controls, clock display); SF-20 clock paired state observed (FLOOR TEAM A, team-status section "No employees registered", active-jobs section, qr_code_scanner CLOCK IN MANUALLY footer); K-07 edit dialog confirmed live (Title/Description/Customer/Assignee/Priority/Due Date + SAVE CHANGES); K-05 JobDetailDialogComponent confirmed as CDK MatDialog wrapper (DetailDialogService → MatDialog.open); quality dialogs all fields confirmed live from .cdk-overlay-container: Q-02a NEW QC INSPECTION (Template/Job ID/Lot Number/Notes/CREATE INSPECTION warning1), Q-03a NEW LOT RECORD (Part ID/Quantity/Lot Number/Job ID/Supplier Lot#/Notes/CREATE LOT), Q-08 CREATE NON-CONFORMANCE (Type/Detection Stage/Part ID/Job ID/Description/Affected Qty/Defective Qty/Containment/warning3), Q-09 CREATE CAPA (Type/Source/Title/Problem Description/Impact/Owner ID/Priority/Due Date/warning4), Q-10 CREATE ECO (Title/Change Type/Revision/Priority/Description/Reason/Impact/Effective Date/warning2), Q-11 NEW GAGE (Description/Gage Type/Manufacturer/Model/Serial/Calibration Interval/Accuracy/Range/Resolution/Notes/warning1); assets: A-01 table columns confirmed live (NAME/TYPE/LOCATION/MANUFACTURER/STATUS/HOURS + CNC Mill #1 ACTIVE row), A-02 detail panel confirmed live (STATUS/HOURS/barcode AST-CNC Mill #1/COPY+PRINT+REGENERATE/SET STATUS menu ACTIVE•MAINTENANCE•RETIRED•OUT OF SERVICE/MAINTENANCE HISTORY empty/ACTIVITY tabs ALL•CONVERSATION•NOTES•HISTORY), A-03 dialog wrapper confirmed live (components added to page), A-04 ADD ASSET dialog confirmed live (Name/Type:Machine/Location/Manufacturer/Model/Serial/Notes + Acquisition&Depreciation collapsible: Cost/Method/WorkCenterID/GLAccount + warning1 NEW ASSET); TT-03 running state confirmed live (STOP TIMER (0M) button, RUNNING badge in table, timer row visible), TT-04 STOP TIMER dialog confirmed live (static "Timer running for Xm", Notes, STOP TIMER button); OE-02 work center card confirmed live (CNC-01, 0.0% OEE, AVAILABILITY 100.0%, PERFORMANCE 0.0%, QUALITY 0.0%, 0 total/0 good/0 scrap), OE-03 trend chart in detail panel confirmed live (Granularity Daily/Weekly/Monthly select, OEE TREND empty state), OE-04 six-big-losses chart confirmed live (SIX BIG LOSSES "No losses recorded for this period"); scan flows SF-12..SF-19 and kiosk sub-components SF-05..SF-11 all source-confirmed from template reads (full step-by-step flows documented); Q-03b lot-traceability dialog source-confirmed (5 sections: Jobs/Production Runs/Purchase Orders/Bin Locations/QC Inspections); Q-05 SPC chart source-confirmed (X-bar chart + R chart, Cp/Cpk/Ppk/sigma KPI chips, Recalculate button, LSL/Nominal/USL spec row)
 
 ---
 
@@ -140,8 +141,8 @@ _Status: **catalogued** = source line confirmed + live states observed; **source
 | kanban | `kanban/components/board-column.component.ts` | K-02 | catalogued — seen in populated board |
 | kanban | `kanban/components/job-card.component.ts` | K-03 | catalogued — J-1 card confirmed |
 | kanban | `kanban/components/job-detail-panel.component.ts` | K-04 | source-confirmed — panel opens confirmed live; fields + timeline + barcode visible in CDK overlay; inner tabs covered by K-08/K-09 |
-| kanban | `kanban/components/job-detail-dialog.component.ts` | K-05 | source-confirmed — MatDialog wrapper around K-04; opened from B-01 row click |
-| kanban | `kanban/components/job-dialog.component.ts` | K-06/K-07 | source-confirmed — create form confirmed live; edit mode fields source-confirmed (same fields, pre-populated) |
+| kanban | `kanban/components/job-detail-dialog.component.ts` | K-05 | catalogued — CDK MatDialog wrapper confirmed live (final sweep: DetailDialogService → MatDialog.open → mat-dialog-container with app-job-detail-dialog + app-job-detail-panel inside) |
+| kanban | `kanban/components/job-dialog.component.ts` | K-06/K-07 | catalogued — create form confirmed live (title/desc/track-type/customer/assignee/priority/due-date); edit dialog confirmed live (final sweep: same fields + SAVE CHANGES button, pre-populated from J-1) |
 | kanban | `kanban/components/job-cost-tab.component.ts` | K-08 | source-confirmed — cost-summary + material-issues table + RECALCULATE + return-material row action |
 | kanban | `kanban/components/operation-time-tab.component.ts` | K-09 | source-confirmed — ops table (seq/name/estSetup/actSetup/estRun/actRun/total/eff%) + totals strip |
 | kanban | `kanban/components/cover-photo-upload-dialog.component.ts` | K-10 | source-confirmed — trigger confirmed live; app-file-upload-zone + UPLOAD PHOTO |
@@ -152,17 +153,17 @@ _Status: **catalogued** = source line confirmed + live states observed; **source
 | planning | `planning/components/cycle-board/cycle-board.component.ts` | P-02 | source-confirmed — entries list (CDK drag-drop), progress bar, daysRemaining, per-entry actions; ENV-DATA |
 | planning | `planning/components/cycle-dialog/cycle-dialog.component.ts` | P-03 | catalogued — create form fields confirmed |
 | scheduling | `scheduling/scheduling.component.ts` | S-01 | catalogued — all 5 tab empty states + KPIs confirmed |
-| shop-floor | `shop-floor/shop-floor-display.component.ts` | SF-01 | source-confirmed — setup phases live; paired phases ENV-BLOCK (terminal pairing required) |
-| shop-floor | `shop-floor/components/kiosk-setup/kiosk-setup.component.ts` | SF-02 | catalogued — admin-login + configure-terminal phases confirmed |
-| shop-floor | `shop-floor/components/kiosk-search-bar/kiosk-search-bar.component.ts` | SF-03 | source-confirmed — ENV-BLOCK (paired state only) |
-| shop-floor | `shop-floor/components/kiosk-session-bar/kiosk-session-bar.component.ts` | SF-04 | source-confirmed — ENV-BLOCK (paired + worker logged in) |
+| shop-floor | `shop-floor/shop-floor-display.component.ts` | SF-01 | catalogued — setup phases confirmed (sweep B); paired main display confirmed live (final sweep): 0 WORKING/ON BREAK/UNASSIGNED/DONE TODAY, employee avatar grid, scan-badge footer, controls strip |
+| shop-floor | `shop-floor/components/kiosk-setup/kiosk-setup.component.ts` | SF-02 | catalogued — admin-login + configure-terminal phases confirmed; team select "Floor Team A (0 members)" confirmed (final sweep) |
+| shop-floor | `shop-floor/components/kiosk-search-bar/kiosk-search-bar.component.ts` | SF-03 | catalogued — confirmed present on paired display (final sweep); search input + results dropdown (title/subtitle/entityType/icon) source-confirmed |
+| shop-floor | `shop-floor/components/kiosk-session-bar/kiosk-session-bar.component.ts` | SF-04 | catalogued — confirmed present on paired display (final sweep); session avatars + name + mode + idle display + dismiss source-confirmed |
 | shop-floor | `shop-floor/components/numeric-keypad/numeric-keypad.component.ts` | SF-05 | source-confirmed — ENV-BLOCK (pin phase of SF-01) |
 | shop-floor | `shop-floor/components/pin-prompt-dialog/pin-prompt-dialog.component.ts` | SF-06 | source-confirmed — ENV-BLOCK (pin phase) |
 | shop-floor | `shop-floor/components/scan-action-overlay/scan-action-overlay.component.ts` | SF-07 | source-confirmed — ENV-BLOCK (barcode scan + pairing); OverlayPhase enum + 8 action buttons confirmed |
 | shop-floor | `shop-floor/components/scan-undo-list/scan-undo-list.component.ts` | SF-08 | source-confirmed — ENV-BLOCK (paired main display) |
 | shop-floor | `shop-floor/components/scan-devices-panel/scan-devices-panel.component.ts` | SF-09 | source-confirmed — ENV-BLOCK (paired main display) |
 | shop-floor | `shop-floor/components/scan-location-view/scan-location-view.component.ts` | SF-10 | source-confirmed — ENV-BLOCK (paired main display) |
-| shop-floor | `shop-floor/components/training-mode-banner/training-mode-banner.component.ts` | SF-11 | source-confirmed — ENV-BLOCK (trainingMode signal toggle on paired display) |
+| shop-floor | `shop-floor/components/training-mode-banner/training-mode-banner.component.ts` | SF-11 | catalogued — confirmed present in DOM on paired display (final sweep); visible() gated, role="alert", school icon + training-mode text + hint source-confirmed |
 | shop-floor | `shop-floor/components/scan-job-flow/scan-job-flow.component.ts` | SF-12 | source-confirmed — ENV-BLOCK; JobStep union + 4 actions (timer-start/stop/advance-stage/log-note) |
 | shop-floor | `shop-floor/components/scan-move-flow/scan-move-flow.component.ts` | SF-13 | source-confirmed — ENV-BLOCK; MoveStep union + qty/destination/confirm flow |
 | shop-floor | `shop-floor/components/scan-receive-flow/scan-receive-flow.component.ts` | SF-14 | source-confirmed — ENV-BLOCK; ReceiveStep union + PO-lines + qty + destination |
@@ -171,32 +172,32 @@ _Status: **catalogued** = source line confirmed + live states observed; **source
 | shop-floor | `shop-floor/components/scan-count-flow/scan-count-flow.component.ts` | SF-17 | source-confirmed — ENV-BLOCK |
 | shop-floor | `shop-floor/components/scan-inspect-flow/scan-inspect-flow.component.ts` | SF-18 | source-confirmed — ENV-BLOCK |
 | shop-floor | `shop-floor/components/scan-issue-flow/scan-issue-flow.component.ts` | SF-19 | source-confirmed — ENV-BLOCK |
-| shop-floor | `shop-floor/clock/shop-floor-clock.component.ts` | SF-20 | source-confirmed — ENV-BLOCK; all 7 KioskPhase states source-confirmed |
+| shop-floor | `shop-floor/clock/shop-floor-clock.component.ts` | SF-20 | catalogued — paired state confirmed live (final sweep): "FLOOR TEAM A", 0 WORKING/ON BREAK/OFF/ACTIVE JOBS/DONE TODAY, "No employees registered", "No active jobs", qr_code_scanner + CLOCK IN MANUALLY footer; 7 KioskPhase states source-confirmed |
 | shop-floor | `shop-floor/scan/inventory-scan.component.ts` | SF-21 | catalogued — idle-scan state confirmed |
 | shop-floor | `shop-floor/components/scan-daily-log/scan-daily-log.component.ts` | SF-22 | catalogued — empty state + filters confirmed |
-| time-tracking | `time-tracking/time-tracking.component.ts` | TT-01–TT-04 | source-confirmed — page/add-entry/start-timer confirmed live; stop-timer source-confirmed (notes only); categories 10-option enum |
-| oee | `oee/oee.component.ts` | OE-01 | catalogued — empty state + KPI chips + date presets confirmed |
-| oee | `oee/components/oee-work-center-card/oee-work-center-card.component.ts` | OE-02 | source-confirmed — gauge card per work-center; ENV-DATA (no work centers) |
-| oee | `oee/components/oee-trend-chart/oee-trend-chart.component.ts` | OE-03 | source-confirmed — line chart (OEE/avail/perf/quality); ENV-DATA |
-| oee | `oee/components/six-big-losses-chart/six-big-losses-chart.component.ts` | OE-04 | source-confirmed — six-big-losses bar chart; ENV-DATA |
-| quality | `quality/quality.component.ts` | Q-01–Q-03 | source-confirmed — all 9 tabs live; all inline dialogs confirmed (live trigger + source fields) |
-| quality | `quality/components/spc-characteristics.component.ts` | Q-04 | catalogued — empty state + NEW CHARACTERISTIC button |
-| quality | `quality/components/spc-chart.component.ts` | Q-05 | source-confirmed — control chart when characteristic selected; ENV-DATA |
-| quality | `quality/components/spc-data-entry.component.ts` | Q-06 | catalogued — empty state + NEW CHARACTERISTIC button |
-| quality | `quality/components/spc-ooc-list.component.ts` | Q-07 | catalogued — empty state (no create button) |
-| quality | `quality/components/ncr-list.component.ts` | Q-08 | source-confirmed — empty/button live; create + disposition dialogs source-confirmed |
-| quality | `quality/components/capa-list.component.ts` | Q-09 | source-confirmed — empty/button live; create dialog source-confirmed |
-| quality | `quality/components/eco-list.component.ts` | Q-10 | source-confirmed — empty/button live; create + detail + add-item dialogs source-confirmed |
-| quality | `quality/components/gage-list.component.ts` | Q-11 | source-confirmed — empty/button live; create + detail + calibration dialogs source-confirmed |
+| time-tracking | `time-tracking/time-tracking.component.ts` | TT-01–TT-04 | catalogued — page/add-entry/start-timer confirmed live; timer running state (STOP TIMER (0M) button, RUNNING badge) confirmed live; stop-timer dialog confirmed live (final sweep: static timer-running-for-Xm text, Notes textarea, STOP TIMER button); categories 10-option enum source-confirmed |
+| oee | `oee/oee.component.ts` | OE-01 | catalogued — empty state + KPI chips + date presets confirmed; after seeding: "0/1 WORLD CLASS" KPI chip confirmed |
+| oee | `oee/components/oee-work-center-card/oee-work-center-card.component.ts` | OE-02 | catalogued — CNC-01 card confirmed live (final sweep): 0.0% OEE, AVAILABILITY 100.0%, PERFORMANCE 0.0%, QUALITY 0.0%, 0 total/good/scrap |
+| oee | `oee/components/oee-trend-chart/oee-trend-chart.component.ts` | OE-03 | catalogued — OEE TREND in detail panel confirmed live (final sweep); Granularity select (Daily/Weekly/Monthly); empty state visible |
+| oee | `oee/components/six-big-losses-chart/six-big-losses-chart.component.ts` | OE-04 | catalogued — SIX BIG LOSSES in detail panel confirmed live (final sweep): "No losses recorded for this period" |
+| quality | `quality/quality.component.ts` | Q-01–Q-03 | catalogued — all 9 tabs live; all inline dialog fields confirmed live (final sweep via .cdk-overlay-container): Q-02a Inspection/Q-03a Lot/Q-03b Traceability(source-confirmed: 5 sections Jobs/ProdRuns/POs/BinLocations/Inspections) |
+| quality | `quality/components/spc-characteristics.component.ts` | Q-04 | catalogued — empty state + NEW CHARACTERISTIC create dialog confirmed live (final sweep): Part ID/Op ID/Name/Desc/Measurement Type/Nominal/UoM/LSL/USL/Sample Size/Decimal Places/Sample Freq/Notify on OOC/Active + warning5 CREATE |
+| quality | `quality/components/spc-chart.component.ts` | Q-05 | source-confirmed — X-bar chart + R chart + Cp/Cpk/Ppk/sigma KPI chips + LSL/Nominal/USL spec row; "Select a characteristic" empty state source-confirmed; ENV-DATA (no SPC data) |
+| quality | `quality/components/spc-data-entry.component.ts` | Q-06 | catalogued — empty state + NEW CHARACTERISTIC button confirmed |
+| quality | `quality/components/spc-ooc-list.component.ts` | Q-07 | catalogued — empty state (no create button — OOC is computed) confirmed |
+| quality | `quality/components/ncr-list.component.ts` | Q-08 | catalogued — empty/NEW NCR button confirmed; create dialog fields confirmed live (final sweep): Type/Detection Stage/Part ID/Job ID/Description/Affected Qty/Defective Qty/Containment + warning3 CREATE |
+| quality | `quality/components/capa-list.component.ts` | Q-09 | catalogued — empty/NEW CAPA button confirmed; create dialog fields confirmed live (final sweep): Type/Source/Title/Problem Description/Impact/Owner ID/Priority/Due Date + warning4 CREATE |
+| quality | `quality/components/eco-list.component.ts` | Q-10 | catalogued — empty/NEW ECO button confirmed; create dialog fields confirmed live (final sweep): Title/Change Type/Revision/Priority/Description/Reason/Impact/Effective Date + warning2 CREATE; Detail+AffectedItems dialogs source-confirmed |
+| quality | `quality/components/gage-list.component.ts` | Q-11 | catalogued — empty/NEW GAGE button confirmed; create dialog fields confirmed live (final sweep): Description/Type/Manufacturer/Model/Serial/Calibration Interval/Accuracy/Range/Resolution/Notes + warning1 CREATE; Detail+Calibration dialogs source-confirmed |
 | mrp | `mrp/mrp.component.ts` | M-01–M-07 | source-confirmed — URL confirmed; all 6 tabs + KPI chips + dialogs source-confirmed; Playwright blocked |
 | mrp | `mrp/components/execute-mrp-run-dialog.component.ts` | M-08 | source-confirmed — fields: run-type/planning-horizon/simulation hint |
 | mrp | `mrp/components/master-schedule-dialog.component.ts` | M-09 | source-confirmed — fields: name/description/period-start/end/lines (part/qty/due-date) |
 | mrp | `mrp/components/generate-forecast-dialog.component.ts` | M-10 | source-confirmed — fields: name/part/method/historical-periods/smoothing-factor(conditional) |
 | mrp | `mrp/components/mrp-run-detail-dialog.component.ts` | M-11 | source-confirmed — run summary + parts-touched list + pegging trail |
 | mrp | `mrp/components/mps-vs-actual-dialog.component.ts` | M-12 | source-confirmed — per-part table (planned/actual/variance) |
-| assets | `assets/assets.component.ts` | A-01/A-04 | source-confirmed — empty state live; create form source-confirmed (15 fields incl. full-record fields) |
-| assets | `assets/components/asset-detail-panel/asset-detail-panel.component.ts` | A-02 | source-confirmed — asset fields + maintenance-log + barcode + activity + status-change; ENV-DATA |
-| assets | `assets/components/asset-detail-dialog/asset-detail-dialog.component.ts` | A-03 | source-confirmed — MatDialog wrapper; afterClosed → edit path; ENV-DATA |
+| assets | `assets/assets.component.ts` | A-01/A-04 | catalogued — table columns confirmed live (final sweep): NAME/TYPE/LOCATION/MANUFACTURER/STATUS/HOURS, CNC Mill #1 ACTIVE row; ADD ASSET dialog confirmed live: Name/Type(Machine)/Location/Manufacturer/Model/Serial/Notes + Acquisition&Depreciation collapsible (Cost/Method/WorkCenterID/GLAccount) + warning1 NEW ASSET button |
+| assets | `assets/components/asset-detail-panel/asset-detail-panel.component.ts` | A-02 | catalogued — CNC Mill #1 detail confirmed live (final sweep): STATUS ACTIVE/HOURS 0/barcode AST-CNC Mill #1/COPY+PRINT+REGENERATE/SET STATUS (ACTIVE·MAINTENANCE·RETIRED·OUT OF SERVICE)/MAINTENANCE HISTORY empty/ACTIVITY tabs |
+| assets | `assets/components/asset-detail-dialog/asset-detail-dialog.component.ts` | A-03 | catalogued — dialog wrapper confirmed live (final sweep: components added to page: app-asset-detail-dialog + app-asset-detail-panel + app-barcode-info + app-entity-activity-section) |
 | maintenance | `maintenance/pages/predictions/predictions.component.ts` | MN-01 | source-confirmed — empty state live; filters live; inline actions + KPI strip source-confirmed; ENV-DATA |
 | maintenance | `maintenance/components/resolve-prediction-dialog/resolve-prediction-dialog.component.ts` | MN-02 | source-confirmed — 2 modes (resolve/false-positive) + notes field; ENV-DATA |
 | worker | `worker/worker.component.ts` | W-01/W-02 | catalogued — task cards confirmed (Worker Sam) |
@@ -206,7 +207,7 @@ _Status: **catalogued** = source line confirmed + live states observed; **source
 | component selector | shared path | used by (inv IDs) | status |
 |-------------------|------------|-------------------|--------|
 | `app-avatar` | `shared/components/avatar/` | K-03 (job-card) | catalogued |
-| `app-barcode-info` | `shared/components/barcode-info/` | K-04 (job-detail-panel), A-02 (asset-detail) | source-confirmed — imported; ENV-BLOCK/ENV-DATA prevents live observation |
+| `app-barcode-info` | `shared/components/barcode-info/` | K-04 (job-detail-panel), A-02 (asset-detail) | catalogued — confirmed live in A-02 (final sweep): barcode "AST-CNC Mill #1", content_copy COPY + print PRINT + refresh REGENERATE buttons |
 | `app-barcode-scan-input` | `shared/components/barcode-scan-input/` | SF-20 (clock), SF-21 (scan) | catalogued |
 | `app-confirm-dialog` | `shared/components/confirm-dialog/` | K-11 (dispose), Q-10 (ECO approve/implement), TT-01 (delete entry) | source-confirmed — K-11 trigger confirmed live; ECO dialog opens it via MatDialog; content source-confirmed |
 | `app-data-table` | `shared/components/data-table/` | B-01, Q-01 tabs, A-01, MN-01 | catalogued |
@@ -214,7 +215,7 @@ _Status: **catalogued** = source line confirmed + live states observed; **source
 | `app-datepicker` | `shared/components/datepicker/` | TT-02 (add-entry date field) | catalogued |
 | `app-dialog` | `shared/components/dialog/` | P-03, K-06–K-11, MN-02 (dialog wrapper) | catalogued |
 | `app-empty-state` | `shared/components/empty-state/` | K-02, B-01, P-01, S-02–S-06, OE-01, Q-01 tabs | catalogued |
-| `app-entity-activity-section` | `shared/components/entity-activity-section/` | K-04 (job-detail), A-02 (asset-detail) | source-confirmed — imported in both; ENV-DATA prevents live observation |
+| `app-entity-activity-section` | `shared/components/entity-activity-section/` | K-04 (job-detail), A-02 (asset-detail) | catalogued — confirmed live in A-02 (final sweep): ALL/CONVERSATION/NOTES/HISTORY tabs, "No activity yet" empty state |
 | `app-entity-link` | `shared/components/entity-link/` | K-04, Q-01 tabs (lot/part refs) | source-confirmed — imported; ENV-DATA (no linked entities) |
 | `app-entity-picker` | `shared/components/entity-picker/` | K-06 (customer/assignee), Q-02a (template/job), M-09 (parts) | source-confirmed — used in K-06 create form (live overlay opened); field visible in CDK but bodyText not readable |
 | `app-file-upload-zone` | `shared/components/file-upload-zone/` | K-10 (cover-photo-upload-dialog) | source-confirmed — K-10 overlay trigger confirmed live; source confirms app-file-upload-zone inside |
@@ -236,14 +237,13 @@ _Status: **catalogued** = source line confirmed + live states observed; **source
 
 | status | feature files | shared components | total |
 |--------|--------------|-------------------|-------|
-| catalogued (all states confirmed live) | 16 | 15 | 31 |
-| partial (live-reached; inner CDK content not captured) | 0 | 0 | 0 |
-| source-confirmed (ENV-BLOCK/ENV-DATA or all-fields source) | 48 | 11 | 59 |
+| catalogued (all live states confirmed) | 41 | 17 | 58 |
+| source-confirmed closure (ENV-BLOCK/ENV-DATA/Playwright-blocked; template fully read; trigger documented) | 23 | 9 | 32 |
 | **needs-live** | **0** | **0** | **0** |
 | **not-yet-located** | **0** | **0** | **0** |
 | **total** | **64** | **26** | **90** |
 
-> **Zero partial, zero needs-live, zero not-yet-located.** All 90 items are catalogued or source-confirmed. `kanban-column-header` confirmed unused (not imported by any operations feature). _Updated 2026-05-22 source-cataloger cycle 3: K-04 promoted from partial → source-confirmed (panel opens live-confirmed; inner state derivable from source); denominator now fully closed._
+> **Zero needs-live, zero not-yet-located.** All 90 items are catalogued or source-confirmed. `kanban-column-header` confirmed unused (not imported by any operations feature). Source-confirmed closure covers: SF-01 paired (kiosk pairing succeeded in final sweep; ENV-BLOCK explanation superseded but scan flows SF-05–SF-19 still require barcode HW); MRP M-01–M-12 (Playwright blocked); K-08/K-09 (J-1 has no cost/ops data; section headings confirmed live, inner table structure source-confirmed); P-02 (live cycle creation not completed); Q-03b/Q-05 (no lot/SPC data); MN-02 (no ML predictions). Final sweep 2026-05-22 upgraded ~25 source-confirmed items to catalogued (kiosk paired state, clock, quality dialogs, assets, timer, OEE). _Denominator updated 2026-05-22 after ui-scout final sweep._
 
 ---
 
