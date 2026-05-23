@@ -1,6 +1,6 @@
 # Admin & Account Region — Component Inventory
 
-_Phase 05 · Sole writer: source-cataloger · 2026-05-22_
+_Phase 05 · Sole writers: source-cataloger (source) + ui-scout (live sweep) · 2026-05-22_
 _Scope: admin (settings, users, reference-data, terminology, capabilities, discovery, presets, EDI, MFA, AI-assistants, events, time-corrections + all other admin tabs), setup-integrations, employees, payroll (pay-stubs, tax-documents), compliance forms (W-4/I-9/state, dynamic forms), training/LMS, account (security, customization)_
 
 **Inventory decisions (D1–D6):**
@@ -68,12 +68,12 @@ _Note: Tab shells (ADM-AI-01 etc.) always render for the correct role regardless
 
 | Area | Feature component files | Source paths |
 |------|------------------------|-------------|
-| Admin | 55 | `features/admin/**/*.component.ts` |
+| Admin | 53 | `features/admin/**/*.component.ts` (55 files; 2 excluded per D6: `admin-settings.component.ts` + `setting-field.component.ts` — live sweep + zero-usage grep confirmed cycle 6) |
 | Account | 21 | `features/account/**/*.component.ts` (22 files; 1 excluded per D6: `account.component.ts` dead code) |
 | Employees | 12 | `features/employees/**/*.component.ts` |
 | Training | 4 | `features/training/**/*.component.ts` |
 | Setup Integrations | 1 | `features/setup-integrations/*.component.ts` |
-| **TOTAL** | **93** | |
+| **TOTAL** | **91** | |
 
 Shared components (SH-01–SH-23) from `platform.md` are excluded from this denominator per D2. `app-barcode-info` is a cross-region shared utility (not in SH list); row ADM-USR-07 accounts for it in admin scope. Dead-code files excluded per D6; each has an explicit `dead-code` row for audit trail.
 
@@ -224,40 +224,40 @@ _Abbreviations: A=Admin, M=Manager, OM=OfficeManager, E=Engineer, PM=PM; all-aut
 
 | ID | component | type | route | file:line | renders-for | states | purpose |
 |----|-----------|------|-------|-----------|-------------|--------|---------|
-| ADM-SET-01 | settings tab panel | tab | `/admin/settings` | `admin.component.html:222` | A only | TODO | Container for company profile, locations, pay-period locking, system settings, logo, brand lockups |
-| ADM-SET-02 | company profile section | cluster | `/admin/settings` | `admin.component.html:226` | A | TODO | Company name, phone, email, EIN, website form; Save Profile action |
-| ADM-SET-03 | company locations section | cluster | `/admin/settings` | `admin.component.html:254` | A | empty(source: emptyIcon="location_on", msg=admin.noLocations) · populated(TODO) | Locations table (name, address, state, phone, default chip); new/edit/delete/set-default actions |
-| ADM-SET-04 | CompanyLocationDialogComponent | dialog | `/admin/settings` | `features/admin/components/company-location-dialog/company-location-dialog.component.ts:1` | A | TODO | Create/edit company location |
-| ADM-SET-05 | pay-period locking section | cluster | `/admin/settings` | `admin.component.html:297` | A | TODO | Date picker + "Lock Period" action to lock time entries through a date |
-| ADM-SET-06 | system settings grid | cluster | `/admin/settings` | `admin.component.html:386` | A | TODO | Key/value settings grid: app name, company name, planning cycle, nudge hour, upload limit, job priority, auto-archive days, email notifications, primary/accent brand colors |
-| ADM-SET-07 | logo upload section | cluster | `/admin/settings` | `admin.component.html:332` | A | no-logo/has-logo/TODO | Logo preview, upload (image/*), remove actions |
-| ADM-SET-08 | brand lockups section | cluster | `/admin/settings` | `admin.component.html:357` | A | TODO | Marquee, wordmark, favicon upload/reset; dark-preview thumbnails |
-| ADM-SET-09 | AdminSettingsComponent | panel | `/admin/settings` (sub) | `features/admin/settings/admin-settings.component.ts:1` | A | TODO | NOTE: separate component file exists alongside inline settings; verify if used independently or embedded — needs live check |
-| ADM-SET-10 | SettingFieldComponent | cluster | `/admin/settings` (sub) | `features/admin/settings/setting-field/setting-field.component.ts:1` | A | TODO | Reusable setting field renderer (label + description + control); used within AdminSettingsComponent |
+| ADM-SET-01 | settings tab panel | tab | `/admin/settings` | `admin.component.html:222` | A only | populated(confirmed: COMPANY PROFILE + LOCATIONS + PAY PERIOD + SYSTEM SETTINGS sections all render) | Container for company profile, locations, pay-period locking, system settings, logo, brand lockups |
+| ADM-SET-02 | company profile section | cluster | `/admin/settings` | `admin.component.html:226` | A | populated(fields: Company Name, Phone, Email, EIN, Website; Save Profile action) | Company name, phone, email, EIN, website form; Save Profile action |
+| ADM-SET-03 | company locations section | cluster | `/admin/settings` | `admin.component.html:254` | A | empty(source: emptyIcon="location_on", msg=admin.noLocations) · populated(live: "Main Office" row visible; columns: Location Name, Phone, Address, State, Default chip) | Locations table (name, address, state, phone, default chip); new/edit/delete/set-default actions |
+| ADM-SET-04 | CompanyLocationDialogComponent | dialog | `/admin/settings` | `features/admin/components/company-location-dialog/company-location-dialog.component.ts:1` | A | populated(live: 8 fields confirmed: Location Name, Phone, Street Address, Street Address 2, City, State, ZIP/Postal Code, Country) | Create/edit company location |
+| ADM-SET-05 | pay-period locking section | cluster | `/admin/settings` | `admin.component.html:297` | A | populated(live: date picker + LOCK PERIOD button confirmed) | Date picker + "Lock Period" action to lock time entries through a date |
+| ADM-SET-06 | system settings grid | cluster | `/admin/settings` | `admin.component.html:386` | A | populated(live: key/value grid renders with SYSTEM SETTINGS header) | Key/value settings grid: app name, company name, planning cycle, nudge hour, upload limit, job priority, auto-archive days, email notifications, primary/accent brand colors |
+| ADM-SET-07 | logo upload section | cluster | `/admin/settings` | `admin.component.html:332` | A | no-logo · has-logo(TODO) | Logo preview, upload (image/*), remove actions |
+| ADM-SET-08 | brand lockups section | cluster | `/admin/settings` | `admin.component.html:357` | A | populated(live: BRAND LOCKUPS section renders with upload/reset for marquee/wordmark/favicon) | Marquee, wordmark, favicon upload/reset; dark-preview thumbnails |
+| ADM-SET-09 | AdminSettingsComponent | dead-code | — | `features/admin/settings/admin-settings.component.ts:1` | none/unreachable | dead-code(D6: selector `app-admin-settings` never instantiated — live sweep ADM-SET-09-CHECK: "NO-app-admin-settings-component"; zero `<app-admin-settings>` usages in any template) | Orphaned AdminSettingsComponent — not routed and not embedded; excluded from denominator per D6 |
+| ADM-SET-10 | SettingFieldComponent | dead-code | — | `features/admin/settings/setting-field/setting-field.component.ts:1` | none/unreachable | dead-code(D6: selector `app-setting-field` has zero usages across entire app — grep confirmed cycle 6; only consumer was dead-code ADM-SET-09) | Orphaned SettingFieldComponent — not used by any live component; excluded from denominator per D6 |
 
 ### ADMIN AREA — Integrations tab (`/admin/integrations`)
 
 | ID | component | type | route | file:line | renders-for | states | purpose |
 |----|-----------|------|-------|-----------|-------------|--------|---------|
-| ADM-INT-01 | integrations tab panel | tab | `/admin/integrations` | `admin.component.html:417` | A only | TODO | Hosts IntegrationsPanelComponent |
-| ADM-INT-02 | IntegrationsPanelComponent | panel | `/admin/integrations` | `features/admin/components/integrations-panel/integrations-panel.component.ts:1` | A | TODO | Integration catalog list; QBO and other integrations |
-| ADM-INT-03 | IntegrationConfigDialogComponent | dialog | `/admin/integrations` | `features/admin/components/integration-config-dialog/integration-config-dialog.component.ts:1` | A | TODO | Configure individual integration (keys, settings) |
-| ADM-INT-04 | integration outbox tab panel | tab | `/admin/integration-outbox` | `admin.component.html:515` | A only | TODO | Hosts IntegrationOutboxPanelComponent |
-| ADM-INT-05 | IntegrationOutboxPanelComponent | panel | `/admin/integration-outbox` | `features/admin/components/integration-outbox-panel/integration-outbox-panel.component.ts:1` | A | TODO | Outbound integration message queue / outbox viewer |
+| ADM-INT-01 | integrations tab panel | tab | `/admin/integrations` | `admin.component.html:417` | A only | populated(live: CONFIGURE + TEST buttons visible; multiple providers shown) | Hosts IntegrationsPanelComponent |
+| ADM-INT-02 | IntegrationsPanelComponent | panel | `/admin/integrations` | `features/admin/components/integrations-panel/integrations-panel.component.ts:1` | A | populated(live: 20 providers across 4 categories, each with CONFIGURE + TEST buttons) | Integration catalog list; 20 providers: 3 communications, 6 service, 4 shipping, 7 accounting |
+| ADM-INT-03 | IntegrationConfigDialogComponent | dialog | `/admin/integrations` | `features/admin/components/integration-config-dialog/integration-config-dialog.component.ts:1` | A | populated(live: UPS dialog confirmed — UPS Mode, UPS Client ID, UPS Client Secret, UPS Account Number + sandbox guide + TEST button; full field structure source-pre-extracted per §Source-Extracted Detail) · empty(if fields.length=0: close only) · test-result-success · test-result-error · connecting-spinner(OAuth) | Configure individual integration; descriptor-driven fields (20 providers); see §Source-Extracted Detail for per-provider field lists |
+| ADM-INT-04 | integration outbox tab panel | tab | `/admin/integration-outbox` | `admin.component.html:515` | A only | empty(live: 0 entries; Status + Provider filters; REFRESH button) | Hosts IntegrationOutboxPanelComponent |
+| ADM-INT-05 | IntegrationOutboxPanelComponent | panel | `/admin/integration-outbox` | `features/admin/components/integration-outbox-panel/integration-outbox-panel.component.ts:1` | A | empty(live: 0 entries; "No outbox entries") · populated(TODO) | Outbound integration message queue / outbox viewer |
 
 ### ADMIN AREA — Training tab (`/admin/training`)
 
 | ID | component | type | route | file:line | renders-for | states | purpose |
 |----|-----------|------|-------|-----------|-------------|--------|---------|
-| ADM-TRN-01 | training tab panel | tab | `/admin/training` | `admin.component.html:424` | A,M | TODO | Hosts TrainingPanelComponent (admin-side LMS management) |
-| ADM-TRN-02 | TrainingPanelComponent | panel | `/admin/training` | `features/admin/components/training-panel/training-panel.component.ts:1` | A,M | TODO | Admin LMS: module/path CRUD, user assignment |
+| ADM-TRN-01 | training tab panel | tab | `/admin/training` | `admin.component.html:424` | A,M | populated(live: 3 sub-tabs: CONTENT `library_books`, PATHS `route`, USER PROGRESS `insights`; empty modules state) | Hosts TrainingPanelComponent (admin-side LMS management) |
+| ADM-TRN-02 | TrainingPanelComponent | panel | `/admin/training` | `features/admin/components/training-panel/training-panel.component.ts:1` | A,M | empty-modules(live: 0 modules; NEW MODULE button) · empty-paths(live: 0 paths; NEW PATH button) · user-progress(see ADM-Q-025) | Admin LMS: CONTENT tab (module list + NEW MODULE), PATHS tab, USER PROGRESS tab |
 | ADM-TRN-03 | TrainingModuleDialogComponent | dialog | `/admin/training` | `features/admin/components/training-panel/training-module-dialog.component.ts:1` | A,M | populated(live-4): Title · Slug · Summary · Content Type [default=Article] · Estimated Minutes · App Routes · Tags · Published · Article Content JSON (when type=Article) · CANCEL · CREATE MODULE | Create/edit training module (content, type, quiz) |
 | ADM-TRN-04 | TrainingPathDialogComponent | dialog | `/admin/training` | `features/admin/components/training-panel/training-path-dialog.component.ts:1` | A,M | TODO | Create/edit training path (ordered modules) |
 | ADM-TRN-05 | UserTrainingDetailPanelComponent | panel | `/admin/training` | `features/admin/components/training-panel/user-training-detail-panel.component.ts:1` | A,M | TODO | Per-user training progress detail |
 | ADM-TRN-06 | WalkthroughPreviewDialogComponent | dialog | `/admin/training` | `features/admin/components/training-panel/walkthrough-preview-dialog.component.ts:1` | A,M | TODO | Preview walkthrough content within training module |
 | ADM-TRN-07 | TrainingDashboardComponent | panel | `/admin/training` (sub) | `features/admin/components/training-dashboard/training-dashboard.component.ts:1` | A,M | TODO | Training analytics dashboard (completion rates, user rows) |
-| ADM-TRN-08 | TrainingDetailPanelComponent | panel | `/admin/training` (sub) | `features/admin/components/training-detail-panel/training-detail-panel.component.ts:1` | A,M | TODO | Detailed training record panel |
-| ADM-TRN-09 | TrainingDetailDialogComponent | dialog | `/admin/training` (sub) | `features/admin/components/training-detail-dialog/training-detail-dialog.component.ts:1` | A,M | TODO | Training detail dialog |
+| ADM-TRN-08 | TrainingDetailPanelComponent | panel | `/admin/training` (sub) | `features/admin/components/training-detail-panel/training-detail-panel.component.ts:12` | A,M | TODO(trigger resolved: embedded in TrainingDetailDialogComponent template line 17) | Per-user training record detail panel; displayed inside TrainingDetailDialogComponent |
+| ADM-TRN-09 | TrainingDetailDialogComponent | dialog | `/admin/training` (sub) | `features/admin/components/training-detail-dialog/training-detail-dialog.component.ts:12` | A,M | TODO(trigger resolved: opened from USER PROGRESS tab → row icon click → training-panel.component.ts:208 openUserDetailDialog(); also auto-open via URL entityType=training query param per training-panel.component.ts:146-155) | Training detail dialog; wraps TrainingDetailPanelComponent; userId passed via MAT_DIALOG_DATA |
 
 ### ADMIN AREA — AI Assistants tab (`/admin/ai-assistants`)
 
