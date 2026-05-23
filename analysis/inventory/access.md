@@ -99,16 +99,16 @@
 - [x] `shared/guards/root-redirect.guard.ts` — rootRedirectGuard (not a page)
 
 ### shared — components used by access-region surfaces (to confirm usage, not re-inventory)
-- [ ] `shared/components/input/input.component.ts` — used by login, mfa-challenge, setup, token-setup, account-security, portal-login
-- [ ] `shared/components/validation-button/validation-button.component.ts` — used by login, mfa-challenge, setup, token-setup, account-security
-- [ ] `shared/components/empty-state/empty-state.component.ts` — used by portal pages, mobile pages
-- [ ] `shared/components/qr-code/qr-code.component.ts` — used by mfa-setup-dialog (TOTP QR)
-- [ ] `shared/components/dialog/dialog.component.ts` — used by mfa-setup-dialog, mfa-recovery-codes-dialog
-- [ ] `shared/components/address-form/address-form.component.ts` — used by setup.component (org setup)
-- [ ] `shared/components/avatar/avatar.component.ts` — used by mobile-account, mobile-chat-thread, mobile-notifications
-- [ ] `shared/directives/loading-block.directive.ts` — used by portal pages, mobile pages
-- [ ] `shared/components/confirm-dialog/confirm-dialog.component.ts` — used by account-security, mobile-chat-channel-info
-- [ ] `shared/components/page-header/page-header.component.ts` — used by dev-tools loading-demo
+- [x] `shared/components/input/input.component.ts` — used by login, mfa-challenge, setup, token-setup, account-security, portal-login, mfa-setup-dialog
+- [x] `shared/components/validation-button/validation-button.component.ts` — used by login, mfa-challenge, setup, token-setup, account-security
+- [x] `shared/components/empty-state/empty-state.component.ts` — used by portal-orders, portal-quotes, portal-invoices, portal-shipments, mobile-jobs, mobile-notifications
+- [x] `shared/components/qr-code/qr-code.component.ts` — used by mfa-setup-dialog (TOTP QR display)
+- [x] `shared/components/dialog/dialog.component.ts` — used by mfa-setup-dialog, mfa-recovery-codes-dialog
+- [x] `shared/components/address-form/address-form.component.ts` — used by setup.component (org address field)
+- [x] `shared/components/avatar/avatar.component.ts` — used by mobile-account, mobile-chat-thread, mobile-chat-channel-info, mobile-notifications
+- [x] `shared/directives/loading-block.directive.ts` — used by portal-dashboard, portal-orders, portal-quotes, portal-invoices, portal-shipments, mobile-clock, mobile-jobs, mobile-hours
+- [x] `shared/components/confirm-dialog/confirm-dialog.component.ts` — used by account-security (remove MFA device), mobile-chat-channel-info (leave channel)
+- [x] `shared/components/page-header/page-header.component.ts` — used by dev-tools/loading-demo
 
 ---
 
@@ -154,19 +154,19 @@
 
 | component | type | route | file:line | renders-for | states | purpose | status |
 |-----------|------|-------|-----------|-------------|--------|---------|--------|
-| LoginComponent | page | `/login` | `features/auth/login.component.ts:30` | all (public) | loading, populated, error | Email+password login form; Forge MES/MRP/ERP marquee logo; email field, password field (show/hide toggle), validation-button (violation badge), "SIGN IN" button; "HAVE A SETUP CODE?" link below; already-authenticated panel (account_circle + Go-to-Dashboard / Sign-Out buttons) | **LC** (screenshot: access-login-unauthenticated.png, access-login-already-authenticated.png) |
-| MfaChallengeComponent | panel | `/login` (embedded) | `features/auth/mfa-challenge.component.ts:19` | MFA-enabled users | loading, populated, error | Inline TOTP/recovery-code challenge after credential verify; 6-digit code input, remember-device checkbox, Verify button; "Use a recovery code instead" toggle; Back to login cancel; embedded in LoginComponent, not a separate route | **D3-terminal** (TOTP wall: shared-stack, no MFA-enrolled users; gate: no TOTP issuer configured) |
+| LoginComponent | page | `/login` | `features/auth/login.component.ts:30` | all (public) | loading, populated, error | Email+password login form; Forge MES/MRP/ERP marquee logo; email field, password field (show/hide toggle), validation-button (violation badge), "SIGN IN" button; "HAVE A SETUP CODE?" link below; already-authenticated panel (account_circle + Go-to-Dashboard / Sign-Out buttons). **Inline SSO section** (no separate component): `ssoProviders` signal loaded from `AuthService.getSsoProviders()` at line 81; renders SSO provider buttons only when `ssoProviders().length > 0` — **D3-terminal on this stack** (Q-006-CLOSED: no SSO providers configured; gate: admin SSO provider setup). | **LC** (screenshot: access-login-unauthenticated.png, access-login-already-authenticated.png) |
+| MfaChallengeComponent | panel | `/login` (embedded) | `features/auth/mfa-challenge.component.ts:19` | MFA-enabled users | loading, populated, error | Inline TOTP/recovery-code challenge after credential verify; 6-digit code input, remember-device checkbox, Verify button; "Use a recovery code instead" toggle; Back to login cancel; embedded in LoginComponent, not a separate route. Source-confirmed states: loading (fetching challenge from server), populated (TOTP input visible), recovery-code toggle (showRecovery signal), error (bad code snackbar). | **D3-terminal** — Q-007-CLOSED: TOTP wall; shared stack has no TOTP issuer configured → no user can enroll MFA → challenge not triggerable. Gate: admin TOTP issuer config. |
 | SetupComponent | page | `/setup` | `features/auth/setup.component.ts:30` | public (first-run only) | populated | First-run org setup: company name, address, admin account; guarded by setupRequiredGuard (redirects to /login once complete) | **D4-terminal** (setupRequired=false; guard confirmed redirecting to /login — screenshot: access-setup-first-admin-redirected.png) |
 | TokenSetupComponent | page | `/setup/:token` | `features/auth/token-setup.component.ts:27` | invited users (token required) | loading, populated, error | Invite-token account setup (set password, first-time login); also activated by `/setup/integrations` URL due to routing shadow (Q-001) | **LC** (error state live-confirmed with invalid token — screenshot: access-token-setup-error.png; "Invalid or expired setup code. Please contact your administrator." + error_outline icon) |
-| SsoCallbackComponent | page | `/sso/callback` | `features/auth/sso-callback.component.ts:18` | SSO users | loading, error | Receives SSO redirect with `?sso_token=`; exchanges for session; redirects to app or shows error | **SC** (no SSO provider configured) |
+| SsoCallbackComponent | page | `/sso/callback` | `features/auth/sso-callback.component.ts:18` | SSO users | loading, error | Receives SSO redirect with `?sso_token=`; exchanges for session token via AuthService; on success navigates to app; on error/missing token shows TranslatePipe error message. Source-confirmed states: loading (processing token), error (invalid/missing sso_token param). | **D3-terminal** — Q-006-CLOSED: no SSO providers configured; sso_token exchange requires a real SSO exchange. Gate: admin SSO provider config in /admin/integrations. |
 
 ### ACCOUNT SECURITY (user-side MFA + password)
 
 | component | type | route | file:line | renders-for | states | purpose | status |
 |-----------|------|-------|-----------|-------------|--------|---------|--------|
-| AccountSecurityComponent | page | `/account/security` | `features/account/pages/security/account-security.component.ts:28` | all (authGuard) | loading, populated | Change password, change PIN, list/manage MFA devices; opens MfaSetupDialogComponent + MfaRecoveryCodesDialogComponent | **SC** (account section not in this phase's live sweep scope; cross-ref admin.md for MFA admin config) |
-| MfaSetupDialogComponent | dialog | `/account/security` (dialog) | `features/account/components/mfa-setup-dialog/mfa-setup-dialog.component.ts:20` | all (authGuard) | loading, populated | TOTP MFA enroll: shows QR code (QrCodeComponent), TOTP code verify | **D3-terminal** (TOTP enroll blocked on shared stack — intentional; gate: no TOTP issuer configured) |
-| MfaRecoveryCodesDialogComponent | dialog | `/account/security` (dialog) | `features/account/components/mfa-recovery-codes-dialog/mfa-recovery-codes-dialog.component.ts:17` | MFA-enrolled users | loading, populated | View/regenerate TOTP recovery codes; only reachable after MFA is enrolled | **D3-terminal** (requires prior MFA enrollment — same TOTP wall) |
+| AccountSecurityComponent | page | `/account/security` | `features/account/pages/security/account-security.component.ts:28` | all (authGuard) | loading, populated | 3-card grid: (1) Change Password — currentPassword + newPassword + confirmPassword + "CHANGE PASSWORD" button; (2) Kiosk PIN — PIN + confirmPin + "SET PIN" button; (3) Two-Factor Authentication — enabled/disabled state card, device list (deviceType icon + name + lastUsedAt + Default chip + remove btn), Add Device / New Recovery Codes / Disable MFA actions, policy-enforcement variant. No forgot-password link. | **LC** — screenshot: access-account-security.png; MFA card in "not enabled" state ("ENABLE TWO-FACTOR AUTHENTICATION" button visible); **password reset closed**: no standalone reset route and no forgot-password link on login page — change-password (requires currentPassword) + invite-token `/setup/:token` are the only password flows |
+| MfaSetupDialogComponent | dialog | `/account/security` (dialog) | `features/account/components/mfa-setup-dialog/mfa-setup-dialog.component.ts:20` | all (authGuard) | loading, populated | TOTP MFA enroll: shows QR code (QrCodeComponent, TOTP URI displayed), TOTP code verify input, submit; opened via MatDialog from AccountSecurityComponent. | **D3-terminal** — Q-007-CLOSED: same TOTP wall; no TOTP issuer configured on shared stack → enrollment blocked. Gate: admin TOTP issuer config. |
+| MfaRecoveryCodesDialogComponent | dialog | `/account/security` (dialog) | `features/account/components/mfa-recovery-codes-dialog/mfa-recovery-codes-dialog.component.ts:17` | MFA-enrolled users | loading, populated | View/regenerate TOTP recovery codes; opened via MatDialog from AccountSecurityComponent; only reachable after MFA is enrolled. | **D3-terminal** — Q-007-CLOSED: requires prior MFA enrollment → same TOTP wall. Gate: admin TOTP issuer config. |
 
 ### SETUP INTEGRATIONS
 
@@ -208,13 +208,13 @@
 | MobileChatChannelInfoComponent | page | `/m/chat/channel-info/:channelId` | `features/mobile/pages/mobile-chat-channel-info/mobile-chat-channel-info.component.ts:23` | authGuard | loading, populated | Channel metadata: member list, leave-channel action | **D4-terminal** (non-seeded: no chat channels) |
 | MobileNotificationsComponent | page | `/m/notifications` | `features/mobile/pages/mobile-notifications.component.ts:15` | authGuard | loading, populated, empty | In-app notification list; empty-state via EmptyStateComponent | **LC** (route navigated — screenshot: access-mobile-notifications.png) |
 | MobileAccountComponent | page | `/m/account` | `features/mobile/pages/mobile-account.component.ts:16` | authGuard | populated | User avatar, name, role; theme toggle; logout; link to desktop site | **LC** (route navigated — screenshot: access-mobile-account.png) |
-| MobileHomeComponent | page | **UNROUTED** | `features/mobile/pages/mobile-home.component.ts:35` | — | — | Exists in source + spec only; NOT in mobile.routes.ts; orphan/dead component | **SC** (orphan — not routed; confirmed via mobile.routes.ts read) |
+| MobileHomeComponent | page | **UNROUTED** | `features/mobile/pages/mobile-home.component.ts:35` | — | — | Exists in source + spec only; NOT in mobile.routes.ts; orphan/dead component | **LC-ORPHAN** — navigation test: GET `/m/home` → redirected to `/dashboard` via `**` catch-all route; `mobile-home` CSS class never appears in rendered DOM; component not imported anywhere outside its own files; closed dead |
 
 ### AI ASSISTANT
 
 | component | type | route | file:line | renders-for | states | purpose | status |
 |-----------|------|-------|-----------|-------------|--------|---------|--------|
-| AiComponent | page | `/ai/:assistantId` | `features/ai/ai.component.ts:39` | authGuard | loading, populated, empty | AI assistant chat: sidebar (assistant list) + right chat panel (messages, starter questions, text input); uses AiService | **LC** (empty-state live-confirmed — screenshot: access-ai-runtime.png; "No assistants available" sidebar + "Select an assistant to start chatting" right panel; no assistants configured in non-seeded env; populated/chat states are D3-terminal pending assistant config) |
+| AiComponent | page | `/ai/:assistantId` | `features/ai/ai.component.ts:39` | authGuard | loading, populated, empty | AI assistant chat: assistant list sidebar (by category, icon, name, description, active-indicator) + right chat panel (messages log, typing-dots, starter questions, textarea input + send); uses AiService (`features/ai/ai.component.ts:39` — AiService, AiHelpMessage, AiAssistantListItem, ChatMessage interfaces). Populated/chat states source-confirmed: AiAssistantCard (sidebar row), AiStarterQuestions (pre-chat welcome), ChatMessage bubbles (user/assistant roles), typing indicator. | **LC** (empty state) + **D4-terminal for populated states** — Q-005-CLOSED: route IS reachable, no capability gate; empty state LC-confirmed. Populated states blocked because no assistants are configured in non-seeded env (not a cap flag — gate is admin AI assistant config). |
 
 ### RENDER
 
@@ -274,3 +274,4 @@
 |-------|------|------------|-------------------|-------|
 | 1 | 2026-05-23 | 33 (all source) | 54/54 feature files, 10/10 shared cmps | Initial source-only pass; awaiting live sweep from ui-scout |
 | 2 | 2026-05-23 | 0 new rows (status updates only) | — | ui-scout live sweep: 61 observations, 21 LC upgrades, 5 D3/D4 confirmed, 1 routing-shadow bug found; Q-items resolved below |
+| 3 | 2026-05-23 | 0 new rows | — | Orchestrator-directed explicit checks: AccountSecurityComponent LC (3-card Security page confirmed); MobileHomeComponent LC-ORPHAN (nav to /m/home → /dashboard catch-all, never renders); password-reset closed (no standalone route, no forgot-password link on login); Q-pending-8 remains open (headless camera limit) |
