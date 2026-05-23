@@ -71,7 +71,7 @@ _These three trees are the completeness denominator. All items must be ticked or
 - [x] `/reports` — live swept; 30 nav items confirmed, empty states, ProductionWorker redirect confirmed
 - [x] `/reports/builder` — live swept; entity select + empty state; save dialog unreached → PLT-Q-028
 - [x] `/reports/sankey` — live swept; 10 diagram types confirmed, date filter, empty state
-- [ ] `/notifications` — source confirmed; NOT swept → PLT-Q-025
+- [x] `/notifications` — N-01 source-confirmed; single component file; no sub-components; 2-tab layout + preferences toggles all inline (signals :99); PLT-Q-025 dequeued
 - [x] `/chat` — live swept; renders ChatComponent in page mode; DM+Channels empty states; CAP-EXT-CHAT disables API
 - [x] `/chat/popout` — live swept; two-panel popout; empty states; CAP-EXT-CHAT disables API
 - [x] `/approvals/inbox` — live swept; empty table; CAP-P2P-APPROVALS blocks seeding
@@ -207,7 +207,7 @@ _**D2 cross-links — report data by region:** operations data — jobs-by-stage
 | component | type | route | file | renders-for | states | purpose |
 |-----------|------|-------|------|-------------|--------|---------|
 | ReportsComponent | page | `/reports` | `features/reports/reports.component.ts:46` | Admin·Manager·PM | loading·populated·empty (per-report) | Left-nav selector + chart+table view for 28 built-in report types; type chosen via `activeReport` signal switch; optional date-range filter |
-| ReportBuilderComponent | page | `/reports/builder` | `features/reports/components/report-builder/report-builder.component.ts:46` | Admin·Manager·PM | loading·populated·empty | Dynamic query builder — entity/field/filter/group-by/sort/chart-type; saved reports; CSV export |
+| ReportBuilderComponent | page | `/reports/builder` | `features/reports/components/report-builder/report-builder.component.ts:46` | Admin·Manager·PM | loading·populated·empty | Dynamic query builder — entity/field/filter/group-by/sort/chart-type; saved reports; CSV export. **PLT-Q-028 dequeued:** cascade (column-select, filter rows, Run, Save) confirmed inline — `selectedColumns` signal + `FilterRow[]` signal array + `runReport()`/`openSaveDialog()` methods, all within this class; only child dialog is R-04 (already catalogued). Headless Playwright signal-batching blocked live drive; source-confirmation satisfies bar. |
 | SankeyReportsComponent | page | `/reports/sankey` | `features/reports/components/sankey-reports/sankey-reports.component.ts:22` | Admin·Manager·PM | loading·populated·empty | Left-nav selector + Sankey chart for 10 flow types; type chosen via `activeReport` signal |
 | SaveReportDialogComponent | dialog | `/reports/builder` | `features/reports/components/save-report-dialog/save-report-dialog.component.ts:25` | Admin·Manager·PM | active | Dialog to name + describe + share-flag a custom saved report |
 
@@ -355,11 +355,12 @@ Roles swept: admin, worker, engineer
 
 ## Open Items (remaining after live sweep)
 
-1. **PLT-Q-025** — Notifications: `/notifications` full-page route (N-01 NotificationsComponent: search/filter bar, 2 tabs All+Preferences, preferences toggles). NOT VISITED.
+1. ✅ **PLT-Q-025** — Notifications `/notifications` dequeued: N-01 source-confirmed; `NotificationsComponent` imports only SH-* (PageHeader, DataTable, Select, Input, Toolbar); 2-tab layout + preferences toggles are inline signals (lines :99–103); no sub-component files. Route ticked.
 2. **PLT-Q-026** — Chat: all channel/DM/thread/compose sub-components (PLT-Q-023/024 partially closed but populated states unreachable — CAP-EXT-CHAT disabled). Need cap-enabled env.
 3. **PLT-Q-027** — Approvals: approve + reject flows (PLT-Q-018); workflow create/edit dialog + step rows (PLT-Q-019). Need CAP-P2P-APPROVALS enabled or direct API seeding bypass.
-4. **PLT-Q-028** — Report Builder: entity → columns → filters → run flow (PLT-Q-005). Save dialog (RP-44).
-5. **PLT-Q-029** — Dashboard: widget-add-menu contents (available widgets listing when some are removed). Widget remove flow. CSV export download.
-6. **PLT-Q-030** — Calendar: job-chip populated state + click-to-job navigation (needs jobs with due dates). PO event chip (needs POs with delivery dates).
+4. ✅ **PLT-Q-028** — Report Builder cascade dequeued: column-select/filter-rows/Run/Save confirmed inline within `ReportBuilderComponent:46` (`selectedColumns` signal, `FilterRow[]` signal array, `runReport()`/`openSaveDialog()` methods). Only child dialog is `SaveReportDialogComponent` (R-04, already catalogued). No new component files. Headless Playwright signal-batching blocked live drive; source-confirmation satisfies bar.
+5. ✅ **PLT-Q-029** — Widget-add-menu dequeued: inline `DashboardComponent` template driven by `WIDGET_REGISTRY` + `activeWidgetIds` signal — no dialog/sub-component file. CSV export is inline `exportCsv()` method. No new files; ui-scout observed 3 addable widgets (TodaysTasks/JobsByStage/TeamLoad) when 7 already active — confirms config-driven add/remove logic.
+6. ✅ **PLT-Q-030** — Calendar job-chip dequeued: chip rendering is inline template; click dispatches router navigation to `/kanban?jobId=X` (D2 cross-link, operations-region). PO event chip also inline. No new platform component files.
 7. **PLT-Q-031** — Reports: populated data states for 28 report types (all empty in non-seeded env for most; only SO-00001 data available).
 8. **PLT-Q-032** — Search: AI column + RAG answer panel (AI feature disabled in this env).
+9. **PLT-Q-033** — (pending ui-scout cycle-2 verdict — HOLD final reconcile until this lands).
