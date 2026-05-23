@@ -7,7 +7,8 @@ _Scope: admin (settings, users, reference-data, terminology, capabilities, disco
 
 ## Cross-links
 
-- **Shared components (24)** — already located in `platform.md` (SH-01 … SH-24); admin reuses `app-page-header` (SH-04), `app-data-table` (SH-05), `app-select` (SH-06), `app-input` (SH-07), `app-empty-state` (SH-09), `app-dialog` (SH-10), `app-datepicker` (SH-13), `app-validation-button` (SH-16), `app-avatar` (SH-17), `app-toolbar` (SH-08), `app-textarea` (SH-11), `app-barcode-info` (SH-24). Cross-linked, not re-catalogued.
+- **Shared components (23)** — already located in `platform.md` (SH-01 … SH-23); admin reuses `app-page-header` (SH-04), `app-data-table` (SH-05), `app-select` (SH-06), `app-input` (SH-07), `app-empty-state` (SH-09), `app-dialog` (SH-10), `app-datepicker` (SH-13), `app-validation-button` (SH-16), `app-avatar` (SH-17), `app-toolbar` (SH-08), `app-textarea` (SH-11). Cross-linked, not re-catalogued.
+- **`app-barcode-info`** — lives in `shared/components/barcode-info/` but is NOT a platform-phase SH component (platform.md CLOSED; all consumers are non-platform regions). Catalogued here as `shared-cmp` at ADM-USR-07; also used in kanban/inventory/parts/purchase-orders/sales-orders (those regions own their own catalogue entries).
 - **Events (admin side)** — `features/events/` is service+model only (no UI). The admin events _management_ tab (`/admin/events`) is catalogued here as ADM-EVT-01; the `/events` platform page (no UI components) is noted in platform.md.
 - **AI-assistant chat surface** — the runtime AI help panel (`app-ai-help-panel`, SH-19) lives in platform.md. The admin config surface for AI assistants (`/admin/ai-assistants`) is catalogued here as ADM-AI-01/02; same `CAP-EXT-AI-ASSISTANT` gate per platform.md D3 terminal closure note.
 
@@ -66,7 +67,7 @@ _Note: Tab shells (ADM-AI-01 etc.) always render for the correct role regardless
 | Setup Integrations | 1 | `features/setup-integrations/*.component.ts` |
 | **TOTAL** | **94** | |
 
-Shared components (SH-01–SH-24) from `platform.md` are excluded from this denominator per D2.
+Shared components (SH-01–SH-23) from `platform.md` are excluded from this denominator per D2. `app-barcode-info` is a cross-region shared utility (not in SH list); row ADM-USR-07 accounts for it in admin scope.
 
 ---
 
@@ -166,9 +167,9 @@ _Paths abbreviated relative to `forge-ui/src/app/features/`. First-occurrence li
 | SH-16 | `app-validation-button` | `admin/admin.component.html:791` · `admin/components/edi-panel/edi-panel.component.html:114` · `admin/components/compliance-template-dialog/compliance-template-dialog.component.html:142` · `admin/entity-capability-requirement-dialog/entity-capability-requirement-dialog.component.html:58` · `admin/lead-sources/lead-sources.component.html:83` · `admin/tariffs/tariffs.component.html:85` · `admin/assignment-rules/assignment-rules.component.html:117` · `admin/icp-rubrics/icp-rubrics.component.html:117` · `admin/components/bi-api-keys-panel/bi-api-keys-panel.component.html:80` · `admin/working-calendars/working-calendars.component.html:84` · `account/pages/contact/account-contact.component.html:23` · `account/pages/profile/account-profile.component.html:55` · `account/pages/security/account-security.component.html:25` · `account/pages/emergency/account-emergency.component.html:17` · `account/components/compliance-form-renderer/compliance-form-renderer.component.html:644` · `account/pages/communications/connect-imap-dialog.component.html:78` · `account/pages/communications/connect-communication-dialog.component.html:35` |
 | SH-17 | `app-avatar` | `admin/admin.component.html:18` · `account/account.component.html:13` · `account/pages/profile/account-profile.component.html:10` · `employees/pages/employee-list/employee-list.component.html:33` · `employees/pages/employee-detail/employee-detail.component.html:20` |
 | SH-18..22 | `app-entity-link` · `app-ai-help-panel` · `app-training-context-panel` · `app-chat-preview-popup` · `app-status-badge` | _not used in admin/account/employees/training feature templates_ |
-| SH-24 | `app-barcode-info` | `admin/admin.component.html:741` (ADM-USR-07) — 6 further usages in assets/kanban/inventory/parts/purchase-orders/sales-orders feature templates |
+| `app-barcode-info` (no SH#) | `admin/admin.component.html:741` (ADM-USR-07) — 6 further usages in assets/kanban/inventory/parts/purchase-orders/sales-orders (non-platform regions; each region will catalogue their own row) |
 
-_SH-24 assigned cycle 3 (source-only resolution): `shared/components/barcode-info/barcode-info.component.ts`. Added to platform.md._
+_Note: `app-barcode-info` (`shared/components/barcode-info/barcode-info.component.ts`) is a cross-region shared utility. platform.md CLOSED explicitly rejected SH-24 — all consumers are non-platform. No SH number assigned; catalogued as `shared-cmp` type in each consuming region's inventory._
 
 ---
 
@@ -193,9 +194,8 @@ _Abbreviations: A=Admin, M=Manager, OM=OfficeManager, E=Engineer, PM=PM; all-aut
 | ADM-USR-04 | scan identifiers cluster | cluster | `/admin/users` dialog | `admin.component.html:668` | A | TODO | RFID/NFC/barcode/biometric scan IDs per user; add/remove; WebHID RFID reader connect |
 | ADM-USR-05 | RFID reader cluster | cluster | `/admin/users` dialog | `admin.component.html:691` | A | TODO | WebHID RFID reader pair/unpair + relay setup script download |
 | ADM-USR-06 | setup code banner | cluster | `/admin/users` dialog | `admin.component.html:751` | A | shown-after-create/pending/TODO | Setup token display with copy action; shown for newly-created or password-pending users |
-| ADM-USR-07 | `app-barcode-info` (SH-24) | shared-cmp | `/admin/users` dialog | `admin.component.html:741` | A | TODO | Barcode/QR info for user entity (compact mode) |
+| ADM-USR-07 | `app-barcode-info` | shared-cmp | `/admin/users` dialog | `admin.component.html:741` | A | TODO | Barcode/QR info for user entity (compact mode); cross-region shared utility (`shared/components/barcode-info/`), no SH# |
 | ADM-USR-08 | `app-validation-button` (SH-16) | shared-cmp | `/admin/users` dialog | `admin.component.html:791` | A | TODO | Save-with-violations button for user form |
-| ADM-USR-09 | TrackTypeDialogComponent | dialog | `/admin/track-types` | `features/admin/components/track-type-dialog.component.ts:1` | A | TODO | Create/edit track type with stage list |
 
 ### ADMIN AREA — Track Types tab (`/admin/track-types`)
 
@@ -479,10 +479,10 @@ Priority items for ui-scout first pass:
 9. `/employees` — confirm Manager sees same tab set as Admin; check for any tab visibility differences
 10. Training LMS tab slugs: `training.routes.ts` has `:tab` catch-all → confirm actual slugs rendered at `/training/my-learning`, `/training/all-modules`, `/training/paths`, `/training/teams`
 ~~11. `AccountComponent` vs `AccountLayoutComponent` ambiguity~~ — **RESOLVED (source):** `AccountComponent` (`account.component.ts`, selector `app-account`) is dead code — not referenced in `account.routes.ts` (which loads `AccountLayoutComponent` as the sole shell at line 3,8), and zero `<app-account>` usages in any HTML template. Profile + password forms that were in `AccountComponent` are now split across `AccountProfileComponent` (`/account/profile`) and `AccountSecurityComponent` (`/account/security`). No inventory row needed; terminal.
-~~12. `app-barcode-info` — platform.md amendment~~ — **RESOLVED (source):** Classified as SH-24 (`shared/components/barcode-info/barcode-info.component.ts`). Added to platform.md SH table + source file table + denominator. Admin cross-link + denominator note updated; ADM-USR-07 row updated to reference SH-24. Denominator unchanged at 94 (excluded per D2). Live confirmation of render in users dialog remains TODO per ADM-USR-07.
+~~12. `app-barcode-info` — classification~~ — **RESOLVED (source):** `app-barcode-info` (`shared/components/barcode-info/barcode-info.component.ts`) is a cross-region shared utility. platform.md CLOSED explicitly rejected SH# assignment (all consumers are non-platform). Catalogued in admin.md as `shared-cmp` type at ADM-USR-07 (file:line confirmed: `admin.component.html:741`). No SH number. Cross-links section updated; denominator unchanged at 94 (row ADM-USR-07 accounts for it within admin scope). Live confirmation of render in users dialog remains TODO per ADM-USR-07.
 
 ---
 
 _Cycle 2 commit: D2 shared cross-links complete (Tree 3 fully mapped, 18 SH usages located); capability defaults source-filled for 11 gates; 13 states moved TODO→source-confirmed; denominator stable=94; remaining TODO=~81; queue=12 items_
 
-_Cycle 3 (source-only): Queue items #11 + #12 resolved from source. AccountComponent confirmed dead code (not routed, zero instantiations). SH-23 (app-barcode-info) assigned and added to platform.md. Queue depth → 10 (items 1–10 remain, all live-dependent)._
+_Cycle 3 (source-only): Queue items #11 + #12 resolved from source. AccountComponent confirmed dead code (not routed, zero instantiations in any template). app-barcode-info = cross-region shared utility; no SH#; catalogued as shared-cmp at ADM-USR-07; platform.md CLOSED rejected SH-24. Duplicate ADM-USR-09 (copy of ADM-TT-04) removed. Queue depth → 10 (items 1–10 remain, all live-dependent). Denominator anomaly flagged: Account file-count includes dead AccountComponent (22 files, 21 live) → proposed 94→93._
