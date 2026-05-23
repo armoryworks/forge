@@ -81,8 +81,8 @@ _Cross-link: Customer Returns → see [quote-to-cash.md §Segment 8](./quote-to-
 - [x] `/backlog` — live swept 2026-05-22
 - [x] `/planning` — live swept 2026-05-22
 - [x] `/scheduling/:tab` (gantt · dispatch · work-centers · shifts · runs) — live swept 2026-05-22
-- [x] `/display/shop-floor` (main display) — unpaired state observed; QUEUE OPS-Q-001 for paired
-- [x] `/display/shop-floor/clock` — redirected to setup; QUEUE OPS-Q-002 for paired
+- [x] `/display/shop-floor` (main display) — unpaired state observed; paired main-display ENV-BLOCK source-confirmed (Q-SF-01 DONE 2026-05-22)
+- [x] `/display/shop-floor/clock` — redirected to setup when unpaired; all 7 KioskPhase states ENV-BLOCK source-confirmed (Q-SF-03 DONE 2026-05-22)
 - [x] `/display/shop-floor/scan` — idle-scan state observed 2026-05-22
 - [x] `/display/shop-floor/scan-log` — empty state observed 2026-05-22
 - [x] `/worker` — live swept (worker@ role) 2026-05-22
