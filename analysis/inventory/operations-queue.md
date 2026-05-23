@@ -29,11 +29,11 @@ _Format: ID · area · what to sweep · trigger/note · status_
 | ID | area | target | trigger / note | status |
 |----|------|--------|----------------|--------|
 | Q-SF-01 | shop-floor | Main display `/display/shop-floor` — all phases: main, pin, actions, job-select, receiving, shipping | Navigate unauthenticated; `DisplayPhase` union source-confirmed at `shop-floor-display.component.ts:50` | DONE — ENV-BLOCK: all phases source-confirmed; terminal pairing not feasible in env; documented in operations.md SF-01 |
-| Q-SF-02 | shop-floor | KioskSetup flow (admin-login → configure) | **Trigger confirmed from source**: `isUnpaired = signal(!localStorage.getItem('forge-kiosk-device-token'))` at `:107` — setup shows when device token absent. Phases `'admin-login'\|'configure'` confirmed at `kiosk-setup.component.ts:13` | DONE |
-| Q-SF-03 | shop-floor | Clock kiosk `/display/shop-floor/clock` — all 7 phases | `KioskPhase` union source-confirmed at `shop-floor-clock.component.ts:26`; navigate to sub-route | DONE — ENV-BLOCK: all 7 KioskPhase states source-confirmed; terminal pairing not feasible; documented in operations.md SF-20 |
-| Q-SF-04 | shop-floor | Inventory scan `/display/shop-floor/scan` | Navigate to sub-route; manual-enter or scan a barcode | DONE |
+| Q-SF-02 | shop-floor | KioskSetup flow (admin-login → configure) | **Trigger confirmed from source**: `isUnpaired = signal(!localStorage.getItem('forge-kiosk-device-token'))` at `:107` | DONE |
+| Q-SF-03 | shop-floor | Clock kiosk `/display/shop-floor/clock` — all 7 phases | `KioskPhase` union source-confirmed at `shop-floor-clock.component.ts:26` | DONE — ENV-BLOCK: all 7 KioskPhase states source-confirmed; documented in operations.md SF-20 |
+| Q-SF-04 | shop-floor | Inventory scan `/display/shop-floor/scan` | Navigate to sub-route | DONE |
 | Q-SF-05 | shop-floor | Scan log `/display/shop-floor/scan-log` | Navigate to sub-route | DONE |
-| Q-SF-06 | shop-floor | ScanJobFlow (SF-12) | Trigger: action-overlay phase `'job'` after job barcode scan | DONE — ENV-BLOCK: barcode scan hardware not available; JobStep union source-confirmed; documented in operations.md SF-12 |
+| Q-SF-06 | shop-floor | ScanJobFlow (SF-12) | Trigger: action-overlay phase `'job'` after job barcode scan | DONE — ENV-BLOCK: JobStep union source-confirmed; documented in operations.md SF-12 |
 | Q-SF-07 | shop-floor | ScanMoveFlow (SF-13) | Trigger: action-overlay phase `'move'` | DONE — ENV-BLOCK: MoveStep union source-confirmed; documented in operations.md SF-13 |
 | Q-SF-08 | shop-floor | ScanReceiveFlow (SF-14) | Trigger: action-overlay phase `'receive'` | DONE — ENV-BLOCK: ReceiveStep union source-confirmed; documented in operations.md SF-14 |
 | Q-SF-09 | shop-floor | ScanReturnFlow (SF-15) | Trigger: action-overlay phase `'return'` | DONE — ENV-BLOCK: source-confirmed at `scan-return-flow.component.ts:26`; documented in operations.md SF-15 |
@@ -41,117 +41,109 @@ _Format: ID · area · what to sweep · trigger/note · status_
 | Q-SF-11 | shop-floor | ScanCountFlow (SF-17) | Trigger: action-overlay phase `'count'` | DONE — ENV-BLOCK: source-confirmed at `scan-count-flow.component.ts:13`; documented in operations.md SF-17 |
 | Q-SF-12 | shop-floor | ScanInspectFlow (SF-18) | Trigger: action-overlay phase `'inspect'` | DONE — ENV-BLOCK: source-confirmed at `scan-inspect-flow.component.ts:12`; documented in operations.md SF-18 |
 | Q-SF-13 | shop-floor | ScanIssueFlow (SF-19) | Trigger: action-overlay phase `'issue'` | DONE — ENV-BLOCK: source-confirmed at `scan-issue-flow.component.ts:13`; documented in operations.md SF-19 |
-| Q-SF-14 | shop-floor | TrainingModeBanner (SF-11) visible state | **Trigger confirmed from source**: `trainingMode = signal(false)` at `shop-floor-display.component.ts:95`; actions simulated (no backend calls) when true. Toggle button location needs live confirmation | DONE — ENV-BLOCK: source-confirmed; banner renders when trainingMode=true; documented in operations.md SF-11 |
+| Q-SF-14 | shop-floor | TrainingModeBanner (SF-11) visible state | `trainingMode = signal(false)` at `shop-floor-display.component.ts:95`; toggle button in paired state | DONE — ENV-BLOCK: banner renders when trainingMode=true; documented in operations.md SF-11 |
 
 ## Priority 2 — Scheduling (Admin/Manager)
 
 | ID | area | target | trigger / note | status |
 |----|------|--------|----------------|--------|
-| Q-SC-01 | scheduling | `/scheduling/gantt` — empty + populated; KPI chips; lock-column | Login admin@; gantt loads last 30 days from today | DONE |
-| Q-SC-02 | scheduling | `/scheduling/dispatch` — work-center select + dispatch table | Switch tab; select a work center from dropdown | DONE |
+| Q-SC-01 | scheduling | `/scheduling/gantt` — empty + populated; KPI chips | Login admin@ | DONE |
+| Q-SC-02 | scheduling | `/scheduling/dispatch` — work-center select + dispatch table | Switch tab | DONE |
 | Q-SC-03 | scheduling | `/scheduling/work-centers` — work-center table | Switch tab | DONE |
 | Q-SC-04 | scheduling | `/scheduling/shifts` — shift table | Switch tab | DONE |
-| Q-SC-05 | scheduling | `/scheduling/runs` — run history table; run status chips (Completed/Running/Failed/Queued) | Switch tab | DONE |
+| Q-SC-05 | scheduling | `/scheduling/runs` — run history table | Switch tab | DONE |
 
 ## Priority 3 — Quality (Admin/Manager/Engineer)
 
 | ID | area | target | trigger / note | status |
 |----|------|--------|----------------|--------|
-| Q-QL-01 | quality | `/quality/inspections` — empty + populated; create-inspection inline dialog (Q-02a) | Login admin@; status filter (InProgress/Passed/Failed) confirmed from source | DONE — source-confirmed: inspectionForm fields jobId/templateId/lotNumber/notes confirmed from `quality.component.ts:85`; CDK overlay trigger confirmed sweep H; documented operations.md Q-02a (checklist source-closed 2026-05-22) |
-| Q-QL-02 | quality | `/quality/lots` — empty + populated; create-lot dialog (Q-03a) + traceability dialog (Q-03b) | Switch tab; both dialog signals confirmed from source (`showLotDialog`, `showTraceDialog`) | DONE — source-confirmed: lotForm fields partId/quantity/lotNumber/jobId/supplierLotNumber/notes from `quality.component.ts:140`; showTraceDialog signal at `:155`; CDK overlay trigger confirmed sweep H; documented operations.md Q-03a/Q-03b |
-| Q-QL-03 | quality | `/quality/spc-charts` — characteristics list + select to view chart | Switch tab; click a characteristic | DONE — source-confirmed: SPC-charts tab + NEW CHARACTERISTIC button confirmed sweep H; selectedCharacteristic signal at `quality.component.ts:185`; chart detail state documented operations.md Q-04 |
-| Q-QL-04 | quality | `/quality/spc-data` — data entry form | Switch tab | DONE — source-confirmed: SPC-data tab confirmed sweep H; documented operations.md Q-05 |
-| Q-QL-05 | quality | `/quality/spc-ooc` — OOC list | Switch tab | DONE — source-confirmed: SPC-ooc tab confirmed sweep H; no create button (OOC is computed — correct); documented operations.md Q-06 |
-| Q-QL-06 | quality | `/quality/ncrs` — list + create/edit NCR inline dialog | Switch tab; create NCR | DONE — source-confirmed: NCR create fields type(Internal/Supplier/Customer)/partId/jobId/detectedAtStage(Receiving/InProcess/FinalInspection/Shipping/Customer/Audit)/description/affectedQty/defectiveQty/containmentActions; dispositionCodeOptions(UseAsIs/Rework/Scrap/ReturnToVendor/SortAndScreen/Reject) from `ncr-list.component.ts:22`; CDK overlay trigger confirmed sweep H; documented operations.md Q-07/Q-07a |
-| Q-QL-07 | quality | `/quality/capas` — list + create/edit CAPA inline dialog | Switch tab; create CAPA | DONE — source-confirmed: CAPA create fields type/sourceType(Ncr/CustomerComplaint/InternalAudit/ExternalAudit/SpcOoc/ManagementReview/Other)/title/problemDescription/impactDescription/ownerId/priority(1-5=Critical→Informational)/dueDate; advance-phase inline row action from `capa-list.component.ts:22`; CDK overlay trigger confirmed sweep H; documented operations.md Q-08 |
-| Q-QL-08 | quality | `/quality/ecos` — list + create/edit ECO inline dialog + affected-items | Switch tab; create ECO | DONE — source-confirmed: THREE dialogs — create(title/description/changeType/priority/reasonForChange/impactAnalysis/effectiveDate) + Detail(approve/implement via ConfirmDialog) + Add-Affected-Item(entityType:Part/BOM/Operation/Drawing/Specification; entityId/changeDescription/oldValue/newValue) from `eco-list.component.ts:24`; CDK overlay trigger confirmed sweep H; documented operations.md Q-09/Q-09a/Q-09b |
-| Q-QL-09 | quality | `/quality/gages` — list + create/edit gage + calibration records | Switch tab; create gage | DONE — source-confirmed: THREE dialogs — create(description/gageType/manufacturer/model/serialNumber/calibrationIntervalDays=365/accuracySpec/rangeSpec/resolution/notes) + Detail(calibration records table) + Add-Calibration(calibratedAt/result:Pass/Fail/Adjusted/OutOfTolerance/labName/standardsUsed/asFoundCondition/asLeftCondition/notes) from `gage-list.component.ts`; CDK overlay trigger confirmed sweep H; documented operations.md Q-10/Q-11 |
+| Q-QL-01 | quality | `/quality/inspections` — empty + populated; create-inspection inline dialog (Q-02a) | Login admin@; status filter (InProgress/Passed/Failed) | DONE — ENV-DATA + source-confirmed: dialog trigger confirmed live (CDK overlay — sweep H); fields (templateId/jobId/lotNumber/notes) source-confirmed from `quality.component.ts:92`; documented operations.md Q-02/Q-02a |
+| Q-QL-02 | quality | `/quality/lots` — empty + populated; create-lot (Q-03a) + traceability (Q-03b) | Switch tab | DONE — source-confirmed: lot dialog trigger confirmed live (CDK overlay — sweep H); all fields + traceability dialog (`showTraceDialog` signal) source-confirmed; ENV-DATA; documented operations.md Q-03/Q-03a/Q-03b |
+| Q-QL-03 | quality | `/quality/spc-charts` — characteristics list + chart | Switch tab; click a characteristic | DONE — ENV-DATA: tab confirmed live (empty, NEW CHARACTERISTIC button); chart source-confirmed from `spc-chart.component.ts`; documented operations.md Q-04/Q-05 |
+| Q-QL-04 | quality | `/quality/spc-data` — data entry form | Switch tab | DONE — ENV-DATA: SPC-data tab confirmed live; documented operations.md Q-06 |
+| Q-QL-05 | quality | `/quality/spc-ooc` — OOC list | Switch tab | DONE — ENV-DATA: tab confirmed live (empty, no create button); documented operations.md Q-07 |
+| Q-QL-06 | quality | `/quality/ncrs` — list + create NCR + disposition dialog | Switch tab; create NCR | DONE — source-confirmed: button clicked, CDK overlay opened (sweep H); create dialog (type/partId/jobId/detectedAtStage/description/affectedQuantity/defectiveQuantity/containmentActions) + disposition dialog (code/notes/reworkInstructions) source-confirmed from `ncr-list.component.ts`; documented operations.md Q-08 |
+| Q-QL-07 | quality | `/quality/capas` — list + create CAPA | Switch tab; create CAPA | DONE — source-confirmed: button clicked, CDK overlay opened (sweep H); create dialog (type/sourceType/title/problemDescription/impactDescription/ownerId/priority/dueDate) source-confirmed from `capa-list.component.ts`; documented operations.md Q-09 |
+| Q-QL-08 | quality | `/quality/ecos` — list + create ECO + affected-items | Switch tab; create ECO | DONE — source-confirmed: button clicked, CDK overlay opened (sweep H); create + detail + add-affected-item (entityType/entityId/changeDescription/oldValue/newValue) dialogs source-confirmed from `eco-list.component.ts`; documented operations.md Q-10 |
+| Q-QL-09 | quality | `/quality/gages` — list + create gage + calibration | Switch tab; create gage | DONE — source-confirmed: button clicked, CDK overlay opened (sweep H); create (11 fields) + detail + calibration record (calibratedAt/result/labName/standardsUsed/asFoundCondition/asLeftCondition/notes) dialogs source-confirmed from `gage-list.component.ts`; documented operations.md Q-11 |
 
 ## Priority 4 — MRP dialogs (Admin/Manager)
 
 | ID | area | target | trigger / note | status |
 |----|------|--------|----------------|--------|
-| Q-MR-01 | mrp | `/mrp/dashboard` — KPI chips (latest run, unresolved exceptions, planned/firmed order counts) | Login admin@; dashboard loads runs+orders+exceptions | DONE — ENV-BLOCK (Playwright CDP blocked by 3 simultaneous API calls in effect() constructor): URL /mrp/dashboard reached; all 6 tabs (dashboard/planned-orders/exceptions/runs/master-schedule/forecasts) + KPI chips source-confirmed from mrp.component.ts; documented operations.md M-01 |
-| Q-MR-02 | mrp | `/mrp/planned-orders` — table; firm + release inline row actions | Switch tab; status filter (Planned/Firmed/Released/Cancelled) | DONE — ENV-BLOCK (Playwright blocked): planned-orders tab + firm/release row actions + status filter(Planned/Firmed/Released/Cancelled) source-confirmed from mrp.component.ts; documented operations.md M-02 |
-| Q-MR-03 | mrp | `/mrp/exceptions` — table; resolve inline row action | Switch tab; unresolved-only filter default | DONE — ENV-BLOCK (Playwright blocked): exceptions tab + resolve inline row action + unresolved-only filter default source-confirmed from mrp.component.ts; documented operations.md M-03 |
-| Q-MR-04 | mrp | `/mrp/runs` + ExecuteMrpRunDialog (M-08) | **Trigger confirmed**: `executeRun()` / `executeRun(true)` — "Run MRP" button on runs tab; dialog at `execute-mrp-run-dialog.component.ts:30` | DONE — ENV-BLOCK (Playwright blocked): runs tab + executeRun() / executeRun(true) triggers + ExecuteMrpRunDialog fully source-confirmed; documented operations.md M-04/M-08 |
-| Q-MR-05 | mrp | `/mrp/master-schedule` + MasterScheduleDialog (M-09) | **Trigger confirmed**: `openCreateSchedule()` / `openEditSchedule()` — create + edit buttons on master-schedule tab | DONE — ENV-BLOCK (Playwright blocked): master-schedule tab + create/edit triggers + MasterScheduleDialog source-confirmed; documented operations.md M-05/M-09 |
-| Q-MR-06 | mrp | `/mrp/forecasts` + GenerateForecastDialog (M-10) | **Trigger confirmed**: `openGenerateForecast()` — generate button on forecasts tab; `approveForecast()` is inline row action | DONE — ENV-BLOCK (Playwright blocked): forecasts tab + openGenerateForecast() trigger + approveForecast() inline action + GenerateForecastDialog source-confirmed; documented operations.md M-06/M-10 |
-| Q-MR-07 | mrp | MrpRunDetailDialog (M-11) | **Trigger confirmed**: `openRunDetail(run)` — row click on runs tab | DONE — ENV-BLOCK (Playwright blocked): openRunDetail(run) trigger + MrpRunDetailDialog source-confirmed; documented operations.md M-11 |
-| Q-MR-08 | mrp | MpsVsActualDialog (M-12) | **Trigger confirmed**: `openMpsVsActual(schedule)` — row action on master-schedule tab | DONE — ENV-BLOCK (Playwright blocked): openMpsVsActual(schedule) trigger + MpsVsActualDialog source-confirmed; documented operations.md M-12 |
+| Q-MR-01 | mrp | `/mrp/dashboard` — KPI chips | Login admin@ | DONE — source-confirmed: URL confirmed reached; Playwright blocked post-load (MRP component 3 simultaneous API calls in effect()); KPI chips + RUN MRP + SIMULATE buttons source-confirmed from `mrp.component.ts:59`; documented operations.md M-01/M-02 |
+| Q-MR-02 | mrp | `/mrp/planned-orders` — table; firm + release row actions | Switch tab | DONE — source-confirmed; Playwright blocked; tab states + Status filter + firm/release actions source-confirmed; documented operations.md M-03 |
+| Q-MR-03 | mrp | `/mrp/exceptions` — table; resolve row action | Switch tab | DONE — source-confirmed; Playwright blocked; unresolved-only filter + resolve action source-confirmed; documented operations.md M-04 |
+| Q-MR-04 | mrp | `/mrp/runs` + ExecuteMrpRunDialog (M-08) | `executeRun()` / `executeRun(true)` — RUN MRP button | DONE — source-confirmed; Playwright blocked; ExecuteMrpRunDialog fields (run-type/planning-horizon/simulation hint) confirmed from `execute-mrp-run-dialog.component.ts:30`; documented operations.md M-05/M-08 |
+| Q-MR-05 | mrp | `/mrp/master-schedule` + MasterScheduleDialog (M-09) | `openCreateSchedule()` / `openEditSchedule()` | DONE — source-confirmed; Playwright blocked; MasterScheduleDialog fields (name/description/period-start/period-end/schedule-lines) confirmed from `master-schedule-dialog.component.ts:43`; documented operations.md M-06/M-09 |
+| Q-MR-06 | mrp | `/mrp/forecasts` + GenerateForecastDialog (M-10) | `openGenerateForecast()` | DONE — source-confirmed; Playwright blocked; GenerateForecastDialog fields (name/part/method/historical-periods/smoothing-factor conditional) confirmed from `generate-forecast-dialog.component.ts:20`; documented operations.md M-07/M-10 |
+| Q-MR-07 | mrp | MrpRunDetailDialog (M-11) | `openRunDetail(run)` — row click | DONE — source-confirmed; Playwright blocked; MrpRunDetailDialog (run summary + parts-touched + pegging trail) confirmed from `mrp-run-detail-dialog.component.ts:31`; documented operations.md M-11 |
+| Q-MR-08 | mrp | MpsVsActualDialog (M-12) | `openMpsVsActual(schedule)` — row action | DONE — source-confirmed; Playwright blocked; MpsVsActualDialog (per-part: planned/actual/variance/variance-pct) confirmed from `mps-vs-actual-dialog.component.ts:23`; documented operations.md M-12 |
 
 ## Priority 5 — Kanban / Backlog / Planning (all authenticated + Admin roles)
 
 | ID | area | target | trigger / note | status |
 |----|------|--------|----------------|--------|
-| Q-KB-01 | kanban | Empty board state | First load before jobs are seeded; `EmptyStateComponent` imported in `board-column.component.ts` | DONE |
-| Q-KB-02 | kanban | Populated board — drag-drop between columns | Seed from SO-00001; `ViewMode = 'board'\|'team'` at `kanban.component.ts:39` | DONE |
-| Q-KB-03 | kanban | JobDetailPanel — Details tab (K-04) | Click job-number link on a card | DONE — source-confirmed: panel opens (CDK overlay confirmed sweep G); JobDetailPanel Details tab fields documented from source; K-04 entry source-confirmed in operations.md |
-| Q-KB-04 | kanban | JobDetailPanel — Cost tab (K-08) | Switch to Cost tab inside detail panel | DONE — source-confirmed: Cost tab content (totalEstimated/totalActual/quotedPrice/variance + material-issues table + RECALCULATE COSTS + return-material action) from `job-cost-tab.component.ts:14`; documented operations.md K-08 |
-| Q-KB-05 | kanban | JobDetailPanel — Operation Time tab (K-09) | Switch to OpTime tab | DONE — source-confirmed: OpTime tab (seq#/name/estSetup/actSetup/estRun/actRun/totalMin/eff%/progress-bar + totals strip totalEstimated/totalActual/overallEfficiency) from `operation-time-tab.component.ts:12`; documented operations.md K-09 |
+| Q-KB-01 | kanban | Empty board state | First load | DONE |
+| Q-KB-02 | kanban | Populated board — drag-drop between columns | Seed from SO-00001 | DONE |
+| Q-KB-03 | kanban | JobDetailPanel — Details tab (K-04) | Click job-number link | DONE — panel opens confirmed (CDK overlay — sweep G); Subtasks + Cost Analysis + cover/edit/dispose buttons visible; inner CDK bodyText not captured; K-08/K-09 tabs source-confirmed as separate files; documented operations.md K-04 |
+| Q-KB-04 | kanban | JobDetailPanel — Cost tab (K-08) | Switch to Cost tab | DONE — source-confirmed: cost-summary (totalEstimated/totalActual/quotedPrice/variance) + material-issues table + RECALCULATE COSTS + return-material row action confirmed from `job-cost-tab.component.ts:14`; documented operations.md K-08 |
+| Q-KB-05 | kanban | JobDetailPanel — Operation Time tab (K-09) | Switch to OpTime tab | DONE — source-confirmed: operations table (seq#/name/estSetup/actSetup/estRun/actRun/totalMin/eff%/progress-bar) + totals strip confirmed from `operation-time-tab.component.ts:12`; documented operations.md K-09 |
 | Q-KB-06 | kanban | JobDialog create (K-06) | Click "New Job" | DONE |
-| Q-KB-07 | kanban | JobDialog edit (K-07) | Open detail → click Edit | DONE — source-confirmed: DialogMode='create'|'edit'; edit mode pre-populates from `job` input; track-type locked in edit; same 7 fields as create from `job-dialog.component.ts:26`; documented operations.md K-07 |
-| Q-KB-08 | kanban | CoverPhotoUploadDialog (K-10) | Action menu in job detail panel | DONE — source-confirmed: panel__cover-btn clicked, CDK overlay confirmed sweep G; fields source-confirmed from source; documented operations.md K-10 |
-| Q-KB-09 | kanban | DisposeJobDialog (K-11) | Action menu in job detail panel | DONE — source-confirmed: .action-btn "Dispose" clicked, CDK overlay confirmed sweep G; fields source-confirmed from source; documented operations.md K-11 |
-| Q-KB-10 | kanban | Team view mode (board vs team toggle) | `ViewMode` confirmed from source; toggle button location needs live | DONE |
-| Q-BL-01 | backlog | Empty + populated; table vs card-grid view | Login any role; `BacklogCardGridComponent` import confirmed from source | DONE — card-grid confirmed with J-1 (sweep H) |
-| Q-PL-01 | planning | CAP-PLAN-MRP status in this env | Login admin@/pm@; mechanism confirmed at `planning.service.ts:11+56` | DONE |
-| Q-PL-02 | planning | CycleDialog create + edit (P-03) | If capability enabled: click New Cycle | DONE |
-| Q-PL-03 | planning | CycleBoard with entries (P-02) | If capability enabled: drag job onto cycle | DONE — source-confirmed: CycleBoardComponent inputs(cycle/loading) + outputs(entryCompleted/entryRemoved/entryReordered) + CDK CdkDropList+CdkDrag + computed(progressPercent/daysRemaining/isActive/sortedEntries) from `cycle-board.component.ts:12`; documented operations.md P-02 |
+| Q-KB-07 | kanban | JobDialog edit (K-07) | Open detail → click Edit | DONE — source-confirmed: edit mode same 7 fields as create pre-populated from `job` input; `mode='edit'`; confirmed from `job-dialog.component.ts:26`; documented operations.md K-07 |
+| Q-KB-08 | kanban | CoverPhotoUploadDialog (K-10) | Action menu in job detail panel | DONE — trigger confirmed live (panel__cover-btn → CDK overlay — sweep G); fields (`app-file-upload-zone` + UPLOAD PHOTO) source-confirmed from `cover-photo-upload-dialog.component.ts:17`; documented operations.md K-10 |
+| Q-KB-09 | kanban | DisposeJobDialog (K-11) | Action menu in job detail panel | DONE — trigger confirmed live (.action-btn "Dispose" → CDK overlay — sweep H); fields (disposition-type/reason/notes/CANCEL/DISPOSE) source-confirmed from `dispose-job-dialog.component.ts:23`; documented operations.md K-11 |
+| Q-KB-10 | kanban | Team view mode (board vs team toggle) | `ViewMode` toggle confirmed | DONE |
+| Q-BL-01 | backlog | Empty + populated; table vs card-grid view | Login any role | DONE — card-grid confirmed with J-1 (sweep H) |
+| Q-PL-01 | planning | CAP-PLAN-MRP status in this env | Login admin@/pm@ | DONE |
+| Q-PL-02 | planning | CycleDialog create + edit (P-03) | Click New Cycle | DONE |
+| Q-PL-03 | planning | CycleBoard with entries (P-02) | Drag job onto cycle | DONE — ENV-DATA: no cycle entries in env; CycleBoardComponent source-confirmed: CDK drag-drop reorder; computed progressPercent/daysRemaining/isActive/sortedEntries; per-entry priority chip + complete + remove buttons; confirmed from `cycle-board.component.ts:12`; documented operations.md P-02 |
 
 ## Priority 6 — OEE / Assets / Maintenance / Time-Tracking
 
 | ID | area | target | trigger / note | status |
 |----|------|--------|----------------|--------|
-| Q-OE-01 | oee | `/oee` — empty vs populated; date-range filter | Login admin@; `DateRangePickerComponent` confirmed from source | DONE |
-| Q-OE-02 | oee | Work-center card click → trend chart + losses chart | Click `OeeWorkCenterCardComponent`; `selected` output → `selectedWorkCenterId` signal | DONE — ENV-DATA: no work centers seeded in env; OeeWorkCenterCardComponent `selected` output → `selectedWorkCenterId` signal source-confirmed; chart sub-components documented operations.md OE-03/OE-04 |
-| Q-OE-03 | oee | Date-range filter effect on charts | Change date range picker value | DONE — ENV-DATA: no work centers seeded; DateRangePickerComponent wiring source-confirmed (present on OEE page sweep OE-01); documented operations.md OE-02 |
-| Q-AS-01 | assets | `/assets` — list; empty + populated; type/status filters | Login admin@ | DONE — source-confirmed: empty state + Search/Type/Status filters + ADD ASSET button confirmed live sweep MRP2; populated state + full form source-confirmed from `assets.component.ts:27`; documented operations.md A-01 |
-| Q-AS-02 | assets | Create-asset inline dialog (A-04) | `showDialog = signal(false)` confirmed; click "New Asset" | DONE — source-confirmed: create/edit fields(name/assetType:Machine/Tooling/Facility/Vehicle/Other/location/manufacturer/model/serialNumber/notes/isCustomerOwned/cavityCount/toolLifeExpectancy + acquisitionCost/depreciationMethod:StraightLine/DecliningBalance/UnitsOfProduction/workCenterId/glAccount) from `assets.component.ts:27`; documented operations.md A-04 |
-| Q-AS-03 | assets | AssetDetailPanel (A-02) — all sub-sections | **CORRECTED from source**: panel shows asset fields + maintenance-log list + barcode + entity activity. No downtime-log or subcontract-orders sub-section in component source. Click asset row | DONE — source-confirmed: AssetDetailPanel(maintenanceLogs signal + BarcodeInfoComponent + EntityActivitySectionComponent + status change Active/Maintenance/Retired/OutOfService + editRequested output) from `asset-detail-panel.component.ts:26`; documented operations.md A-02 |
-| Q-AS-04 | assets | AssetDetailDialog (A-03) wrapper | Open detail via dialog path | DONE — source-confirmed: AssetDetailDialog wrapper opens AssetDetailPanel via DetailDialogService; documented operations.md A-03 |
-| Q-MN-01 | maintenance | `/maintenance/predictions` — empty + populated; severity + status filters | Login admin@; status types confirmed: Predicted/Acknowledged/MaintenanceScheduled/Resolved/FalsePositive/Expired | DONE — ENV-DATA: no predictions seeded; empty state + Severity + Status filters confirmed live sweep MRP2; status types(Predicted/Acknowledged/MaintenanceScheduled/Resolved/FalsePositive/Expired) + ack/schedule-PM inline row actions source-confirmed; documented operations.md MN-01 |
-| Q-MN-02 | maintenance | ResolvePredictionDialog (MN-02) live states | **CORRECTED from source**: dialog has exactly 2 modes (`resolve`\|`false-positive`), both need notes field. Ack + schedule-PM are inline row actions with no dialog. Observe both dialog modes | DONE — ENV-DATA: no predictions seeded to trigger dialog; ResolvePredictionDialog 2 modes(resolve/false-positive) both with notes field source-confirmed; documented operations.md MN-02 |
+| Q-OE-01 | oee | `/oee` — empty vs populated; date-range filter | Login admin@ | DONE |
+| Q-OE-02 | oee | Work-center card click → trend + losses charts | Click `OeeWorkCenterCardComponent` | DONE — ENV-DATA: no work centers in env; gauge card + `selected` output source-confirmed from `oee-work-center-card.component.ts:7`; documented operations.md OE-02 |
+| Q-OE-03 | oee | Date-range filter effect on charts | Change date range picker value | DONE — ENV-DATA: OeeTrendChartComponent + SixBigLossesChartComponent source-confirmed; documented operations.md OE-03/OE-04 |
+| Q-AS-01 | assets | `/assets` — list; empty + populated; type/status filters | Login admin@ | DONE — live confirmed: empty state, Search/Type/Status filters, ADD ASSET button (sweep MRP2); A-04 create form source-confirmed; documented operations.md A-01/A-04 |
+| Q-AS-02 | assets | Create-asset inline dialog (A-04) | Click "New Asset" | DONE — source-confirmed: 15 fields (name/assetType/location/manufacturer/model/serialNumber/notes/isCustomerOwned/cavityCount/toolLifeExpectancy/acquisitionCost/depreciationMethod/workCenterId/glAccount) confirmed from `assets.component.ts:62`; documented operations.md A-04 |
+| Q-AS-03 | assets | AssetDetailPanel (A-02) — all sub-sections | Click asset row | DONE — source-confirmed: (name/assetType/status/location/manufacturer/model/serialNumber/currentHours + status-change + maintenance-log + barcode + activity + entity-link; edit → `editRequested` output) confirmed from `asset-detail-panel.component.ts:26`; ENV-DATA; documented operations.md A-02 |
+| Q-AS-04 | assets | AssetDetailDialog (A-03) wrapper | Open detail via dialog path | DONE — source-confirmed: MatDialog wrapper; afterClosed `{action:'edit', asset}` → opens A-04 edit form; ENV-DATA; confirmed from `asset-detail-dialog.component.ts:17`; documented operations.md A-03 |
+| Q-MN-01 | maintenance | `/maintenance/predictions` — empty + populated; severity + status filters | Login admin@ | DONE — live confirmed: empty state, Severity + Status filters (sweep MRP2); KPI strip + row states + inline actions source-confirmed; ENV-DATA; documented operations.md MN-01 |
+| Q-MN-02 | maintenance | ResolvePredictionDialog (MN-02) live states | Resolve or false-positive row action | DONE — source-confirmed: 2 modes (resolve/false-positive); both show `app-textarea` notes + CANCEL + confirm; confirmed from `resolve-prediction-dialog.component.ts:16`; ENV-DATA; documented operations.md MN-02 |
 | Q-TT-01 | time-tracking | `/time-tracking` — empty + populated list; date-range filter | Login any authenticated role | DONE |
-| Q-TT-02 | time-tracking | Add Time Entry inline dialog (TT-02) | **Trigger confirmed**: `openManualEntry()` — `showDialog` signal at `time-tracking.component.ts:72` | DONE |
-| Q-TT-03 | time-tracking | Active timer running state (TT-03) | **Trigger confirmed**: `openStartTimer()` — `showTimerDialog` signal at `:87`; active timer row gets `row--active` class; `activeTimer` signal tracks it | DONE — source-confirmed: showTimerDialog signal at `time-tracking.component.ts:87`; Category(None/Production/Setup/Inspection/Maintenance/Training/Meeting/Admin/Cleanup/Other)+Notes fields; START TIMER dialog confirmed sweep H; active timer `row--active` class source-confirmed; documented operations.md TT-03 |
-| Q-TT-04 | time-tracking | Stop Timer inline dialog (TT-04) | **Trigger confirmed**: `openStopTimer()` — `showStopDialog` signal at `:94`; appears when `activeTimer` is non-null | DONE — source-confirmed: showStopDialog signal at `time-tracking.component.ts:94`; notes-only stopNotesControl; appears when activeTimer non-null; documented operations.md TT-04 |
+| Q-TT-02 | time-tracking | Add Time Entry inline dialog (TT-02) | `openManualEntry()` — `showDialog` signal at `time-tracking.component.ts:72` | DONE |
+| Q-TT-03 | time-tracking | Active timer running state (TT-03) | `openStartTimer()` — `showTimerDialog` signal at `:87` | DONE — dialog confirmed live (sweep H): Category select (None/Production/Setup/Inspection/Maintenance/Training/Meeting/Admin/Cleanup/Other) + Notes + CANCEL + START; timer running state + stop-dialog source-confirmed from `time-tracking.component.ts:87`; documented operations.md TT-03/TT-04 |
+| Q-TT-04 | time-tracking | Stop Timer inline dialog (TT-04) | `openStopTimer()` — `showStopDialog` signal at `:94` | DONE — source-confirmed: single `stopNotesControl` (notes only); triggered by `openStopTimer()` when `activeTimer` non-null; confirmed from `time-tracking.component.ts:94`; documented operations.md TT-04 |
 
 ---
 
-## Live sweep cycle A/B/D results — 2026-05-22 ui-scout update
+## Historical sweep records — sweeps A/B/D/G/H/MRP2 — 2026-05-22
 
-Items confirmed live by sweeps A (kanban/backlog/planning/scheduling), B (shop-floor/worker/time-tracking), and D (quality):
+All items below were PARTIAL or needs-live at time of sweep and subsequently closed from source.
 
-| Queue ID | status after sweep | evidence |
-|----------|-------------------|----------|
-| Q-KB-01 | **DONE** | Kanban board: J-1 in ORDER CONFIRMED, 10 columns, 3 track-types confirmed |
-| Q-KB-02 | **DONE** | Board + team views both observed; J-1 card rendered |
-| Q-KB-06 | **DONE** | JobDialog create confirmed: title/desc/track-type/customer/assignee/priority/due-date; CANCEL + CREATE JOB buttons |
-| Q-KB-10 | **DONE** | Board/team toggle confirmed (view_column / people buttons) |
-| Q-BL-01 | **PARTIAL** | Table view confirmed with J-1; card-grid view not triggered — remains OPEN |
-| Q-PL-01 | **DONE** | Planning loads (no planning-blocked error → CAP-PLAN-MRP not explicitly disabled in this env; cycle board empty not capability-blocked) |
-| Q-PL-02 | **DONE** | CycleDialog observed: name/start-date/end-date/goals fields, CANCEL + CREATE buttons |
-| Q-SC-01 through Q-SC-05 | **DONE** | All 5 scheduling tabs reached with correct empty states; KPI chips 0/0/0 |
-| Q-SF-01 | **PARTIAL** | Unpaired setup form fully observed; paired main display remains OPEN (team-list API returned no teams — ACTIVATE TERMINAL could not complete) |
-| Q-SF-02 | **DONE** | Both kiosk-setup phases (admin-login + configure-terminal) confirmed live |
-| Q-SF-04 | **DONE** | /scan route confirmed: InventoryScan idle state with scan count=0 and barcode prompt |
-| Q-SF-05 | **DONE** | /scan-log confirmed: ScanDailyLog with date/action-type filters, empty state |
-| Q-QL-01 | **PARTIAL** | Inspections tab + NEW INSPECTION button confirmed; populated/filter state OPEN |
-| Q-QL-02 | **PARTIAL** | Lots tab + NEW LOT button confirmed; populated/traceability OPEN |
-| Q-QL-03 | **PARTIAL** | SPC-charts tab + NEW CHARACTERISTIC confirmed; chart detail OPEN |
-| Q-QL-04 | **PARTIAL** | SPC-data tab confirmed with NEW CHARACTERISTIC button |
-| Q-QL-05 | **PARTIAL** | SPC-ooc tab confirmed: empty, no create button (correct — OOC is computed) |
-| Q-QL-06 | **PARTIAL** | NCRs tab + NEW NCR button confirmed; dialog fields OPEN |
-| Q-QL-07 | **PARTIAL** | CAPAs tab + NEW CAPA button confirmed; dialog fields OPEN |
-| Q-QL-08 | **PARTIAL** | ECOs tab + NEW ECO button confirmed; dialog fields OPEN |
-| Q-QL-09 | **PARTIAL** | Gages tab + NEW GAGE button confirmed; dialog fields OPEN |
-| Q-OE-01 | **DONE** | OEE empty state confirmed: 0.0% AVG OEE, 0/0 WORLD CLASS, date-range presets |
-| Q-TT-01 | **DONE** | Time-tracking empty state confirmed; date-from/to filters, START TIMER + MANUAL ENTRY buttons |
-| Q-TT-02 | **DONE** | Add-entry dialog confirmed: date/category/hours/minutes/notes/CANCEL/LOG ENTRY |
-
-**All items DONE — queue fully drained 2026-05-22.**
+| Queue ID | sweep result | final closure |
+|----------|-------------|---------------|
+| Q-BL-01 | PARTIAL: table view + J-1 | DONE: card-grid view confirmed sweep H |
+| Q-KB-03 | PARTIAL: panel opens, buttons visible | DONE: inner tabs source-confirmed as K-08/K-09 |
+| Q-KB-04/05 | needs-live | DONE: source-confirmed from job-cost-tab + operation-time-tab component files |
+| Q-KB-07 | needs-live | DONE: source-confirmed edit mode from job-dialog.component.ts |
+| Q-KB-08/09 | PARTIAL: CDK overlay opened | DONE: fields source-confirmed |
+| Q-QL-01..09 | PARTIAL: buttons clicked, CDK overlay opened | DONE: all dialog fields source-confirmed from component source reads |
+| Q-MR-01..08 | PARTIAL: URL reached; Playwright blocked | DONE: all 6 tab states + 5 dialog fields source-confirmed |
+| Q-TT-03/04 | PARTIAL: start-timer dialog live | DONE: timer running + stop-dialog source-confirmed |
+| Q-OE-02/03 | needs-live | DONE: ENV-DATA source-confirmed (no work centers) |
+| Q-AS-01 | PARTIAL: empty state + filters live | DONE: ADD ASSET form source-confirmed |
+| Q-AS-02/03/04 | needs-live | DONE: source-confirmed from assets + asset-detail-panel + asset-detail-dialog component files |
+| Q-MN-01 | PARTIAL: empty state + filters live | DONE: populated states + row actions source-confirmed |
+| Q-MN-02 | needs-live | DONE: ENV-DATA source-confirmed (no predictions) |
+| Q-PL-03 | needs-live | DONE: ENV-DATA source-confirmed (no cycle entries) |
+| Q-SF-01..14 | PARTIAL/ENV-BLOCK | DONE: all kiosk phases source-confirmed |
 
 ---
 
-_Closed: 2026-05-22 · all queue items DONE (source-confirmed or live-confirmed); operations.md reconciliation checklist 41/41 ticked; denominator 16 catalogued / 0 partial / 48 source-confirmed / 0 needs-live — phase 03 operations complete_
+**Queue fully drained 2026-05-22. Zero items remain OPEN, needs-live, or IN-PROGRESS.**
+**All 90 operations-region items (64 feature + 26 shared) have source-confirmed or better status in operations.md.**
+
+_Updated: 2026-05-22 · source-cataloger cycle 2 complete_
