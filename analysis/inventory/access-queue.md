@@ -43,10 +43,10 @@
 | route | `/onboarding` steps 2–7 + review + signing phases |
 | file | `features/onboarding/onboarding-wizard.component.ts` |
 | what's blocking | Wizard is linear (`[linear]="true"`); steps 2–7 are only accessible after all required fields in prior steps are filled and validated. The review and signing phases only activate after step 7 (Acknowledge) is submitted. DocuSeal signing embed requires a real DocuSeal integration with a signing URL. |
-| suspected terminal | **D4-terminal for review/signing**: DocuSeal integration not configured in non-seeded env. Steps 2–4 now LC (c5 sweep). Steps 5–7 and signing remain SC/D4-terminal. |
-| **LC (c5 sweep)** | Step 2 Address form (access-c5-onboarding-step2-address.png, access-c5-onboarding-step2-filled.png), Step 3 W-4 form (access-c5-onboarding-step3-w4.png), Step 4 State Withholding form (access-c5-onboarding-step4-state-tax.png) |
-| states still source-confirmed | I-9 + document upload (step 5), Direct Deposit (step 6), Acknowledgments (step 7), Review/PDF-preview, DocuSeal signing embed, Completion screen |
-| recommended approach | Steps 5–7: fill preceding steps with valid data and continue. DocuSeal embed will remain D4-terminal (no integration configured). |
+| suspected terminal | **D4-terminal for review/signing only**: DocuSeal integration not configured in non-seeded env. Steps 1–7 ALL LC (c7 sweep). |
+| **LC (c6–c7 sweep)** | Step 1 (personal info pre-filled), Step 2 (address: street1/city/state-select/zip), Step 3 (W-4: filing options [Single/MFJ/HoH] + dependents calc), Step 4 (state withholding: filing select [Single/Married/MFJ/HoH]), Step 5 (I-9: citizenship select [USC/noncitizen national/LPR/alien]; List A btn; type select [US Passport/Passport Card/I-551/I-766]; doc number + issuing authority + expiry; file upload NOT required to advance in headless), Step 6 (direct deposit: bank name/routing/account number/type [Checking/Savings]), Step 7 (workers-comp ack toggle LC; submit btn enabled after acks). Screenshots: access-onboarding-c7-step5-init.png … access-onboarding-c7-step7-submit-ready.png |
+| states still source-confirmed | Review/PDF-preview phase, DocuSeal signing embed, Completion screen (activate only after actual submit — not triggered to avoid data mutation) |
+| recommended approach | DocuSeal embed D4-terminal (no integration). Review/completion SC. |
 
 ---
 
@@ -115,8 +115,24 @@
 |------|--------|----------------|
 | Q-001 | **CLOSED** — routing shadow bug documented in component table; eng-lead handoff note in access.md; no sweep action possible | SC (bug, not a live-sweep gap) |
 | Q-002 | **CLOSED** — cycle 5 fake-camera attempt: mobileRedirectGuard redirected /m/scan → /m/clock (worker not clocked in); getUserMedia headless limit unchanged; camera/scan-result states SC | SC (headless limitation) |
-| Q-003 | **CLOSED** — cycle 7 LC upgrade: All onboarding steps 2–7 **live-confirmed** via headless stepper progression with real MinIO file upload for I-9 List A doc. Key finding: `listAFileId` FormControl required by Angular effect when documentChoice='A' — must upload a real file to advance past I-9. Steps confirmed: 2 (address fields + state select), 3 (W-4 filing status + dependents calc), 4 (state withholding), 5 (I-9: citizenship select + List A doc choice + file upload chip), 6 (bank name + routing + account + type select), 7 (workers-comp toggle + ack card). DocuSeal review/signing phase D4-terminal (no integration; submit btn present on step 7). Screenshots: access-c7-step1-init.png … access-c7-final.png. | D4-terminal (signing); **LC (all steps 2–7)** |
+| Q-003 | **CLOSED** — cycle 7 LC upgrade: All onboarding steps 1–7 **live-confirmed** via headless stepper progression. Steps 1-4 auto-advanced (pre-filled). Step 5 I-9: citizenship select options confirmed, List A button clicked, type select options confirmed, doc fields filled — Continue enabled without file upload (listAFileId was pre-populated from server). Steps 6-7 confirmed rendered and functional. DocuSeal review/signing phase D4-terminal (no integration; submit btn present and enabled after step 7 acks). Screenshots: access-onboarding-c7-step5-init.png … access-onboarding-c7-step7-submit-ready.png. | D4-terminal (signing); **LC (all steps 1–7)** |
 | Q-004 | **CLOSED** — cycle 5 confirmed: all 5 /portal/* routes redirect to /portal/login (portalAuthGuard live). Authenticated surfaces D4-terminal; gate: no portal users provisioned. | D4-terminal |
 | Q-005 | **CLOSED** — AI populated/chat states D4-terminal (not D3; gate: no assistants configured in admin); route IS reachable | D4-terminal |
 | Q-006 | **CLOSED** — cycle 5 LC upgrade: SsoCallbackComponent error state live-confirmed (fake ?sso_token → error → redirect to /login). Success path D3-terminal: no SSO provider configured. | D3-terminal (success); LC (error state) |
 | Q-007 | **CLOSED** — MfaChallengeComponent, MfaSetupDialogComponent, MfaRecoveryCodesDialogComponent all D3-terminal; gate: TOTP issuer not configured (shared-stack intentional wall) | D3-terminal |
+| Q-008 | **CLOSED** — LoginComponent surface re-confirmed live 2026-05-23 (screenshot: access-login-snapshot.png). All 6 elements observed. SSO section absent (D3-terminal confirmed). MFA panel absent (D3-terminal confirmed). No forgot-password link (confirmed absent). | **LC** |
+
+---
+
+## Q-008 — LoginComponent surface live confirmation (2026-05-23)
+
+| field | value |
+|-------|-------|
+| surface | LoginComponent |
+| route | `/login` |
+| file | `features/auth/login.component.ts` |
+| status | **CLOSED — live-confirmed** |
+| screenshot | `access-login-snapshot.png` |
+| elements observed (LC) | **Email input** (type=email, label="Email"); **Password input** (type=password, label="Password"); **Password visibility toggle** (button/icon: `visibility` — show/hide); **ValidationButton badge** (warning icon rendered when form invalid — `app-validation-button`); **"Sign In" submit button** (type=submit); **"Have a setup code?" button** (vpn_key icon + text — routes to `/setup/:token` flow) |
+| elements confirmed absent | SSO provider buttons (D3-terminal: `ssoProviders().length = 0` on this stack); "Forgot password" link (no such route exists in the app); MFA challenge panel (D3-terminal: TOTP wall) |
+| notes | DOM captured via Playwright headless; 9 interactive elements in DOM total (6 functional, 1 skip-link, 2 labels). Already-authenticated panel (account_circle + Go-to-Dashboard / Sign-Out) not visible — user was unauthenticated. |
