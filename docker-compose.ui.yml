@@ -1,0 +1,14 @@
+# UI-server overlay — point this box's forge-ui at a REMOTE api server.
+#
+# The UI's nginx proxies /api/, /hubs/, etc. to the name `forge-api`. On a
+# split deployment forge-api lives on another host, so we make that name
+# resolve to the API server's address via extra_hosts (no image rebuild, no
+# nginx edit). forge-topology.sh sets FORGE_API_HOST before `up`.
+#
+#   FORGE_API_HOST=10.0.0.5 docker compose -f docker-compose.yml -f docker-compose.ui.yml up -d --no-deps forge-ui
+#
+# Requirement: the API server must expose forge-api's port 8080 to this box.
+services:
+  forge-ui:
+    extra_hosts:
+      - "forge-api:${FORGE_API_HOST:-127.0.0.1}"
