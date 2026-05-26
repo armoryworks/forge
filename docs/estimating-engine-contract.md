@@ -141,3 +141,69 @@ These affect engine internals only — **DTO shape is stable regardless**, so th
 6. **Rounding:** per-line vs per-total, decimal places (model is `decimal(18,4)`).
 
 When the REQ lands, these resolve inside `Compute`; the contract above does not change.
+
+---
+
+## 9. Persisted form — `QuoteLine.CostBreakdown` (for the FE thin slice to mock against)
+
+The engine's per-line cost components persist on each quote line as `QuoteLine.CostBreakdown`
+(JSON or child table — REQ §292). This is the per-line projection of `EstimateResult.Breaks[].Cost`,
+**minus NRE** (NRE/tooling is counted once at the estimate level, never folded per-line — §A1):
+
+```json
+QuoteLine.CostBreakdown = {
+  "labor":    0.00,   // decimal(18,4)
+  "burden":   0.00,
+  "material": 0.00,
+  "osp":      0.00,
+  "total":    0.00    // = labor + burden + material + osp
+}
+```
+
+The quote line itself also carries `unitPrice`, `extendedPrice`, and `effectiveMargin`
+(from `EstimateResult.Breaks[]`). **NRE/tooling** is a separate estimate-level line, not inside
+any `CostBreakdown`.
+
+**FE thin slice builds against:** `EstimateResult` (the breaks table — §3) for the compute preview,
+and `QuoteLine.CostBreakdown` (above) for the saved per-line detail. Both shapes are frozen.
+Mock these directly; the engine internals do not affect either shape.
+
+---
+
+## 10. Compute endpoint — the `useMock=false` flip target (`[ENG-LEAD]` 2026-05-21)
+
+`POST /api/v1/estimates/compute`
+
+A **thin client contract**: FE sends identifiers; the server materializes the routing/rate/tier
+snapshot from the part and invokes the pure engine. FE does **not** send the `Operations[]`
+snapshot — that is the engine's *internal* input (§2), materialized server-side.
+
+```
+Request — EstimateComputeRequest {
+  partId: int,
+  breakQuantities: int[],                       // ascending
+  pricing: { mode: "Margin" | "Markup", value: decimal }
+}
+
+Response 200 — EstimateResult                   // the §3 shape FE ALREADY mocks — unchanged
+  (ValidationErrors empty on 200)
+
+Response 422 — blocking validation (REQ-QUOTE-01/02/05) {
+  validationErrors: [ { code, message, context? } ]
+}
+  codes: MISSING_WORKCENTER_RATE | MISSING_UOM_CONVERSION
+       | MISSING_PART_COST | MARGIN_OUT_OF_RANGE
+```
+
+The 422 cases are **hard blocks** (quote line cannot save), not warnings — the engine never
+silently defaults a missing rate/cost to $0 (REQ-QUOTE-01/02 DoD).
+
+**The flip is clean because the 200 response shape is identical to the mock.** FE: set
+`useMock=false`, POST `EstimateComputeRequest`, render `EstimateResult` on 200 (existing binding,
+no change), surface `validationErrors` on 422. No response-shape migration on the FE side.
+
+**No DB migration** is required for this endpoint — it reads existing `Operation`/`WorkCenter`/
+`OperationMaterial`/`VendorPart`/`VendorPartPriceTier` and returns a computed result. Persisting
+`CostBreakdown` onto the quote line (§9) is a *separate, later* migration routed through DevOps
+serialization — it does not gate the compute endpoint or the FE flip.
+

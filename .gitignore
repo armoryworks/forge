@@ -25,6 +25,7 @@
 /.env.example
 /.compose-build.log
 /storage/
+/ENV-READY.md
 
 # --- Local Claude / IDE config ---
 /.claude/
@@ -39,3 +40,15 @@
 /RESUME-*.md
 /Generated Tests/
 /node_modules/
+
+/.artifacts-*/
+
+# --- Inventory journey: keep the inventory docs (analysis/**/*.md); ignore the
+# scout's regenerable scratch (sweep scripts + raw result/log JSON) and the
+# screenshot evidence (archive to object storage if needed, not git). ---
+analysis/**/*.png
+analysis/**/*.mjs
+analysis/**/*.cjs
+analysis/**/*.json
+analysis/inventory/screenshots/
+analysis/inventory/_scout/
