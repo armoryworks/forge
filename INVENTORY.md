@@ -17,6 +17,7 @@ This file **consolidates** (it does not replace) the per-region inventories unde
 - [§0.4 Carried defects (findings, not gaps)](#04--carried-defects-findings-to-analyze-not-inventory-gaps)
 - [§0.5 Deferred-to-analysis (inline open-items)](#05--deferred-to-analysis-inline-open-items-surfaced-from-region-docs)
 - [§0.6 Documented intentional terminals (covered-with-reason)](#06--documented-intentional-terminals-covered-with-reason--do-not-re-flag-as-gaps)
+- [§0.7 Reconcile fold-ins (P2 gaps)](#07--reconcile-fold-ins-p2-gaps--added-at-consolidation)
 
 **Region inventories (folded-in verbatim):**
 - [§A — Master-Data Region](#a--master-data-region) — leads, customers, vendors, parts, inventory
@@ -132,6 +133,29 @@ These were closed during inventory **with a stated reason** (cap OFF and/or non-
 | ADM-Q-028 | `WalkthroughPreviewDialogComponent` (ADM-TRN-06) | D4 (no walkthrough-type module) + D3 (`CAP-HR-TRAINING` OFF). Trigger source-confirmed. |
 
 Plus the broader D3 cap-OFF set (`CAP-EXT-AI-ASSISTANT`, `CAP-CROSS-INTEG-EDI`, `CAP-P2P-AUTOPO`, `CAP-EXT-ANNOUNCEMENTS`, `CAP-CROSS-BI-EXPORT`, `CAP-EXT-EMAIL-SYNC`, `CAP-QC-COMPLIANCE-FORMS`) and the D4 non-seeded set across admin — all covered-with-reason per each region doc's states column.
+
+---
+
+## §0.7 — Reconcile fold-ins (P2 gaps) — added at consolidation
+
+The completeness-auditor's reconcile (`E:/dev/forge/analysis/reconcile-gaps.md`,
+2026-05-25) found **2 gaps / 4 components / 3 routes** absent from every region
+checklist. Both are folded in here (the region source docs predate the reconcile,
+so these entries live in INVENTORY only — marked as fold-ins where they appear):
+
+1. **`expenses` feature** (employee-facing, distinct from the `/admin/expenses`
+   settings tab ADM-EXP-01/02 already in §E) → catalogued as **§B Segment 10 —
+   Expenses** (Q2C financial adjacency). 3 components, `source-confirmed`. This is
+   a real functional area — the analysis journey gives it its own completeness
+   phase + an expense⇄vendor / expense⇄approval intersection.
+2. **`workflow-demo`** → minimal entry at the end of **§F** (dev/demo surface,
+   `source-confirmed`). The analysis journey covers it for completeness but
+   **explicitly excludes it from the UX/flow phases** (it smoke-tests the workflow
+   shell, not a user workflow).
+
+Reconcile summary: routes ~130 ground-truth / 127 inventoried (+3 here);
+feature component files 386 / 382 (+4 here); shared dirs 77/77 and subdirs 12/12
+(zero gaps). No other gaps.
 
 ---
 ---
@@ -2605,6 +2629,25 @@ All create dialogs show validation badge `▲{n}` between Cancel and Submit. Sub
 
 *Cycle 8 complete — **PHASE RECONCILIATION DONE.** All checklist items ticked. Queue drained. Q5-a corrected to live/populated. Q3-c trigger source added. DN-9 added. Zero unticked checklist boxes. Terminal-only items: Q1-d (CAP-P2P-RFQ), Q1-h (CAP-O2C-RMA), Q1-i list (CAP-O2C-RECURRING), Q3-c (vendor config absent). All other entries populated or dead-code confirmed.*
 
+---
+
+## Segment 10 — Expenses _(P2 reconcile fold-in · 2026-05-25 · added at consolidation, not in the region source doc)_
+
+> Employee-facing expense feature `features/expenses/` — **distinct** from the
+> `/admin/expenses` settings tab (ADM-EXP-01/02 in §E; cross-link only, do not
+> duplicate). Routes are `authGuard` only (all authenticated, no roleGuard).
+> All `source-confirmed` (added from the route/feature reconcile, not a live sweep).
+> The `EXPENSES_TOUR` (`shared/tours/expenses-tour.ts`) is already catalogued in §G.
+
+| component | type | route | file | renders-for | states | purpose |
+|-----------|------|-------|------|-------------|--------|---------|
+| `ExpensesComponent` | page | `/expenses` | `features/expenses/expenses.component.ts:33` | all authenticated | source-confirmed | Employee expense list / entry page (list + empty/loading/populated/error). |
+| `ExpenseApprovalQueueComponent` | page | `/expenses/approval` | `features/expenses/approval-queue/expense-approval-queue.component.ts:23` | all authenticated | source-confirmed | Expense approval queue — approval-workflow surface for submitted expenses. |
+| `UpcomingExpensesComponent` | page | `/expenses/upcoming` | `features/expenses/upcoming/upcoming-expenses.component.ts:36` | all authenticated | source-confirmed | Upcoming / time-ahead expense view. |
+
+**Analysis-journey coverage:** own completeness phase (`expenses`) + an
+expense⇄vendor / expense⇄approval-workflow intersection phase. **Cross-link:**
+admin expense settings = §E ADM-EXP-01/02.
 
 ---
 
@@ -4746,6 +4789,22 @@ _Folded-in verbatim from `analysis/inventory/access.md`. Sole-writer cataloger c
 | 7c | 2026-05-23 | 0 new rows (LC upgrade) | — | ui-scout cycle 7c: OnboardingWizardComponent Steps 6–7 upgraded SC→LC. I-9 file-upload wall bypassed via Playwright setInputFiles() (minimal 1×1 PNG uploaded to MinIO via API; upload chip confirmed). Continue advanced through Step 5 → Step 6 Direct Deposit (bankName/routingNumber/accountNumber/accountType rendered + filled; access-c7-step6-init.png, access-c7-step6-filled.png) → Step 7 Acknowledgments (workers-comp toggle rendered + clicked; submit btn visible; access-c7-step7-init.png, access-c7-step7-filled.png). Post-submit: review phase triggered but DocuSeal signingUrl not returned (D4-terminal confirmed; access-c7-final-stuck.png). All 7 steps now LC. |
 | 7d | 2026-05-23 | 0 new rows (LC upgrades — shared cmps) | — | Source-cataloger: upgraded 4 shared-component rows SC→LC consequent on Steps 3–7 onboarding LC (cycle 7c). SelectComponent LC (filing-status/state selects in Steps 3/4/6 rendered). DatepickerComponent LC (Step 5 expiry field now confirmed, Step 1 DOB already LC). ToggleComponent LC (Step 7 ack toggle clicked + confirmed). CurrencyInputComponent LC (Step 6 deposit amounts rendered). All 67 checklist items [x]. 37 component rows. Queue drained. Phase 06 inventory complete. |
 
+---
+
+## Checked and excluded (P2 reconcile fold-in · 2026-05-25) — workflow-demo
+
+> Added from the route/feature reconcile (`reconcile-gaps.md`), not in the region
+> source doc. A **dev/demo surface**, not a production user-facing page.
+
+| component | type | route | file | renders-for | states | purpose |
+|-----------|------|-------|------|-------------|--------|---------|
+| `WorkflowShellDemoComponent` | page (demo/dev) | `/workflow-shell-demo` | `features/workflow-demo/workflow-shell-demo.component.ts:27` | all authenticated (`authGuard`) | source-confirmed | Standalone demo route to verify the workflow shell renders end-to-end without per-entity wiring (mounts `WorkflowComponent` with a hand-built run + definition payload; `?step=`/`?mode=` query params; inline entity-edit form driving step-rail indicators). |
+
+**Terminal disposition:** `source-confirmed` — not a cap gate, not a D4 block;
+fully functional but dev-only. **Analysis-journey:** covered for completeness in
+the access phase; **explicitly EXCLUDED from the UX/flow audit phases** — it
+smoke-tests the workflow shell, not a user workflow. Workflow runtime proper is
+inventoried via `WorkflowComponent` in §G (used by `features/parts/workflow/` etc.).
 
 ---
 
