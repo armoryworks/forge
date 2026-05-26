@@ -11,6 +11,20 @@ Also update `docs/coding-standards.md` or the relevant doc file if the change is
 
 **Implementation tracking:** Check `docs/implementation-status.md` at the start of every session. When completing a feature or sub-feature, update its status (Not Started → Partial → Done) in that file before ending the session. This is the master progress tracker.
 
+## Documentation Placement (Non-Negotiable)
+
+All docs follow the taxonomy in **`docs/README.md`**. Two axes:
+- **Reference** (stable knowledge) → by type: `docs/{domain,product,technical,business,training}/`.
+- **Delivery** (work we code/modify *against*) → by status: `docs/delivery/{pending,in-progress,complete,abandoned}/`. An effort is a folder, moved with `git mv` as its status changes.
+
+Hard rules (a `PreToolUse` hook + a CI check enforce these):
+1. **Never create a new `.md` at `docs/` root** (or repo root — except `README`/`CLAUDE`/`CONTRIBUTING`/`CODE_OF_CONDUCT`). It goes in a category folder or `delivery/<stage>/`.
+2. **Every doc starts with frontmatter** — at least `type:` and `status:` (full spec in `docs/README.md` §4).
+3. **When unsure which category, use `docs/delivery/in-progress/`** — never the root.
+4. New efforts: scaffold with `/new-effort <slug>`.
+
+Full taxonomy, frontmatter spec, and the legacy-migration map live in `docs/README.md`. (Migration of existing files is deferred until the analysis journey finishes — don't move files it may be reading.)
+
 ## Auto-Restart API
 
 **When any .NET backend change is made that requires a restart (controller changes, entity changes, Program.cs, appsettings, etc.), automatically rebuild and restart the API container:**
