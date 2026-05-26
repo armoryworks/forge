@@ -1,60 +1,266 @@
-# forge
+# Forge
 
-Open-source manufacturing operations platform. QuickBooks-integrated
-engineering and production management for small-to-mid shops.
+**Open-source manufacturing operations platform.** QuickBooks-integrated engineering and production management for small-to-mid shops — the full quote-to-cash lifecycle in one self-hosted stack.
 
-> **This is the umbrella repo.** The actual code lives in sibling repos:
+<p>
+  🌐 <strong>Live site:</strong> <a href="https://forge.armoryworks.com">forge.armoryworks.com</a>
+  &nbsp;·&nbsp;
+  🏭 <strong>Built by:</strong> <a href="https://armoryworks.com">Armory Works</a>
+</p>
+
+> **This is the umbrella repo.** It holds project documentation, governance, and the release manifest. The code lives in sibling repos:
 >
-> - **[forge-ui](https://github.com/armoryworks/forge-ui)** — Angular 21 frontend
-> - **[forge-api](https://github.com/armoryworks/forge-api)** — .NET 9 API + EF migrations
-> - **[forge-deploy](https://github.com/armoryworks/forge-deploy)** — docker-compose + ops scripts (start here to install)
-> - **[forge-test](https://github.com/armoryworks/forge-test)** — manual test plans for human testers
-> - **[forge-voice](https://github.com/armoryworks/forge-voice)** — Asterisk-based voice / telephony integration
-
-This repo holds project-level documentation, governance, and the
-release manifest pinning which sibling versions ship together.
-
----
-
-## What is this?
-
-A manufacturing-shop operations platform covering the full quote-to-cash
-lifecycle: leads, quotes, sales orders, jobs, kanban shop floor, time
-tracking, inventory, purchasing, shipping, invoicing, payments, returns.
-Designed for shops that use QuickBooks Online as their accounting system
-of record but want richer operational tooling on top.
-
-Runs as a self-hosted docker-compose stack. Single-node by default;
-designed to scale to small-team use without a Kubernetes commitment.
+> | Repo | What it is |
+> |------|-----------|
+> | **[forge-ui](https://github.com/armoryworks/forge-ui)** | Angular 21 frontend (SPA) |
+> | **[forge-api](https://github.com/armoryworks/forge-api)** | .NET API + EF Core migrations |
+> | **[forge-deploy](https://github.com/armoryworks/forge-deploy)** | docker-compose + the `forge-deploy` CLI — **start here to install** |
+> | **[forge-test](https://github.com/armoryworks/forge-test)** | Public test/demo SPA + manual test plans |
+> | **[forge-voice](https://github.com/armoryworks/forge-voice)** | Asterisk-based voice / telephony integration |
 
 ---
 
-## Get started (for users)
+## What is Forge?
+
+A manufacturing-shop operations platform covering the full **quote-to-cash** lifecycle: leads, quotes, sales orders, jobs, a kanban shop floor, time tracking, inventory, purchasing, shipping, invoicing, payments, and returns — plus parts/BOM management, quality control, an employee training LMS, document signing, and a configurable AI assistant.
+
+It is designed for shops that use **QuickBooks Online** (or Xero, FreshBooks, Sage, etc.) as their accounting system of record but want richer operational tooling on top. Forge also runs fully **standalone** — when no accounting provider is connected, its built-in invoicing/payments/AR features activate; when one is connected, those defer to the provider.
+
+Forge runs as a **self-hosted Docker Compose stack**. Single-node by default, with a deploy toolchain (`forge-deploy`) that also supports splitting the UI, API, and database across separate machines — without a Kubernetes commitment.
+
+### The stack at a glance
+
+| Layer | Technology | Container |
+|-------|-----------|-----------|
+| Frontend | Angular 21 + Material, served by nginx | `forge-ui` |
+| Backend | .NET API (MediatR/CQRS, EF Core) | `forge-api` |
+| Database | PostgreSQL (with pgvector) | `forge` |
+| Object storage | MinIO (S3-compatible) | `forge-storage` |
+| Backups | Scheduled `pg_dump` sidecar | `forge-backup` |
+| Optional | Ollama (AI), Coqui (TTS), DocuSeal (signing), Seq (logs) | profile-gated |
+
+---
+
+## Installing Forge with `forge-deploy`
+
+Everything below runs on the machine that will host Forge. The deploy toolchain lives in the **[forge-deploy](https://github.com/armoryworks/forge-deploy)** repo: `setup.sh` bootstraps a new install, and the `forge-deploy` CLI manages topology, versions, and updates afterward.
+
+### Prerequisites
+
+- **A 64-bit Linux host** (Ubuntu/Debian recommended), macOS, or Windows with Docker Desktop. ARM (Raspberry Pi 4/5, Apple Silicon) is supported.
+- **Docker Engine + the Compose v2 plugin.** Verify with `docker version` and `docker compose version`. On a fresh Linux box: `curl -fsSL https://get.docker.com | sudo sh`.
+- **git**, and **~4 GB RAM** minimum (8 GB+ recommended; the setup script applies tighter container limits automatically on low-RAM hosts).
+- Outbound access to **ghcr.io** (to pull prebuilt images) unless you build from source.
+
+### Step 1 — Get the deploy repo
 
 ```bash
-# Clone the deploy repo
-git clone https://github.com/armoryworks/forge-deploy.git
-cd forge-deploy
-
-# Run the setup wizard (Linux/macOS)
-./setup.sh
-
-# Or on Windows
-.\setup.ps1
+git clone https://github.com/armoryworks/forge-deploy.git /opt/forge-deploy
+cd /opt/forge-deploy
 ```
 
-The setup script handles prerequisite checks, env file generation, JWT
-key creation, and starts the stack via `docker compose up -d`. See
-[forge-deploy](https://github.com/armoryworks/forge-deploy) for
-full installation docs.
+`/opt/forge-deploy` is the conventional location, but any path works. **What this gives you:** the compose files, the `setup.sh` bootstrapper, and the `forge-deploy` / `forge-preflight` CLIs under `scripts/`.
+
+### Step 2 — Run the setup bootstrapper
+
+```bash
+./setup.sh
+```
+
+This is the one-shot first-time bring-up. **Each thing it does:**
+
+1. **Prerequisite checks** — confirms Docker is installed and running, and the Compose plugin is present. It stops with clear guidance if anything's missing.
+2. **Environment file** — creates `.env` from `.env.example`. This holds every tunable: image tags, port bindings, database credentials, integration keys. It is **never committed** (it contains secrets).
+3. **JWT signing keys** — generates the keys the API uses to sign login tokens.
+4. **Seed/admin password** — prompts you for a password (hidden input). On a seeded install this becomes the password for the demo users (e.g. `admin@forge.local`); on a fresh install it's the first admin account.
+5. **Hosting mode + SSL** — auto-detects whether you're running **standalone** (Forge owns ports 80/443) or **cohost** (an existing reverse proxy / tunnel fronts it), and whether to generate a self-signed certificate. Override with `--standalone` / `--cohost` and `--ssl` / `--no-ssl`.
+6. **Images** — pulls prebuilt multi-arch images from `ghcr.io/armoryworks/*` (the default), or builds from local source with `--source`.
+7. **Start** — brings the core services up: `docker compose up -d` for `forge` (db), `forge-storage`, `forge-backup`, `forge-api`, `forge-ui`.
+
+**Useful flags:** `--seeded` (load demo data — recommended for a first look), `--source` (build locally instead of pulling), `--cohost` (behind a host proxy), `--public` (one-command exposure with SSL + firewall preflight), `--include-ai` / `--include-tts` / `--include-signing` (optional profiles). Run `./setup.sh --help` for the full list.
+
+### Step 3 — Open Forge
+
+When setup finishes it prints your access URLs. By default:
+
+| Service | URL |
+|---------|-----|
+| **Web app** | http://localhost:4200 |
+| API | http://localhost:5000 |
+| API health | http://localhost:5000/api/v1/health |
+| MinIO console | http://localhost:9001 (`minioadmin` / `minioadmin`) |
+
+Log in with `admin@forge.local` and the password you set in Step 2 (seeded installs). On a **cohost** box, point your reverse proxy / tunnel at `http://127.0.0.1:4200`.
+
+### Step 4 — Install the `forge-deploy` CLI
+
+`setup.sh` got you running. The **`forge-deploy` CLI** manages everything afterward — version upgrades, rollbacks, and multi-machine topology:
+
+```bash
+sudo bash scripts/install-forge-deploy.sh
+```
+
+**What this does:** copies `forge-deploy` to `/usr/local/bin` (so you can run it from anywhere), creates `/etc/forge/deploy-state.json` (records what's deployed), and a log at `/var/log/forge-deploy.log`. Re-running it is safe and preserves your state. Verify with `forge-deploy --version`.
+
+### Step 5 — Manage Forge with `forge-deploy`
+
+Run it with **no arguments** — it adapts to the box:
+
+```bash
+forge-deploy
+```
+
+- **First run** (box not yet configured) → a **topology wizard**: it asks what this box should run, prompts for only the addresses that choice needs, picks an image version per component, wires everything, and brings the stack up.
+- **A configured box** → a **version picker**: for each component it lists the published versions (newest releases), highlights the one you're running with `»  0.0.121  « current`, and defaults to it — press **Enter** to keep it and move to the next component, or pick a number to upgrade/downgrade. Press **`r`** at any prompt to re-run setup from scratch, **`q`** to quit.
+
+Other commands: `forge-deploy --status` (what's deployed + container health), `forge-deploy --list` (available versions), `forge-deploy --rollback` (revert to the previous version), `forge-deploy --logs` (deploy history), `forge-deploy --self-update` (update the CLI itself). Run `forge-deploy --help` for everything.
+
+> **Always run `forge-preflight` if a deploy misbehaves** — it's a read-only doctor that checks the things that actually break deployments (floating image tags, file ownership, line endings, overlay drift) and prints the exact fix for each.
+
+### Deployment topologies
+
+Forge runs on one box or splits across several. The setup wizard (`forge-deploy --setup`, or the first-run prompt) configures any of these — picking the right containers per box and wiring the connections automatically:
+
+| Topology | Boxes & roles | One-line setup (per box) |
+|----------|---------------|--------------------------|
+| **All-in-one** | everything on one box | `forge-deploy --setup --role all --host forge.example.com` |
+| **UI + API / DB** | app box + database box | `--role ui+api --db-host DB` · `--role db` |
+| **UI / API + DB** | web box + backend box | `--role ui --api-url http://API:5000` · `--role api+db` |
+| **UI / API / DB** | three separate boxes | `--role ui …` · `--role api --db-host DB …` · `--role db` |
+
+For a split deployment the wizard handles the cross-box plumbing for you: pointing the web tier at a remote API, pointing the API at a remote Postgres/MinIO, exposing the database box on the LAN, and generating the host reverse-proxy vhost (TLS, WebSocket, SPA + API routing). You don't hand-edit nginx or connection strings.
 
 ---
 
-## Get started (for contributors)
+## Updating
 
-Clone this umbrella repo and run the bootstrap script — it clones all
-five sibling repos as children of the wrapper so you have the full
-project laid out for cross-cutting work:
+To upgrade (or roll back) a running install, just run `forge-deploy` and use the version picker, or target a specific version:
+
+```bash
+forge-deploy 1.4.2                 # deploy that release to this box's components
+forge-deploy 1.4.2 --service api   # just the API
+forge-deploy --rollback            # revert to the previously deployed version
+```
+
+Deploys are **health-gated**: forge-deploy waits for the new container to report healthy and **automatically rolls back** if it doesn't. It refuses to deploy the floating `latest` tag — production always runs an immutable, pinned version.
+
+---
+
+## Configuration reference
+
+All configuration lives in `/opt/forge-deploy/.env` (created by `setup.sh`). Common keys:
+
+| Key | Purpose | Default |
+|-----|---------|---------|
+| `SERVER_IMAGE_TAG` / `UI_IMAGE_TAG` | Pinned image versions | managed by `forge-deploy` |
+| `UI_PORT` / `API_PORT` | Host ports for the web app / API | `4200` / `5000` |
+| `UI_BIND` / `API_BIND` | Interface to bind (`127.0.0.1` = local only, `0.0.0.0` = LAN) | `127.0.0.1` |
+| `POSTGRES_*` / `MINIO_*` | Database / object-storage credentials + ports | see `.env.example` |
+| `QBE_HOSTING_MODE` | `standalone` or `cohost` | `standalone` |
+| `SEED_DEMO_DATA` | Load demo data on first start | `true` |
+
+Edit `.env`, then re-apply with `forge-deploy --up` (which brings up only this box's components and never recreates the ones you've split off).
+
+---
+
+## Troubleshooting
+
+Run **`forge-preflight`** first — it diagnoses most of these automatically. If you're still stuck, work through the relevant section.
+
+### 1. `docker compose up` fails: "port is already allocated"
+
+Another process (often a stray `docker-proxy` from a previous stack) holds the port.
+
+```bash
+sudo ss -tlnp 'sport = :4200'        # find what's listening (swap in the port from the error)
+docker ps --format '{{.Names}}\t{{.Ports}}'   # is it one of yours?
+```
+
+If it's a Forge container, `docker compose down` and retry. If it belongs to another app, change `UI_PORT`/`API_PORT` in `.env` instead. **Never blindly `kill` a `docker-proxy`** — it may be serving another site on the same host.
+
+### 2. `git pull` fails: "dubious ownership" or "Permission denied"
+
+The repo files are owned by `root` (common after a `sudo` operation). Reclaim them:
+
+```bash
+sudo chown -R "$(id -un):$(id -gn)" /opt/forge-deploy
+cd /opt/forge-deploy && git fetch origin && git reset --hard origin/main
+```
+
+### 3. The API container keeps restarting / crash-loops
+
+Almost always a bad or floating image tag. Check the logs and pin a known-good version:
+
+```bash
+docker logs forge-api --tail 50          # read the startup error
+forge-preflight                          # flags SERVER_IMAGE_TAG=latest as a FAIL
+forge-deploy --list --releases           # see available versions
+forge-deploy 1.4.2 --service api         # pin an immutable tag
+```
+
+If `.env` has `SERVER_IMAGE_TAG=latest`, pin it — `latest` can move under you and ship a broken build.
+
+### 4. `forge-deploy: Unknown option` after a `git pull`
+
+The installed CLI in `/usr/local/bin` is a stale copy. The installer copies the script, so a `git pull` alone doesn't update the command:
+
+```bash
+cd /opt/forge-deploy && git fetch origin && git reset --hard origin/main
+sudo bash scripts/install-forge-deploy.sh
+forge-deploy --version                   # confirm it matches the repo
+```
+
+### 5. The site shows a 502 / "Bad Gateway" (behind a reverse proxy or tunnel)
+
+The chain is `browser → proxy/tunnel → host reverse proxy → forge-ui`. Test each hop from the host, bypassing the outer layers:
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:4200/                 # forge-ui itself (expect 200)
+curl -sk -o /dev/null -w '%{http_code}\n' https://127.0.0.1:443/ -H 'Host: forge.example.com'  # host proxy
+```
+
+- **forge-ui returns 200 but the host proxy 502s** → the host proxy's forge vhost points at the wrong upstream (e.g. an old IP/port). Re-run `forge-deploy --setup` (or `forge-deploy --edge --host forge.example.com`) to regenerate a correct vhost.
+- **forge-ui shows a friendly "under maintenance" dragon page** → that's intentional: the UI is up but can't reach the API. Fix the API path (next section).
+
+### 6. Split deployment: the web box can't reach the API box
+
+The API binds to `127.0.0.1` by default (local-only), so another machine can't reach it. On the **API box**:
+
+```bash
+# in .env: API_BIND=0.0.0.0   (or the LAN IP), then redeploy:
+forge-deploy --service api <version>
+ss -tlnp | grep ':5000'                  # should show 0.0.0.0:5000, not 127.0.0.1:5000
+```
+
+From the **web box**, confirm reachability, then (re-)wire it:
+
+```bash
+curl -sS http://<API-BOX-IP>:5000/api/v1/health     # must return Healthy JSON
+forge-deploy --setup --role ui --api-url http://<API-BOX-IP>:5000 --host forge.example.com
+```
+
+(If a host firewall is in the way: `sudo ufw allow from <WEB-BOX-IP> to any port 5000` on the API box.)
+
+### 7. The stack starts but the app won't load / health check fails
+
+```bash
+docker compose ps                        # which containers are unhealthy?
+docker logs forge-api --tail 100         # API errors (migrations, DB connection)
+docker logs forge --tail 50              # Postgres
+curl -s http://localhost:5000/api/v1/health   # composite health (db, storage, hangfire, signalr)
+```
+
+The API runs database migrations on first start and waits for Postgres + MinIO to be healthy, so the first boot can take a couple of minutes on a populated or low-RAM host.
+
+### Still stuck?
+
+Open an issue on the relevant repo ([forge-deploy](https://github.com/armoryworks/forge-deploy/issues) for install/ops, [forge-api](https://github.com/armoryworks/forge-api/issues) / [forge-ui](https://github.com/armoryworks/forge-ui/issues) for bugs) and include `forge-preflight` output, `docker compose ps`, and the relevant `docker logs`.
+
+---
+
+## For contributors
+
+Clone this umbrella repo and run the bootstrap script — it clones all sibling repos as children of the wrapper so you have the full project laid out for cross-cutting work:
 
 ```bash
 git clone https://github.com/armoryworks/forge.git
@@ -63,30 +269,18 @@ cd forge
 .\bootstrap.ps1       # Windows
 ```
 
-After bootstrap, your directory layout looks like:
+After bootstrap your layout is:
 
 ```
 forge/                 ← this repo (docs, governance)
 ├── forge-ui/          ← Angular code
 ├── forge-api/         ← .NET code
 ├── forge-deploy/      ← docker-compose + scripts
-├── forge-test/        ← manual test plans
+├── forge-test/        ← public test SPA + manual test plans
 └── forge-voice/       ← Asterisk voice / telephony integration
 ```
 
-The bootstrap script also hard-links the four overlay compose files
-(`docker-compose.{dev,demo,cohost,export}.yml`) from `forge-deploy/`
-and junctions `tools/` to `forge-deploy/tools/`, so editing either
-side propagates to the other locally. The four overlays are tracked
-in **both** repos; CI verifies they stay byte-identical on every PR
-and push. When you edit one, commit it in both repos. If a `git
-checkout` ever breaks the underlying inode share, run
-`bash scripts/relink.sh` to re-establish it (verify with
-`bash scripts/check-overlay-parity.sh`).
-
-The base `docker-compose.yml` stays an independent wrapper-local
-file because its relative build-context paths (`./forge-ui`) differ
-from forge-deploy's (`../forge-ui`).
+The bootstrap script hard-links the overlay compose files (`docker-compose.{dev,demo,cohost,export}.yml`) from `forge-deploy/` and junctions `tools/` so edits propagate locally. These overlays are tracked in **both** repos; CI verifies they stay byte-identical. If a `git checkout` ever breaks the inode share, run `bash scripts/relink.sh` (verify with `bash scripts/check-overlay-parity.sh`).
 
 Read [`CONTRIBUTING.md`](./CONTRIBUTING.md) before opening a PR.
 
@@ -109,11 +303,7 @@ Visual flow specs live in [`specs/`](./specs/) (SVG files).
 
 ## Release coordination
 
-Each sibling repo versions independently. The
-[`release-manifest.md`](./release-manifest.md) records which versions
-were tested together as a release of the platform. When you install,
-pull the sibling versions named in the manifest entry that matches the
-master tag you're targeting.
+Each sibling repo versions independently. The [`release-manifest.md`](./release-manifest.md) records which versions were tested together as a platform release. When you install, the versions named in the manifest entry for your target tag are the ones known to work together.
 
 ---
 
@@ -121,9 +311,6 @@ master tag you're targeting.
 
 [Apache 2.0](./LICENSE) — see the LICENSE file for full terms.
 
----
-
 ## Code of Conduct
 
-This project follows the [Contributor Covenant](./CODE_OF_CONDUCT.md).
-By participating, you agree to abide by its terms.
+This project follows the [Contributor Covenant](./CODE_OF_CONDUCT.md). By participating, you agree to abide by its terms.
