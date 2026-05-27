@@ -60,5 +60,6 @@ analysis/inventory/_scout/
 /*.cjs
 /*.py
 /ui-scout-screenshots/
+/ui-scout-*.json
 analysis/**/*.py
 analysis/**/*.ps1
