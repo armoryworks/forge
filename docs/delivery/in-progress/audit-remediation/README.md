@@ -21,10 +21,25 @@ that turns each finding into a permanent regression guard.
 
 ## Goal
 
-Burn down the audit findings **test-first** (TDD): every finding becomes a test
-asserting the *correct* behavior (per `docs/business/definition-of-correct*.md`).
-The test is RED today, the fix makes it GREEN, and it stays as a regression guard.
-Ship nothing on the release-blocker list until its test is GREEN.
+Burn down the audit findings **test-first** (TDD), **one feature at a time**: every
+finding becomes a test asserting the *correct* behavior (per
+`docs/business/definition-of-correct*.md`). The test is RED today, the fix makes it
+GREEN, and it stays as a regression guard. Ship nothing on the release-blocker list
+until its test is GREEN.
+
+Two framing decisions drive this plan:
+
+1. **Net-benefit inclusion.** If a finding or suggestion makes the app better *at
+   all* and doesn't add cruft, gold-plating, or muddiness, it's **in** — regardless
+   of severity. The smaller LOW/nit items are included on purpose. Items we
+   deliberately *won't* do (by-design, false positives, out-of-scope) are recorded
+   in the catalog's [Excluded appendix](findings-catalog.md#excluded--deliberately-not-doing)
+   so the decision is explicit, not silently dropped.
+2. **Feature-by-feature, not severity-first.** The work is organized and sequenced
+   by **feature**: pick a feature, write the RED tests for *all* of its rows, fix
+   them, ship a coherently-improved feature, move to the next. Severity is a per-row
+   attribute and a ship-gate (below) — not the order of work. (The earlier
+   severity-wave framing was replaced on 2026-05-27 per this directive.)
 
 ## What the audit found
 
@@ -41,48 +56,82 @@ Ship nothing on the release-blocker list until its test is GREEN.
   The user is led to a feature, then dropped into a silent dead-end. Fixing the
   two root causes collapses ~25 per-feature symptom findings at once.
 
-## Severity rollup
+## Scope rollup
 
-Net of de-duplication against the pre-existing backlog (the flow tier independently
-re-confirmed several api defects already logged — those are cross-referenced, not
-double-counted).
+Net-benefit inclusion across all 44 phases (deduped — the flow/intersection/gating
+tiers independently re-confirmed several defects the completeness tier already
+logged; those are merged and cross-referenced, not double-counted). Roughly **160
+actionable items** after dedup + cruft exclusion, organized into ~50 features.
 
-| Severity | Count | Nature |
+| Severity | ~Count | Nature |
 |----------|------:|--------|
-| **BLOCKER / release-gating** | 8 | Must-not-ship: a crash, an authz bypass, a broken-MFA crypto bug, and WCAG keyboard traps |
-| **HIGH** | ~42 | Data-integrity / financial correctness, security authz, gating coherence, WCAG |
-| **MED** | ~32 | Mostly per-feature gating-UX symptoms + consistency drift |
-| **LOW** | ~13 | Token drift, copy, read-leaks |
+| **BLOCKER / ship-gate** | ~18 | Crashes, authz bypasses (kanban/shop-floor/planning/time-tracking), broken MFA (crypto + login contract), payroll race, a no-op predictive-maint façade, WCAG keyboard traps |
+| **HIGH** | ~45 | Data-integrity / financial correctness, IDOR / data exposure, gating coherence, dead-but-shipped surfaces, WCAG |
+| **MED** | ~60 | Half-built features, cap-OFF UX dead-ends, missing edit/lifecycle paths, state-machine guards |
+| **LOW** | ~40 | Dead methods, token drift, copy, read-leaks, orphan components |
 
-Full per-finding detail: [findings-catalog.md](findings-catalog.md).
+Full per-feature detail: [findings-catalog.md](findings-catalog.md). Counts are
+approximate because several rows bundle a sibling cluster (e.g. PRI-1/2/3).
 
-## Release blockers (must-not-ship until GREEN)
+## Ship gate (must-not-ship until GREEN)
 
-These gate any release regardless of wave ordering.
+A severity overlay on top of the feature spine: these must all be GREEN before GA,
+**regardless of which feature you're working through**. They are crashes, authz
+bypasses, broken crypto, data exposure, or accessibility traps.
 
-| ID | What | Layer |
-|----|------|-------|
-| **G-38-MRP-1** | MRP page **freezes** (infinite effect loop, JS main thread dead) when `CAP-PLAN-MRP` is OFF | Cypress E2E + route guard |
-| **G-MFA-3** | TOTP HMAC keyed on UTF-8 bytes vs the base32 QR secret → **standard authenticator codes never match**; MFA enrolment is broken | xUnit (crypto) |
-| **G-38-MRP-3 / F-07B-03** | **ProductionWorker can create/activate/complete planning cycles** — no role gate on the mutations (live-confirmed POST→201) | WebApplicationFactory |
-| **F-EXP-01** | Expense approval (`PATCH /expenses/{id}/status`) has **no role/self gate** — any user approves any expense | WebApplicationFactory |
-| **SYS-01** | Inline `app-dialog` does **not trap focus** (0/12) — keyboard users escape into the page behind the modal (WCAG 2.1.2) | Cypress + axe |
-| **B1-N04 / B1-S01** | Skip link not first in tab order + global search input has **no accessible name** (WCAG 2.4.1 / 4.1.2) | Cypress + axe |
+| Area | ID(s) | What |
+|------|-------|------|
+| MRP | `G-38-MRP-1` | page **freezes** (infinite effect loop) when `CAP-PLAN-MRP` is OFF |
+| MFA | `G-MFA-3`, `F-15-FS-01` | TOTP keyed on UTF-8 vs base32 secret (codes never match) **and** the login request/response token contract is mismatched — MFA can't work end-to-end |
+| Kanban | `K-F3`, `K-F13`, `K-F15` | bulk-move bypasses irreversible-guard + skips stage events; `explode-bom` / `PUT job` ungated |
+| Shop floor | `SF-04`, `SF-05`, `SF-10` | complete-job / assign-job / clock all ungated (any worker, any job, any user) |
+| Planning | `P-F6` | ProductionWorker can create/activate/complete cycles (no role gate) |
+| Time tracking | `TT-04` | `GET /entries` exposes **all users'** entries to any caller |
+| Expenses | `F-EXP-01` | approval ungated — any user approves any expense |
+| Payroll | `F-14-BE-02` | `OvertimeRule.IsDefault` atomic-swap race |
+| Maintenance | `MAINT-01` | predictive-maint is a no-op mock bound in **all** envs (decide: build or remove) |
+| WCAG | `SYS-01`, `B1-N01/N04`, `B1-S01`, `B2-K01`, `B3-C01/C02` | focus trap, nav landmark, skip-link order, search label, kanban + chart keyboard |
 
 WCAG AA is declared non-negotiable in `CLAUDE.md` and gated by `npm run test:a11y`,
 so the WCAG criticals are contract violations, not nice-to-haves.
 
-## Burn-down waves (root-cause ordered)
+## Feature-by-feature burn-down
 
-Sequenced so each wave fixes a *root cause* and resolves its symptom cluster,
-rather than chasing per-screen symptoms. See the catalog for the finding→test map.
+Work **one feature to completion** before the next: write the RED tests for all of
+that feature's catalog rows, fix them (blocker→high→med→low within the feature),
+verify (`dotnet test` / `npm run test` + `test:a11y` / Cypress), ship the feature.
+A feature pass produces a coherent, shippable improvement instead of a thin
+severity-skim across everything.
 
-- **Wave 0 — Release blockers.** The 8 must-not-ship items above. Nothing ships until these are GREEN.
-- **Wave 1 — Financial & data-integrity correctness (api).** The handler/EF defects: QBO sync never enqueued, no `invoiced ≤ shipped` guard, shipping doesn't relieve inventory + reservation leaks, zero-line convert, BOM cycle, lead-convert atomicity, calendar set-default 500, job advances past open NCRs, expense↔vendor orphan. TDD via xUnit + EF `TestDbContext` + `WebApplicationFactory`.
-- **Wave 2 — Capability-gating coherence (ui).** The phase-40 NO verdict. Three root-cause fixes — (a) make `NavTreeService` capability-aware, (b) ship a shared "feature-disabled" state (`CapNotDirective` / explained-unavailable component) on cap-gated routes, (c) guard the MRP page — collapse the ~25 `G-37/38/39-*` symptoms. TDD via Cypress.
-- **Wave 3 — WCAG 2.2 AA (a11y).** 16 findings, 5 critical. Fix the *shared* components (`app-dialog` focus trap, `validation-button` live region, sidebar landmarks/`aria-current`, global search combobox, `app-data-table` caption, kanban keyboard move, chart text-alt + keyboard) so fixes propagate app-wide. TDD via Cypress + axe.
-- **Wave 4 — Editability & discoverability (ui + api).** Draft quote/SO edit paths, Draft-SO list visibility + Confirm path, lead "Convert" row-action, bulk-assign null guard, nav orphans (quality module, notifications, chat).
-- **Wave 5 — Consistency & polish (ui).** Design-token drift (hardcoded hex), currency-component usage, page-shell consistency, wiring `unsavedChangesGuard`, surfacing price-lists + vendor price-tiers.
+**Two cross-cutting "features" are highest leverage — do them first.** They're in
+Region 7 of the catalog and fixing them retires rows that recur across many other
+features:
+
+1. **Navigation shell + capability coherence** (`N-E3`, `P-F4`, `G-E2`). This is the
+   phase-40 NO verdict. Making the nav cap-aware and shipping one shared
+   "feature-disabled" state turns every per-feature "cap-OFF silent dead-end" row
+   (RFQ, RMA, recurring, MRP, compliance, training, EDI, announcements, AI, BI,
+   inventory tabs, quality tabs, customer tabs…) into a one-line consumer of the
+   shared fix. Build the shared piece once, then each feature just adopts it.
+2. **Shared-component spine + WCAG** (`app-dialog` focus trap + dialog-pattern
+   consolidation, `app-data-table` caption, sidebar landmarks, validation-button
+   live region, search combobox). Fixing the shared component fixes it everywhere
+   it's used — so the per-feature WCAG/dialog rows mostly evaporate.
+
+**Then proceed through the feature spine** (the catalog's region order is a
+reasonable default — it follows the value chain and front-loads the ship-gate
+features):
+
+- **Region 1 — Master Data:** Leads (the `L3` 500 blocks the whole worker queue) → Customers → Vendors → Parts/BOM → Inventory → Lots.
+- **Region 2 — Quote-to-Cash + Expenses:** Quotes/Estimates → Sales Orders → Purchasing/Receiving → Shipments → **Invoices** (QBO-sync blocker) → Payments → Returns → **Expenses** (approval blocker).
+- **Region 3 — Operations:** **Kanban** + **Shop Floor** + **Planning** + **Time Tracking** (cluster the authz blockers) → Scheduling → OEE → Quality → **MRP** → Assets → **Maintenance** (mock-façade decision).
+- **Region 4 — Platform:** Reports → Approvals (needs Users `ManagerId` first) → Dashboard → Notifications → Calendar → Chat → Search.
+- **Region 5 — Admin + Account:** Admin Core (calendar/location set-default 500) → Users → Capabilities → MFA → Payroll (overtime race) → Training → EDI/Announcements/BI/Events.
+- **Region 6 — Access + Edge:** **Auth/MFA** (login contract blocker) → Onboarding → Portal → Mobile → AI.
+
+Within each feature, the catalog row's `Test` column names the layer (xUnit / EF /
+integration / Vitest / Cypress / axe). api rows also appear in
+`forge-api/forge.tests/Remediation/BACKLOG.md` for the `grep "Skip = \"RED"` view.
 
 ## Where things live (single source of truth per layer)
 
@@ -96,22 +145,26 @@ rather than chasing per-screen symptoms. See the catalog for the finding→test 
 
 ## Definition of Done
 
-- Every BLOCKER and HIGH finding has a written test (RED → GREEN) and the fix landed.
-- `npm run test:a11y` passes (WCAG criticals closed).
+- Every **in-scope** catalog row (all severities, not just BLOCKER/HIGH) has a
+  written test (RED → GREEN) and the fix landed — *or* is moved to the Excluded
+  appendix with a one-line reason. Net-benefit means nothing is silently dropped.
+- The ship-gate table is fully GREEN; `npm run test:a11y` passes.
 - The phase-40 coherence verdict flips to YES: nav is cap-aware and every cap-gated
   surface renders an explained-unavailable state (verified by Cypress).
-- MED/LOW findings either fixed or explicitly deferred with a one-line reason here.
+- Each feature is checked off only when *all* its rows are GREEN (feature-complete,
+  not severity-complete).
 - On completion: `git mv` this effort to `docs/delivery/complete/`, set
-  `status: complete`, and graduate durable rules (e.g. the gating-UX contract, the
-  WCAG component contracts) into `docs/business/` + `docs/technical/`.
+  `status: complete`, and graduate durable rules (the gating-UX contract, the WCAG
+  component contracts, the dialog-pattern partition) into `docs/business/` +
+  `docs/technical/`.
 
 ## Notes
 
-- **De-dup discipline:** the flow tier (27–30) restated several api defects the
-  completeness/intersection tiers already logged. The catalog lists each defect
-  **once** under its root-cause theme and notes the corroborating phases — a defect
-  confirmed by both a unit-level and a flow-level phase is *higher confidence*, not
-  two findings.
+- **De-dup discipline:** the flow / intersection / gating tiers restated several
+  defects the completeness tier already logged. The catalog lists each defect
+  **once** under its owning feature and notes corroborating phases with "(also X)" —
+  a defect confirmed by both a unit-level and a flow-level phase is *higher
+  confidence*, not two findings.
 - **Writing the test sharpens the finding** (e.g. `AUDIT-S3` "5 header fields
   dropped" collapsed to a single `Notes` drop + a separate SO-edit UI gap once
   checked against `Quote.cs`). Expect refinement during burn-down; record it here.
