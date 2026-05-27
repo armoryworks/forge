@@ -117,29 +117,140 @@
 |----|--------|------|-----|----------|-----------|------------|-------|
 | **F-020** | [ENG] | BUG | BLOCKER | P0 | **DoD-pending** (not ship-blocking) | Code PASS ✓ | Regression test → auto-eng-2; seed backfill → [BA] assessing |
 | **F-021** | [QA] | GAP | BLOCKER | P0 | **YES** | open | Real Invoice/Payment never sync; $0 placeholder |
-| **F-026** | [ENG] | BUG | MAJOR | P1 | TBD | open | Payment over-application race; live |
+| **F-026** | [ENG] | BUG | MAJOR | P1 | TBD | open | Payment over-application race; **unblocks after F-027 DoD verified** |
+| **F-027** | [ENG] | BUG | MAJOR | P1 | NO | **live (1512cc7); DoD-unverified** | Balance formula canonical (Invoice.BalanceDue); harness staged — pending `f026-f027-payment-balance-dod.md`; **F-027 close ⊢ F-026 unblock** |
 | **F-028** | [BA] | GAP | BLOCKER | P0 | **YES** | open | No estimating engine; INV-Q1–Q4 untestable; largest single build in wave; bounded by §A1 MVP scope |
-| **F-029** | [BA] | BUG | MAJOR | P1 | TBD | open | Job estimated costs never populated |
-| **F-030** | [BA] | GAP | BLOCKER | P0 | **YES** | open | Shipment relieves no inventory/COGS |
+| **F-029** | [BA] | BUG | MAJOR | P1 | TBD | open | Est-cost stamp in CreateJob; rides F-043 handler (same PR); **F-029 ⊢ F-028** |
+| **F-030** | [BA] | GAP | BLOCKER | P0 | **YES** | open | Shipment relieves no inventory/COGS; lot-additive (nullable `lot_id`); COGS split → BE-2b **gated on DOM ruling**; **F-030 ⊢ F-047** |
 | **F-031** | [BA] | BUG | BLOCKER | P0 | **YES** | open | Flat tax diverges from QBO AST; latent under mock |
-| **F-033** | [ENG] | BUG | MAJOR | P1 | TBD | open | State-machine blacklists; partial-ship cancel unguarded |
+| **F-033** | [ENG] | BUG | MAJOR | P1 | TBD | **live (5f6bef1); DoD-pending** | State-machine blacklists; partial-ship cancel unguarded |
 | **F-035[BA]** | [BA] | BUG+GAP | MAJOR | P1 | TBD | open | Credit-memo model absent; FE create/apply in MVP scope |
 | **F-037** | [SEC] | BUG | MAJOR | P1 | TBD | not started | Margin summary → ProductionWorker; live |
 | **F-038** | [SEC] | BUG | MAJOR | P1 | TBD | not started | Job cost summary → ProductionWorker; live |
 | **F-041** | [QA] | BUG | MAJOR | P1 | TBD | open | Quote list `total` = pre-tax; detail = tax-inclusive |
-| **F-043** | [QA] | GAP | BLOCKER | P0 | **YES** | open | SO→Job linkage never wired; C4 hard break |
-| **F-044** | [QA] | BUG | MAJOR | P1 | TBD | open | Shipment lines null part; packing lists unusable |
+| **F-043** | [QA] | GAP | BLOCKER | P0 | **YES** | open | SO→Job linkage never wired; C4 hard break; **F-043 ⊢ F-029**; reseed ⊢ (F-043 ∧ BE-2a ∧ F-044) |
+| **F-044** | [QA] | BUG | MAJOR | P1 | TBD | open | Shipment lines null part; fast-lane; **F-044 ⊢ F-047**; reseed ⊢ (F-043 ∧ BE-2a ∧ F-044) |
 | **F-046** | [QA] | GAP | MAJOR | P1 | TBD | open | CAP-ACCT-EXTERNAL disabled; C10 dark |
-| **F-047** | [QA] | GAP | BLOCKER | P0 | **YES** | open | Lot/serial backbone absent; INV-SH3 fails |
+| **F-047** | [QA] | GAP | BLOCKER | P0 | **YES** | open | Lot/serial backbone absent; INV-SH3 fails; **gated on F-030+BE-1+F-044** (all must land first); BE-5 backbone |
 | **F-048** | [DISC] | BUG | MAJOR | P1 | TBD | open | Double QB invoice per job when cap enabled |
 | **F-049** | [ENG] | BUG | MAJOR | P1 | TBD | open | Production runs accept over-complete; INV-SF2 |
-| **F-051** | [SEC] | BUG | BLOCKER | P0 | **YES** | impl → review | No account lockout; `AccessFailedAsync` never called; live |
+| **F-051** | [SEC] | BUG | BLOCKER | P0 | ~~YES~~ **closed-pending-ship-confirm** | resolved (c7e76cf) — 3-path smoke PASS ✓; ship-gate clearance pending DevOps DAG confirm + SEC canonical SHA (open item #17) | No account lockout — fix committed; ship-gate clearance held pending DevOps/SEC (#17) |
 | **F-053** | [SEC] | BUG | MAJOR | P1 | TBD | impl → review | Hardcoded JWT fallback key |
 | **F-054** | [SEC] | BUG | BLOCKER | P0 | **YES** | STR · not started | MFA full-auth bypass; structural; live when MFA enrolled |
 | **F-055** | [QA] | BUG/GAP | MAJOR | P1 | TBD | open | Price-lock invariant — SO.unit_price vs accepted Quote |
 | **F-056** | [ENG] | GAP | MINOR | P3 | NO | open | ETag If-Match not injected on Kanban job sub-path PATCHes (`/stage`, `/subtasks/{id}`, etc.) — URL-key mismatch in interceptor |
+| **F-057** | — | — | — | — | — | **RESERVED GAP** | No finding; slot preserved per ID-collision ruling 2026-05-21 — do not reuse |
+| **F-058** | [SEC] | BUG | MAJOR | P1 | TBD | stub → `[SEC]` to fill | DP keys at rest unencrypted; `[SEC]` to append evidence + CVSS |
 
-> Priority ratifications (source: `[ORCH]` 2026-05-21): F-021/F-030/F-031/F-043/F-047 = BLOCKER/ship-gate; F-051 = BLOCKER/P0 live-security; F-020 = code-PASS/DoD-pending (not ship-blocking). F-054 = BLOCKER/P0 per [SEC] H-015. Remaining P1 TBDs await `[ORCH]` priority call.
+> Priority ratifications (source: `[ORCH]` 2026-05-21): F-021/F-030/F-031/F-043/F-047 = BLOCKER/ship-gate; F-051 = BLOCKER/P0 live-security; F-020 = code-PASS/DoD-pending (not ship-blocking). F-054 = BLOCKER/P0 per [SEC] H-015. Remaining P1 TBDs await `[ORCH]` priority call. **ID registry tail (2026-05-21):** F-056 = ETag gap (stands); F-057 = reserved gap (no finding); F-058 = DP-keys-at-rest ([SEC] stub); **next-free = F-059**.
+>
+> **Ship-gate BLOCKER set — 7 ACTIVE (updated 2026-05-21):** F-021 · F-028 · F-030 · F-031 · F-043 · F-047 · F-054. All 7 must reach resolved/code-PASS before ship. F-051 **closed-pending-ship-confirm** — out of active set; ship-gate clearance held pending DevOps DAG placement + SEC canonical SHA (open item #17 DevOps/SEC lane).
+>
+> **Live fixes pending DoD (DevOps #17, HEAD = c7e76cf):** F-027 live (1512cc7) — DoD-unverified; harness staged, single gate = `f026-f027-payment-balance-dod.md` (in flight; shared-stack read-only constraint applies). F-033 live (5f6bef1) — DoD-pending (auto-eng ReturnMaterialIssue test task outstanding, see coverage-gap ruling above).
+>
+> **Locked dependency chains (`[ENG]` 2026-05-21):** (1) Inventory/shipment: BE-1[F-030 qty-relief, lot-additive nullable `lot_id`] ⊢ F-047; F-044[PartId fast-lane] ⊢ F-047; F-030[COGS] split → BE-2b **gated on DOM COGS-ownership ruling**. (2) Job seam: F-043[SO-line FK + BOM-pin] ⊢ F-029[est-cost stamp, same handler PR] ⊢ F-028[estimating engine]. (3) Reseed: durable handler-driven reseed ⊢ (BE-2a ∧ F-043 ∧ F-044) — all three must be merged before reseed runs.
+
+**P1 priority sweep — 13 MAJOR candidates (2026-05-21, `[QA]`)**
+
+All 13 are **PRIMARY** scope. No SECONDARY finding rises to blocker-sweep escalation. Exception: **F-033** — the `CancelSalesOrder`/`VoidInvoice` handlers are PRIMARY must-fix; the `CancelPurchaseOrder`/`ReceiveItems` handlers are SECONDARY and require blocker-sweep depth only (not full remediation).
+
+| Rank | ID | Scope | Bundle | Cost | Rationale |
+|------|----|-------|--------|------|-----------|
+| 1 | **F-037** | PRIMARY | bundle F-037+F-038 | S | Live auth hole: margin summary readable by any worker; 1-liner `[Authorize]`; impl pending review |
+| 2 | **F-038** | PRIMARY | bundle F-037+F-038 | S | Same class as F-037; job cost summary → ProductionWorker; same PR |
+| 3 | **F-053** | PRIMARY | standalone | S | Hardcoded JWT fallback key in appsettings; impl done, awaiting review |
+| 4 | **F-033** | PRIMARY (CancelSO/VoidInv) · SECONDARY blocker-sweep (CancelPO/ReceiveItems) | standalone (Wave-1 H-009) | S | State-machine blacklists; 1–2 line whitelist per PRIMARY handler; SECONDARY handlers checked at sweep depth only |
+| 5 | **F-041** | PRIMARY | standalone | S | Quote list `total` = pre-tax; quick DTO fix adds tax-inclusive field |
+| 6 | **F-049** | PRIMARY | standalone | S | Production over-complete accepted; 2-line guard in handler |
+| 7 | **F-055** | PRIMARY | standalone (same price surface as F-028 07-B — coordinate) | S | Price-lock invariant guard in UpdateSalesOrder + ConvertQuote |
+| 8 | **F-026** | PRIMARY | bundle F-026+F-027 (Wave-0 stacked on F-020) | M | Payment race; row-lock on invoice in payment tx; F-027 code-complete, can ship together |
+| 9 | **F-048** | PRIMARY | bundle BE-2a seam hardening | S | DB migration: remove duplicate `accounting_document_type`; add UNIQUE index; sequence before F-046 flip |
+| 10 | **F-044** | PRIMARY | fast-lane standalone; ⊢ F-047 | M | Null `part_id` on shipment_lines; schema migration + handler update; hard prerequisite for F-047 (alongside BE-1+F-030 complete) |
+| 11 | **F-046** | PRIMARY | sequence after F-048 | S | DevOps: flip CAP-ACCT-EXTERNAL; unblocks C10 seam; sequence after F-048 migration lands |
+| 12 | **F-029** | PRIMARY | rides F-043 handler (same PR); F-029 ⊢ F-028 | S | Est-cost stamp added to CreateJob alongside F-043 SO-line FK + BOM-pin; F-028 estimating engine consumes what F-029 stamps |
+| 13 | **F-035[BA]** | PRIMARY | standalone (sequence after F-026 payment fixes) | L | Credit-memo model; multi-sprint; MVP scope = FE create + apply surface |
+
+**3-BLOCKER cross-ref (F-030, F-043, F-047) — sequencing LOCKED by eng-lead 2026-05-21**
+
+- **F-030 ↔ BE-1 (conservation race):** Adjacent, NOT the same fix. BE-1 (H-006) = concurrency guard on the `bin_contents` allocation term (check-then-set race; optimistic lock). F-030 = the shipment-relief decrement is structurally absent — `bin_contents` is never touched on ship-confirm at all. Sequence: F-030 must land first (creates the term); BE-1 then guards it from concurrent over-relief. Same sprint, sequential PRs. **F-030 COGS split → BE-2b** — gated on pending DOM COGS-ownership ruling; not in F-030 PR scope until that ruling lands.
+- **F-030 ⊢ F-047 — LOCKED (supersedes prior `F-030 ⟂ F-047` parallel claim):** Eng-lead ruling 2026-05-21: F-030 ships with **nullable `lot_id`** (lot-additive design); F-047 fills that column. F-047 is fully gated on two independent prerequisites — both must land first: **(1) F-030 quantity-relief + BE-1 concurrency guard complete**; **(2) F-044 `part_id` on shipment_lines (fast-lane)**. F-047 backbone (BE-5) is owned by BE-1's peer and starts as sequential continuation after BE-1+F-044.
+- **F-043 ⊢ F-029 ⊢ F-028 — LOCKED (supersedes prior F-028-gates-F-029 claim):** Eng-lead ruling 2026-05-21: F-043 [SO-line FK + BOM-pin] lands in `CreateJob` first. **F-029 [est-cost stamp] rides the same handler PR** — not a separate build, not gated on F-028. Once F-043+F-029 are live, `Job.EstimatedCost` is populated and F-028's estimating engine can consume it (F-029 ⊢ F-028). Prior claim that F-029 depended on F-028 is superseded.
+
+**Coverage-gap ruling — `ReturnMaterialIssue` test coverage (2026-05-21, `[QA]`)**
+
+Context: auto-eng-1's F-033 regression suite covers the `ReturnMaterialIssue` archived-job guard **indirectly** (via the handler change); `CreateMaterialIssue` has three explicit tests (INV-SF2 archived-job guard + active happy-path + not-found). No dedicated `ReturnMaterialIssueHandlerTests` exists.
+
+**Archived-job guard — indirect coverage is sufficient for GT-CHARTER.** Rationale: the guard is structurally identical in both handlers (same condition, same throw path); the F-033 handler change was applied to both; `CreateMaterialIssue`'s explicit guard test confirms the pattern works. A dedicated guard-only test for `ReturnMaterialIssue` would add no new signal and is not required to close F-033.
+
+**Quantity-restoration path (happy-path + not-found) — follow-up test task required.** `ReturnMaterialIssue` performs distinct DB mutations (`bin_contents++`, job-consumption decrement) that are not exercised by the guard tests or by any `CreateMaterialIssue` test. This path has zero explicit coverage and is a legitimate regression risk. Below GT-CHARTER threshold (corrective/inverse operation, not PRIMARY forward spine), but warrants a dedicated test before Wave-1 close.
+
+> **Action → auto-eng (routing via `[ORCH]`):** Add `ReturnMaterialIssueHandlerTests` — minimum: (1) happy-path quantity restoration (bin_contents += returned qty, job consumption decremented correctly), (2) not-found guard. Archived-job guard test is optional (already indirectly covered). Attach to F-033 DoD checklist.
+
+**Wave-0 invariant-test gate — F-027 (E1–E9) + F-026 (A1–A5) · `[QA]` owns gate signal (2026-05-21)**
+
+> **Binding rule (user, 2026-05-21):** A Wave-0 fix is "done" ONLY when its invariant regression test is GREEN (red pre-fix, green post-fix). Gate signal is `[QA]`-owned and is the Wave-0 ship signal reported to `[ORCH]`. Fixtures align to DOM DoD `f026-f027-payment-balance-dod.md` (inbound, #15) — pre-align spec below; update each fixture row when the doc lands.
+
+**Harness constraints (DevOps #17, shared :4200):**
+- Tests MUST NOT mutate the demo seed or trigger rebuild — dedicated xUnit + EF integration DB setup/teardown per test class (matching F-020 harness pattern)
+- **Auth pattern (canonical):** `CapabilityTestWebApplicationFactory` + `TestAuthHandler` (X-Test-User / X-Test-Role headers) — see "Canonical integration test-auth pattern" section below; minted-JWT bearer is NOT a supported harness path
+- Location: `forge-api/forge.api.tests/Features/Payments/` — agree final path with auto-eng-1/auto-eng-2 before authoring
+- Coordination: auto-eng-1 (after F-033 409 suite stands up) **or** auto-eng-2; run target agreed with DevOps before any execution against shared stack
+- HEAD at time of gate run must be confirmed with DevOps (c7e76cf or later)
+
+**F-027 — Balance formula canonical · Fixtures E1–E9**
+
+Formula under test: `BalanceDue = quantize(Total) − Σ(payments) − Σ(credits)` — per-line rounding (not aggregate), sourced from `Invoice.TaxAmount` (not re-derived from `TaxRate × subtotal`).
+
+| # | Fixture | Invariant probed | Pass condition |
+|---|---------|-----------------|----------------|
+| E1 | Single-line invoice — exact full payment | BalanceDue → 0 | status = Paid; no residual balance |
+| E2 | Single-line invoice — partial payment | BalanceDue = Total − payment | status = PartiallyPaid; remainder exact |
+| E3 | Multi-line invoice — per-line vs. aggregate rounding | BalanceDue = Σ(quantize(lineᵢ)) − payments | sum-of-rounded-lines ≠ rounded-sum where they differ |
+| E4 | TaxAmount field consumed, not re-derived | BalanceDue unchanged when TaxRate mutated post-invoice | formula reads Invoice.TaxAmount, not TaxRate × subtotal |
+| E5 | Credit applied: partial payment + credit memo | BalanceDue = Total − payment − credit | both deduction types subtracted correctly |
+| E6 | Payment > BalanceDue | hard-block | 400/422; ApplicationAmount > BalanceDue → rejected |
+| E7 | Sequential partials → final payment | Sent → PartiallyPaid → Paid status chain | each step promotes correctly; no skip |
+| E8 | Zero-balance edge (all amounts round to 0.00) | BalanceDue = 0.00; status = Paid | no negative balance; status correct |
+| E9 | Mixed: multiple payments + credit + rounding edge | BalanceDue = quantize(Total) − Σ(payments) − Σ(credits) | single canonical formula; no inline re-derivation anywhere |
+
+> **F-027 gate: 🔴 RED** — harness not yet executed; DOM DoD #15 in flight. Update to 🟢 GREEN when all E1–E9 pass on HEAD.
+
+**F-026 — Payment over-application race · Fixtures A1–A5**
+
+Invariant under test: single application ≤ remaining balance (hard-block) + row-lock serialises concurrent writers.
+
+| # | Fixture | Invariant probed | Pass condition |
+|---|---------|-----------------|----------------|
+| A1 | Application exactly at remaining balance | Amount = BalanceDue | accepted; status → Paid |
+| A2 | Application 1 cent over remaining balance | Amount = BalanceDue + 0.01 | rejected 400/422; error body includes BalanceDue |
+| A3 | Second partial after first partial (correct remainder) | Amount = BalanceDue post-first | accepted; balance = 0.00; status → Paid |
+| A4 | Concurrent applications — each individually ≤ balance, sum > balance | row-lock: only one writer wins; second sees updated balance | second writer rejected; no over-application; no deadlock |
+| A5 | Concurrent application + concurrent credit (sum > balance) | same row-lock guarantee covers credit path | serialised correctly; balance floor = 0.00 |
+
+> **F-026 gate: 🔴 RED** — open; F-027 DoD must verify first (F-027 close ⊢ F-026 unblock). A4/A5 require concurrent-test harness pattern (Task.WhenAll or TransactionScope pair). Update to 🟢 GREEN when all A1–A5 pass on HEAD.
+
+*On DOM DoD #15 landing: `[QA]` will reconcile E1–E9 and A1–A5 against exact fixture definitions in that doc, update any row that diverges, and report RED → GREEN transitions to `[ORCH]` as the Wave-0 ship signal.*
+
+**Canonical integration test-auth pattern — ratified `[QA]` 2026-05-21**
+
+> **Ruling:** `CapabilityTestWebApplicationFactory` + `TestAuthHandler` (headers `X-Test-User` / `X-Test-Role`) is the **canonical auth pattern** for all integration tests in this suite that require an authenticated principal.
+
+**Rationale:** `F033SourceStateGuardTests` (8 tests, auto-eng-1) were 🔴 RED at 401 — `MintAdminToken`-minted JWTs rejected by the test host. Root cause: minted-JWT bearer has no working precedent in this suite; JWT signing-key bootstrap in the test `WebApplicationFactory` differs from production. `CapabilityTestWebApplicationFactory` / `TestAuthHandler` is the established working pattern (every currently-passing auth integration test uses it) and is the correct precedent.
+
+- **Use:** `CapabilityTestWebApplicationFactory` as the `WebApplicationFactory<Program>` base; set principal via `X-Test-User` / `X-Test-Role` request headers through `TestAuthHandler`
+- **Do NOT use:** `MintAdminToken` or raw JWT bearer tokens in new integration tests — minted-JWT bearer is **not a supported harness path** in this suite
+- **Scope:** F-033 409 regression suite; Wave-0 E1–E9 / A1–A5 payment fixtures; all future integration tests requiring an authenticated principal
+
+**F-033 409 suite sign-off — `[QA]` owns gate · status: 🔴 PENDING (auto-eng-1 executing auth switch)**
+
+auto-eng-1 owns the file (`F033SourceStateGuardTests`) — `[QA]` does NOT co-edit. Sign-off requires more than "8 tests green"; `[QA]` will verify against the test file:
+
+1. **Each illegal source-state test asserts HTTP 409 specifically** — not 401, not 2xx, not a generic failure. The assertion must be `.StatusCode == HttpStatusCode.Conflict` (or equivalent), not just `!IsSuccessStatusCode`.
+2. **The legal source-state test asserts a non-409 success** — guard must not over-fire; a valid transition (e.g., Confirmed → CancelSalesOrder) must complete without 409.
+3. **409 originates from guard logic, not auth rejection** — if `TestAuthHandler` were misconfigured the test could return 401 and still satisfy a `!IsSuccessStatusCode` assertion silently. Sign-off reads the specific status code assertion.
+4. **No auth-bypass scenario** — confirm no `[AllowAnonymous]` was introduced on the handler that would make the suite vacuously green regardless of auth.
+
+`[QA]` reports signed-off to `[ORCH]` as: *"F-033 409 suite GREEN — 8/8, criteria 1–4 verified."*
 
 **De-dupe rule.** Before filing, ctrl-F the feature name in §4. If you find a likely match, file a new finding tagged `dup-of-Fxxx` linking to the original instead of rewriting.
 
@@ -259,6 +370,157 @@ Both held — no merge — pending DevOps rollback gate + QA verification. Will 
 - **F-042** (3 invoices wrong "Paid" status — BUG/MAJOR)
 - **F-043** (lot/serial-on-shipped absent — GAP/BLOCKER)
 - **F-044** (CAP-ACCT-EXTERNAL disabled — coverage hole)
+
+### H-023 [SEC] 2026-05-21 — FE contract-delta spec for F-054 (for frontend-engineer; routed by `[ORCH]`)
+
+`[FE]` (routed via `[ORCH]`) — F-054's backend fix (packet H-020) changes the MFA login contract. **This is a spec, not an implementation — `[SEC]` will not touch `forge-ui`.** Path back: reply in this H-023 thread or ping `[ORCH]`.
+
+**Why:** the old flow handed the client a raw `mfaUserId` and `/mfa/challenge` trusted it — that was the no-password bypass. Now Login issues a short-lived single-purpose **MFA-pending token** (proof the password passed) and the challenge requires it.
+
+**Endpoint deltas (JSON, camelCase as serialized):**
+1. `POST /api/v1/auth/login` **response** — when `mfaRequired: true`:
+   - **REMOVED:** `mfaUserId` (number)
+   - **ADDED:** `mfaPendingToken` (string) — short-lived (~5 min), single-purpose; the proof-of-password credential for the MFA step.
+2. `POST /api/v1/auth/mfa/challenge` **request body**:
+   - **REMOVED:** `userId` (number)
+   - **ADDED / REQUIRED:** `mfaPendingToken` (string) — send the value from step 1. (The server derives the user identity from the token; no userId is accepted.)
+   - Response unchanged: `{ challengeToken, deviceType, maskedTarget }`.
+3. `POST /api/v1/auth/mfa/validate` and `/mfa/recovery` — **UNCHANGED** (still `{ challengeToken, code, rememberDevice }` / `{ challengeToken, recoveryCode }` → `{ accessToken, … }`).
+
+**Flow FE must mirror:** login → if `mfaRequired`, hold `mfaPendingToken` **in memory** (not localStorage — it's a transient credential) → `/mfa/challenge` with `{ mfaPendingToken }` → `/mfa/validate` with `{ challengeToken, code }` (unchanged) → store the returned `accessToken`.
+
+**New error handling (important):** `/mfa/challenge` now returns **401** if the `mfaPendingToken` is missing/invalid/expired (previously it accepted any `userId`). On 401 at challenge, send the user **back to the password step** (re-login) — do not retry the challenge. The ~5-min TTL means a user who stalls on the code screen must re-authenticate.
+
+**Affected FE area (pointer only — FE owns the repo):** wherever the auth/login service reads `mfaUserId` from the login response and passes it to the challenge call, plus the MFA challenge component. No backend coordination needed beyond this delta.
+
+**Live-safety:** no users are MFA-enrolled in the demo seed, so the contract change breaks nothing live today; this is to land before MFA is enabled for any user.
+
+### H-022 [QA] 2026-05-21 — auto-eng-1: F-033 409-regression suite location + Wave-0 harness coordination
+
+`[auto-eng-1]` — two coordination points before harness authoring begins:
+
+**1. F-033 409-regression suite location.**
+`[QA]` needs to know where your F-033 state-machine regression suite is landing (namespace + file path) so the Wave-0 payment harness can share the same test project structure without conflicts. Proposed: `forge-api/forge.api.tests/Features/Payments/` for the F-026/F-027 fixtures. If you're under a different root or using a shared `forge.api.tests/` vs. a separate project, confirm before `[QA]` authors the E1–E9 / A1–A5 suites.
+
+**2. Wave-0 harness constraints (shared :4200 stack).**
+F-027 (E1–E9) and F-026 (A1–A5) fixture specs are in AUDIT §1 (Wave-0 invariant-test gate section). Key constraint: **tests MUST NOT mutate the demo seed or trigger rebuild** — each fixture class needs its own dedicated xUnit + EF setup/teardown DB, matching the F-020 harness pattern auto-eng-2 is building. Concurrent-test pattern (Task.WhenAll) needed for A4/A5.
+
+**Trigger (payment fixtures only):** DOM DoD `f026-f027-payment-balance-dod.md` (#15) governs the F-026/F-027 payment fixtures (E1–E9 / A1–A5) — those are not yet authored and remain gated on #15. DevOps must confirm run-target slot before execution.
+
+**F-033 409 suite — `[ORCH]` ruling 2026-05-21: #15 gate LIFTED.** The F-033 suite is INDEPENDENT of DOM DoD #15. Its only gates are (a) auth-pattern switch to `CapabilityTestWebApplicationFactory` + `TestAuthHandler` (auto-eng-1 executing) and (b) DevOps run-target slot (shared-stack read-only, no rebuild).
+
+**Path confirmed:** `forge.tests/Integration/F033SourceStateGuardTests.cs` — file already placed by auto-eng-1. Test project root: `forge-api/forge.tests/`. Wave-0 payment fixtures (E1–E9 / A1–A5) will land at `forge.tests/Integration/` to match, with class names `F027BalanceFormulaInvariantTests` and `F026OverApplicationRaceTests` — `[QA]` will author after #15 lands and path is confirmed with auto-eng-2/DevOps.
+
+### H-021 [SEC] 2026-05-21 — Auth-hardening BATCH ship packet: F-053 + F-037 + F-038 (ONE commit, off tip c7e76cf)
+
+`[DEVOPS]` `[ORCH]` — single auth-hardening commit per `[ORCH]` (not three micro-commits). All implemented + green; **full suite 959/959**. **Migration call: NONE.**
+
+**Covers:**
+- **F-053** — close the hardcoded JWT fallback (the previously-committed Program.cs throw alone was *ineffective*): blank `appsettings.json` `Jwt:Key`; harden the startup guard to reject null/blank/`<32` chars; drop the `JwtTokenService.cs:47` signing-path fallback. Both the public key literal and both fallback sites are now gone.
+- **F-037** — `[Authorize(Roles="Admin,Manager,Controller,OfficeManager,PM")]` on `DashboardController.GetMarginSummary`.
+- **F-038** — `[Authorize(Roles="Admin,Manager,Engineer,PM,Controller,OfficeManager")]` on `JobsController.GetCostSummary`.
+
+**Files — 6 stage-whole + 1 selective hunk:**
+- `forge.api/appsettings.json` (`Jwt:Key` → `""`)
+- `forge.api/Services/JwtTokenService.cs` (drop fallback → throw)
+- `forge.api/Controllers/DashboardController.cs` (F-037 decorator)
+- `forge.api/Controllers/JobsController.cs` (F-038 decorator)
+- `forge.tests/Integration/TestWebApplicationFactory.cs` (inject test `Jwt:Key`)
+- `forge.tests/Capabilities/CapabilityTestWebApplicationFactory.cs` (inject test `Jwt:Key`)
+- `forge.tests/Handlers/Auth/JwtTokenServiceTests.cs` *(new — asserts token issuance throws when `Jwt:Key` is absent; the F-053 "fails without a key" regression)*
+- ⚠ `forge.api/Program.cs` — **selective**: stage ONLY the F-053 guard hunk `@@ -122` (the `var jwtKey = …; if (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Length < 32) throw …` block). **Do NOT** stage the F-054 DI hunk `@@ -320` (that's H-020's separate commit) or the other-agent hunks (`@@ -377/-887/-1312/-1530`). `git add -p`.
+
+**Why the two test factories are in this commit:** appsettings no longer ships a key, so the `WebApplicationFactory<Program>` integration tests must inject one or the new guard throws at boot. The two factory edits supply a test-only key (not a real secret) — required to keep the suite green.
+
+**Intended behavior change:** a keyless `dotnet run` now fails fast at startup. The team sets `JWT_KEY` in `.env` (docker-compose maps it), so the running stack is unaffected — only a bare local run without the env var is impacted, which is the F-053 secure behavior.
+
+**Pairs with (separate, DevOps/.env action):** the F-053 **JWT_KEY rotation** ruling (the live key was exposed in the register + transcripts) — rotate `JWT_KEY` in `.env` + restart when this ships.
+
+**Suggested message:** `fix(auth): remove JWT fallback key + scope margin/cost endpoints (F-053, F-037, F-038)`
+**Sequencing vs H-020 (F-054):** both touch `Program.cs` but DISJOINT hunks (F-053 guard `@@122` here; F-054 DI `@@320` there) — commit order between them doesn't matter; each stages only its own hunk.
+
+### H-020 [SEC] 2026-05-21 — F-054 MFA-bypass ship packet for DevOps (off tip c7e76cf)
+
+`[DEVOPS]` `[ORCH]` — F-054 (no-password MFA full-JWT bypass, P0) implemented + green off tip `c7e76cf` (F-051). **Migration call: NONE** — the pre-auth token is a stateless signed JWT (key derived from the main JWT key) and the challenge stays in `IMemoryCache`; no schema/column change.
+
+**What it does:** Login now issues a single-purpose **MFA-pending token** after the password check (replacing the bare `MfaUserId`); `/mfa/challenge` requires + validates that token and derives the userId from it (raw caller-supplied userId removed). A full JWT can no longer be minted without first passing the password step. (`/mfa/validate` + `/mfa/recovery` are transitively closed — their `challengeToken` is only issuable via the now-gated challenge.)
+
+**Files — 7 stage-whole + 1 selective hunk:**
+- `forge.api/Features/Auth/Login.cs` (issue token; `LoginResponse.MfaUserId`→`MfaPendingToken`)
+- `forge.api/Features/Auth/CreateMfaChallenge.cs` (validate token → bound userId)
+- `forge.api/Controllers/AuthController.cs` (`MfaChallengeRequest(string MfaPendingToken)` + dispatch)
+- `forge.api/Services/MfaPreAuthTokenService.cs` *(new)*
+- `forge.tests/Handlers/Auth/MfaPreAuthTokenServiceTests.cs` *(new)*
+- `forge.tests/Handlers/Auth/CreateMfaChallengeHandlerTests.cs` *(new)*
+- `forge.tests/Handlers/Auth/LoginHandlerTests.cs` (ctor dep + MFA-issuance test)
+- ⚠ `forge.api/Program.cs` — **selective**: stage ONLY the hunk `+ builder.Services.AddSingleton<IMfaPreAuthTokenService, MfaPreAuthTokenService>();` (just after the `ITokenService` registration, ~line 325). **Do NOT** stage the F-053 JWT-throw hunk (`@@ -122`, separate + incomplete finding) or the other-agent hunks (`@@ -377/-887/-1312/-1530`). Use `git add -p`.
+- **Suggested message:** `fix(auth): require MFA-pending pre-auth token on challenge — close no-password bypass (F-054)`
+- **Tests:** Auth suite **103/103**, full suite **959/959** green.
+- **⚠ Frontend follow-up (non-blocking, no live break):** the login-response field (`mfaUserId`→`mfaPendingToken`) and the `/mfa/challenge` body (`userId`→`mfaPendingToken`) are contract changes the Angular MFA flow must adopt. No seeded users have MFA enrolled, so nothing breaks live; FE must update before MFA is enabled for users. Track as a separate FE task.
+- **Review:** backend mechanical review per `[ORCH]`; H-017 is the security DoD this was built against (A1–A5 + D1 covered by the new tests; full D6 end-to-end is a FE/integration follow-up).
+
+### H-019 [SEC] 2026-05-21 — F-052 setup-token hashing ship packet for DevOps (ready now, off c7e76cf)
+
+`[DEVOPS]` `[ORCH]` — F-052 (setup tokens stored plaintext → SHA-256) is **ready-for-ship**, fully disjoint from F-054. **Migration call: NONE** (value-format change to the existing `setup_token` column; no schema change). Caveat: any in-flight plaintext setup token is invalidated and must be re-issued — fine for demo/pre-prod.
+
+**Files — 3 src + 1 test (all stage-whole; clean vs c7e76cf):**
+- `forge.api/Features/Admin/CreateAdminUser.cs` (`HashSetupToken` on write)
+- `forge.api/Features/Auth/ValidateSetupToken.cs` (hash-on-compare)
+- `forge.api/Features/Auth/CompleteSetup.cs` (hash-on-compare)
+- `forge.tests/Handlers/Auth/ValidateSetupTokenHandlerTests.cs` (store hashed token)
+- **Suggested message:** `fix(auth): hash setup tokens at rest (F-052)`
+- **Tests:** green within the 959/959 full suite. **Slot: ship ahead of or parallel to F-054** (independent files).
+
+### H-018 [SEC] 2026-05-21 — F-051 ship packet for DevOps build-train slot (SHA pending commit go-ahead)
+
+`[DEVOPS]` `[ORCH]` — F-051 (account lockout) is source-complete + green, ready for the slot after F-020-live. **Not yet committed** (sits in the shared `forge-api` working tree among other agents' in-flight work) → no SHA yet. Everything needed to cut it:
+
+- **Repo:** `forge-api` (inner repo; toplevel `E:/dev/forge/forge-api`).
+- **Files — exactly 5 (surgical; never `git add -A`):**
+  - `forge.api/Features/Auth/Login.cs` — `SignInManager.CheckPasswordSignInAsync(lockoutOnFailure:true)`
+  - `forge.api/Features/Auth/KioskLogin.cs` — `IsLockedOutAsync` guard + `AccessFailedAsync` + `ResetAccessFailedCountAsync`
+  - `forge.tests/Handlers/Auth/LoginHandlerTests.cs`
+  - `forge.tests/Handlers/Auth/KioskLoginHandlerTests.cs`
+  - `forge.tests/Handlers/Auth/KioskLockoutIntegrationTests.cs` *(untracked — the live 6-attempt InMemory-EF regression; confirm author before including)*
+- **Excludes:** F-052 (`CreateAdminUser`/`CompleteSetup`/`ValidateSetupToken` + its test), F-053 (`Program.cs`), and all unrelated working-tree changes.
+- **Suggested message:** `fix(auth): enforce account lockout on password + kiosk PIN paths (F-051)`
+- **Tests:** **89/89 Auth green** (9 Login + 6 Kiosk unit + 2 Kiosk-lockout integration + rest). No migration; isolated to login handlers.
+- **Rollback snapshot (confirmed present):** `/.local-deploy/db-snapshots/forge-pre-auth-hardening-20260521T015304Z.dump`
+- **Post-deploy live regression (fire on deploy):** 6 wrong-password POSTs to `/api/v1/auth/login` for a seeded user, then `psql … SELECT access_failed_count, lockout_end FROM asp_net_users WHERE …` → expect `count=5` + `lockout_end` set by attempt 6, correct password rejected while locked. (CI already covers the DB layer via the InMemory-EF integration test.)
+- **Review:** backend mechanical review on release per `[ORCH]`.
+
+`[SEC]` can cut this surgical commit immediately on your go, or DevOps cuts it on the train — `[ORCH]`'s call.
+
+### H-017 [SEC] 2026-05-21 — F-054 MFA-bypass: security DoD + regression-test spec (design-review criteria)
+
+For **eng-lead / backend** (whoever owns the pre-auth-token design — `[ORCH]` resourcing call pending). This is the spec the design **and** implementation are reviewed against. F-054 = confirmed **no-password full-JWT bypass (P0)**; full mechanics + precondition ruling in §4 F-054. **Sequencing:** lands AFTER F-051 (shared `Login.cs` success path), rebased on top.
+
+**A. Defensive requirements — the MFA-pending pre-auth token MUST:**
+1. **Single-purpose.** A dedicated token type/scope (e.g. `purpose=mfa_pending`), NOT a full access JWT — carries **no role claims**, authorizes nothing except the MFA challenge/validate/recovery endpoints. A full JWT must not be derivable from it without the second factor.
+2. **Issued only after a successful password check** — minted inside the `Login` handler on the success branch for an MFA-enrolled user, in the SAME flow that verified the password (possession proves the password step happened).
+3. **Bound to the subject.** Cryptographically bound to the userId it was issued for; challenge/validate/recovery derive userId **from the token**, never from a caller-supplied field. (Kills the arbitrary-userId vector — drop `MfaChallengeRequest.UserId`.)
+4. **Short TTL** ≤ a few minutes (challenge window only; ≤ the 5-min challenge cache). Single-use — consumed when the full JWT is minted.
+5. **Integrity-protected & server-validatable** (signed/HMAC or server-side-stored) so it can't be forged or replayed; validated on every MFA endpoint **before** any device lookup or code check.
+6. **No fallback path** — no endpoint may issue a full JWT for an MFA-enrolled user without a valid pre-auth token + valid second factor.
+
+**B. Surface changes (remove the bypass):**
+1. `/auth/mfa/challenge`, `/mfa/validate`, `/mfa/recovery` — remove the `[AllowAnonymous]` raw-userId entry; **require** the pre-auth token and 401 without a valid one.
+2. `MfaService.CreateChallengeAsync` consumes the validated userId from the pre-auth token, not an arbitrary `int`.
+3. `GenerateFullTokenAsync` runs only when reached via a flow that presented a valid pre-auth token for that same userId; reject otherwise.
+
+**C. Co-filed unauth MFA-device-lockout DoS:** once (B) requires a pre-auth token (which requires the password), the anonymous device-lock vector closes. DoD: an unauthenticated caller (no/invalid pre-auth token) cannot reach `ValidateChallengeAsync` and therefore cannot increment `device.FailedAttempts` / set `LockedUntil`.
+
+**D. Regression-test spec (acceptance gates — `[SEC]` wires these against the landed design):**
+1. NEG — no pre-auth token: `/mfa/challenge` with raw userId, no token → 401, no challengeToken.
+2. NEG — password skipped: `/mfa/validate` (valid TOTP) without ever passing `/auth/login` → **no full JWT** (401). *(The core bypass assertion.)*
+3. NEG — cross-subject: a pre-auth token minted for userA cannot drive challenge/validate for userB.
+4. NEG — expired pre-auth token → `/mfa/challenge` 401.
+5. NEG — recovery path: `/mfa/recovery` without a valid pre-auth token → 401, no JWT.
+6. POS — full linked flow: `/auth/login` (correct pw, MFA user) → pre-auth token → `/mfa/challenge` → `/mfa/validate` (valid TOTP) → full role JWT. *(2FA still works end-to-end.)*
+7. DoS — unauthenticated caller cannot increment `device.FailedAttempts` (no anonymous path to `ValidateChallengeAsync`).
+8. INVARIANT — no endpoint mints a full access JWT for an MFA-enrolled user without BOTH a valid pre-auth token AND a valid second factor.
+
+**E. Merge:** rebase on the F-051 fix commit — F-051 adds `SignInManager`+lockout to the `Login` success path; F-054 adds pre-auth-token issuance on the MFA-enrolled success branch (same method). Land F-051 first to avoid conflict.
 
 ### H-016 [SEC] 2026-05-21 — REDACTION LIST for DevOps (PATH-a scrub-then-commit, re #9 gate)
 
@@ -798,6 +1060,8 @@ The outstanding balances on INV-2341AP, INV-2321A, INV-2221AP align with the unp
   - `2026-05-21` `[QA]` redirect stub created per H-013 — canonical ID for F-036[SEC]. All future status updates should be appended here.
   - `2026-05-21` `[SEC]` map **CONFIRMED** — F-053 is the correct canonical ID for F-036[SEC]. Severity unchanged: MAJOR/P1. Fix IMPLEMENTED (`Program.cs` fallback `?? "dev-secret..."` → fail-fast `throw new InvalidOperationException`). Remaining: startup key-length≥32 assertion, backend review. Fix-queue + DoD: H-015.
   - `2026-05-21` `[SEC]` **JWT_KEY rotation ruling per `[ORCH]`: ROTATE.** The live signing key was reproduced into AUDIT.md (committed register) + agent transcripts + the shared `.env` across a multi-agent engagement → treat as compromised. Rotation is near-free: replace `JWT_KEY` in `.env` and restart the API (the in-memory `SessionStore` is wiped on restart regardless, so the only cost is a forced re-login). Tracked as an F-053 remediation subtask alongside the fail-fast throw + key-length assertion. Skip ONLY if this instance is provably disposable with zero promotion path to any shared/customer/prod environment.
+  - `2026-05-21` `[SEC]` **RELEASE REVIEW: FAIL — impl INCOMPLETE, do NOT ship.** Registry shows F-053 "impl done," but the implemented change (`Program.cs:125-128` `?? throw`) only hardens the JWT **validation** key and is itself **ineffective**: `appsettings.json:6` still ships `"Key": "dev-secret-key-change-in-production-min-32-chars!!"`, so `Configuration["Jwt:Key"]` is **never null** → the `?? throw` can't fire; a deploy without the `JWT_KEY` env override silently uses the committed public key. Worse, the **signing** path `JwtTokenService.cs:47` still carries `?? "dev-secret-key-…!!"` and was not touched. **Complete fix = 3 coordinated edits:** (1) `appsettings.json` — remove the hardcoded `Jwt:Key` value (set `""`/omit) so absence is real; (2) `Program.cs` — change guard to `string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Length < 32` → throw (also satisfies the H-015 key-length≥32 DoD; needed because `""` is non-null); (3) `JwtTokenService.cs:47` — drop the `?? "dev-secret-…"` fallback (throw / use validated key). Until all 3 land, the hole is OPEN. `[SEC]` can implement on `[ORCH]` go. Supersedes the "IMPLEMENTED" note in H-015 for F-053.
+  - `2026-05-21` `[SEC]` **NOW PROPERLY IMPLEMENTED — all 3 edits landed.** (1) `appsettings.json` `Jwt:Key` → `""`; (2) `Program.cs` guard → `string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Length < 32` throw; (3) `JwtTokenService.cs:47` fallback dropped → throw. Both fallback sites + the committed public key literal are gone. Test factories patched to inject a test key (appsettings no longer supplies one). Full suite **959/959** green. Shipped as part of the auth-hardening BATCH — ship packet **H-021** (F-053 + F-037 + F-038, one commit, no migration). Pair with the JWT_KEY rotation (`.env`) per the earlier ruling.
 
 ---
 
@@ -1278,6 +1542,8 @@ Net: MFA *replaces* the password instead of *supplementing* it. For any MFA-enro
 **Status log**:
   - `2026-05-21` `[SEC]` opened — BLOCKER, P0. Most severe defect of the auth sweep. Promoted from implicit C0 coverage note ("MFA not required for admin — known from auth audit") to a first-class tracked finding per `[ORCH]`. Structural fix; pre-auth-token design routed to backend-engineer/eng-lead (fix-queue H-015). Not live-exploitable on current seed (no enrolled devices) — do NOT down-rank: structural, and live the moment MFA is enabled.
   - `2026-05-21` `[SEC]` **PRECONDITION RULING (for eng-lead severity gate).** **VERDICT: YES — confirmed no-password-required full-JWT bypass; code-confirmed, NOT live-reproducible on current seed.** Meets eng-lead's stated P0 trigger. Mechanics: `/auth/mfa/challenge` (`[AllowAnonymous]`, raw `{userId}`) → `CreateChallengeAsync` issues a challengeToken with zero linkage to a password check, then EITHER `/mfa/validate` (TOTP) OR `/mfa/recovery` (recovery code) — **both `[AllowAnonymous]`** — call `GenerateFullTokenAsync` → a FULL role JWT (same roles/claims as a password login) + session. `Login.cs` is never invoked; the password is never requested or verified on this path. **Preconditions (all necessary for an actual exploit):** (1) target has ≥1 verified MFA device (`UserMfaDevices.IsVerified=true`) — else challenge throws "No verified MFA device found", no token; (2) caller presents a valid current TOTP code OR an unused recovery code — i.e. needs the second-factor seed, **NOT** the password; (3) userId is a sequential int (trivially enumerable). **Classification: password-NOT-required bypass, not zero-knowledge/unauthenticated** — an attacker with no secrets can't walk in, but one holding the TOTP/recovery seed gets full access with the password entirely out of the loop (MFA *replaces* rather than *supplements* the first factor; 2FA→1FA, discarded factor = password). **Live-reproducible: NO today** (zero seeded users have a verified device → every challenge throws); becomes live the instant any user verifies MFA — i.e. the first admin who hardens their account creates a password-bypassable account. **Escalation chain:** `UserMfaDevice.EncryptedSecret` is sealed by DP keys stored UNENCRYPTED at rest (`PersistKeysToDbContext`, no `ProtectKeysWith*`) → a DB/backup dump decrypts every TOTP seed → mint codes → password-less admin JWT, converting precondition (2) into "anyone with DB/backup read" (nightly backup + B2 offsite). That DP-keys finding is still UNFILED (recommend F-055). **Severity recommendation: P0/stop-the-line, ranks ABOVE F-028** (estimating gap is a feature/trust deficit, not a security bypass). Only mitigant for sequencing: blast radius bounded today by precondition (1) → a fix-before-anyone-enrolls window exists, but for a published/market-readiness build that is not grounds to down-rank.
+  - `2026-05-21` `[SEC]` **IMPLEMENTED — ship packet H-020 (off c7e76cf), migration: NONE.** Fix: Login issues a single-purpose **MFA-pending pre-auth token** after the password check (`MfaPreAuthTokenService`, derived signing key — a full JWT can't be used as a pre-auth token and vice versa); `/mfa/challenge` requires + validates it and derives the userId from it (raw `{userId}` removed); `/mfa/validate`+`/mfa/recovery` transitively closed (challengeToken only issuable post-gate). Tests: Auth **103/103**, full **959/959** green (H-017 gates A1–A5 + D1 covered). Awaiting backend review + DevOps surgical commit (Program.cs DI line is a selective hunk — see H-020). FE follow-up flagged (login-response/challenge contract change; no live break — no users enrolled).
+  - `2026-05-21` `[SEC]` **E2E regression test + FE spec landed (the two remaining DoD items per `[ORCH]`).** (1) `MfaBypassE2ETests` — wires the REAL `MfaPreAuthTokenService`→`CreateMfaChallengeHandler`→`MfaService` against InMemory EF + real `IMemoryCache`, driving login→challenge→validate: POSITIVE (pre-auth token + valid TOTP → full JWT) and NEGATIVE (no/forged pre-auth token → no challenge; fabricated challengeToken → no JWT; full JWT rejected as pre-auth token) — closes H-017 D2 + D6. (2) FE contract-delta spec = **H-023** (routed to frontend-engineer via `[ORCH]`). ⚠ **Test execution blocked locally** by a persistent Windows WDAC AppControl policy (`0x800711C7`) refusing to load the freshly-rebuilt `forge.data.dll` — blocks the WHOLE `forge.tests` assembly, so no test runs locally (infra issue, not a code/test failure). Files compile; mirror already-green patterns; full suite was 959/959 before the block. Needs DevOps/operator WDAC allowlist (or ship-lane run) to show green. F-054 board-closure now gates on: H-020 cut + FE (H-023) + this E2E test going green on an unblocked env.
 
 ---
 
@@ -1323,6 +1589,27 @@ Only `PUT /jobs/{id}` (update job body) shares the same key as the GET — that 
 
 **Status log**:
   - `2026-05-21` `[ENG]` opened — identified during Wave-1 If-Match surface survey. MINOR/P3; not ship-blocking. Proposed fix scoped but not built pending eng-lead decision on mandatory 428 enforcement at sub-path endpoints. Next free finding ID: **F-057**.
+
+---
+
+### F-057 — RESERVED GAP (ID-collision ruling 2026-05-21)
+
+> **No finding in this slot.** F-057 appeared as the next-free pointer in F-056's status log (`[ENG]`, 2026-05-21). Peer and QA accountings diverged on whether this slot was reserved or free. Per resolution ruling 2026-05-21: slot preserved as a documented gap to prevent future re-divergence. **Do not reuse F-057.** Nothing was silently dropped — both accountings agreed the range F-056 → F-058 contains exactly one real finding (F-056). First new assignment after the ruling is **F-058**.
+
+---
+
+### F-058 [SEC] [BUG] [MAJOR] [P1] [PRIMARY] [security] · Auth / Infrastructure · ASP.NET Data Protection keys stored unencrypted at rest
+
+**Where**: ASP.NET Core Data Protection key ring; `forge-api` container key-storage path (Docker volume or host-mount).
+
+**Observed**: Data Protection keys are persisted to storage without encryption at rest. These keys protect session cookies, anti-forgery tokens, and other security-sensitive payloads issued by the API. An attacker with read access to the key store (container escape, volume mount, or storage misconfiguration) can extract key material and forge protected payloads — including authentication cookies — without valid credentials.
+
+**Expected**: Keys must be encrypted at rest via a durable master key mechanism (X.509 certificate bound to `ProtectKeysWithCertificate`, Azure Key Vault, or equivalent). MSDN: "Key encryption at rest in Windows and Azure using ASP.NET Core."
+
+**Impact**: MAJOR/P1 — enables forged session/cookie tokens on key-store access. Risk is elevated in a containerised single-host deployment where volumes may be co-accessible. Not a live-exploitable BLOCKER under normal demo operation (requires storage access), but is a production-hardening requirement before external deployment.
+
+**Status log**:
+  - `2026-05-21` `[QA]` ID assigned per collision-resolution ruling (F-056 stands as committed; F-057 reserved gap; F-058 = next collision-safe ID). Finding body is a stub — `[SEC]` to append full evidence, CVSS vector, and remediation detail. **Next free finding ID: F-059.**
 
 ---
 
