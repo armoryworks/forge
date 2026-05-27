@@ -52,3 +52,13 @@ analysis/**/*.cjs
 analysis/**/*.json
 analysis/inventory/screenshots/
 analysis/inventory/_scout/
+
+# --- Audit/analysis scratch at repo ROOT (regenerable probe/sweep/scout scripts;
+#     the deliverables + evidence are archived in the private forge-analysis repo).
+#     The umbrella root holds no legitimate loose .mjs/.cjs/.py, so ignore them. ---
+/*.mjs
+/*.cjs
+/*.py
+/ui-scout-screenshots/
+analysis/**/*.py
+analysis/**/*.ps1
