@@ -133,6 +133,28 @@ Within each feature, the catalog row's `Test` column names the layer (xUnit / EF
 integration / Vitest / Cypress / axe). api rows also appear in
 `forge-api/forge.tests/Remediation/BACKLOG.md` for the `grep "Skip = \"RED"` view.
 
+## RED test status (2026-05-27)
+
+The TDD burn-down has started, top-down. **42 RED tests across 29 files** now
+encode the definition-of-correct for the **api-layer findings of Regions 1–5**, in
+`forge-api/forge.tests/Remediation/<Feature>/` — all `[Fact(Skip="RED: …")]`,
+suite builds green (`dotnet build -warnaserror`). Live list:
+`grep -rn 'Skip = "RED' forge.tests/Remediation`. Per-feature coverage + the
+deferred set are mapped in that suite's `BACKLOG.md`.
+
+**Not yet covered (tracked for the next passes):**
+- **UI layer** (Vitest/Cypress/axe) — all of Regions 6 (Auth/MFA-login-contract,
+  Onboarding, Portal, Mobile, AI) and 7 (nav cap-coherence, shared-component spine,
+  WCAG), plus the UI rows inside Regions 1–5. Kept out of the .NET run on purpose;
+  needs a forge-ui spec pass.
+- **Real-Postgres** findings the InMemory harness can't reproduce (set-default
+  unique-index races: working-calendar/CompanyLocation, OvertimeRule) — need a
+  Testcontainers integration harness.
+- **Crypto / complex-seed** api findings (G-MFA-3 TOTP, F-JQ1, invoiced≤shipped,
+  approval audit, lead-convert atomicity) — listed in the suite BACKLOG with why.
+- A handful of catalog rows turned out **stale** (already implemented): report
+  export/schedules, EDI mapping CRUD, customer-return DELETE.
+
 ## Where things live (single source of truth per layer)
 
 | Artifact | Home | Role |
