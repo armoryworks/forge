@@ -182,6 +182,27 @@ rows — the *option* carries its content-in-base-UoM. `UomCategory` already blo
 "sheet" worth 8 *grams* for an area part). A real UoM is only warranted if a "Packaging" category
 is added, and even then "sheet" is meaningless without the option's content.
 
+### Same content quantity, different shape
+
+Two options can share the **same content + UoM** yet be physically different — 32 sqft as a
+**4×8 sheet** vs. 32 sqft as a **64 ft × 6 in roll**. This needs no special handling, because
+content and shape are **orthogonal**:
+
+- **Content + UoM is not a uniqueness key.** Each option is its own row (`Label`, `VendorSku`,
+  price tiers); two 32-sqft options coexist and are distinguished by label.
+- **For cost + inventory they're identical: 32 sqft.** Both add 32 sqft of on-hand and carry a
+  $/sqft cost — the base UoM is the right denominator for money and stock, and shape changes
+  neither.
+- **Physical shape is an optional descriptive layer.** Add structured **dimensions** to the option
+  (a small typed set — length × width for sheet/roll, diameter for round stock — each with its own
+  UoM) for (i) human disambiguation in the UI and (ii) future fit/yield checks. Keep dimensions
+  **orthogonal** to `ContentQuantity`: content drives cost/inventory, dimensions describe geometry.
+- **Fit / yield is downstream.** "Can my 12-in-wide part be cut from a 6-in roll?" and "how many
+  blanks per 4×8 sheet, how much scrap?" are nesting/yield problems — out of scope here (see *Not
+  in scope*); capturing dimensions now just seeds that work. Corollary: **auto-picking the cheapest
+  option optimizes cost, not fit** — until yield logic exists a too-narrow-but-cheaper roll could
+  be auto-selected, so the buyer must be able to override.
+
 ### Continuous bulk needs no extra row
 
 Buy kg, stock g, same dimension → that's a global `UomConversion` (1 kg = 1000 g) the engine
@@ -278,6 +299,10 @@ usable") is out of scope here.
    or require the buyer to choose the option explicitly (auto-pick as a default they can override)?
 9. **Name:** confirm `PartPurchaseOption` / "purchase option" (vs. *vendor offering* / *order
    unit*) before any code locks it into entity + API names.
+10. **Option dimensions:** capture physical shape now (structured `Dimensions` on the option, e.g.
+    length × width / diameter — seeds future fit/yield), or defer and rely on `Label` alone for
+    v1? (Two same-content options like 4×8 sheet vs 64×6 roll already work via distinct labels;
+    structured dimensions only buy future nesting/fit logic + richer display.)
 
 ## Suggested phasing (once decisions land)
 
@@ -300,5 +325,6 @@ usable") is out of scope here.
 ## Not in scope
 
 Full standard-cost / actual-cost accounting, multi-level BOM cost with yield/scrap factors,
-and currency conversion on tiers (tiers already snapshot currency) — those are separate efforts
-if/when needed.
+**nesting / fit / yield optimization** (cutting parts from a sheet/roll by geometry — distinct
+from area-based cost/inventory), and currency conversion on tiers (tiers already snapshot
+currency) — those are separate efforts if/when needed.
