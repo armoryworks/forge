@@ -74,10 +74,10 @@ threads that cost from the vendor tier → PO → BOM.
   conversion engine, so `UomService` can validate/round-trip it; `PackSize` is the vendor's
   concrete instance of that factor.
 
-> ⚠️ This assumes **one `PackSize` per vendor-part**, which holds only if a vendor offers the
-> part in a single pack. If one vendor sells multiple pack sizes (bag of 100 *and* drum of 5000),
-> the model needs a pack-option level — see [Multiple pack sizes per vendor](#multiple-pack-sizes-per-vendor-raised-in-review)
-> below; it changes both the schema and the derivation.
+> ⚠️ This assumes **one `PackSize` per vendor-part**. It breaks when a vendor offers the same part
+> in multiple **purchase forms** — not just packs of N, but e.g. thermoplastic in 1/8/16/32 sqft
+> sheets, or resin sold by the kg and used by the gram. See [Purchase forms (beyond a "pack")](#purchase-forms-beyond-a-pack)
+> below; it changes the schema, the derivation, **and** inventory + PO handling.
 
 **New derivation service (the connective tissue):** a small `VendorCostResolver` (or extend
 the existing `PartSourcingResolver`) exposing:
@@ -86,10 +86,10 @@ the existing `PartSourcingResolver`) exposing:
   part's stock UoM. **Bidirectional:** also `GetPackPriceFromUnitCost(...)`.
 
 **Threading:**
-- **PO line:** `PurchaseOrderLine.UnitPrice` is interpreted **per its `UomId`**. If `UomId =
-  BAG`, the price is per bag and `OrderedQuantity` is in bags; `PartLandedCostService` must
-  become UoM-aware (convert to per-stock-unit via `PackSize`/conversion before landed-cost
-  math). This is the one existing service that needs a correctness fix.
+- **PO line:** in the single-form baseline, `PurchaseOrderLine.UnitPrice` is interpreted **per its
+  `UomId`** (per bag) and `PartLandedCostService` becomes UoM-aware (convert to per-base-unit via
+  `PackSize`/conversion before landed-cost math). With purchase forms, the line gains a
+  `PurchaseFormId` FK — see [Purchase order impact](#purchase-order-impact-raised-in-review).
 - **BOM rollup:** BOM line cost = `consumptionQty (stock units) × costPerStockUnit`. Surface a
   rolled-up material cost on the part.
 
@@ -99,46 +99,118 @@ the existing `PartSourcingResolver`) exposing:
   ("$12 / bag of 100  ≈  $0.12 / ea").
 - (Optional) a part cost card showing rolled-up material cost from the BOM.
 
-## Multiple pack sizes per vendor (raised in review)
+## Purchase forms (beyond a "pack")
 
-**The current model can't represent this.** `VendorPartConfiguration` puts a **unique index on
-`(VendorId, PartId)`**, so a vendor has exactly one `VendorPart` row per part — and therefore one
-`PackSize`. `VendorPartPriceTier` rows are **quantity breaks** keyed by `MinQuantity`
-("$5/ea @ 1–99, $4.50 @ 100–499"), *not* pack sizes. So "the same vendor sells widget-X as a bag
-of 100 **and** a drum of 5000" has nowhere to live. (The config comment suggests "model as a
-vendor alternate part on a separate row," but the unique index blocks exactly that — the
-suggested workaround can't be inserted.)
+A "pack of N" is just the **count-dimension** special case. The general idea: a vendor offers the
+same part/material in several **purchase forms**, and each form maps to a **content quantity in
+the part's base (stock) UoM** — whatever dimension that UoM lives in:
 
-Three orthogonal axes are collapsed today:
+| Part — base/stock UoM | Vendor purchase forms | Content (base UoM) | Derived cost |
+|---|---|---|---|
+| Fastener — **each** | bag/100, bag/500, box/5000 | 100, 500, 5000 ea | $12 / 100 = $0.12/ea |
+| Thermoplastic — **sqft** (area) | 1 sqft, 2×4, 4×4, 4×8 sheet | 1, 8, 16, 32 sqft | $50 / 8 = $6.25/sqft |
+| Resin — **g** (mass) | 1 kg bar, 25 kg pail | 1 000, 25 000 g | $400 / 25 000 = $0.016/g |
+| Wire — **mm** (length) | 100 m reel, 500 m reel | 100 000, 500 000 mm | … |
 
-1. **Pack configuration** — *which* purchasable SKU (bag-100, drum-5000). No home today.
-2. **Quantity-break pricing** — buy ≥N of a *chosen* pack, pay less. Today's `VendorPartPriceTier`.
-3. **Vendor↔part relationship** — AVL approval, preferred flag, lead time, certs. Today's `VendorPart`.
+The invariant: **the base/stock UoM is the common denominator**, and every form declares how much
+of it the form contains. "Pack size" was the count instance of "content quantity," and the cost
+generalizes to `costPerBaseUnit = tierPrice ÷ contentQuantity`.
 
-**Recommended: introduce a pack-option level.** Add `VendorPartPackOption` as a child of
-`VendorPart` — `{ PackUomId, PackSize, VendorSku?, MinOrderQty }` — and **reparent
-`VendorPartPriceTier` from `VendorPart` to the pack option**:
+**Current model can't represent multiple forms.** `(VendorId, PartId)` is unique → one
+`VendorPart` → one `PackSize`; price tiers are quantity breaks, not forms. (The config comment's
+"separate row" workaround is blocked by that very unique index.)
+
+### Recommended: a `VendorPartPurchaseForm` child (name TBD — *not* "pack")
+
+Child of `VendorPart` ("purchase form" / "offering" / "order unit"):
+- `Label` / `VendorSku` — "2×4 sheet", "1 kg bar", "bag/100"
+- `ContentQuantity` + `ContentUomId` — content in a base UoM (8 sqft, 1000 g, 100 ea);
+  `ContentUomId` must be in the same `UomCategory` as (or convertible to) `Part.StockUomId`
+- `MinOrderQty`
+- **price tiers reparented here** — quantity-break pricing lives *per form*
 
 ```
 VendorPart (vendor↔part: AVL, preferred, lead time, certs)
- ├─ PackOption "bag of 100"   (PackSize 100, SKU ABC-100)  ── tiers: qty-break pricing
- ├─ PackOption "bag of 500"   (PackSize 500, SKU ABC-500)  ── tiers: …
- └─ PackOption "drum of 5000" (PackSize 5000)              ── tiers: …
+ ├─ PurchaseForm "2×4 sheet"  (8 sqft,  SKU TP-2X4)  ── tiers: qty-break pricing
+ ├─ PurchaseForm "4×8 sheet"  (32 sqft, SKU TP-4X8)  ── tiers: …
+ └─ PurchaseForm "1 kg bar"   (1000 g)               ── tiers: …
 ```
 
-Rejected alternatives:
-- **Drop the `(vendor,part)` unique index + multiple `VendorPart` rows** (one per pack):
-  duplicates AVL/cert/lead-time/preferred metadata across rows and makes "preferred vendor for
-  this part" ambiguous (preferred *which* pack?).
-- **Put `PackSize`/`PackUom` on each `VendorPartPriceTier`:** conflates pack choice with volume
-  discounts — you lose "bag of 100, AND a discount when buying 50 bags."
+Three axes, cleanly separated: **form/SKU** (the new entity) · **qty-break price** (tiers, now
+under the form) · **vendor↔part relationship** (`VendorPart`). Rejected: multiple `VendorPart`
+rows (duplicates AVL/preferred/lead-time, ambiguous "preferred"); content on each tier (conflates
+form choice with volume discounts — you'd lose "the 4×8 sheet, AND a discount when buying 50").
 
-**Consequence for the cost derivation:** with multiple packs, the cheapest *per-unit* option
-**depends on the quantity needed** (drum @ $0.08/ea is cheaper per unit but forces buying 5000;
-bag @ $0.12/ea suits small runs). So `GetCostPerStockUnitAsync(partId, qty)` must either (a) pick
-the optimal pack option for `qty`, or (b) take an explicit pack-option choice from the buyer. PO
-lines and auto-PO pack-rounding would then reference a **pack option**, not just the vendor-part.
-This is meaningfully bigger than the single-pack derivation and is likely its own phase.
+### Order unit: a label, not a universal UoM
+
+"Sheet" / "bar" / "reel" have **no universal size**, so they shouldn't be global `UnitOfMeasure`
+rows — the *form* carries its content-in-base-UoM. `UomCategory` already blocks nonsense (a
+"sheet" worth 8 *grams* for an area part). A real UoM is only warranted if a "Packaging/Form"
+category is added, and even then "sheet" is meaningless without the form's content.
+
+### Continuous bulk needs no form row
+
+Buy kg, stock g, same dimension → that's a global `UomConversion` (1 kg = 1000 g) the engine
+already has. Forms are specifically for **vendor/SKU-specific orderable sizes** ("2×4 sheet",
+"bag/100") that can't be a universal conversion. The model degrades gracefully: simple bulk
+material needs nothing new; only multi-form parts need a form row.
+
+### Inventory implications (raised in review)
+
+On-hand is tracked in the **base/stock UoM**, always — never in "forms." Consequences:
+- **Receiving converts form → base.** Receiving 2 "4×8 sheets" adds 2 × 32 = 64 sqft on-hand,
+  not "2 sheets." `BinContent.Quantity` stays in base UoM.
+- **Discrete carriers become continuous on receipt.** You don't track "1 sheet remaining" — you
+  track "30 sqft remaining" after cutting 2 sqft off a 32 sqft sheet. (If physical sheet/offcut
+  identity ever matters — true remnant tracking — that's a separate, larger effort; flag, don't
+  build it here.)
+- **Reorder math** (`AutoPurchaseOrderJob`) computes need in base UoM, then rounds *up to a whole
+  number of the chosen form* (need 50 sqft → 2 × 32 sqft sheets); the form drives the PO line.
+- **PO / receiving line** references the form (qty in forms) and converts to base UoM into the bin.
+
+### Purchase order impact (raised in review)
+
+Forms are a purchasing concept, so the PO is where they're chosen and committed:
+- **PO line references the form.** Add `PurchaseOrderLine.PurchaseFormId` (FK). `OrderedQuantity` /
+  `ReceivedQuantity` are counted **in forms** (2 sheets, 3 bags) and `UnitPrice` is **per form**
+  (from the selected tier) — the line reads "2 × 4×8 sheet @ $50".
+- **Base UoM is derived, not the stored order qty.** `baseQty = OrderedQuantity ×
+  form.ContentQuantity` (2 × 32 = 64 sqft) drives receiving-into-bin and landed cost
+  (`PartLandedCostService` divides by content for per-base-unit).
+- **Picking the form.** The form list on a PO line comes from the chosen vendor-part's forms;
+  default to the preferred / most-economical form for the line qty (see "cost selection"),
+  buyer-overridable.
+- **Receiving** converts forms → base UoM (above); over/under-receipt is still counted in forms,
+  the bin delta is in base UoM.
+- **Auto-PO** already rounds to whole packs — generalize to "whole forms" and stamp the chosen
+  `PurchaseFormId` on the generated line.
+- **Existing `PurchaseOrderLine.UomId`** can stay for display (the form's order-unit label), but
+  the form FK is the source of truth — `UomId` alone can't recover the content size.
+- **Vendor RFQ / quote intake** maps naturally: a vendor quoting "$50 per 4×8, $400 per drum" is
+  authoring forms + tiers — the same bidirectional vendor-side editor seeds PO pricing.
+
+### UI (raised in review) — guided + non-guided, vendor-authored, bidirectional
+
+- **Vendor side authors the forms.** On the vendor-part / sources surface, the user defines each
+  purchase form (label, content-in-base-UoM, MOQ) and its price tiers. Render it
+  **bidirectionally**: enter "$50 per 4×8 (32 sqft)" → the row shows "≈ $6.25/sqft"; or enter a
+  target $/sqft → back-solve the form price. One control, read/written both ways.
+- **Non-guided (power user):** a forms sub-table on the vendor-part editor — add/edit/remove forms
+  inline, each with its own tier list (today's tier editor, one level deeper).
+- **Guided (part-creation wizard):** keep it light — the base UoM is already captured "at the top
+  of part creation." A "how do you buy this?" step offers the common shapes (single each-pack, a
+  sheet set, bulk-by-weight) and pre-fills sensible forms; full multi-form authoring defers to the
+  non-guided vendor editor. Don't force the whole form matrix on someone creating a simple part.
+- **Consuming side stays simple:** BOM / issue UIs work purely in the base UoM — forms are a
+  purchasing-side concept and never leak into consumption.
+
+### Consequence for cost selection
+
+Cheapest per-base-unit **depends on the quantity needed** (a 1 sqft piece for one part vs. a 4×8
+for a run). `GetCostPerBaseUnitAsync(partId, qty)` either (a) picks the optimal form for `qty`, or
+(b) takes an explicit form choice from the buyer; PO lines + auto-PO reference a **form**, not just
+the vendor-part. True offcut/yield/scrap optimization ("a 32 sqft sheet yields 30 usable") is out
+of scope here.
 
 ## Open decisions (need Dan's call before coding)
 
@@ -155,11 +227,16 @@ This is meaningfully bigger than the single-pack derivation and is likely its ow
    vendor document faithfully; the latter is simpler downstream but loses the "as quoted" view.)
 4. **Scope of v1:** just the per-unit cost *derivation + price-tier UI preview* first — or the
    full BOM material-cost rollup in the same pass?
-5. **Multiple pack sizes per vendor:** in scope? (See section above.) If yes, it needs the
-   `VendorPartPackOption` entity + reparenting price tiers — a larger schema change than the
-   single-pack derivation — and decides whether the resolver auto-selects the optimal pack for a
-   quantity or the buyer picks one. If no (one pack per vendor-part is "good enough" for now),
-   the single-`PackSize` model in this proposal stands as-is.
+5. **Multiple purchase forms per vendor:** in scope? (See [Purchase forms](#purchase-forms-beyond-a-pack).)
+   If yes, it needs a `VendorPartPurchaseForm` child (content-in-base-UoM, any dimension) +
+   reparenting price tiers + a `PurchaseOrderLine.PurchaseFormId` FK — the biggest change, touching
+   schema, cost derivation, **inventory** (receive form→base) and **PO/receiving** — and it decides
+   whether the resolver auto-selects the optimal form for a quantity or the buyer picks one. If no
+   (one form per vendor-part is good enough for now), the single-`PackSize` model stands as-is.
+6. **Order unit — label vs. UoM:** carry the form's order unit as a free label + content-in-base
+   (recommended), or add a "Packaging/Form" `UomCategory` and make "sheet"/"bar" first-class UoMs?
+7. **Form selection on a PO line:** auto-pick the most-economical form for the line quantity, or
+   require the buyer to choose the form explicitly (auto-pick as a default they can override)?
 
 ## Suggested phasing (once decisions land)
 
@@ -171,8 +248,11 @@ This is meaningfully bigger than the single-pack derivation and is likely its ow
 - **P3 — Cost threading:** make `PartLandedCostService` UoM-aware; BOM material-cost rollup on
   the part cost card.
 - **P4 — (if approved in decision #2)** explicit `PackUomId`/`PriceUomId` migration + backfill.
-- **P5 — (if approved in decision #5)** `VendorPartPackOption` entity + reparent price tiers +
-  pack-aware resolver / PO lines. Biggest schema change — sequence last, on its own.
+- **P5 — (if approved in decision #5) purchase forms, end-to-end.** `VendorPartPurchaseForm` entity
+  (content-in-base-UoM) + reparent price tiers + `PurchaseOrderLine.PurchaseFormId` FK +
+  form-aware resolver, receiving (form→base into bin), auto-PO ("whole forms"), and the
+  vendor-side bidirectional forms/tier editor (non-guided) + a light "how do you buy this?" guided
+  step. Biggest change — schema + cost + inventory + PO + UI — sequence last, on its own.
 
 ## Not in scope
 
