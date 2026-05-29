@@ -9,11 +9,31 @@ updated: 2026-05-28
 
 # UoM Cost Connective Tissue
 
-> **Status: IN PROGRESS (2026-05-28).** Dan green-lit the **full multi-option** model **with the
-> cost derivation**. Decisions locked: #6 → additive (tier/PO-line nullable `PurchaseOptionId`, no
+> **Status: IMPLEMENTED — awaiting review/merge (2026-05-29).** Dan green-lit the **full
+> multi-option** model **with cost derivation**. All planned stages are built, tested, and pushed
+> on branch `feature/uom-purchase-options` (both `forge-api` and `forge-ui`); nothing merged to
+> `main` yet. Decisions locked: #6 → additive (tier/PO-line nullable `PurchaseOptionId`, no
 > price-tier reparent; per-(vendor,option) SKU/MOQ deferred); #10 → label-only for v1 (structured
-> dimensions deferred with fit/yield). Building backend-first on branch
-> `feature/uom-purchase-options`, verified against the Testcontainers Postgres harness.
+> dimensions deferred with fit/yield).
+>
+> **Delivered:**
+> - **Stage 1** — `PartPurchaseOption` (part-level) + nullable `PurchaseOptionId` on price tiers &
+>   PO lines + `AddPartPurchaseOptions` migration (additive; verified on the Testcontainers
+>   Postgres harness) + `VendorCostResolver` (cost/base-unit = tier ÷ option content, cheapest-for-qty).
+> - **Stage 2** — `PartPurchaseOption` CRUD API (`/parts/{id}/purchase-options`) + UoM-category guard.
+> - **Stage 3** — `PartLandedCostService` per-base-unit; receiving converts option→base into the bin.
+> - **Stage 4a** — purchase-options authoring cluster on the part Sourcing tab.
+> - **Stage 4b** — BOM consumption-UoM picker (`BOMEntry.UomId` surfaced).
+> - **Stage 4c** — price tier → option tie + live "≈ $/base-unit" preview in the tier editor.
+> - **Stage 4d** — PO line option selector (PO dialog) + threaded through create/update/read.
+>
+> Backend suite 1052 green; UI suite 1255 green; AOT build clean; `-warnaserror` throughout.
+>
+> **Deferred (documented, not built):** auto-PO whole-option rounding (background job — risky, its
+> base-unit suggestions remain valid + buyer-reviewed); full *bidirectional* tier pricing edit
+> ($/base → back-solve $/option — only the one-way $/base preview shipped); the `VendorPartOption`
+> junction for per-(vendor,option) SKU/MOQ (decision #6 simple path taken); structured option
+> dimensions + nesting/fit/yield (decision #10 — label-only).
 
 ## Terminology
 
