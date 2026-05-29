@@ -74,6 +74,11 @@ threads that cost from the vendor tier → PO → BOM.
   conversion engine, so `UomService` can validate/round-trip it; `PackSize` is the vendor's
   concrete instance of that factor.
 
+> ⚠️ This assumes **one `PackSize` per vendor-part**, which holds only if a vendor offers the
+> part in a single pack. If one vendor sells multiple pack sizes (bag of 100 *and* drum of 5000),
+> the model needs a pack-option level — see [Multiple pack sizes per vendor](#multiple-pack-sizes-per-vendor-raised-in-review)
+> below; it changes both the schema and the derivation.
+
 **New derivation service (the connective tissue):** a small `VendorCostResolver` (or extend
 the existing `PartSourcingResolver`) exposing:
 - `GetCostPerStockUnitAsync(partId, requestedQty)` → resolves preferred `VendorPart` + the
@@ -94,6 +99,47 @@ the existing `PartSourcingResolver`) exposing:
   ("$12 / bag of 100  ≈  $0.12 / ea").
 - (Optional) a part cost card showing rolled-up material cost from the BOM.
 
+## Multiple pack sizes per vendor (raised in review)
+
+**The current model can't represent this.** `VendorPartConfiguration` puts a **unique index on
+`(VendorId, PartId)`**, so a vendor has exactly one `VendorPart` row per part — and therefore one
+`PackSize`. `VendorPartPriceTier` rows are **quantity breaks** keyed by `MinQuantity`
+("$5/ea @ 1–99, $4.50 @ 100–499"), *not* pack sizes. So "the same vendor sells widget-X as a bag
+of 100 **and** a drum of 5000" has nowhere to live. (The config comment suggests "model as a
+vendor alternate part on a separate row," but the unique index blocks exactly that — the
+suggested workaround can't be inserted.)
+
+Three orthogonal axes are collapsed today:
+
+1. **Pack configuration** — *which* purchasable SKU (bag-100, drum-5000). No home today.
+2. **Quantity-break pricing** — buy ≥N of a *chosen* pack, pay less. Today's `VendorPartPriceTier`.
+3. **Vendor↔part relationship** — AVL approval, preferred flag, lead time, certs. Today's `VendorPart`.
+
+**Recommended: introduce a pack-option level.** Add `VendorPartPackOption` as a child of
+`VendorPart` — `{ PackUomId, PackSize, VendorSku?, MinOrderQty }` — and **reparent
+`VendorPartPriceTier` from `VendorPart` to the pack option**:
+
+```
+VendorPart (vendor↔part: AVL, preferred, lead time, certs)
+ ├─ PackOption "bag of 100"   (PackSize 100, SKU ABC-100)  ── tiers: qty-break pricing
+ ├─ PackOption "bag of 500"   (PackSize 500, SKU ABC-500)  ── tiers: …
+ └─ PackOption "drum of 5000" (PackSize 5000)              ── tiers: …
+```
+
+Rejected alternatives:
+- **Drop the `(vendor,part)` unique index + multiple `VendorPart` rows** (one per pack):
+  duplicates AVL/cert/lead-time/preferred metadata across rows and makes "preferred vendor for
+  this part" ambiguous (preferred *which* pack?).
+- **Put `PackSize`/`PackUom` on each `VendorPartPriceTier`:** conflates pack choice with volume
+  discounts — you lose "bag of 100, AND a discount when buying 50 bags."
+
+**Consequence for the cost derivation:** with multiple packs, the cheapest *per-unit* option
+**depends on the quantity needed** (drum @ $0.08/ea is cheaper per unit but forces buying 5000;
+bag @ $0.12/ea suits small runs). So `GetCostPerStockUnitAsync(partId, qty)` must either (a) pick
+the optimal pack option for `qty`, or (b) take an explicit pack-option choice from the buyer. PO
+lines and auto-PO pack-rounding would then reference a **pack option**, not just the vendor-part.
+This is meaningfully bigger than the single-pack derivation and is likely its own phase.
+
 ## Open decisions (need Dan's call before coding)
 
 1. **Confirm the contract:** `tier.UnitPrice` is *per purchase pack* and `PackSize` is
@@ -109,6 +155,11 @@ the existing `PartSourcingResolver`) exposing:
    vendor document faithfully; the latter is simpler downstream but loses the "as quoted" view.)
 4. **Scope of v1:** just the per-unit cost *derivation + price-tier UI preview* first — or the
    full BOM material-cost rollup in the same pass?
+5. **Multiple pack sizes per vendor:** in scope? (See section above.) If yes, it needs the
+   `VendorPartPackOption` entity + reparenting price tiers — a larger schema change than the
+   single-pack derivation — and decides whether the resolver auto-selects the optimal pack for a
+   quantity or the buyer picks one. If no (one pack per vendor-part is "good enough" for now),
+   the single-`PackSize` model in this proposal stands as-is.
 
 ## Suggested phasing (once decisions land)
 
@@ -120,6 +171,8 @@ the existing `PartSourcingResolver`) exposing:
 - **P3 — Cost threading:** make `PartLandedCostService` UoM-aware; BOM material-cost rollup on
   the part cost card.
 - **P4 — (if approved in decision #2)** explicit `PackUomId`/`PriceUomId` migration + backfill.
+- **P5 — (if approved in decision #5)** `VendorPartPackOption` entity + reparent price tiers +
+  pack-aware resolver / PO lines. Biggest schema change — sequence last, on its own.
 
 ## Not in scope
 
