@@ -74,6 +74,18 @@ fires only on `main`: `latest-amd64`, `<version>-amd64`, `main-<sha>-amd64`, plu
    before `build-and-push`, so the nightly build self-gates. Optionally chain off the existing
    nightly E2E (`workflow_run` after `Nightly E2E` succeeds) instead of a fixed 04:00 cron, so
    `edge` only publishes when E2E is green.
+4. **Skip the scheduled run when `main` hasn't moved.** A nightly with no new commits should no-op
+   — don't rebuild/republish an identical `edge`. Applies to the **`schedule`** trigger only:
+   `workflow_dispatch` always builds (manual = "I want one now") and tag releases always build. A
+   guard step at the top of the job short-circuits via `if`/early-exit. Two ways to detect "no
+   change":
+   - *Idempotent (recommended):* read the commit the current `edge` image was built from (the
+     `edge-<sha>` tag, or the image's `org.opencontainers.image.revision` OCI label) and skip if it
+     equals `main`'s HEAD sha. Self-healing — a failed or missing prior build leaves HEAD ≠
+     edge-sha so it retries; a quiet night leaves them equal so it skips.
+   - *Simple (time-window):* skip if there are no commits in the last 24 h —
+     `test -z "$(git rev-list --since='24 hours ago' origin/main)"`. Fewer moving parts, but
+     fragile around failed builds and cron/commit-timing boundaries.
 
 ## Semantic shift to flag (consumers must know)
 
@@ -105,6 +117,8 @@ Anything pulling `latest` for bleeding-main behavior must switch to `edge`. Audi
 3. **Keep a short-lived `edge-<sha>`** alongside `edge` for traceability/rollback, or `edge` only.
 4. **`latest` redefinition** — confirm `latest` should become *stable* (tag-only); update any
    consumer pinned to it.
+5. **No-change skip mechanism** — idempotent `edge`-sha compare (recommended) vs. 24 h commit
+   window; and whether `workflow_dispatch` gets an optional `force` input to rebuild anyway.
 
 ## Not in scope
 
