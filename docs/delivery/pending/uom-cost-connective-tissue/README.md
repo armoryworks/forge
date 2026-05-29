@@ -15,11 +15,12 @@ updated: 2026-05-28
 
 ## Terminology
 
-The unit a vendor sells in is called a **purchase option** throughout this doc — *not* a
-"pack." A "pack of 100" is just the count-dimension instance of the general idea (a vendor may
-sell the same material as a 32 sqft sheet, a 1 kg bar, a 500 m reel…), so a UoM-neutral name
-matters. **Purchase option** is the recommended term; *vendor offering* or *order unit* are
-acceptable synonyms — the name is cheap to change, the concept is what counts. The only place
+The size/form a part comes in (and is bought in) is called a **purchase option** throughout this
+doc — *not* a "pack." A "pack of 100" is just the count-dimension instance of the general idea (a
+part may come as a 32 sqft sheet, a 1 kg bar, a 500 m reel…), so a UoM-neutral name matters.
+**Purchase option** is the recommended term; *vendor offering* or *order unit* are acceptable
+synonyms — the name is cheap to change, the concept is what counts. Purchase options live at the
+**Part** level (the sizes are part-intrinsic); vendors price the ones they carry. The only place
 "pack" survives is the **existing** `VendorPart.PackSize` column, named in code today.
 
 ## The client's scenario
@@ -111,11 +112,12 @@ the existing `PartSourcingResolver`) exposing:
 
 ## Purchase options (multiple buy sizes per vendor)
 
-A "pack of N" is just the **count-dimension** special case. The general idea: a vendor offers the
-same part/material as several **purchase options**, and each option maps to a **content quantity
-in the part's base (stock) UoM** — whatever dimension that UoM lives in:
+A "pack of N" is just the **count-dimension** special case. The general idea: a part comes in
+several **purchase options** (sizes / forms), each mapping to a **content quantity in the part's
+base (stock) UoM** — whatever dimension that UoM lives in. Vendors then price the options they
+carry:
 
-| Part — base/stock UoM | Vendor purchase options | Content (base UoM) | Derived cost |
+| Part — base/stock UoM | Purchase options (sizes) | Content (base UoM) | Derived cost |
 |---|---|---|---|
 | Fastener — **each** | bag/100, bag/500, box/5000 | 100, 500, 5000 ea | $12 / 100 = $0.12/ea |
 | Thermoplastic — **sqft** (area) | 1 sqft, 2×4, 4×4, 4×8 sheet | 1, 8, 16, 32 sqft | $50 / 8 = $6.25/sqft |
@@ -130,27 +132,48 @@ cost generalizes to `costPerBaseUnit = tierPrice ÷ contentQuantity`.
 `VendorPart` → one `PackSize`; price tiers are quantity breaks, not options. (The config
 comment's "separate row" workaround is blocked by that very unique index.)
 
-### Recommended: a `VendorPartPurchaseOption` child
+### Recommended: part-level `PartPurchaseOption` + vendor pricing that references it
 
-Child of `VendorPart` (recommended name `VendorPartPurchaseOption`; *offering* / *order unit* are
-acceptable synonyms):
-- `Label` / `VendorSku` — "2×4 sheet", "1 kg bar", "bag/100"
-- `ContentQuantity` + `ContentUomId` — content in a base UoM (8 sqft, 1000 g, 100 ea);
-  `ContentUomId` must be in the same `UomCategory` as (or convertible to) `Part.StockUomId`
-- `MinOrderQty`
-- **price tiers reparented here** — quantity-break pricing lives *per option*
+Options live at the **Part** level, because content quantity is **part-intrinsic** — a "2×4
+sheet" is 8 sqft no matter who sells it. Defining it once avoids vendors disagreeing on the same
+form's size and lets you compare vendors for the *same* option.
+
+- **`PartPurchaseOption`** — child of `Part` (1..*): `{ Label, ContentQuantity, ContentUomId }`.
+  The catalog of sizes/forms the part comes in (8 sqft sheet, 16 sqft sheet…). `ContentUomId`
+  must share a `UomCategory` with (or convert to) `Part.StockUomId`.
+- **Vendor pricing references the option.** `VendorPartPriceTier` gains a nullable
+  `PurchaseOptionId` (null = priced per base unit / the lone default option). Each tier is one
+  *(vendor, option, min-qty, price)*.
+- **Vendor-specific bits stay vendor-side.** `VendorSku` and `MinOrderQty` differ per *(vendor,
+  option)* — Acme's SKU/MOQ for the 32 sqft sheet ≠ Globex's — so they don't belong on the
+  part-level option. Two ways to structure (decision below):
+  - *Simple:* tier carries `PurchaseOptionId`; SKU/MOQ kept per-vendor (denormalized).
+  - *Normalized:* a `VendorPartOption` junction `{ VendorPartId, PurchaseOptionId, VendorSku,
+    MinOrderQty }` owns the tiers — one more entity, fully clean.
 
 ```
-VendorPart (vendor↔part: AVL, preferred, lead time, certs)
- ├─ PurchaseOption "2×4 sheet"  (8 sqft,  SKU TP-2X4)  ── tiers: qty-break pricing
- ├─ PurchaseOption "4×8 sheet"  (32 sqft, SKU TP-4X8)  ── tiers: …
- └─ PurchaseOption "1 kg bar"   (1000 g)               ── tiers: …
+Part "Thermoplastic 1/8in grade-X"  (stock UoM = sqft)
+ ├─ PartPurchaseOption "2×4 sheet"  (8 sqft)
+ ├─ PartPurchaseOption "4×4 sheet"  (16 sqft)
+ └─ PartPurchaseOption "4×8 sheet"  (32 sqft)
+
+VendorPart (Acme ↔ part)          VendorPart (Globex ↔ part)
+ ├─ tier: 4×8 @ $50 (qty ≥ 1)      └─ tier: 4×8 @ $48 (qty ≥ 10)   ← same option, compare vendors
+ └─ tier: 2×4 @ $14 (qty ≥ 1)
 ```
 
-Three axes, cleanly separated: **option/SKU** (the new entity) · **qty-break price** (tiers, now
-under the option) · **vendor↔part relationship** (`VendorPart`). Rejected: multiple `VendorPart`
-rows (duplicates AVL/preferred/lead-time, ambiguous "preferred"); content on each tier (conflates
-option choice with volume discounts — you'd lose "the 4×8 sheet, AND a discount when buying 50").
+**Cardinality:** a tier → one option (many-to-one); an option ← many vendors' tiers
+(option↔vendor is many-to-many). The "selectable column on the tier grid" *is* that
+`PurchaseOptionId` FK; pricing becomes an option × qty-break (× vendor) matrix.
+
+**Progressive disclosure (graceful defaults):**
+- **0 options** → bought/priced **per single base unit** — today's behavior, no UI change.
+- **1 option** → treat it as the lone purchase unit; no selector shown.
+- **>1 options** → the tier grid shows a **Purchase Option** column to tag each tier.
+
+Rejected: content quantity per vendor (duplicates the geometry; vendors can disagree); content on
+each tier (conflates option choice with volume discounts — you'd lose "the 4×8 sheet, AND a
+discount when buying 50").
 
 ### Order unit: a label, not a universal UoM
 
@@ -188,9 +211,9 @@ Purchase options are a purchasing concept, so the PO is where they're chosen and
 - **Base UoM is derived, not the stored order qty.** `baseQty = OrderedQuantity ×
   option.ContentQuantity` (2 × 32 = 64 sqft) drives receiving-into-bin and landed cost
   (`PartLandedCostService` divides by content for per-base-unit).
-- **Picking the option.** The option list on a PO line comes from the chosen vendor-part's
-  options; default to the preferred / most-economical option for the line qty (see "cost
-  selection"), buyer-overridable.
+- **Picking the option.** The option list on a PO line comes from the part's options the chosen
+  vendor carries (has pricing for); default to the most-economical option for the line qty (see
+  "cost selection"), buyer-overridable.
 - **Receiving** converts options → base UoM (above); over/under-receipt is still counted in
   options, the bin delta is in base UoM.
 - **Auto-PO** already rounds to whole `PackSize` multiples — generalize to "whole options" and
@@ -238,19 +261,23 @@ usable") is out of scope here.
    vendor document faithfully; the latter is simpler downstream but loses the "as quoted" view.)
 4. **Scope of v1:** just the per-unit cost *derivation + price-tier UI preview* first — or the
    full BOM material-cost rollup in the same pass?
-5. **Multiple purchase options per vendor:** in scope? (See
+5. **Multiple purchase options per part:** in scope? (See
    [Purchase options](#purchase-options-multiple-buy-sizes-per-vendor).) If yes, it needs a
-   `VendorPartPurchaseOption` child (content-in-base-UoM, any dimension) + reparenting price tiers
-   + a `PurchaseOrderLine.PurchaseOptionId` FK — the biggest change, touching schema, cost
-   derivation, **inventory** (receive option→base) and **PO/receiving** — and it decides whether
-   the resolver auto-selects the optimal option for a quantity or the buyer picks one. If no (one
-   option per vendor-part is good enough for now), the single-`PackSize` model stands as-is.
-6. **Order unit — label vs. UoM:** carry the option's order unit as a free label + content-in-base
+   part-level `PartPurchaseOption` child (content-in-base-UoM, any dimension), a nullable
+   `VendorPartPriceTier.PurchaseOptionId`, and a `PurchaseOrderLine.PurchaseOptionId` FK — the
+   biggest change, touching schema, cost derivation, **inventory** (receive option→base) and
+   **PO/receiving** — and it decides whether the resolver auto-selects the optimal option for a
+   quantity or the buyer picks one. If no (one size per part is good enough for now), the
+   single-`PackSize` model stands as-is.
+6. **Vendor SKU / MOQ structure:** keep `VendorSku` + `MinOrderQty` denormalized per vendor, or
+   add a `VendorPartOption` junction `{VendorPartId, PurchaseOptionId, VendorSku, MinOrderQty}`
+   that owns the tiers (cleaner, one more entity)?
+7. **Order unit — label vs. UoM:** carry the option's order unit as a free label + content-in-base
    (recommended), or add a "Packaging" `UomCategory` and make "sheet"/"bar" first-class UoMs?
-7. **Option selection on a PO line:** auto-pick the most-economical option for the line quantity,
+8. **Option selection on a PO line:** auto-pick the most-economical option for the line quantity,
    or require the buyer to choose the option explicitly (auto-pick as a default they can override)?
-8. **Name:** confirm `VendorPartPurchaseOption` / "purchase option" (vs. *vendor offering* /
-   *order unit*) before any code locks it into entity + API names.
+9. **Name:** confirm `PartPurchaseOption` / "purchase option" (vs. *vendor offering* / *order
+   unit*) before any code locks it into entity + API names.
 
 ## Suggested phasing (once decisions land)
 
@@ -262,11 +289,13 @@ usable") is out of scope here.
 - **P3 — Cost threading:** make `PartLandedCostService` UoM-aware; BOM material-cost rollup on
   the part cost card.
 - **P4 — (if approved in decision #2)** explicit content-UoM / `PriceUomId` migration + backfill.
-- **P5 — (if approved in decision #5) purchase options, end-to-end.** `VendorPartPurchaseOption`
-  entity (content-in-base-UoM) + reparent price tiers + `PurchaseOrderLine.PurchaseOptionId` FK +
-  option-aware resolver, receiving (option→base into bin), auto-PO ("whole options"), and the
-  vendor-side bidirectional options/tier editor (non-guided) + a light "how do you buy this?"
-  guided step. Biggest change — schema + cost + inventory + PO + UI — sequence last, on its own.
+- **P5 — (if approved in decision #5) purchase options, end-to-end.** Part-level
+  `PartPurchaseOption` entity (content-in-base-UoM) + nullable `VendorPartPriceTier.PurchaseOptionId`
+  (and, per decision #6, an optional `VendorPartOption` junction for vendor SKU/MOQ) +
+  `PurchaseOrderLine.PurchaseOptionId` FK + option-aware resolver, receiving (option→base into
+  bin), auto-PO ("whole options"), and the vendor-side bidirectional options/tier editor
+  (non-guided) + a light "how do you buy this?" guided step. Biggest change — schema + cost +
+  inventory + PO + UI — sequence last, on its own.
 
 ## Not in scope
 
