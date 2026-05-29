@@ -1,7 +1,7 @@
 ---
 title: UoM Cost Connective Tissue (vendor purchase option → per-unit cost → BOM)
 type: delivery
-status: pending
+status: in-progress
 id: uom-cost-connective-tissue
 owner:
 updated: 2026-05-28
@@ -9,9 +9,11 @@ updated: 2026-05-28
 
 # UoM Cost Connective Tissue
 
-> **Status: PENDING — design proposal for review. No code yet.** This documents the gap,
-> what already exists, a recommended model, and the open decisions that need Dan's call
-> before implementation. Raised from client notes (2026-05-28).
+> **Status: IN PROGRESS (2026-05-28).** Dan green-lit the **full multi-option** model **with the
+> cost derivation**. Decisions locked: #6 → additive (tier/PO-line nullable `PurchaseOptionId`, no
+> price-tier reparent; per-(vendor,option) SKU/MOQ deferred); #10 → label-only for v1 (structured
+> dimensions deferred with fit/yield). Building backend-first on branch
+> `feature/uom-purchase-options`, verified against the Testcontainers Postgres harness.
 
 ## Terminology
 
