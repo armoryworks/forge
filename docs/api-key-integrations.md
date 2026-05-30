@@ -270,10 +270,12 @@ egress IP.
 ### 2.1 What it is
 
 `POST /api/v1/auth/sso/token-exchange` accepts an OIDC id_token from a
-configured external provider (today: Google) and returns a standard Forge
-JWT. The id_token IS the credential — it's validated server-side against
-the provider's published JWKS and the install's configured client id
-(audience).
+configured external provider — **Google**, **Microsoft** (Azure AD v2.0),
+or any **generic OIDC** IdP (Okta, Auth0, Keycloak, custom) — and returns
+a standard Forge JWT. The id_token IS the credential: it's validated
+server-side against the provider's published JWKS and the install's
+configured client id (audience). Every provider is gated independently
+via `Sso:<Provider>:Enabled`.
 
 This lets a federated client app (deployed alongside Forge) authenticate
 its users against the same IdP, then drive Forge actions AS those users
@@ -308,9 +310,9 @@ Content-Type: application/json
 }
 ```
 
-`provider` is currently always `"google"`. (Microsoft and generic OIDC
-support already exist for the browser flow; token exchange will follow
-when needed.)
+`provider` is one of `"google"`, `"microsoft"`, or `"oidc"` — case
+insensitive. The matching `Sso:<Provider>:Enabled` must be `true` on
+this install, otherwise the request returns 401.
 
 **Success (200 OK):** standard `LoginResponse` — same shape as
 `POST /api/v1/auth/login`:
@@ -340,32 +342,63 @@ Cache the Forge JWT per user session. Use it as a standard
 
 | Status | Cause                                                       |
 |--------|-------------------------------------------------------------|
-| 400    | Body shape invalid (missing fields, unsupported provider).  |
-| 401    | id_token validation failed: bad signature, expired, wrong audience, unverified email, or Google JWKS unreachable. |
-| 403    | `SsoOptions.Google.AllowedDomains` policy excludes the email's domain (see §3). |
+| 400    | Body shape invalid (missing fields, unknown provider name). |
+| 401    | id_token validation failed: bad signature, expired, wrong audience, unverified email, provider not enabled, or the provider's JWKS unreachable. |
+| 403    | `SsoOptions.<Provider>.AllowedDomains` policy excludes the email's domain (see §3). |
 | 409    | The token validated but no matching `ApplicationUser` exists for that subject or email. Admin must provision the user first. |
 
 ### 2.3 Validation details
 
-The validator checks:
+#### Common to every provider
 
-- **Signature** — against Google's live JWKS at
-  `https://www.googleapis.com/oauth2/v3/certs`. The key set is cached
-  (12h refresh) by the standard `ConfigurationManager<OpenIdConnectConfiguration>`.
-- **Issuer** — must be `https://accounts.google.com` or `accounts.google.com`.
-- **Audience** — must be the configured `Sso:Google:ClientId`. Critical:
-  this is what prevents an attacker from forwarding an id_token issued
-  for a different app.
+- **Signature** — verified against the provider's live JWKS, fetched
+  from its OIDC discovery document (`{authority}/.well-known/openid-configuration`).
+  The key set is cached (12h refresh, 5min refresh-on-error floor) by
+  the standard `ConfigurationManager<OpenIdConnectConfiguration>` and
+  shared across calls — instantiating per-validation would hammer the
+  provider on every call.
+- **Audience** — must equal `Sso:<Provider>:ClientId` **or** any value in
+  `Sso:<Provider>:AdditionalAudiences`. The list lets a federated client
+  (e.g. Tuyere with its own Google OAuth client) trade an id_token whose
+  `aud` is the client's own id, without Forge having to share OAuth
+  credentials with it. The primary `ClientId` is always accepted; the
+  additional list is purely additive.
 - **Lifetime** — `exp` and `nbf` claims, with 2-minute clock-skew tolerance.
-- **`email_verified`** — must be `true`. Email is the fallback link key
-  in `SsoCallbackHandler` (when no `GoogleId` exists on the local user
-  yet), so an unverified email would let an attacker claim a Google
-  account for an email they don't own.
+- **Subject + email** are forwarded to the same `SsoCallbackHandler` the
+  browser flow uses, so user resolution / auto-link / `AllowedDomains`
+  semantics are identical across both flows. A change to user lookup
+  affects both.
 
-After validation, the trusted `sub` and `email` claims are forwarded to
-the same `SsoCallbackHandler` the browser flow uses. The two flows
-therefore have identical user-resolution and auto-link semantics — a
-change to user lookup affects both.
+#### Per-provider specifics
+
+| | Google | Microsoft (Azure AD v2.0) | Generic OIDC |
+|---|---|---|---|
+| **Authority** | `https://accounts.google.com` (fixed) | `Sso:Microsoft:Authority`, default `https://login.microsoftonline.com/common/v2.0` | `Sso:Oidc:Authority` (required when enabled) |
+| **Issuer check** | `https://accounts.google.com` or `accounts.google.com` | Multi-tenant: any `https://login.microsoftonline.com/{tenant-guid}/v2.0` via `IssuerValidator`. Single-tenant (when `Authority` names a specific tenant): exact match to discovery-doc issuer. | Discovery-doc `issuer` value, exact match |
+| **Subject claim** | `sub` | `oid` (AAD object id — tenant-stable across all OAuth clients), falling back to `sub` for personal MS accounts | `sub` |
+| **Email claim** | `email` | `email`, falling back to `preferred_username` | `email` |
+| **Email verification** | `email_verified=true` **required** (Google sets it reliably; email is the fallback link key) | Accepted if absent (AAD doesn't always emit it); rejected only when explicitly `false` | Accepted if absent; rejected only when explicitly `false` |
+| **Hosted-domain hint** | `hd` claim → `ExternalIdTokenClaims.HostedDomain` | not used | not used |
+
+> **Why `oid` for Microsoft, not `sub`?** Microsoft's `sub` is per-OAuth-client
+> — the same end user gets different `sub` values when they sign into
+> different apps. A federated client (Tuyere with its own AAD app) would
+> therefore fail to match the same `ApplicationUser` even with
+> `AdditionalAudiences` correctly configured. The `oid` claim is the AAD
+> object id, stable across every app in the tenant. We fall back to `sub`
+> only for personal Microsoft accounts that don't carry `oid`.
+
+#### Multi-tenant Microsoft caveat
+
+When `Sso:Microsoft:Authority` is unset (or ends in `/common`,
+`/organizations`, or `/consumers`), the install accepts id_tokens from
+any Microsoft tenant. The audience and signature checks still gate this
+hard, so it's not "anyone can authenticate" — only callers holding an
+id_token issued for **your** Microsoft client id can succeed. But if you
+want to restrict to a single tenant, set `Sso:Microsoft:Authority` to
+the tenant-specific URL (e.g. `https://login.microsoftonline.com/{your-tenant-id}/v2.0`)
+and the issuer check switches from regex-shape to exact match against
+the discovery-doc issuer.
 
 ---
 
