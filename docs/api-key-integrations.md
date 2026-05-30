@@ -400,6 +400,33 @@ the tenant-specific URL (e.g. `https://login.microsoftonline.com/{your-tenant-id
 and the issuer check switches from regex-shape to exact match against
 the discovery-doc issuer.
 
+For a third option in between, set `Sso:Microsoft:AllowedTenantIds` to a
+list of permitted tenant guids:
+
+```json
+{
+  "Sso": {
+    "Microsoft": {
+      "Enabled": true,
+      "ClientId": "...",
+      "AllowedTenantIds": [
+        "11111111-1111-1111-1111-111111111111",
+        "22222222-2222-2222-2222-222222222222"
+      ]
+    }
+  }
+}
+```
+
+The install stays multi-tenant on the authority side (no single-tenant
+Authority override), but after the signature + audience + issuer checks
+pass, the token's `tid` claim must also be on the list — otherwise
+401. This is the right shape when an MSP runs one Forge install for
+several customer tenants, or when you want to permit your tenant plus a
+specific partner tenant. Microsoft-only; Google and generic OIDC ignore
+the field. Empty / null = no per-tenant restriction (multi-tenant
+default behavior).
+
 ---
 
 ## 3. `SsoOptions.{Provider}.AllowedDomains` — per-install domain restriction
