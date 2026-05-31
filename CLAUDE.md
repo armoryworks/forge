@@ -350,6 +350,29 @@ Never build custom dialog shells. Every dialog uses the shared component.
 - `.dialog-row` = 2-column grid for side-by-side fields (1-column on mobile)
 - Footer buttons: equal width, horizontal, cancel left, primary right
 
+### Guided Wizards — ALWAYS Use `WorkflowComponent` Framework (Non-Negotiable)
+
+Multi-step guided creation flows (parts, vendors, customers, leads, etc.) MUST use the shared `WorkflowComponent` shell, NOT `mat-stepper`. The shell provides: theme-consistent pill+chevron stepper that scroll-carousels when the step set is wider than the dialog, Express/Guided mode toggle, on-demand rationale sidecar, validation-button stereotype on the Continue button, URL-as-source-of-truth (`?workflow=…&step=…&mode=…&runId=…`), server-side run state machine, deferred-materialization for entity-less starts.
+
+**Reference implementations**: `parts` ([features/parts/workflow/](forge-ui/src/app/features/parts/workflow/)) and `vendors` ([features/vendors/workflow/](forge-ui/src/app/features/vendors/workflow/) — migrated from mat-stepper 2026-05-31).
+
+**Migration recipe** (mirrors the vendor migration, see commits `8ac8ea5` + `a5341ad` + `7796472`):
+
+1. **Server adapter** (`forge.api/Workflows/{Entity}WorkflowAdapter.cs`) — implement `IWorkflowEntityCreator` (materializes the row on first patch) + `IWorkflowFieldApplier` (applies field payloads from each step). Optional: `IWorkflowEntityPromoter` if the entity has a Draft→Active lifecycle. `SoftDeleteIfDraftAsync` cleans up abandoned runs — soft-delete only when no transactions exist.
+2. **Server readiness loader** (`{Entity}ReadinessLoader.cs`) — implements `IEntityReadinessLoader`, loads the row + any relations the predicates need to introspect.
+3. **Server seed data** (`WorkflowSeedData.cs`) — add a `{Entity}ReadinessValidators` list (one `ValidatorSeed` per readiness gate) + `{Entity}WorkflowDefinitions` list (one `DefinitionSeed` per workflow definition with `StepsJson` referencing each step's `componentName`). Append a tuple to `WorkflowSubstrateSeeder.EntityBundles`.
+4. **Server DI** (`Program.cs`) — register the adapter as scoped + forward `IWorkflowEntityCreator` / `IWorkflowFieldApplier` / `IEntityReadinessLoader` factories alongside the part registrations.
+5. **Client step components** (`features/{entity}/workflow/{entity}-{step}-step/`) — one per step in the definition. Each: `input()` signals for `runId`/`entityId`/`entity`, a `FormGroup`, `effect()` to hydrate from the entity, registers with `WorkflowService.registerStepForm()` on construct + `unregisterStepForm()` on destroy. Save callback calls `workflowService.patchStep(runId, stepId, fields)` then refetches the entity and writes it to `currentEntity`.
+6. **Client express form** (`{entity}-express-form/`) — single consolidated screen for one-shot mode. Same shape as a step component but patches the materialization step (`'identity'` for vendor) with every field at once.
+7. **Client registry** (`register-{entity}-workflow-steps.ts`) — `provideEnvironmentInitializer(() => registry.register(...))` for each step + `registerExpress(...)` for the express form. Hook via `providers: [provide{Entity}WorkflowSteps()]` on the feature's route definitions.
+8. **Client page component** (`{entity}-workflow-page/`) — near-mirror of `PartWorkflowPageComponent`: URL-bound signals for `id`/`runId`/`workflow`/`step`/`mode`, three entry paths (fresh `/new`, entity-less resume with `?runId=`, existing entity at `/:id`), deferred-materialization URL upgrade effect, save-then-navigate handlers for Continue/Back/Jump/Complete.
+9. **Route registration** — `/{entity}/new` + `/{entity}/:id` both `loadComponent` the workflow page, both `providers: [provide{Entity}WorkflowSteps()]` so the registry is populated before the shell resolves a componentName.
+10. **Replace dialog opener** — wherever the old `MatDialog.open(GuidedXxxDialogComponent)` lived, replace with `router.navigate(['/{entity}/new'], { queryParams: { workflow: '{entity}-guided-v1' } })`.
+11. **Delete the old mat-stepper dialog** and any in-memory bulk-create patterns it used (collection mutations move to the entity's detail page post-creation).
+12. **i18n** — `workflow.{entity}.steps.*` (top-level, sibling of `workflow.parts.steps.*`), `validators.{entity}.*`, plus per-step `{entity}.workflow.{step}.*` labels and the page-level `{entity}.workflow.page.*` block. Mirror to `es.json`.
+
+**Never** introduce a new `mat-stepper`-backed wizard. Customer + lead-convert wizards are scheduled to follow this same migration; until they do they remain on the legacy mat-stepper substrate and are visually inconsistent with the rest of the suite (known debt).
+
 ### Date Handling
 - Angular sends dates via `toIsoDate()` from `shared/utils/date.utils.ts`
 - Format: `"YYYY-MM-DDT00:00:00Z"` — full ISO with explicit UTC (never date-only strings)
