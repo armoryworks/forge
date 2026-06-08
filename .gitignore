@@ -63,3 +63,7 @@ analysis/inventory/_scout/
 /ui-scout-*.json
 analysis/**/*.py
 analysis/**/*.ps1
+
+# Playwright e2e run artifacts (test output, never source)
+test-results/
+.last-run.json
