@@ -6,6 +6,17 @@ once they're resolved.
 
 ---
 
+## 🚧 Work in progress — tomorrow
+
+- [ ] Finalize the `forge-ui` lead/account UX work:
+  - complete inline account creation for lead edit and bulk-assign flows.
+  - add regression coverage for account list refresh and newly created-account selection.
+  - verify with `npm run lint && npm run lint:i18n && npm run test -- --watch=false`, plus `ng build --configuration development`.
+- [ ] Continue the repo bug backlog sweep:
+  - review `forge/forge/AUDIT.md`, `forge-api/forge.tests/Remediation/BACKLOG.md`, and local TODOs.
+  - surface the highest-impact actionable fixes for tomorrow (invoice/payment balance, auth scope, shipment/quote invariants, lead/account flow polish).
+- [ ] Create tracked issue-style entries for each discovered bug and follow-up work item.
+
 ## ✅ RESOLVED — Shop floor footer falls off-screen at increased font sizes
 
 **Symptom.** On `/display/shop-floor` (the kiosk display), clicking `A+`
