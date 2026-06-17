@@ -56,8 +56,9 @@ without, and shows them with a one-line reason. Nothing turns on silently. The
 inclusion list is read from the dependency graph that already exists, so we do
 not hand-maintain it. The customer-facing reason lines:
 
-- Inventory: "Includes Parts and Locations. You need items to track and somewhere
-  to keep them."
+- Inventory: "Includes Parts. You need items to track. Stock is counted at one
+  location to begin with. Turn on Locations and bins later if you need to track
+  where things are kept."
 - Purchasing: "Includes Vendors and Inventory. You need someone to buy from, and
   what you receive goes into stock."
 - Production: "Includes Inventory, Parts, Work Centers, and Bills of Material. A
@@ -77,6 +78,25 @@ not hand-maintain it. The customer-facing reason lines:
 - Scheduling: "Works with Production. It plans the jobs you run."
 - Training: "Includes the Employee list, since training is tracked per person."
 
+## Modules compose, but never force each other
+
+Turning two modules on does not chain their day-to-day actions together. In
+particular:
+
+- Manual inventory always works on its own. Receive, Issue, Move, and Count are
+  available whenever Inventory is on, with or without Purchasing or Shipping, and
+  never require a purchase order or a shipment. The audited manual path
+  (CAP-INV-ADJUST) is the everyday way to manage stock, not a fallback for when
+  the other modules are off.
+- Shipping can run with or without an inventory effect. A shipment can relieve
+  stock when that is what you want, or just record an outbound shipment for
+  labels and tracking without touching on-hand at all (non-stock items, samples,
+  or a customer who only wants the shipment recorded). The stock effect is a
+  choice on the shipment, not a hard wire.
+
+The general rule: a module's records and actions stand on their own. Enabling a
+neighbor adds options, it does not take the simple path away.
+
 ## The modules
 
 Each module turns on a core set of capabilities. Some bring optional extras that
@@ -91,12 +111,17 @@ path that never touches a ledger (CAP-INV-ADJUST).
 
 - Core: CAP-INV-CORE, CAP-INV-ADJUST, CAP-PLAN-SAFETYSTOCK (reorder points),
   CAP-RPT-INVVAL (a simple quantity-times-cost value view).
-- Pulls in: CAP-MD-PARTS (and its unit-of-measure prerequisite CAP-MD-UOM),
-  CAP-MD-LOCATIONS.
+- Pulls in: CAP-MD-PARTS, and its unit-of-measure prerequisite CAP-MD-UOM.
+- Locations and bins are an optional sub-feature, not a prerequisite
+  (CAP-MD-LOCATIONS, plus CAP-INV-MULTILOC for multiple sites). With it off,
+  inventory runs in single-location mode: stock is counted per part at one
+  default location the system creates, and no location or bin field appears in
+  any transaction. Turn it on and location and bin management plus the picker
+  appear. This keeps the simple case simple.
 - Suggested for injection molding: CAP-INV-LOTS (resin lots and expiry, FEFO),
   CAP-INV-CYCLECOUNT, CAP-INV-HAZMAT (resin SDS).
-- Available to add: CAP-INV-MULTILOC, CAP-INV-PHYSICAL, CAP-INV-RESERVE,
-  CAP-INV-SERIALS, CAP-INV-PICKWAVE, CAP-PLAN-ABC, CAP-PLAN-ATP.
+- Available to add: CAP-INV-PHYSICAL, CAP-INV-RESERVE, CAP-INV-SERIALS,
+  CAP-INV-PICKWAVE, CAP-PLAN-ABC, CAP-PLAN-ATP.
 
 ### Purchasing
 
@@ -221,11 +246,13 @@ Most of this is configuration on top of what exists. Two items are actual build:
    with the same audited movement underneath. This is a thin UI layer over
    endpoints that already work.
 
-2. Standalone Shipping. As the dependency graph stands, Shipping pulls in Sales
-   because pick/pack assumes an order. To let a customer ship without first
-   creating a sales order, Shipping needs a manual ship path, the same way
-   Inventory got a manual receive path that skips purchasing. Small and
-   contained, but real, and worth doing before we sell Shipping as standalone.
+2. Shipping that does not force its neighbors. Two parts. First, a manual ship
+   path so a shipment can be created without a sales order, since today pick/pack
+   assumes an order. This is the same shape as Inventory's manual receive path
+   that skips purchasing. Second, a per-shipment choice of whether the shipment
+   relieves stock, so Shipping can run with Inventory on without being wired to
+   always decrement it. Both are contained, and worth doing before we sell
+   Shipping as standalone.
 
 ## What gets built
 
@@ -245,6 +272,7 @@ Most of this is configuration on top of what exists. Two items are actual build:
   is adopted.
 - How much of Inventory's optional set is on by default for a molding shop (lots,
   cycle count, hazmat are the likely yes).
-- How far to take the inventory-first home: curated dashboard widgets inside the
-  standard shell (lower effort), or a purpose-built inventory landing screen (the
-  cleanest first run). Either way the nav is already trimmed by capability.
+- Inventory-first home: decided. A purpose-built, task-first landing aimed at a
+  user who is not deep in software (Receive, Use, Move, Count, Find a part, plus
+  on-hand and low stock), rather than the dense standard dashboard. High-volume
+  floor scanning reuses the existing kiosk surface.
