@@ -223,18 +223,28 @@ personal pay-stub, tax-document, and onboarding sections from account settings.
   withholding (CAP-QC-COMPLIANCE-FORMS).
 - Pulls in: Locations, since employees are scoped to a site.
 
-## The landing screen follows the modules
+## The home screen for a standalone module
 
-The home screen is built from widgets, and each widget belongs to a module. With
-a module off, its widgets and its nav group are hidden, so the landing screen
-only shows what the install actually uses. An inventory-only install lands on an
-inventory home: on-hand at a glance, low stock, recent movements, and a
-scan-to-transact box, with no job, sales, or finance widgets and no prompt to
-finish an employee profile. As modules are added, their widgets and nav appear.
+When a module is run on its own, its home is a tabbed surface with three views,
+defaulting to the simplest:
 
-This is largely existing behavior. The dashboard is already widget-based and the
-nav already hides by capability. The work is curating a sensible default widget
-set per module and a clean inventory-first home for the most common entry case.
+- Kiosk (default). The big-button, scan-first surface, one action at a time.
+  Reuses the existing shop-floor kiosk. It is the default because it is the
+  easiest for someone who is not deep in software.
+- Tasks. A task-first page: the common actions (for inventory, Receive, Use,
+  Move, Count, and Find a part), the on-hand list with search, and low stock up
+  top.
+- Dashboard. The widget view for a manager who wants the numbers, drawn from the
+  existing widget grid filtered to the module.
+
+The same tabbed pattern applies to any module selected as standalone, not just
+inventory. Which tabs show, which one is the default, and how each is laid out
+per customer is a later customization. For now all three ship, with Kiosk as the
+default.
+
+The nav stays trimmed by capability regardless, so only the active module's areas
+appear. As more modules are added, the install moves toward the regular
+multi-module dashboard.
 
 ## Two pieces of real work, named honestly
 
@@ -272,7 +282,7 @@ Most of this is configuration on top of what exists. Two items are actual build:
   is adopted.
 - How much of Inventory's optional set is on by default for a molding shop (lots,
   cycle count, hazmat are the likely yes).
-- Inventory-first home: decided. A purpose-built, task-first landing aimed at a
-  user who is not deep in software (Receive, Use, Move, Count, Find a part, plus
-  on-hand and low stock), rather than the dense standard dashboard. High-volume
-  floor scanning reuses the existing kiosk surface.
+- Standalone-module home: decided. A tabbed surface with Kiosk (default), Tasks,
+  and Dashboard, reusing the existing kiosk and widget grid. Same pattern for any
+  standalone module. Per-customer choice of tabs, default, and layout is a later
+  customization.
