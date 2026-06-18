@@ -246,6 +246,48 @@ The nav stays trimmed by capability regardless, so only the active module's area
 appear. As more modules are added, the install moves toward the regular
 multi-module dashboard.
 
+## Discovering the next module (admin-only edge nudges)
+
+The module picker is the up-front way to choose modules. The edge nudge is the
+in-app way to discover them later. When a user reaches a point where the next
+natural step needs a capability that is off, and that user is an admin, a small,
+easily-ignored note names the step and the module that would enable it.
+
+- Wording: "To <next thing>, enable <module>." For example, on a received part
+  with Purchasing off: "To raise a purchase order for this part, enable
+  Purchasing."
+- Admin only. Other users never see it, since they cannot act on it and it would
+  just be noise.
+- Quiet by default. It sits inline, low contrast, and never blocks the screen or
+  pops a dialog. It is meant to be skipped over until the admin is curious.
+- An info icon opens a fuller explainer: what the module does, what turning it on
+  changes, and a button that jumps straight to the capability admin screen,
+  scrolled to that exact setting, ready to flip on.
+- The explainer has a "Don't show me this again" control that hides that
+  particular nudge for that user from then on.
+
+How it is built, grounded in what exists:
+
+- The system already knows what is gated and what would ungate it (the capability
+  gate plus the dependency graph), so a nudge is just: this area is gated by
+  capability X, X is off, show "enable the module that owns X."
+- The jump-to-setting link is the existing capability detail route
+  (`/admin/capabilities/<code>`).
+- Dismissal is stored per user, keyed by the nudge, the same way the other UI
+  preferences are kept.
+- The text names the module rollup, not the raw capability code, since that is
+  what an admin recognizes.
+
+## Demo: entering each module
+
+The demo environment needs a way to drop straight into each cordoned module as it
+is finished, so it can be shown on its own. A demo launcher lists the completed
+modules and enters the demo with just that module's configuration, using the same
+bundle the picker applies. A walkthrough can then show Inventory by itself, then
+Shipping by itself, and so on. This grows as modules are polished. It shares the
+capability state and bundle definitions with the picker, so it is wiring, not new
+machinery.
+
 ## Two pieces of real work, named honestly
 
 Most of this is configuration on top of what exists. Two items are actual build:
@@ -274,6 +316,14 @@ Most of this is configuration on top of what exists. Two items are actual build:
 - The guided path: unchanged. It moves behind a "Help me decide" choice.
 - Re-entry: the same module picker is reachable later from capability admin, so
   expansion is the same screen, not a new one.
+- Edge nudges: a small, reusable hint shown to admins at a gated boundary, with an
+  info popover, a deep link to the capability setting, and a per-user "don't show
+  again." Reads the capability gate and dependency graph that already exist, and
+  stores dismissals as a user preference. Built as modules mature, since it needs
+  finished edges to point at.
+- Demo launcher: a per-module entry into the demo that applies just that module's
+  bundle, so each finished module can be shown on its own. Shares the picker's
+  bundle data.
 
 ## Open decisions
 
