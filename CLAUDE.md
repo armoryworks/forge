@@ -3,6 +3,15 @@
 > Loaded into every Claude Code session. These rules override defaults. Follow exactly.
 > Full specs in `docs/`. When in doubt, check `docs/coding-standards.md` first.
 
+## Client & Meeting Transcripts (Confidential — Non-Negotiable)
+
+Meeting and client-conversation transcripts (e.g. Google Docs, Gemini/recorder notes) are **proprietary and confidential**. Discussing their contents freely in conversation is fine — the hard rule is about what lands on disk in the repo:
+
+1. **Never write transcript content into the repo or anything that could be committed/pushed to GitHub.** No raw transcripts, verbatim quotes, client names, or excerpts in tracked files. Keep transcript text out of anything git can see (use the session scratchpad for scratch work, not the working tree).
+2. **The goal of processing a transcript is to drive application change or produce a TODO list of new functionality** — deliver distilled requirements/decisions/TODOs, and only those may enter `docs/`.
+3. **Filter out banter and already-existing/documented functionality.** Cross-check against `docs/` and flag what is genuinely new vs. duplicative of existing design/implementation.
+4. If a derived work item requires paraphrasing sensitive specifics into a committed doc, ask first.
+
 ## SELF-MAINTENANCE RULE
 
 **After every session that introduces a new pattern, convention, architectural decision, or workflow change — update this file.** This is the single source of truth for project rules across sessions. If a decision is made during implementation (new shared component, naming convention, SCSS pattern, API convention, etc.), add it here before the session ends. Outdated or missing rules cause rework. Keep this file current.
