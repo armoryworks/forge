@@ -9,7 +9,13 @@ updated: 2026-07-03
 
 # AI Fleet Orchestration + per-client customization
 
-> **Status: DESIGN LOCKED (2026-07-02/03) — implementation not started.** Derived
+> **Status: DESIGN LOCKED; D‑2 doc-override resolver implemented (2026-07-03); rest infra/AI-deferred.**
+> Implemented + verified on main: `ClientDocResolver` (D‑2 Tier‑0 per-client `.md` override
+> merge, client-wins). **Deferred (infra/AI-heavy — need the multi-container AI stack + a
+> research pass, logged in `blocking-questions.md`):** multi-instance topology, master
+> orchestrator, LoRA/fine-tune tiers, hardware sizing matrix + advisor, AI-provenance icons,
+> hybrid DB freshness wiring, and the provider-aware Accounting AI. Design below is complete.
+> Derived
 > from the 2026-07-02 planning session, cluster D of
 > `delivery/pending/functional-backlog-2026-07-02`. Extends the existing single
 > `forge-ai` RAG stack toward a multi-instance fleet with per-client, hardware-gated

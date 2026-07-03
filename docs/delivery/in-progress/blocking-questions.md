@@ -47,6 +47,12 @@ breadth through cluster E). Backends are implemented + verified; these UI pieces
   `ComplianceFieldRule` (required field @ process step) server-side; compute the deduped
   assembly BOM SDS set on-the-fly. Backends/entities exist; the query/enforcement layer + UI remain.
 
+- **[ai-fleet-orchestration D] Infra/AI implementation** — multi-instance topology,
+  master orchestrator, LoRA/fine-tune tiers, hardware sizing matrix + in-app advisor,
+  AI-provenance icons, hybrid DB-freshness wiring, provider-aware Accounting AI. Needs the
+  multi-container AI stack + a current-model sizing research pass; not verifiable in this
+  env. Design complete; D‑2 (`.md` override resolver) implemented.
+
 ## Resolved
 
 _(none yet)_
