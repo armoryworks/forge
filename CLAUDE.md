@@ -20,6 +20,12 @@ Also update `docs/coding-standards.md` or the relevant doc file if the change is
 
 **Implementation tracking:** Check `docs/implementation-status.md` at the start of every session. When completing a feature or sub-feature, update its status (Not Started → Partial → Done) in that file before ending the session. This is the master progress tracker.
 
+## Autonomous Execution (Non-Negotiable)
+
+When doing build/implementation work, **run continuously — never pause to ask a question or wait for confirmation.** If something needs the owner's input, append it to the blocking-questions inventory (`docs/delivery/in-progress/blocking-questions.md`), make the most reasonable assumption (or skip that individual task), and move on to the next unblocked task — in the same deliverable or a different one (sub-deliverables or whole deliverables). Surface the accumulated inventory only at the end of the run. Merge/push and "which first" choices are **log-and-continue**, not stop-and-ask. Keep docs in lockstep as each item completes (don't let them drift).
+
+**"Milestones" are NOT a concept on this project.** Do not checkpoint, batch, pause, or report around milestones. Work task-by-task / stage-by-stage and keep going.
+
 ## Documentation Placement (Non-Negotiable)
 
 All docs follow the taxonomy in **`docs/README.md`**. Two axes:
