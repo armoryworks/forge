@@ -24,7 +24,11 @@ design/impl (doc cited) · `BUG` = defect against current behaviour.
 
 ---
 
-## A. Compliance Calendar  *(candidate effort: `compliance-calendar`)*
+## A. Compliance Calendar  *(→ PROMOTED to `delivery/in-progress/compliance-calendar`)*
+
+> **Design locked 2026-07-02.** All five forks (A‑1…A‑5) decided; full spec +
+> data model + staged plan live in the `compliance-calendar` effort. The checklist
+> below is retained as the source requirements it was distilled into.
 
 - [ ] `AUGMENT` Rebuild the calendar around an **Event → Event-Type → Super-Group**
   hierarchy. Admin can define custom event types and super-groups; ship seeded
