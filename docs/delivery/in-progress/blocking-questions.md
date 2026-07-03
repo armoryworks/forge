@@ -25,6 +25,12 @@ Format: `[effort · stage] question — assumption/skip taken → (status)`.
   (schema branch) merge to `main`? → **Assumed** (owner: "continue"): keep on the
   branch through the remaining stages; merge later.
 
+- **[compliance-calendar · A/Stage 3] Calendar capability gating.** The new
+  `CalendarController` (taxonomy read) is `[Authorize]`-only; the Events controller uses
+  `CAP-MD-EMPLOYEES`. Should the calendar get its own capability (e.g. `CAP-*-CALENDAR`)
+  in the catalog, or stay ungated? → **Assumed**: `[Authorize]` only for now (per-group
+  visibility already enforced by A-2); revisit when the capability catalog is touched.
+
 ## Resolved
 
 _(none yet)_
