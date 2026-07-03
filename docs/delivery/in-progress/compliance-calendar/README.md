@@ -9,7 +9,7 @@ updated: 2026-07-02
 
 # Compliance Calendar → generalized event organizer
 
-> **Status: IMPLEMENTATION IN PROGRESS — Stage 1 (data model) done & verified (2026-07-03).** Derived from
+> **Status: IMPLEMENTATION IN PROGRESS — Stages 1–2 done & verified (2026-07-03).** Derived from
 > the 2026-07-02 planning session, cluster A of
 > `delivery/pending/functional-backlog-2026-07-02`. All five design forks (A‑1…A‑5)
 > are decided (see [Locked decisions](#locked-decisions)). This spec is ready to
@@ -42,7 +42,14 @@ Branch `feature/compliance-calendar` (forge-api + forge-db), not yet merged to m
   Postgres green (`CalendarAclSavedViewSchemaTests`). **`RegulatoryChangeProposal`
   deferred to Stage 8** — it is the Watchtower (cluster B) hook and B isn't built;
   building it now would risk rework.
-- [ ] Stages 2–8 — see [staged plan](#staged-plan-proposed). Stage 8 (Watchtower
+- [x] **Stage 2 — server-side ACL enforcement.** `ICalendarVisibilityService` /
+  `CalendarVisibilityService` computes visible Super-Group ids from the user's roles +
+  the allow-list (Admin/null-user → unrestricted). Enforced in `GetEvents` (filter) and
+  `GetEventById` (non-visible → 404, no existence leak). No schema change. Verified:
+  Release `-warnaserror` green; 24 calendar+Events tests green incl. 3 new visibility
+  tests. Note: `GetUpcomingEventsForUser` left unfiltered by design — it's already
+  attendee-scoped (being invited is its own grant).
+- [ ] Stages 3–8 — see [staged plan](#staged-plan-proposed). Stage 8 (Watchtower
   integration incl. `RegulatoryChangeProposal`) is blocked on cluster B.
 
 ## Goal
