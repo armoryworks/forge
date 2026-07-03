@@ -34,8 +34,15 @@ sandbox lacks.
 
 - **[ai-fleet D] AI topology/ML.** Master orchestrator, LoRA/fine-tune tiers, multi-instance
   topology, provider-aware Accounting AI (needs the dark GL enabled), hybrid live-retrieval
-  wiring. Design complete; the codeable seams are done (`ClientDocResolver`, `AiHardwareAdvisor`,
-  `AiProvenance` stamper). The rest needs the multi-container AI stack + a model-sizing research pass.
+  wiring. Design complete; the codeable seams are done and now WIRED: `ClientDocResolver` feeds
+  the doc-index job (per-client `.md` override), `AiHardwareAdvisor` is exposed at
+  `POST /api/v1/ai/hardware-advice`. The rest needs the multi-container AI stack + a model-sizing research pass.
+- **[ai-fleet D] AI-provenance surfacing.** The `AiProvenance` stamper is wired to nothing yet —
+  no create-path stamps AI-generated POs/SOs/notes, and there's no UI badge. Deferred: it touches
+  many transactional handlers + entity views (broad surface); do as its own effort.
+- **[ai-fleet D] Embedding ANN index.** `document_embeddings.embedding` has no ivfflat/hnsw index —
+  similarity search is an exact full scan (fine at current scale). Adding it is a forge-db schema
+  change; deferred to avoid colliding with the concurrent compliance/role schema work.
 - **[watchtower B] Real feed clients + scheduling.** Per-feed-type `IRegulatoryFeedClient`
   impls (Federal Register API, RSS, GovDelivery email, scrape) + a Hangfire recurring poll.
   Network-dependent; the poller/API/seed + an offline-safe mock are done.
@@ -55,4 +62,8 @@ sandbox lacks.
   fields + on-the-fly BOM-SDS dedupe). Merged.
 - **C-4** — GS1 license-as-part Part fields + due-window logic. Merged.
 - **D codeable** — D-2 doc-override resolver, hardware-sizing advisor, AI-provenance stamper. Merged.
+- **D cracks wired** — `ClientDocResolver` now feeds the doc-index job (`ClientDocsPath` setting);
+  `AiHardwareAdvisor` exposed at `POST /ai/hardware-advice`; RAG now indexes text-attachment bodies
+  (not just filenames); removed the dead `SmartSearchAsync` no-op (+ orphaned `AiSearchResult`);
+  corrected `ai-system.md` model name to `gemma3:4b`. Build clean, 1803 tests green. Merged.
 - **Merge cadence** — all effort branches merged to `main` (verified) once "no intervention" was set.
