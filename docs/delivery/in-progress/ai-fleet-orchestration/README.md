@@ -9,12 +9,16 @@ updated: 2026-07-03
 
 # AI Fleet Orchestration + per-client customization
 
-> **Status: DESIGN LOCKED; D‑2 doc-override resolver implemented (2026-07-03); rest infra/AI-deferred.**
+> **Status: DESIGN LOCKED; D‑2 + advisor seams now WIRED (2026-07-03); rest infra/AI-deferred.**
 > Implemented + verified on main: `ClientDocResolver` (D‑2 Tier‑0 per-client `.md` override
-> merge, client-wins). **Deferred (infra/AI-heavy — need the multi-container AI stack + a
+> merge, client-wins) is now **wired into the doc-index job** via the `ClientDocsPath` setting;
+> `AiHardwareAdvisor` is now **exposed** at `POST /api/v1/ai/hardware-advice`. RAG quality: the
+> indexer now pulls **text-attachment bodies** (not just filenames); the dead `SmartSearchAsync`
+> no-op was removed. **Deferred (infra/AI-heavy — need the multi-container AI stack + a
 > research pass, logged in `blocking-questions.md`):** multi-instance topology, master
-> orchestrator, LoRA/fine-tune tiers, hardware sizing matrix + advisor, AI-provenance icons,
-> hybrid DB freshness wiring, and the provider-aware Accounting AI. Design below is complete.
+> orchestrator, LoRA/fine-tune tiers, hardware sizing matrix numbers, AI-provenance icon
+> surfacing (stamper unwired), embedding ANN index, hybrid DB freshness wiring, and the
+> provider-aware Accounting AI. Design below is complete.
 > Derived
 > from the 2026-07-02 planning session, cluster D of
 > `delivery/pending/functional-backlog-2026-07-02`. Extends the existing single

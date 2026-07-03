@@ -9,7 +9,7 @@ Forge's AI layer is powered by a self-hosted **Ollama** instance running inside 
 | Component | Details |
 |-----------|---------|
 | Container | `forge-ai` (Ollama) |
-| Generation model | `mistral:7b` (instruction following, help chat, search suggestions, RAG answers) |
+| Generation model | `gemma3:4b` (instruction following, help chat, search suggestions, RAG answers) |
 | Embedding model | `all-minilm:l6-v2` (384-dimension vectors for semantic search) |
 | Vector store | PostgreSQL + pgvector extension (`document_embeddings` table) |
 | Config | `appsettings.json` → `Ollama` section (`BaseUrl`, `Model`, `EmbeddingModel`, `TimeoutSeconds`) |
@@ -334,7 +334,7 @@ Edit or add markdown files. The next daily index (3 AM) or a manual `POST /api/v
 **2. Update system contexts in `AiHelpChat.cs`**
 Add or correct specific how-to information in the role context strings. These are compiled into the handler — requires an API restart after changes.
 
-The model itself (`mistral:7b`) is not fine-tuned. RAG and prompt engineering are the only levers.
+The model itself (`gemma3:4b`) is not fine-tuned. RAG and prompt engineering are the only levers.
 
 ---
 
