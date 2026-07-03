@@ -9,7 +9,8 @@ updated: 2026-07-02
 
 # Compliance Calendar → generalized event organizer
 
-> **Status: IMPLEMENTATION IN PROGRESS — Stages 1–4 done & verified; Stage 5 next (2026-07-03).** Derived from
+> **Status: IMPLEMENTATION — Stages 1–6 done & verified; 7 deferred (safe), 8 blocked on B (2026-07-03).**
+> Backend + core UI complete; deferred UI follow-ups in `blocking-questions.md`. Derived from
 > the 2026-07-02 planning session, cluster A of
 > `delivery/pending/functional-backlog-2026-07-02`. All five design forks (A‑1…A‑5)
 > are decided (see [Locked decisions](#locked-decisions)). This spec is ready to
@@ -74,7 +75,14 @@ Branch `feature/compliance-calendar` (forge-api + forge-db), not yet merged to m
   DocumentSet/URL); `POST /events/{id}/status` (rejects reminder-tier, stamps Done) +
   `/acknowledge`; response exposes the fields. Verified: Release/-warnaserror + Postgres
   tests green. Status-management UI deferred (see `blocking-questions.md`).
-- [ ] Stages 6–8 — Stage 8 (Watchtower + `RegulatoryChangeProposal`) blocked on cluster B.
+- [x] **Stage 6 — recurrence field + compliance-bucket seeding.** `Event.RecurrenceRule`
+  (RRULE) + `SeedComplianceBucketsAsync` seeds the regulatory Super-Groups (OSHA/EPA/DOT/
+  Tax/HR/Fire + ATF/FDA industry-gated, default-hidden, tracking-tier) + starter types.
+  Verified green. RRULE occurrence expansion + seeded recurring instances deferred.
+- [ ] **Stage 7 — contract (drop `event_type` enum column).** Deferred (safe): expand/
+  contract explicitly permits the legacy column to linger while the FK + backfill are
+  live. Cleanup for a later pass once all readers use the FK.
+- [ ] **Stage 8 — Watchtower integration + `RegulatoryChangeProposal`.** Blocked on cluster B.
 
 ## Goal
 
