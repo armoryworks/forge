@@ -49,14 +49,18 @@ Branch `feature/compliance-calendar` (forge-api + forge-db), not yet merged to m
   Release `-warnaserror` green; 24 calendar+Events tests green incl. 3 new visibility
   tests. Note: `GetUpcomingEventsForUser` left unfiltered by design — it's already
   attendee-scoped (being invited is its own grant).
-- [~] **Stage 3 — read API done; overlay UI + authoring pending.**
-  `GET /api/v1/calendar/super-groups` (`GetCalendarSuperGroups` + `CalendarController`)
-  returns the visibility-filtered layer list (Super-Groups with nested Event-Types).
-  Verified: Release `-warnaserror` green; Postgres handler test green. **Remaining:**
-  the Angular overlay calendar (layer checkboxes, filter chips) in `forge-ui`, and
-  authoring (`CreateEvent`/`UpdateEvent` accepting `EventTypeId` — the enum dual-write
-  during expand). Calendar controller is `[Authorize]`-only for now (see
-  `blocking-questions.md`).
+- [~] **Stage 3 — read API + authoring + layer-panel UI done; event-by-layer grid
+  rendering pending.** Done: `GET /api/v1/calendar/super-groups`
+  (`GetCalendarSuperGroups` + `CalendarController`, visibility-filtered);
+  `CreateEvent`/`UpdateEvent` accept `EventTypeId` (validated; enum dual-write during
+  expand); forge-ui `CalendarSuperGroup`/`CalendarEventType` models +
+  `calendar.service.getSuperGroups()` + `CalendarLayersComponent` (dumb layer list) +
+  wired into the calendar as a collapsible panel with pref-persisted selection.
+  Verified: API Release/-warnaserror + Postgres tests green; UI lint + i18n-parity +
+  build green. **Remaining:** render events on the grid filtered by the selected
+  layers (needs `EventResponseModel` to carry `superGroupId`/`eventTypeId`), and a
+  create/edit dialog with an Event-Type picker. Calendar controller is
+  `[Authorize]`-only for now (see `blocking-questions.md`).
 - [ ] Stages 4–8 — see [staged plan](#staged-plan-proposed). Stage 8 (Watchtower
   integration incl. `RegulatoryChangeProposal`) is blocked on cluster B.
 
