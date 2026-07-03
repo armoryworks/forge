@@ -90,7 +90,14 @@ design/impl (doc cited) · `BUG` = defect against current behaviour.
   account for manufacturing-SDS vs consumer-SDS. SDS storage was deferred
   (`CAP-INV-HAZMAT`); the aggregation/dedupe is entirely new.
 
-## D. AI Architecture  *(candidate effort: `ai-fleet-orchestration`)*
+## D. AI Architecture  *(→ PROMOTED to `delivery/in-progress/ai-fleet-orchestration`)*
+
+> **Design captured 2026-07-02/03.** Tiered hardware-gated customization (RAG floor
+> + optional LoRA/fine-tune), per-client `.md`-override scaffold, hybrid DB freshness,
+> hardware advisor, provider-aware Accounting AI. Both strategic pivots resolved —
+> self-training is an opt-in tier, and the native GL already exists (dark), so the
+> Accounting AI just wires to it. Full spec in the effort. (Note: the "Decisions"
+> section below re: accounting is stale — correction deferred per owner.)
 
 - [ ] `AUGMENT` **Multi-instance topology** — ~5 scaling toward ~a dozen models,
   each in its own Docker container on its own dedicated low-cost box; ~1GB
