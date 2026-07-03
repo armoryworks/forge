@@ -9,7 +9,7 @@ updated: 2026-07-02
 
 # Compliance Calendar → generalized event organizer
 
-> **Status: IMPLEMENTATION IN PROGRESS — Stages 1–2 done & verified (2026-07-03).** Derived from
+> **Status: IMPLEMENTATION IN PROGRESS — Stages 1–3 done & verified (2026-07-03).** Derived from
 > the 2026-07-02 planning session, cluster A of
 > `delivery/pending/functional-backlog-2026-07-02`. All five design forks (A‑1…A‑5)
 > are decided (see [Locked decisions](#locked-decisions)). This spec is ready to
@@ -49,8 +49,7 @@ Branch `feature/compliance-calendar` (forge-api + forge-db), not yet merged to m
   Release `-warnaserror` green; 24 calendar+Events tests green incl. 3 new visibility
   tests. Note: `GetUpcomingEventsForUser` left unfiltered by design — it's already
   attendee-scoped (being invited is its own grant).
-- [~] **Stage 3 — read API + authoring + layer-panel UI done; event-by-layer grid
-  rendering pending.** Done: `GET /api/v1/calendar/super-groups`
+- [x] **Stage 3 — overlay calendar COMPLETE.** `GET /api/v1/calendar/super-groups`
   (`GetCalendarSuperGroups` + `CalendarController`, visibility-filtered);
   `CreateEvent`/`UpdateEvent` accept `EventTypeId` (validated; enum dual-write during
   expand); forge-ui `CalendarSuperGroup`/`CalendarEventType` models +
@@ -58,10 +57,11 @@ Branch `feature/compliance-calendar` (forge-api + forge-db), not yet merged to m
   wired into the calendar as a collapsible panel with pref-persisted selection.
   Verified: API Release/-warnaserror + Postgres tests green; UI lint + i18n-parity +
   build green. `EventResponseModel` now carries `superGroupId`/`eventTypeId`, and the
-  **month view renders events filtered by the selected layers** (colour per layer,
-  degrades to empty if events are gated). **Remaining:** week/day-view event rendering
-  (mirror the month chips) + a create/edit dialog with an Event-Type picker. Calendar
-  controller is `[Authorize]`-only for now (see `blocking-questions.md`).
+  **all three views (month/week/day) render events filtered by the selected layers**
+  (colour per layer, degrades to empty if events are gated), and the admin events
+  dialog has an **Event-Type picker** (populated from the visibility-filtered taxonomy;
+  `eventTypeId` flows through create/update). Verified: API + UI gates green throughout.
+  Calendar controller is `[Authorize]`-only for now (see `blocking-questions.md`).
 - [ ] Stages 4–8 — see [staged plan](#staged-plan-proposed). Stage 8 (Watchtower
   integration incl. `RegulatoryChangeProposal`) is blocked on cluster B.
 
