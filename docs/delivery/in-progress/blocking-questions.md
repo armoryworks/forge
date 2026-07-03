@@ -40,6 +40,12 @@ breadth through cluster E). Backends are implemented + verified; these UI pieces
   `/acknowledge`) + response fields are done.
 - **[compliance-calendar A-3] Module-embedded scoped calendar** — embed a
   `scope: module:compliance` calendar in a compliance module route (needs that route).
+- **[regulated-parts-safety C-4] Barcode + GS1 license** — standard barcoding default,
+  opt-in GS1 with license-as-part (non-inventory PartKind) + expiry-driven renewal PO.
+  Deferred (touches the critical `parts` table + a scheduled job).
+- **[regulated-parts-safety C-1/C-3] Enforcement + aggregation** — enforce
+  `ComplianceFieldRule` (required field @ process step) server-side; compute the deduped
+  assembly BOM SDS set on-the-fly. Backends/entities exist; the query/enforcement layer + UI remain.
 
 ## Resolved
 
