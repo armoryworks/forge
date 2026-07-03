@@ -8,51 +8,51 @@ updated: 2026-07-03
 
 # Blocking Questions & Issues Inventory
 
-Running log of things that need the owner's input, captured during autonomous build
-work **without stopping**. Each entry records the assumption made (or task skipped)
-so work kept moving. Owner answers in batch; resolved entries move to Resolved.
+Running log captured during autonomous build work **without stopping**. After the
+"pick them all up" pass, everything **codeable and verifiable in this environment**
+is done and merged to `main`. What remains needs the owner's decision, external
+infrastructure (multi-container AI stack / network / ML training), or a runtime the
+sandbox lacks.
 
-Format: `[effort · stage] question — assumption/skip taken → (status)`.
+## Open — needs the owner's decision
 
-## Open
+- **[compliance-calendar A-2] Compliance role model.** Dedicated Compliance role vs.
+  grant compliance groups to `Manager`/`Admin` + custom role. Assumed the latter (no new
+  role seeded); enforcement works via `CalendarSuperGroupRoleVisibility`.
+- **[compliance-calendar Stage 3] Calendar capability gating.** `CalendarController` /
+  `WatchtowerController` are `[Authorize]`(-roles) only; no dedicated `CAP-*` added.
+  Revisit when the capability catalog is next touched.
+- **[compliance-calendar A-3] Module-embedded scoped calendar.** Needs a new
+  **compliance feature module + nav route** in `forge-ui` to host a `scope:module:compliance`
+  calendar — an IA/nav decision (where the compliance module lives), not just code.
+- **[deferred, per owner] Stale-doc corrections.** `kickoff-prompt.md` ("NOT an accounting
+  system"), `ai-system.md` (RAG-only) still assert the old stances; correct **after current
+  efforts complete** (accounting GL + AI tiers are accepted directions). See
+  [[inbuilt-accounting-accepted]] (memory).
 
-- **[compliance-calendar · A-2] Compliance role model.** Is there a dedicated
-  Compliance/ComplianceOfficer role, or should compliance Super-Groups be granted to
-  `Manager`/`Admin` + an optional custom role? → **Assumed**: enforcement grants by
-  existing roles (`Admin` always; others via `CalendarSuperGroupRoleVisibility`); no
-  new role seeded. Revisit if a Compliance role is wanted.
-- **[compliance-calendar] Merge cadence.** When should `feature/compliance-calendar`
-  (schema branch) merge to `main`? → **Assumed** (owner: "continue"): keep on the
-  branch through the remaining stages; merge later.
+## Open — needs external infrastructure (not verifiable in this sandbox)
 
-- **[compliance-calendar · A/Stage 3] Calendar capability gating.** The new
-  `CalendarController` (taxonomy read) is `[Authorize]`-only; the Events controller uses
-  `CAP-MD-EMPLOYEES`. Should the calendar get its own capability (e.g. `CAP-*-CALENDAR`)
-  in the catalog, or stay ungated? → **Assumed**: `[Authorize]` only for now (per-group
-  visibility already enforced by A-2); revisit when the capability catalog is touched.
+- **[ai-fleet D] AI topology/ML.** Master orchestrator, LoRA/fine-tune tiers, multi-instance
+  topology, provider-aware Accounting AI (needs the dark GL enabled), hybrid live-retrieval
+  wiring. Design complete; the codeable seams are done (`ClientDocResolver`, `AiHardwareAdvisor`,
+  `AiProvenance` stamper). The rest needs the multi-container AI stack + a model-sizing research pass.
+- **[watchtower B] Real feed clients + scheduling.** Per-feed-type `IRegulatoryFeedClient`
+  impls (Federal Register API, RSS, GovDelivery email, scrape) + a Hangfire recurring poll.
+  Network-dependent; the poller/API/seed + an offline-safe mock are done.
+- **[regulated-parts C] Remaining wiring.** GS1 expiry→renewal-PO Hangfire job (reuses
+  purchasing) + a company barcode-mode setting; the Part fields, `ComplianceService`
+  (enforcement + BOM-SDS aggregation) are done. Plus the SDS/genealogy/profile admin UIs.
+- **[compliance-calendar] UI polish.** Full status dialog (owner picker, waive reason,
+  evidence upload) — the quick Mark-done/Acknowledge actions are shipped.
 
-## Deferred UI follow-ups (non-blocking; backend done)
+## Resolved (this session)
 
-Recorded per the autonomous-execution rule (skip individual tasks, keep moving toward
-breadth through cluster E). Backends are implemented + verified; these UI pieces remain:
-- **[compliance-calendar A-4] Status-management UI** — mark done/in-progress/waive,
-  forced-ack modal, evidence (DocumentSet/URL) attach. API (`/events/{id}/status`,
-  `/acknowledge`) + response fields are done.
-- **[compliance-calendar A-3] Module-embedded scoped calendar** — embed a
-  `scope: module:compliance` calendar in a compliance module route (needs that route).
-- **[regulated-parts-safety C-4] Barcode + GS1 license** — standard barcoding default,
-  opt-in GS1 with license-as-part (non-inventory PartKind) + expiry-driven renewal PO.
-  Deferred (touches the critical `parts` table + a scheduled job).
-- **[regulated-parts-safety C-1/C-3] Enforcement + aggregation** — enforce
-  `ComplianceFieldRule` (required field @ process step) server-side; compute the deduped
-  assembly BOM SDS set on-the-fly. Backends/entities exist; the query/enforcement layer + UI remain.
-
-- **[ai-fleet-orchestration D] Infra/AI implementation** — multi-instance topology,
-  master orchestrator, LoRA/fine-tune tiers, hardware sizing matrix + in-app advisor,
-  AI-provenance icons, hybrid DB-freshness wiring, provider-aware Accounting AI. Needs the
-  multi-container AI stack + a current-model sizing research pass; not verifiable in this
-  env. Design complete; D‑2 (`.md` override resolver) implemented.
-
-## Resolved
-
-_(none yet)_
+- **B Watchtower backend** — entities, source seeder, poller (offline-safe mock seam),
+  sources/proposals/apply/dismiss API. Merged.
+- **A-8** — applying a proposal creates a system compliance-calendar deadline. Merged.
+- **A-4 status-management (core)** — Mark-done + Acknowledge write API + UI actions. Merged.
+- **C-1/C-3 enforcement + aggregation** — `ComplianceService` (active-profile union + missing
+  fields + on-the-fly BOM-SDS dedupe). Merged.
+- **C-4** — GS1 license-as-part Part fields + due-window logic. Merged.
+- **D codeable** — D-2 doc-override resolver, hardware-sizing advisor, AI-provenance stamper. Merged.
+- **Merge cadence** — all effort branches merged to `main` (verified) once "no intervention" was set.
