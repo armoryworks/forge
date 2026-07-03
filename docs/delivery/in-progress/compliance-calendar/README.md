@@ -9,7 +9,7 @@ updated: 2026-07-02
 
 # Compliance Calendar → generalized event organizer
 
-> **Status: IMPLEMENTATION IN PROGRESS — Stage 1a done & verified (2026-07-03).** Derived from
+> **Status: IMPLEMENTATION IN PROGRESS — Stages 1a–1b done & verified (2026-07-03).** Derived from
 > the 2026-07-02 planning session, cluster A of
 > `delivery/pending/functional-backlog-2026-07-02`. All five design forks (A‑1…A‑5)
 > are decided (see [Locked decisions](#locked-decisions)). This spec is ready to
@@ -27,7 +27,13 @@ Branch `feature/compliance-calendar` (forge-api + forge-db), not yet merged to m
   Verified: `dotnet build -c Release -warnaserror` green; round-trip + unique-key
   test against real Postgres green (`CalendarTaxonomySchemaTests`). Entity names are
   `Calendar`-prefixed to avoid colliding with the legacy `EventType` enum.
-- [ ] Stage 1b — Event FK + columns, backfill, seed the 4 legacy enum values.
+- [x] **Stage 1b — Event linkage + seed/backfill.** Added `Event.EventTypeId` FK
+  (nullable, expand phase) + nav; `events.event_type_id` column/FK/index (forge-db);
+  `SeedData.Calendar` seeds 3 baseline Super-Groups + the 4 legacy-promoted Event-Types
+  and backfills existing events from the enum (idempotent, wired into boot seed).
+  Verified: Release `-warnaserror` green; seed/backfill + round-trip tests on real
+  Postgres green (`CalendarTaxonomySeedTests`). Legacy `event_type` enum column
+  retained until Stage 7 (contract).
 - [ ] Stage 1c — SuperGroupRoleVisibility + CalendarSavedView + RegulatoryChangeProposal.
 - [ ] Stages 2–8 — see [staged plan](#staged-plan-proposed).
 
