@@ -104,15 +104,6 @@ Selected in onboarding by budget/hardware; the [hardware matrix](#dcross--hardwa
 
 ---
 
-## Doc corrections needed — DEFERRED (per owner: after current efforts complete)
-Do **not** edit these yet; tracked for a later pass once in-flight work lands.
-- `kickoff-prompt.md` — *"This is NOT an accounting system — QuickBooks handles
-  that"* is stale: the native GL (Forge Accounting Suite) exists, dark behind
-  `CAP-ACCT-FULLGL`. The in-built full accounting system is an **accepted direction**.
-- 2026-07-02 backlog "Decisions" #1 — calls `CAP-ACCT-FULLGL` "aspirational,
-  never-enabled"; stale for the same reason. (Left as-is intentionally.)
-- `ai-system.md` — RAG-only / no-fine-tuning disclaimer → tiered stance (pivot #2).
-
 ## Staged plan (proposed)
 1. Per-client scaffold + `.md` override layer (Tier 0) on the existing RAG stack.
 2. Hybrid freshness: extractors + live-retrieval tool-calls; wire to Hangfire reindex.
