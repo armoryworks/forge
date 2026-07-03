@@ -9,7 +9,17 @@ updated: 2026-07-03
 
 # Regulated Parts, Traceability & Safety
 
-> **Status: DESIGN LOCKED (2026-07-03) — implementation not started.** Derived from
+> **Status: IMPLEMENTATION — C‑1/C‑2/C‑3 backend done & verified (2026-07-03); C‑4 + enforcement/aggregation/UI deferred.**
+>
+> Done (on main, Postgres-tested): **C‑1** `ComplianceProfile` + `ComplianceFieldRule`
+> (additive-union, required traceability + SDS) with firearms/food/medical seeder;
+> **C‑2** `LotConsumption` genealogy edges (consumed→produced) for recall trace; **C‑3**
+> `PartSafetyDataSheet` (DocumentSet-backed SDS, mfg/consumer). **Deferred** (logged in
+> `blocking-questions.md`): C‑4 (standard/GS1 barcode + license-as-part + expiry reorder —
+> touches the parts table), assembly BOM-SDS on-the-fly aggregation, `ComplianceFieldRule`
+> enforcement at process steps, and all UI.
+>
+> Original design below. Derived from
 > the 2026-07-02 planning session, cluster C of
 > `delivery/pending/functional-backlog-2026-07-02`. Four forks decided (C‑1…C‑4).
 > Grounded against live code, not the backlog's prose (several `AUGMENT`s were
