@@ -69,8 +69,12 @@ Branch `feature/compliance-calendar` (forge-api + forge-db), not yet merged to m
   Verified: API Release/-warnaserror + Postgres test green; UI lint + i18n + build green.
   **Remaining:** embed a scope-filtered calendar in the compliance module
   (`scope: module:compliance`) — a routing/embedding task once a compliance module route exists.
-- [ ] Stages 5–8 — see [staged plan](#staged-plan-proposed). Stage 8 (Watchtower
-  integration incl. `RegulatoryChangeProposal`) is blocked on cluster B.
+- [~] **Stage 5 — workflow BACKEND done; status UI deferred.** `EventStatus` enum +
+  tiered fields on `Event` (status/owner/completion/waived, forced-ack, evidence
+  DocumentSet/URL); `POST /events/{id}/status` (rejects reminder-tier, stamps Done) +
+  `/acknowledge`; response exposes the fields. Verified: Release/-warnaserror + Postgres
+  tests green. Status-management UI deferred (see `blocking-questions.md`).
+- [ ] Stages 6–8 — Stage 8 (Watchtower + `RegulatoryChangeProposal`) blocked on cluster B.
 
 ## Goal
 
