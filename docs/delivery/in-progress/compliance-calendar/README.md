@@ -9,7 +9,7 @@ updated: 2026-07-02
 
 # Compliance Calendar → generalized event organizer
 
-> **Status: IMPLEMENTATION IN PROGRESS — Stages 1a–1b done & verified (2026-07-03).** Derived from
+> **Status: IMPLEMENTATION IN PROGRESS — Stage 1 (data model) done & verified (2026-07-03).** Derived from
 > the 2026-07-02 planning session, cluster A of
 > `delivery/pending/functional-backlog-2026-07-02`. All five design forks (A‑1…A‑5)
 > are decided (see [Locked decisions](#locked-decisions)). This spec is ready to
@@ -34,8 +34,16 @@ Branch `feature/compliance-calendar` (forge-api + forge-db), not yet merged to m
   Verified: Release `-warnaserror` green; seed/backfill + round-trip tests on real
   Postgres green (`CalendarTaxonomySeedTests`). Legacy `event_type` enum column
   retained until Stage 7 (contract).
-- [ ] Stage 1c — SuperGroupRoleVisibility + CalendarSavedView + RegulatoryChangeProposal.
-- [ ] Stages 2–8 — see [staged plan](#staged-plan-proposed).
+- [x] **Stage 1c — ACL + saved-view entities.** `CalendarSuperGroupRoleVisibility`
+  (A-2 per-group role allow-list; unique (group,role), cascade on group delete) +
+  `CalendarSavedView` (A-3; `int[]` layer selections, personal/role-default, master vs
+  `module:<area>` scope). Entities/configs/DbSets + forge-db tables/indexes/FK.
+  Verified: Release `-warnaserror` green; round-trip + unique-grant tests on real
+  Postgres green (`CalendarAclSavedViewSchemaTests`). **`RegulatoryChangeProposal`
+  deferred to Stage 8** — it is the Watchtower (cluster B) hook and B isn't built;
+  building it now would risk rework.
+- [ ] Stages 2–8 — see [staged plan](#staged-plan-proposed). Stage 8 (Watchtower
+  integration incl. `RegulatoryChangeProposal`) is blocked on cluster B.
 
 ## Goal
 
