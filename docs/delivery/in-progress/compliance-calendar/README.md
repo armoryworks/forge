@@ -9,12 +9,27 @@ updated: 2026-07-02
 
 # Compliance Calendar → generalized event organizer
 
-> **Status: DESIGN LOCKED (2026-07-02) — implementation not started.** Derived from
+> **Status: IMPLEMENTATION IN PROGRESS — Stage 1a done & verified (2026-07-03).** Derived from
 > the 2026-07-02 planning session, cluster A of
 > `delivery/pending/functional-backlog-2026-07-02`. All five design forks (A‑1…A‑5)
 > are decided (see [Locked decisions](#locked-decisions)). This spec is ready to
 > code against once the [kickoff reconciliation](#reconciliation-with-existing-code)
 > is confirmed against live code.
+
+## Implementation progress
+
+Branch `feature/compliance-calendar` (forge-api + forge-db), not yet merged to main
+(schema migration → branch per repo convention).
+
+- [x] **Stage 1a — taxonomy tables.** `CalendarSuperGroup` + `CalendarEventType`
+  entities/configs (forge-api), `calendar_super_groups` / `calendar_event_types`
+  tables + indexes + FK (forge-db), schema re-assembled, DbSets registered.
+  Verified: `dotnet build -c Release -warnaserror` green; round-trip + unique-key
+  test against real Postgres green (`CalendarTaxonomySchemaTests`). Entity names are
+  `Calendar`-prefixed to avoid colliding with the legacy `EventType` enum.
+- [ ] Stage 1b — Event FK + columns, backfill, seed the 4 legacy enum values.
+- [ ] Stage 1c — SuperGroupRoleVisibility + CalendarSavedView + RegulatoryChangeProposal.
+- [ ] Stages 2–8 — see [staged plan](#staged-plan-proposed).
 
 ## Goal
 
