@@ -60,6 +60,11 @@ design/impl (doc cited) · `BUG` = defect against current behaviour.
   box — **cannot** be air-gapped (contrast cluster E). Nearest existing concept
   is compliance-form auto-sync of known gov PDFs, which is not horizon-scanning.
 
+> Seed source list captured as reference doc `regulatory-source-inventory`
+> (`docs/domain/`) — backbone (Federal Register + Unified Agenda + regulations.gov),
+> per-domain sources with feed flags, and the known automation gaps (ATF, ITAR,
+> standards bodies). Admins add/remove at runtime.
+
 ## C. Compliance / Traceability / Parts  *(candidate effort: `regulated-parts-safety`)*
 
 - [ ] `NEW` **GS1 barcode integration** — model the barcode registry as a
