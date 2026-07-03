@@ -69,7 +69,12 @@ design/impl (doc cited) · `BUG` = defect against current behaviour.
 > per-domain sources with feed flags, and the known automation gaps (ATF, ITAR,
 > standards bodies). Admins add/remove at runtime.
 
-## C. Compliance / Traceability / Parts  *(candidate effort: `regulated-parts-safety`)*
+## C. Compliance / Traceability / Parts  *(→ PROMOTED to `delivery/in-progress/regulated-parts-safety`)*
+
+> **Design locked 2026-07-03.** Four forks decided: ComplianceProfile (additive
+> per-industry union) · explicit LotConsumption genealogy edges · DocumentSet-backed
+> SDS with live BOM aggregation · standard barcoding default + opt-in GS1
+> license-as-part. Full spec + data model in the effort.
 
 - [ ] `NEW` **GS1 barcode integration** — model the barcode registry as a
   *vendor* and the barcode license as a *part*, so renewal flows through normal
