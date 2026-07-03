@@ -326,15 +326,15 @@ When search input is not empty and user pauses, calls `POST /api/v1/ai/search-su
 
 ## Improving AI Responses
 
-The AI's knowledge comes from two sources — both can be improved without touching model weights:
+The base install improves the AI **without touching model weights** — RAG is the mandatory floor, available on any hardware:
 
 **1. Update docs in `/docs/`**
-Edit or add markdown files. The next daily index (3 AM) or a manual `POST /api/v1/ai/bulk-index {"entityType":"Documentation"}` will update the RAG index. The AI's next answer about that topic will incorporate the new content.
+Edit or add markdown files. The next daily index (3 AM) or a manual `POST /api/v1/ai/bulk-index {"entityType":"Documentation"}` will update the RAG index. The AI's next answer about that topic will incorporate the new content. Per-client overrides can shadow shipped docs — see `ai.client-docs-path` (ai-fleet-orchestration D-2).
 
 **2. Update system contexts in `AiHelpChat.cs`**
 Add or correct specific how-to information in the role context strings. These are compiled into the handler — requires an API restart after changes.
 
-The model itself (`gemma3:4b`) is not fine-tuned. RAG and prompt engineering are the only levers.
+**Model weights (opt-in, hardware-gated).** RAG + prompt engineering is the floor (`gemma3:4b` unmodified). Beyond it, the ai-fleet plan defines **opt-in customization tiers** chosen by the client's hardware/budget: Tier 0 = RAG scaffold only; Tier 1 = RAG + per-client LoRA adapters over a shared base; Tier 2 = RAG + fuller fine-tune / larger base models. Self-training is therefore an upgrade, not disallowed — see `delivery/in-progress/ai-fleet-orchestration/README.md`. The tier pipeline itself is not yet built (infra-deferred).
 
 ---
 
