@@ -31,6 +31,16 @@ Format: `[effort · stage] question — assumption/skip taken → (status)`.
   in the catalog, or stay ungated? → **Assumed**: `[Authorize]` only for now (per-group
   visibility already enforced by A-2); revisit when the capability catalog is touched.
 
+## Deferred UI follow-ups (non-blocking; backend done)
+
+Recorded per the autonomous-execution rule (skip individual tasks, keep moving toward
+breadth through cluster E). Backends are implemented + verified; these UI pieces remain:
+- **[compliance-calendar A-4] Status-management UI** — mark done/in-progress/waive,
+  forced-ack modal, evidence (DocumentSet/URL) attach. API (`/events/{id}/status`,
+  `/acknowledge`) + response fields are done.
+- **[compliance-calendar A-3] Module-embedded scoped calendar** — embed a
+  `scope: module:compliance` calendar in a compliance module route (needs that route).
+
 ## Resolved
 
 _(none yet)_
