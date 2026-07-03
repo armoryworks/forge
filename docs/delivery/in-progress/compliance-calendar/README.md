@@ -57,10 +57,11 @@ Branch `feature/compliance-calendar` (forge-api + forge-db), not yet merged to m
   `calendar.service.getSuperGroups()` + `CalendarLayersComponent` (dumb layer list) +
   wired into the calendar as a collapsible panel with pref-persisted selection.
   Verified: API Release/-warnaserror + Postgres tests green; UI lint + i18n-parity +
-  build green. **Remaining:** render events on the grid filtered by the selected
-  layers (needs `EventResponseModel` to carry `superGroupId`/`eventTypeId`), and a
-  create/edit dialog with an Event-Type picker. Calendar controller is
-  `[Authorize]`-only for now (see `blocking-questions.md`).
+  build green. `EventResponseModel` now carries `superGroupId`/`eventTypeId`, and the
+  **month view renders events filtered by the selected layers** (colour per layer,
+  degrades to empty if events are gated). **Remaining:** week/day-view event rendering
+  (mirror the month chips) + a create/edit dialog with an Event-Type picker. Calendar
+  controller is `[Authorize]`-only for now (see `blocking-questions.md`).
 - [ ] Stages 4–8 — see [staged plan](#staged-plan-proposed). Stage 8 (Watchtower
   integration incl. `RegulatoryChangeProposal`) is blocked on cluster B.
 
