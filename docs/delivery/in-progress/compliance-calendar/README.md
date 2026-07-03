@@ -9,7 +9,7 @@ updated: 2026-07-02
 
 # Compliance Calendar → generalized event organizer
 
-> **Status: IMPLEMENTATION IN PROGRESS — Stages 1–3 done & verified (2026-07-03).** Derived from
+> **Status: IMPLEMENTATION IN PROGRESS — Stages 1–4 done & verified; Stage 5 next (2026-07-03).** Derived from
 > the 2026-07-02 planning session, cluster A of
 > `delivery/pending/functional-backlog-2026-07-02`. All five design forks (A‑1…A‑5)
 > are decided (see [Locked decisions](#locked-decisions)). This spec is ready to
@@ -62,7 +62,14 @@ Branch `feature/compliance-calendar` (forge-api + forge-db), not yet merged to m
   dialog has an **Event-Type picker** (populated from the visibility-filtered taxonomy;
   `eventTypeId` flows through create/update). Verified: API + UI gates green throughout.
   Calendar controller is `[Authorize]`-only for now (see `blocking-questions.md`).
-- [ ] Stages 4–8 — see [staged plan](#staged-plan-proposed). Stage 8 (Watchtower
+- [~] **Stage 4 — saved views DONE; module-embedded scoped calendar pending.**
+  `GET/POST/DELETE /api/v1/calendar/saved-views` (personal + role-default, scope-aware,
+  ownership-guarded delete) + UI: the layer panel has a saved-view selector (applies a
+  view's layers), a save-current-as control, and applies a role-default view on load.
+  Verified: API Release/-warnaserror + Postgres test green; UI lint + i18n + build green.
+  **Remaining:** embed a scope-filtered calendar in the compliance module
+  (`scope: module:compliance`) — a routing/embedding task once a compliance module route exists.
+- [ ] Stages 5–8 — see [staged plan](#staged-plan-proposed). Stage 8 (Watchtower
   integration incl. `RegulatoryChangeProposal`) is blocked on cluster B.
 
 ## Goal
