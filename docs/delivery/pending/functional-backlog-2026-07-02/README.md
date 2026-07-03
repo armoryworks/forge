@@ -136,6 +136,12 @@ design/impl (doc cited) · `BUG` = defect against current behaviour.
 
 ## E. Infrastructure / Security  *(candidate effort: `airgap-skiff-mode`)*
 
+> **Update-transfer slice designed 2026-07-02** in `forge-deploy/docs/airgap-bundle.md`
+> (+ `scripts/forge-bundle` skeleton). The "encrypted USB" item was **reframed** to a
+> *signed bundle verified on import* (cosign) — authenticity over confidentiality;
+> encryption is an optional media bolt-on. This is also the seed-refresh vehicle for
+> compliance-calendar A‑5. The rest of cluster E stays infrastructural.
+
 - [ ] `NEW` **Air-gap / "SKIFF" mode** — run isolated on the LAN as a "private
   box": LAN-reachable, WAN-blocked via DNS reroute + firewall + specific ports;
   security lives in infra, not app code. On-prem LAN hosting exists; the isolated
