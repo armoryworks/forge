@@ -4,7 +4,7 @@ type: delivery
 status: in-progress
 id: ai-fleet-orchestration
 owner:
-updated: 2026-07-03
+updated: 2026-07-04
 ---
 
 # AI Fleet Orchestration + per-client customization
@@ -132,3 +132,33 @@ Selected in onboarding by budget/hardware; the [hardware matrix](#dcross--hardwa
 - Backlog cluster D — `delivery/pending/functional-backlog-2026-07-02`.
 - Existing: `ai-system.md`, `libraries.md`, `ACCOUNTING_SUITE_PLAN` + `PHASE*_STATUS.md`.
 - Related efforts: `compliance-calendar` (A‑5 seed/AI), `forge-deploy/docs/airgap-bundle.md`.
+
+---
+
+## Wrap-up notes (2026-07-04) — accomplishable-AI pass
+
+Triaged the deferred list into "buildable now" vs "hardware/research-blocked", then executed the buildable slice.
+
+- **ANN index (embedding search) — SHIPPED.** `forge-db/schema/indexes/ix_document_embeddings_embedding_hnsw.sql`:
+  HNSW over `document_embeddings.embedding` with `vector_cosine_ops` (matches `EmbeddingRepository.CosineDistance`;
+  the pg17 image supports HNSW). To land: regenerate the embedded schema
+  (`forge-db assemble --repo <forge-db> --out forge.data/Schema/forge-schema.sql`), then `plan`/`apply` on existing
+  dev DBs (fresh DBs get it at boot). HNSW is approximate NN — tune `hnsw.ef_search` for recall. No forge-api change.
+- **AI-provenance surfacing — DEFERRED (decision 2026-07-04).** Verified `StampAsync` is never called and **nothing
+  persists an AI-generated business artifact today** — every AI path (chat/help/search/summarize/RAG/PDF-compare/PO
+  price-override) returns ephemeral text; `BulkLeadIntake` is a deterministic CSV pipeline, not AI. The stamper (entity
+  + service + DI + tests) stays as forward-scaffolding. Wire provenance into the **first feature that actually persists
+  AI output** (an "AI drafts a PO/SO/note" flow) — a 2-line `StampAsync` + a badge — rather than building UI that renders
+  on zero rows and can't be visually verified.
+- **D-3 hybrid RAG freshness — IMPLEMENTED (forge-api).** Embeds stay stable/semantic (the indexer already embeds only
+  text fields); volatile facts are live-retrieved at answer-time via a deterministic mapped-query provider (no tool-call
+  loop). New: `ILiveContextProvider` + `LiveContextProvider` (Part on-hand from `BinContent`, `Status`, manual cost;
+  extensible switch), `EntityReference` + `LiveContextFact` models; wired into `RagSearchHandler`'s answer context
+  ("Current data (live — authoritative…)") + DI in `Program.cs`. Confirmed embed/live split: embed
+  descriptions/specs/BOM/profiles; live-retrieve stock/status/price/cost. **Follow-ups:** apply the same
+  `liveContext.GetFactsAsync` injection to `AiHelpChat`/`AssistantChat` context builders; add a `PostgresFixture`-backed
+  `LiveContextProviderTests`; extend the provider switch (Job stage, Customer open-order rollups) as those gain volatile value.
+
+**Still hardware/research-blocked (unchanged):** multi-instance topology + master orchestrator (needs the multi-container
+AI stack), LoRA/fine-tune tiers (training rig), hardware sizing-matrix numbers (advisor endpoint is wired; the numbers need
+a local-model-sizing research pass — do not fabricate), Accounting AI over the native GL (waits on the Phase-0 GL engine).

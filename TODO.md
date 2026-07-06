@@ -17,6 +17,20 @@ once they're resolved.
   - surface the highest-impact actionable fixes for tomorrow (invoice/payment balance, auth scope, shipment/quote invariants, lead/account flow polish).
 - [ ] Create tracked issue-style entries for each discovered bug and follow-up work item.
 
+## ⏸️ DEFERRED — Activity-Based Costing (ABC), AI-assisted
+
+Advanced managerial overhead-allocation layer on top of the GL — **not scoped for
+Phases 0–5**. Near-term costing (standard/weighted-avg/FIFO + `Job`/`CostCenter`
+dimensions) already covers job-margin + valuation, which SMB adopters ask for first.
+**Revisit** when a customer needs product costs where overhead is large and unevenly
+consumed. Cheap to add later: Forge already emits ABC's cost drivers (setups,
+inspections, moves) as operational events, so a future add (prefer *Time-Driven* ABC)
+is just an allocation layer over cost centers — no schema rework. AI stays **advisory
+only** (driver discovery, method recommendation, anomaly flagging, plain-language
+explanation) and **never in the immutable posting path**. Validate demand with the
+design-partner customers before building. Context: `ACCOUNTING_SUITE_PLAN.md` (§5A is
+the GL Workspace + training slice this would eventually layer onto).
+
 ## ✅ RESOLVED — Shop floor footer falls off-screen at increased font sizes
 
 **Symptom.** On `/display/shop-floor` (the kiosk display), clicking `A+`
