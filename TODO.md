@@ -17,6 +17,25 @@ once they're resolved.
   - surface the highest-impact actionable fixes for tomorrow (invoice/payment balance, auth scope, shipment/quote invariants, lead/account flow polish).
 - [ ] Create tracked issue-style entries for each discovered bug and follow-up work item.
 
+## ⏸️ DEFERRED — §5A GL Workspace UI remainder (blocked, 2026-07-06)
+
+The §5A read/create/advisory/reverse surface is **built + on `main`** (endpoints: ledger register,
+chart-of-accounts, AI-explain, anomaly-scan, reverse; components: ledger view w/ explain+anomaly+reverse,
+manual-entry editor, reverse dialog; dashboard tiles). All gates green except the Playwright screenshot.
+What remains is blocked, not merely undone:
+
+- **[blocked: visual-verify / Docker] Split-pane workspace shell + virtualized find-in-context scroller
+  (§5A.1–5A.2 items 2, and the workspace embed of item 4).** Buildable, but these are *interaction*-heavy
+  (scroll-and-center, candidate popover, split-pane) — the one class of UI that shouldn't ship without a
+  screenshot pass. **Unblock:** the docker-ce migration → then screenshot-verify + build these with real
+  verification. (The already-shipped ledger view + editor are also each one screenshot from verified.)
+- **[blocked: design] Two-track training feature (§5A.4 / items 7–9).** Needs the sandbox demo-`Book`
+  seed model + fix-it-scenario schema + the QuickBooks crosswalk content decided before building (see the
+  §12 "scenario/tour authoring format" deferral). Not a code task yet.
+- **[blocked: review] Turn `CAP-ACCT-FULLGL` on.** Wiring `GlCapabilityGate` (the §7A opening-balances
+  hard-gate) into `ToggleCapabilityHandler` is a deliberate Phase-1 governance step — wants a reviewed
+  session, not an unattended change. Until then the whole GL area is route-guarded off / 403s.
+
 ## ⏸️ DEFERRED — Activity-Based Costing (ABC), AI-assisted
 
 Advanced managerial overhead-allocation layer on top of the GL — **not scoped for
