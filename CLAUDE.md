@@ -240,6 +240,10 @@ When `docker compose up` fails with "port is already allocated" or "bind: addres
 
 Scripts (`setup.sh`, `refresh.sh`) must follow this ownership check before taking any remediation action. Never blanket-kill all `docker-proxy` processes.
 
+### snap Docker + cgroup v2 — "could not kill container: permission denied"
+
+On hosts where Docker is the **snap** build (`docker info` → `Root=/var/snap/docker/...`) running on **cgroup v2 + systemd driver**, `docker stop`/`rm`/`compose up --build` on a *running* container fails with `could not kill container: permission denied` (create/exec/build/ps all work; Testcontainers integration tests fail only at teardown). Cause: the `snap.docker.dockerd` AppArmor profile has no write rule for the container's cgroup-v2 `cgroup.kill` under `system.slice`. Quick dev fix: `sudo apparmor_parser -R /var/lib/snapd/apparmor/profiles/snap.docker.dockerd` (reversible with `-r`; not persistent across reboot/snap-refresh). Permanent fix: use Docker CE from apt (unconfined daemon). **Full Symptom→Cause→Fix write-up: `forge-deploy/docs/TROUBLESHOOTING.md` → Host setup.**
+
 ---
 
 
