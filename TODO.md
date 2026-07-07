@@ -24,6 +24,8 @@ chart-of-accounts, AI-explain, anomaly-scan, reverse; components: ledger view w/
 manual-entry editor, reverse dialog; dashboard tiles). All gates green except the Playwright screenshot.
 What remains is blocked, not merely undone:
 
+- **[DONE 2026-07-07] Screenshot-verification of shipped §5A surfaces** — ledger, editor, dashboard, and the new
+  Reverse/correct prefill flow all visually verified; 4 UI bugs found + fixed in the loop.
 - **[UNBLOCKED 2026-07-07 — Docker migrated to apt; teardown + rebuilds work] Split-pane workspace
   shell + virtualized find-in-context scroller (§5A.1–5A.2 items 2, and the workspace embed of item 4).**
   Visual verification is available again (`docker compose up -d --build forge-ui` + the Playwright
