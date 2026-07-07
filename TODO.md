@@ -39,13 +39,13 @@ What remains is blocked, not merely undone:
   CoA, one quarter, 5 planted errors), the fix-it scenario JSON schema (6 validator types, bait-then-correct
   flow), the 8-card QB crosswalk, and the 2-question intake router. **Build starts once Daniel settles the
   5 OPEN DECISIONS in that doc** (sandbox isolation, reset carve-out, scenario storage, gate softness, crosswalk tone).
-- **[DONE 2026-07-07] §7A hard-gate WIRED.** `ToggleCapabilityHandler` now evaluates `GlCapabilityGate`
-  for every active book before enabling `CAP-ACCT-FULLGL` — 409 `capability-gl-opening-balances` until a
-  posted `Source=Conversion` opening journal exists (3 tests; full suite 1827 green; deployed).
-  **⚠ Dev caveat:** the dev book has FULLGL ON but NO Conversion journal (it predates the wiring) — if
-  FULLGL is ever toggled OFF on dev, re-enabling requires posting an opening journal first.
-  **Remaining for production cutover (§7A, needs Daniel):** the Conversion-workstream tooling itself —
-  opening-journal import + the go-live TB tie-out (native opening TB == legacy closing TB).
+- **[DONE 2026-07-07] §7A COMPLETE (v1, PS-run).** The hard-gate is wired into `ToggleCapabilityHandler`
+  AND the conversion tooling shipped: `POST /accounting/conversion/opening-journal` (CSV-template lines →
+  one idempotent `Source=Conversion` entry) + `GET /accounting/conversion/tie-out` (TB readable pre-FULLGL),
+  both gated `CAP-ACCT-MIGRATION` (not FULLGL — chicken-and-egg). **Proven live on dev end-to-end:**
+  MIGRATION on → opening journal posted (idempotent re-post returned the same entry) → tie-out balanced →
+  FULLGL off→on passed the gate. Dev caveat resolved (dev book now has its Conversion journal).
+  Remaining §7A work is per-customer execution (AP/SLP cutovers) + the AR/AP open-item load at real cutover.
 
 ## ⏸️ DEFERRED — Activity-Based Costing (ABC), AI-assisted
 
