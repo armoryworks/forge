@@ -24,11 +24,12 @@ chart-of-accounts, AI-explain, anomaly-scan, reverse; components: ledger view w/
 manual-entry editor, reverse dialog; dashboard tiles). All gates green except the Playwright screenshot.
 What remains is blocked, not merely undone:
 
-- **[blocked: visual-verify / Docker] Split-pane workspace shell + virtualized find-in-context scroller
-  (§5A.1–5A.2 items 2, and the workspace embed of item 4).** Buildable, but these are *interaction*-heavy
-  (scroll-and-center, candidate popover, split-pane) — the one class of UI that shouldn't ship without a
-  screenshot pass. **Unblock:** the docker-ce migration → then screenshot-verify + build these with real
-  verification. (The already-shipped ledger view + editor are also each one screenshot from verified.)
+- **[UNBLOCKED 2026-07-07 — Docker migrated to apt; teardown + rebuilds work] Split-pane workspace
+  shell + virtualized find-in-context scroller (§5A.1–5A.2 items 2, and the workspace embed of item 4).**
+  Visual verification is available again (`docker compose up -d --build forge-ui` + the Playwright
+  screenshot spec). Next: (1) flip `CAP-ACCT-FULLGL` on the dev book + post seed entries, (2)
+  screenshot-verify the five already-shipped §5A surfaces (ledger view, editor, reverse dialog, anomaly
+  flags, dashboard tiles), (3) build the workspace shell + scroller WITH per-iteration screenshots.
 - **[blocked: design] Two-track training feature (§5A.4 / items 7–9).** Needs the sandbox demo-`Book`
   seed model + fix-it-scenario schema + the QuickBooks crosswalk content decided before building (see the
   §12 "scenario/tour authoring format" deferral). Not a code task yet.
