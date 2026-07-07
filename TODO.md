@@ -33,19 +33,14 @@ What remains is blocked, not merely undone:
   §5A.2 split-pane correction (original pinned above the pre-seeded compose form via `?correctionOf=`).
   *Remaining nice-to-have (not blocking):* CDK-virtualized rendering for very large books; UI surfacing
   of the engine's late-posting fallback.
-- **[decision-ready: design drafted 2026-07-07] Two-track training feature (§5A.4 / items 7–9).**
-  All three gating artifacts are DRAFTED for review at
-  `docs/delivery/in-progress/accounting-suite/training-design.md`: sandbox demo-`Book` seed spec (12-account
-  CoA, one quarter, 5 planted errors), the fix-it scenario JSON schema (6 validator types, bait-then-correct
-  flow), the 8-card QB crosswalk, and the 2-question intake router. **Build starts once Daniel settles the
-  5 OPEN DECISIONS in that doc** (sandbox isolation, reset carve-out, scenario storage, gate softness, crosswalk tone).
-- **[DONE 2026-07-07] §7A COMPLETE (v1, PS-run).** The hard-gate is wired into `ToggleCapabilityHandler`
-  AND the conversion tooling shipped: `POST /accounting/conversion/opening-journal` (CSV-template lines →
-  one idempotent `Source=Conversion` entry) + `GET /accounting/conversion/tie-out` (TB readable pre-FULLGL),
-  both gated `CAP-ACCT-MIGRATION` (not FULLGL — chicken-and-egg). **Proven live on dev end-to-end:**
-  MIGRATION on → opening journal posted (idempotent re-post returned the same entry) → tie-out balanced →
-  FULLGL off→on passed the gate. Dev caveat resolved (dev book now has its Conversion journal).
-  Remaining §7A work is per-customer execution (AP/SLP cutovers) + the AR/AP open-item load at real cutover.
+- **[DONE 2026-07-07] Two-track training feature (§5A.4) — BUILT + verified live.** Backend: TRAINING
+  sandbox (real-engine quarter seed + plants P1–P5, idempotent), shipped JSON scenario catalog (6),
+  end-state LedgerScenarioRunner (6 validator types), reset via the D2 trigger carve-out (proven live),
+  /accounting/training API. UI: intake router (A/B), scenario cards w/ hints + validator chips, QB
+  crosswalk (8 cards), driver.js ledger tour, sandbox reset; ledger/editor take ?bookId= so practice
+  happens on the sandbox. Live-verified: seed→fail→post→pass→reset→fail. Deferred-by-design: the
+  plan's item 10 readiness banner (explicitly optional; D4 chose soft) and the SlideoutComponent JIT
+  variant (progressive hints shipped on the scenarios instead).
 
 ## ⏸️ DEFERRED — Activity-Based Costing (ABC), AI-assisted
 
