@@ -26,12 +26,13 @@ What remains is blocked, not merely undone:
 
 - **[DONE 2026-07-07] Screenshot-verification of shipped §5A surfaces** — ledger, editor, dashboard, and the new
   Reverse/correct prefill flow all visually verified; 4 UI bugs found + fixed in the loop.
-- **[UNBLOCKED 2026-07-07 — Docker migrated to apt; teardown + rebuilds work] Split-pane workspace
-  shell + virtualized find-in-context scroller (§5A.1–5A.2 items 2, and the workspace embed of item 4).**
-  Visual verification is available again (`docker compose up -d --build forge-ui` + the Playwright
-  screenshot spec). Next: (1) flip `CAP-ACCT-FULLGL` on the dev book + post seed entries, (2)
-  screenshot-verify the five already-shipped §5A surfaces (ledger view, editor, reverse dialog, anomaly
-  flags, dashboard tiles), (3) build the workspace shell + scroller WITH per-iteration screenshots.
+- **[DONE 2026-07-07] §5A find-in-context + account lens + split-pane correction** — all landed +
+  visual-verified: ledger find bar (highlight/cycle, peers never hidden) on a new generic
+  `DataTableComponent.scrollToRow()` locate primitive; `/accounting/ledger/:accountId` lens with a
+  TB-seeded running-balance column + account drill-down links; click-to-center reversal chips; and the
+  §5A.2 split-pane correction (original pinned above the pre-seeded compose form via `?correctionOf=`).
+  *Remaining nice-to-have (not blocking):* CDK-virtualized rendering for very large books; UI surfacing
+  of the engine's late-posting fallback.
 - **[blocked: design] Two-track training feature (§5A.4 / items 7–9).** Needs the sandbox demo-`Book`
   seed model + fix-it-scenario schema + the QuickBooks crosswalk content decided before building (see the
   §12 "scenario/tour authoring format" deferral). Not a code task yet.
