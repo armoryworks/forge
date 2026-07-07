@@ -33,9 +33,12 @@ What remains is blocked, not merely undone:
   §5A.2 split-pane correction (original pinned above the pre-seeded compose form via `?correctionOf=`).
   *Remaining nice-to-have (not blocking):* CDK-virtualized rendering for very large books; UI surfacing
   of the engine's late-posting fallback.
-- **[blocked: design] Two-track training feature (§5A.4 / items 7–9).** Needs the sandbox demo-`Book`
-  seed model + fix-it-scenario schema + the QuickBooks crosswalk content decided before building (see the
-  §12 "scenario/tour authoring format" deferral). Not a code task yet.
+- **[decision-ready: design drafted 2026-07-07] Two-track training feature (§5A.4 / items 7–9).**
+  All three gating artifacts are DRAFTED for review at
+  `docs/delivery/in-progress/accounting-suite/training-design.md`: sandbox demo-`Book` seed spec (12-account
+  CoA, one quarter, 5 planted errors), the fix-it scenario JSON schema (6 validator types, bait-then-correct
+  flow), the 8-card QB crosswalk, and the 2-question intake router. **Build starts once Daniel settles the
+  5 OPEN DECISIONS in that doc** (sandbox isolation, reset carve-out, scenario storage, gate softness, crosswalk tone).
 - **[blocked: review] Turn `CAP-ACCT-FULLGL` on.** Wiring `GlCapabilityGate` (the §7A opening-balances
   hard-gate) into `ToggleCapabilityHandler` is a deliberate Phase-1 governance step — wants a reviewed
   session, not an unattended change. Until then the whole GL area is route-guarded off / 403s.
