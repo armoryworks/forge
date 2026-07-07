@@ -100,8 +100,12 @@ Selected in onboarding by budget/hardware; the [hardware matrix](#dcross--hardwa
   very different footprints) and the ~1GB/model budget goal.
 - Advisor warns when enabled capabilities exceed the host budget; recommends
   offloading to a mini-PC/Pi; supports redundant model storage for failover.
-- ⚠️ **Needs a research pass** for current local-model sizing (Ollama models,
-  quantization tiers) before publishing numbers — do not fabricate.
+- ✅ **Research pass DONE (2026-07-07):** `AiHardwareAdvisor` footprints grounded in current
+  Ollama Q4_K_M figures (Small 1–4B ≈ 4 GB resident / 3.5 GB disk; Medium 7–12B ≈ 9 GB / 8.5 GB;
+  Large 27–32B ≈ 22 GB / 20 GB; all-minilm embedder 46 MB) against the decided deployment tiers
+  (Pi 5 8 GB → one Small; 32 GB mini-PC CPU-only → several Small/Medium; 64 GB + consumer GPU →
+  Large). Sources cited in the advisor's class doc (ollama.com/library; localaimaster.com;
+  localllm.in).
 
 ## Additive core (from backlog, no pivots)
 - Multi-instance topology (~5 → ~dozen models, own container/box each).
