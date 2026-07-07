@@ -107,6 +107,18 @@ Selected in onboarding by budget/hardware; the [hardware matrix](#dcross--hardwa
   Large). Sources cited in the advisor's class doc (ollama.com/library; localaimaster.com;
   localllm.in).
 
+## Tier-0 fleet floor — VALIDATED LIVE (2026-07-07)
+
+On the 26 GB / 16-core CPU-only dev box (measured: the "mini-PC" tier): `forge-ai` (Ollama) up with
+`gemma3:4b` (3.3 GB — matches the research figures) + `all-minilm:l6-v2`; `ai.mode=Real` via the
+per-integration system_settings row; `CAP-EXT-AI-ASSISTANT` opt-in flipped. Verified end-to-end:
+real Accounting-AI explain narratives (gemma3 flags "manual + significant — verify documentation"
+unprompted), bulk index → 5,294 real embeddings through the HNSW index, RAG answers that include
+**D-3 live-retrieved stock quantities**, and the grounded hardware advisor correctly sizing this
+box's workload at 24.1 GB → "Distribute" hint. Remaining fleet work (multi-instance topology,
+orchestrator, LoRA tiers) now has a proven Tier-0 baseline to build from; tiers are opt-in by
+design (owner decision 2026-07-07).
+
 ## Additive core (from backlog, no pivots)
 - Multi-instance topology (~5 → ~dozen models, own container/box each).
 - **Master orchestrator AI** trained only on brief sub-agent descriptions; delegates.

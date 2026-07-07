@@ -42,6 +42,12 @@ What remains is blocked, not merely undone:
   plan's item 10 readiness banner (explicitly optional; D4 chose soft) and the SlideoutComponent JIT
   variant (progressive hints shipped on the scenarios instead).
 
+## ✅ 2026-07-07 — Tier-0 AI fleet floor validated live (see ai-fleet-orchestration README)
+
+Real Ollama (gemma3:4b + all-minilm) on the 26 GB dev box; ai.mode=Real; assistant capability opt-in;
+real explain narratives, 5,294 embeddings through HNSW, D-3 live facts in RAG answers, grounded
+advisor verified. AP/SLP cutovers: superseded — fresh UAT systems planned for both (owner, 2026-07-07).
+
 ## ⏸️ DEFERRED — Activity-Based Costing (ABC), AI-assisted
 
 Advanced managerial overhead-allocation layer on top of the GL — **not scoped for
