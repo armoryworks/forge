@@ -108,7 +108,22 @@ Learner can always override the routing; choice stored in user preferences.
 
 ---
 
-## 5. OPEN DECISIONS (Daniel)
+## 5. DECISIONS — SETTLED 2026-07-07 (Daniel, all recommendations accepted)
+
+- **D1 = A:** second `Book` (`TRAINING`) in the same install. *(Follow-up chore: audit that no report aggregates across books.)*
+- **D2 = A:** immutability-trigger carve-out scoped to the TRAINING book's `book_id`.
+- **D3 = A:** scenarios ship as versioned JSON assets.
+- **D4 = A:** soft readiness gate (recommendation banner on the FULLGL toggle).
+- **D5 = A:** crosswalk cards name QuickBooks explicitly.
+
+**Also settled (§7A cutover):** opening-balance import = **CSV template + in-app tie-out**; cutover is
+**PS-run for the anchor customers** (minimal UI polish); the dev book gets a proper Conversion opening
+journal via the new import seam. Hardware research targets the effort's three tiers
+(Pi 5 8GB → 32GB mini-PC CPU-only → 64GB + consumer GPU).
+
+**→ The training build is UNBLOCKED.** Original decision framing preserved below for context.
+
+## 5-orig. OPEN DECISIONS (as drafted)
 
 - **D1 — Sandbox isolation mechanism:** second `Book` in the same install (proposed; cheap, reuses
   everything) vs. a separate demo database. Second-book risk: training entries appearing in cross-book
