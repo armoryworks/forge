@@ -12,6 +12,26 @@ Tier 0 is validated on the 26 GB dev box (see README). This runbook takes a beef
 Medium/Large classes + multi-instance topology, and feeds measured numbers back into
 `AiHardwareAdvisor`. Deploy is the normal stack (`setup.sh` guards apt-Docker) or just the AI slice.
 
+## Target box (named 2026-07-08): AMD 16-core / 64 GB RAM / Radeon RX 9070 XT (16 GB VRAM)
+
+This IS the researched top tier (64 GB + consumer GPU). **AMD-specific setup — ROCm, not CUDA:**
+
+```bash
+# The stock ollama/ollama image is CPU/NVIDIA. AMD GPU accel needs the ROCm variant + device maps:
+docker run -d --name forge-ai -p 127.0.0.1:11434:11434 \
+  --device /dev/kfd --device /dev/dri \
+  -v ollamadata:/root/.ollama ollama/ollama:rocm
+# If the RDNA4 card isn't auto-detected, try: -e HSA_OVERRIDE_GFX_VERSION=<per ROCm docs for gfx12>
+# Compose equivalent: image ollama/ollama:rocm + devices: [/dev/kfd, /dev/dri] on the forge-ai service.
+```
+
+**Expected VRAM fits (16 GB, Q4_K_M):**
+- `gemma3:4b` (3.3 GB) + embedder — trivially all-GPU, blistering.
+- `gemma3:12b` (~8 GB weights) — **fully in VRAM**, the sweet spot; likely the assistant default for this tier.
+- `gemma3:27b` (~17 GB weights) — just over 16 GB → partial offload (most layers GPU, spillover to system RAM).
+  Still interactive; record the GPU/CPU split from `ollama ps`.
+- Concurrency: 4b + 12b co-resident fit VRAM together (~11.5 GB) — the interesting multi-model case.
+
 ## 0. Characterize the box (fills in the tier)
 ```bash
 free -h; nproc; nvidia-smi || echo CPU-only          # record RAM / cores / GPU+VRAM
