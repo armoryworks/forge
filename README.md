@@ -45,26 +45,129 @@ Forge runs as a **self-hosted Docker Compose stack**. Single-node by default, wi
 
 Everything below runs on the machine that will host Forge. The deploy toolchain lives in the **[forge-deploy](https://github.com/armoryworks/forge-deploy)** repo: `setup.sh` bootstraps a new install, and the `forge-deploy` CLI manages topology, versions, and updates afterward.
 
-### Prerequisites
+### Step 0 — OS prerequisites (start here on a bare machine)
 
-- **A 64-bit Linux host** (Ubuntu/Debian recommended), macOS, or Windows with Docker Desktop. ARM (Raspberry Pi 4/5, Apple Silicon) is supported.
-- **Docker Engine + the Compose v2 plugin.** Verify with `docker version` and `docker compose version`. On a fresh Linux box: `curl -fsSL https://get.docker.com | sudo sh`.
-- **git**, and **~4 GB RAM** minimum (8 GB+ recommended; the setup script applies tighter container limits automatically on low-RAM hosts).
-- Outbound access to **ghcr.io** (to pull prebuilt images) unless you build from source.
+Every host needs the same four things: **Docker Engine + the Compose v2 plugin**, **git**, **curl**, and **jq** (the `forge-deploy` CLI installer hard-requires docker/curl/jq). Also: **~4 GB RAM** minimum (8 GB+ recommended; setup applies tighter container limits automatically on low-RAM hosts) and outbound access to **ghcr.io** to pull prebuilt images (unless you build from source). ARM (Raspberry Pi 4/5, Apple Silicon) is fully supported — all images are multi-arch. The commands below assume **nothing** is pre-installed.
+
+> **GHCR authentication:** if pulling `ghcr.io/armoryworks/*` fails with `unauthorized`, the packages are private for your account. Create a GitHub personal access token with only the **`read:packages`** scope and run `docker login ghcr.io -u <github-username>` (paste the PAT at the password prompt). To let the `forge-deploy` CLI use the same credentials for version lookups, install it with `sudo GHCR_USER=<user> GHCR_TOKEN=<pat> bash scripts/install-forge-deploy.sh`.
+
+<details open>
+<summary><strong>Linux</strong> — Debian/Ubuntu · Fedora/RHEL · Arch</summary>
+
+Any 64-bit distro works (x86_64 or arm64). Commands for the three biggest families:
+
+**Debian / Ubuntu / Raspberry Pi OS (apt)**
+
+```bash
+sudo apt update
+sudo apt install -y git curl jq
+curl -fsSL https://get.docker.com | sudo sh      # Docker Engine + Compose v2 plugin
+sudo usermod -aG docker "$USER"                  # run docker without sudo
+```
+
+On Ubuntu 24.04+ you can use the distro packages instead of the convenience script — note the compose plugin is named `docker-compose-v2` there, not `docker-compose-plugin`:
+
+```bash
+sudo apt install -y docker.io docker-compose-v2
+```
+
+**Fedora / RHEL / CentOS Stream (dnf)**
+
+```bash
+sudo dnf install -y git curl jq
+curl -fsSL https://get.docker.com | sudo sh      # sets up the docker-ce repo and installs Engine + Compose
+sudo systemctl enable --now docker
+sudo usermod -aG docker "$USER"
+```
+
+**Arch / Manjaro (pacman)**
+
+```bash
+sudo pacman -Syu --needed git curl jq docker docker-compose
+sudo systemctl enable --now docker.service
+sudo usermod -aG docker "$USER"
+```
+
+On all three: **log out and back in** (group membership takes effect at login), then verify:
+
+```bash
+docker version && docker compose version && git --version && jq --version
+```
+
+</details>
+
+<details>
+<summary><strong>macOS</strong> — Homebrew + Docker Desktop</summary>
+
+```bash
+# 1. Homebrew (skip if installed)
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# 2. CLI prerequisites (curl ships with macOS)
+brew install git jq
+
+# 3. Docker Desktop
+brew install --cask docker
+```
+
+**UI step (required):** launch **Docker Desktop** from Applications, accept the service agreement, and wait until the menu-bar whale reports "Docker Desktop is running" — the `docker` CLI and Compose v2 only work after the app is running. Enable *Start Docker Desktop when you sign in* in Settings → General so the stack survives reboots. Apple Silicon is fine (arm64 images are published).
+
+Verify: `docker version && docker compose version`.
+
+macOS notes: `setup.sh` and the `forge-deploy` CLI both run on macOS; the host network watchdog is Linux-only and is silently skipped.
+
+</details>
+
+<details>
+<summary><strong>Windows 10/11</strong> — WSL2 (recommended) or native PowerShell</summary>
+
+**Path A — WSL2 (recommended; full `forge-deploy` toolchain, production-capable)**
+
+```powershell
+# PowerShell as Administrator
+wsl --install -d Ubuntu                          # installs WSL2 + Ubuntu; reboot when prompted
+winget install -e --id Docker.DockerDesktop
+```
+
+**UI steps (required):** launch **Docker Desktop** → accept the agreement → Settings → *General* → check **Use the WSL 2 based engine** → *Resources → WSL integration* → enable your **Ubuntu** distro → **Apply & restart**.
+
+Then open the **Ubuntu** terminal, install the remaining CLI tools (`sudo apt update && sudo apt install -y git curl jq` — do **not** install Docker Engine inside WSL; Docker Desktop provides `docker` and `docker compose` there), and follow **all remaining steps below exactly as written for Linux**, inside the WSL shell.
+
+**Path B — native PowerShell (developer / source-build only)**
+
+`setup.ps1` builds images from local source (there is no GHCR-pull mode on native Windows), so it needs the source repos cloned as **siblings** of `forge-deploy`:
+
+```powershell
+winget install -e --id Git.Git
+winget install -e --id Docker.DockerDesktop      # UI step: launch it, wait for "running"
+winget install -e --id Microsoft.PowerShell      # pwsh 7 (the scripts target pwsh)
+
+git clone https://github.com/armoryworks/forge-ui.git    C:\dev\forge-ui
+git clone https://github.com/armoryworks/forge-api.git   C:\dev\forge-api
+git clone https://github.com/armoryworks/forge-deploy.git C:\dev\forge-deploy
+cd C:\dev\forge-deploy
+.\setup.ps1 -Seeded          # flags mirror setup.sh: -Fresh, -IncludeAi, -IncludeAll, -Public, ...
+```
+
+The `forge-deploy` CLI (Step 4) is bash and uses Linux paths (`/etc/forge`, `/var/log`) — it does not run natively on Windows. For version-pinned installs, upgrades, and rollback on Windows, use Path A.
+
+</details>
 
 ### Step 1 — Get the deploy repo
 
 ```bash
+sudo mkdir -p /opt/forge-deploy && sudo chown "$USER:$(id -gn)" /opt/forge-deploy
 git clone https://github.com/armoryworks/forge-deploy.git /opt/forge-deploy
 cd /opt/forge-deploy
 ```
 
-`/opt/forge-deploy` is the conventional location, but any path works. **What this gives you:** the compose files, the `setup.sh` bootstrapper, and the `forge-deploy` / `forge-preflight` CLIs under `scripts/`.
+`/opt/forge-deploy` is the conventional location (it's what the docs and tooling assume), but any path works — on macOS or WSL a home-directory path is fine too. **What this gives you:** the compose files, the `setup.sh` bootstrapper, and the `forge-deploy` / `forge-preflight` CLIs under `scripts/`.
 
 ### Step 2 — Run the setup bootstrapper
 
 ```bash
-./setup.sh
+./setup.sh            # Linux, macOS, Windows/WSL
+# .\setup.ps1         # native Windows only (source builds — see Step 0, Path B)
 ```
 
 This is the one-shot first-time bring-up. **Each thing it does:**
@@ -94,7 +197,7 @@ Log in with `admin@forge.local` and the password you set in Step 2 (seeded insta
 
 ### Step 4 — Install the `forge-deploy` CLI
 
-`setup.sh` got you running. The **`forge-deploy` CLI** manages everything afterward — version upgrades, rollbacks, and multi-machine topology:
+`setup.sh` got you running. The **`forge-deploy` CLI** manages everything afterward — version upgrades, rollbacks, and multi-machine topology. It runs on Linux, macOS, and Windows/WSL (not native Windows):
 
 ```bash
 sudo bash scripts/install-forge-deploy.sh
@@ -117,9 +220,11 @@ Other commands: `forge-deploy --status` (what's deployed + container health), `f
 
 > **Always run `forge-preflight` if a deploy misbehaves** — it's a read-only doctor that checks the things that actually break deployments (floating image tags, file ownership, line endings, overlay drift) and prints the exact fix for each.
 
-### Deployment topologies
+### Deployment topologies (separate hardware)
 
-Forge runs on one box or splits across several. The setup wizard (`forge-deploy --setup`, or the first-run prompt) configures any of these — picking the right containers per box and wiring the connections automatically:
+Forge runs on one box or splits across several. Multi-box deployments are Linux-host territory (each box runs the Step 0 Linux prerequisites, the repo clone, and the `forge-deploy` CLI). **Hardware guidance:** any 64-bit box with 4 GB+ RAM works; the reference small-shop target is a Raspberry Pi 5 (16 GB, NVMe root — never run Postgres on an SD card). Full hardware/OS provisioning, GHCR auth, and ingress (Cloudflare tunnel) runbook: [`forge-deploy/docs/DEPLOY.md`](https://github.com/armoryworks/forge-deploy/blob/main/docs/DEPLOY.md).
+
+The setup wizard (`forge-deploy --setup`, or the first-run prompt) configures any of these — picking the right containers per box and wiring the connections automatically:
 
 | Topology | Boxes & roles | One-line setup (per box) |
 |----------|---------------|--------------------------|
@@ -134,15 +239,35 @@ For a split deployment the wizard handles the cross-box plumbing for you: pointi
 
 ## Updating
 
+### Linux, macOS, Windows/WSL — the `forge-deploy` CLI
+
 To upgrade (or roll back) a running install, just run `forge-deploy` and use the version picker, or target a specific version:
 
 ```bash
+forge-deploy                       # interactive version picker per component
 forge-deploy 1.4.2                 # deploy that release to this box's components
 forge-deploy 1.4.2 --service api   # just the API
 forge-deploy --rollback            # revert to the previously deployed version
+forge-deploy --self-update         # update the forge-deploy CLI itself (git pull + reinstall)
 ```
 
 Deploys are **health-gated**: forge-deploy waits for the new container to report healthy and **automatically rolls back** if it doesn't. It refuses to deploy the floating `latest` tag — production always runs an immutable, pinned version.
+
+> **Rollback caveat:** the API applies database schema changes automatically on startup (via its embedded schema bootstrapper), and schema changes are forward-only. `--rollback` across a release that shipped a schema change also requires restoring the pre-upgrade database dump (the `forge-backup` sidecar takes them on schedule) — see [`forge-deploy/docs/DEPLOY.md` §12](https://github.com/armoryworks/forge-deploy/blob/main/docs/DEPLOY.md) for the step-by-step procedure. Releases that require this say so in their CHANGELOG entry.
+
+### Native Windows / source-build installs — `refresh`
+
+Installs created with `setup.ps1` (or `./setup.sh --source`) are rebuilt from source rather than version-pinned:
+
+```powershell
+.\refresh.ps1          # native Windows: git pull, rebuild images, restart
+```
+
+```bash
+./refresh.sh           # Linux/macOS source-build workstations
+```
+
+Both pull the latest `main` in the source repos, rebuild with `--no-cache --force-recreate`, and restart the stack. On a host managed by the `forge-deploy` CLI these scripts refuse to run (they detect `/etc/forge/deploy-state.json`) — use `forge-deploy` there instead.
 
 ---
 
@@ -293,7 +418,7 @@ Specs and architecture decisions live in [`docs/`](./docs/):
 - [`architecture.md`](./docs/architecture.md) — tech stack, auth model, integrations
 - [`functional-decisions.md`](./docs/functional-decisions.md) — kanban, order management, financials
 - [`coding-standards.md`](./docs/coding-standards.md) — code conventions across UI + server
-- [`qb-integration.md`](./docs/qb-integration.md) — QuickBooks integration boundary
+- [`[ARCHIVE]qb-integration.md`](./docs/%5BARCHIVE%5Dqb-integration.md) — QuickBooks integration boundary (archived; superseded by the pluggable accounting-provider model)
 - [`roles-auth.md`](./docs/roles-auth.md) — tiered authentication and role definitions
 - [`implementation-status.md`](./docs/implementation-status.md) — feature status tracker
 
