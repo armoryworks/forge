@@ -16,15 +16,6 @@ sandbox lacks.
 
 ## Open — needs the owner's decision
 
-- **[compliance-calendar A-2] Compliance role model.** Dedicated Compliance role vs.
-  grant compliance groups to `Manager`/`Admin` + custom role. Assumed the latter (no new
-  role seeded); enforcement works via `CalendarSuperGroupRoleVisibility`.
-- **[compliance-calendar Stage 3] Calendar capability gating.** `CalendarController` /
-  `WatchtowerController` are `[Authorize]`(-roles) only; no dedicated `CAP-*` added.
-  Revisit when the capability catalog is next touched.
-- **[compliance-calendar A-3] Module-embedded scoped calendar.** Needs a new
-  **compliance feature module + nav route** in `forge-ui` to host a `scope:module:compliance`
-  calendar — an IA/nav decision (where the compliance module lives), not just code.
 - **[deferred, per owner] Stale-doc corrections.** `kickoff-prompt.md` ("NOT an accounting
   system"), `ai-system.md` (RAG-only) still assert the old stances; correct **after current
   efforts complete** (accounting GL + AI tiers are accepted directions). See
@@ -54,6 +45,24 @@ sandbox lacks.
 
 ## Resolved (this session)
 
+- **A-2 role model (owner-decided + built).** Users are now assigned **multiple roles directly**
+  (Create/UpdateAdminUser reconcile the Identity role set). One-time raw-SQL migration expands any
+  user's assigned role template into direct roles then clears the FK. The user-side `RoleTemplate`
+  coupling is retired (column/FK/index dropped, auth-path expansion + assign/unassign endpoints
+  removed); `role_templates` is retained as a named role bundle for SystemApiKey scoping. A
+  first-class **`ComplianceOfficer`** role is seeded and granted read visibility to the regulatory
+  Super-Groups via `CalendarSuperGroupRoleVisibility`. Backend merged (795 tests green); the forge-ui
+  multi-select + info-icon suggestions are in flight.
+- **A-3 module-embedded scoped calendar (owner picked a dedicated module).** New top-level
+  `/compliance` feature in forge-ui (role-gated Admin/Manager/ComplianceOfficer/OfficeManager)
+  reuses `CalendarComponent` via a new `scope` input (`module:compliance`) — no fork. In module
+  scope the calendar defaults its layers to every super-group the user can see (surfacing the
+  regulatory buckets hidden by default in the master calendar) and namespaces saved views; the
+  calendar's optional `titleKey`/`subtitleKey` inputs keep it to one page-header. Merged
+  (1316 tests green).
+- **Stage 3 Watchtower capability gating.** `WatchtowerController` is now gated behind
+  **`CAP-EXT-WATCHTOWER`** (EXT, default-OFF, network-dependent) so air-gapped installs never surface
+  it. `CalendarController` intentionally stays `[Authorize]`-only (core calendar, not a network feature).
 - **B Watchtower backend** — entities, source seeder, poller (offline-safe mock seam),
   sources/proposals/apply/dismiss API. Merged.
 - **A-8** — applying a proposal creates a system compliance-calendar deadline. Merged.

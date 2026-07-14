@@ -26,6 +26,8 @@ When doing build/implementation work, **run continuously — never pause to ask 
 
 **"Milestones" are NOT a concept on this project.** Do not checkpoint, batch, pause, or report around milestones. Work task-by-task / stage-by-stage and keep going.
 
+**No over-wrapping (a summary is a disguised pause).** Do not end a turn with a status recap just because a stage finished or the next unit is large — that stalls the run. After a task, immediately make the next unblocked task's tool call **in the same turn**; put no prose between tasks. Status already lives in the todo list, doc updates, and commit messages, so prose to the owner is ≤1–2 lines. Produce an end-of-run report **only** when there is genuinely no unblocked work left. Tripwire: if about to write more than ~3 sentences of summary, make the next tool call instead.
+
 ## Documentation Placement (Non-Negotiable)
 
 All docs follow the taxonomy in **`docs/README.md`**. Two axes:
@@ -150,7 +152,10 @@ forge-wrapper/
 | Production Worker | Simple task list, start/stop timer, move cards, notes/photos |
 | Manager | Everything PM + assign work, approve expenses, set priorities |
 | Office Manager | Customer/vendor, invoice queue, employee docs |
+| Compliance Officer | Regulatory compliance calendar + regulated-parts safety; read visibility to the regulatory calendar Super-Groups (`CalendarSuperGroupRoleVisibility`) |
 | Admin | Everything + user management, roles, system settings, track types |
+
+**Multi-role assignment (2026-07-03):** a user is assigned **multiple roles directly** — access is the union. The former user-side "role template" rollup was retired in favor of direct multi-role; `role_templates` now survives only as a named role bundle for SystemApiKey scoping (not user assignment). Seeded roles live in `forge-api/.../Data/SeedData.cs`.
 
 ---
 
