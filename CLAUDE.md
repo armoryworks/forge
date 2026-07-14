@@ -175,7 +175,7 @@ forge-wrapper/
 - Branch naming: `feature/job-card-crud`, `fix/notification-dismiss`, `chore/update-dependencies`
 - Commit messages: imperative mood, < 72 chars — "Add job card CRUD endpoints"
 - One logical change per commit
-- PR required for main (even solo)
+- PR required for main: **DISABLED** (2026-07-14) — commit/push directly to main until the owner explicitly re-enables this rule
 - No force pushes to main
 
 ---
