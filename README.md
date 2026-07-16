@@ -163,28 +163,37 @@ cd /opt/forge-deploy
 
 `/opt/forge-deploy` is the conventional location (it's what the docs and tooling assume), but any path works — on macOS or WSL a home-directory path is fine too. **What this gives you:** the compose files, the `setup.sh` bootstrapper, and the `forge-deploy` / `forge-preflight` CLIs under `scripts/`.
 
-### Step 2 — Run the setup bootstrapper
+### Step 2 — Install the `forge-deploy` CLI
 
 ```bash
-./setup.sh            # Linux, macOS, Windows/WSL
-# .\setup.ps1         # native Windows only (source builds — see Step 0, Path B)
+sudo bash scripts/install-forge-deploy.sh
 ```
 
-This is the one-shot first-time bring-up. **Each thing it does:**
+**What this does:** copies `forge-deploy` to `/usr/local/bin` (so you can run it from anywhere), creates `/etc/forge/deploy-state.json` (records what's deployed), and a log at `/var/log/forge-deploy.log`. Re-running it is safe and preserves your state. Verify with `forge-deploy --version`.
+
+The CLI runs on Linux, macOS, and Windows/WSL. (Native Windows is the source-build developer path — use `.\setup.ps1` there instead; see Step 0, Path B.)
+
+### Step 3 — Run `forge-deploy`
+
+```bash
+forge-deploy
+```
+
+That's the whole install. On a box with no configuration yet, the built-in **recovery doctor** checks the machine (Docker present and running, correct packaging, repo intact), then runs the first-time bootstrap and the topology wizard. **Each thing the first run does:**
 
 1. **Prerequisite checks** — confirms Docker is installed and running, and the Compose plugin is present. It stops with clear guidance if anything's missing.
 2. **Environment file** — creates `.env` from `.env.example`. This holds every tunable: image tags, port bindings, database credentials, integration keys. It is **never committed** (it contains secrets).
 3. **JWT signing keys** — generates the keys the API uses to sign login tokens.
-4. **Seed/admin password** — prompts you for a password (hidden input). On a seeded install this becomes the password for the demo users (e.g. `admin@forge.local`); on a fresh install it's the first admin account.
+4. **Demo data (optional)** — asks whether to load sample users/jobs/customers (good for a first look). If you say yes, it prompts for a password (hidden input) for the demo users (e.g. `admin@forge.local`). On a clean install there's no prompt — the in-app setup wizard creates your first admin account on first visit.
 5. **Hosting mode + SSL** — auto-detects whether you're running **standalone** (Forge owns ports 80/443) or **cohost** (an existing reverse proxy / tunnel fronts it), and whether to generate a self-signed certificate. Override with `--standalone` / `--cohost` and `--ssl` / `--no-ssl`.
-6. **Images** — pulls prebuilt multi-arch images from `ghcr.io/armoryworks/*` (the default), or builds from local source with `--source`.
-7. **Start** — brings the core services up: `docker compose up -d` for `forge` (db), `forge-storage`, `forge-backup`, `forge-api`, `forge-ui`.
+6. **Images** — pulls prebuilt multi-arch images from `ghcr.io/armoryworks/*`, pinned to the newest release.
+7. **Topology wizard** — asks what this box should run (all-in-one, or a role in a split deployment — see below), wires everything, and brings the stack up.
 
-**Useful flags:** `--seeded` (load demo data — recommended for a first look), `--source` (build locally instead of pulling), `--cohost` (behind a host proxy), `--public` (one-command exposure with SSL + firewall preflight), `--include-ai` / `--include-tts` / `--include-signing` (optional profiles). Run `./setup.sh --help` for the full list.
+**If anything goes wrong — or a previous attempt died halfway** — run `forge-deploy --recover`. It detects the common failure modes (Docker not running, broken snap packaging, half-written config, unpulled images, stopped or crash-looping containers, port conflicts) and offers two paths: **resume** (fix in place, keep your data) or **fresh start** (`forge-deploy --fresh-start`: wipe containers, database, files, and config after typed confirmation, then set up from scratch). If it hits something it can't fix or identify, it explains the situation in plain language and gives you a direct link to file a GitHub issue — offering to file it for you (with sanitized diagnostics) if you're logged into `gh`.
 
-### Step 3 — Open Forge
+### Step 4 — Open Forge
 
-When setup finishes it prints your access URLs. By default:
+When the first run finishes it prints your access URLs. By default:
 
 | Service | URL |
 |---------|-----|
@@ -193,32 +202,18 @@ When setup finishes it prints your access URLs. By default:
 | API health | http://localhost:5000/api/v1/health |
 | MinIO console | http://localhost:9001 (`minioadmin` / `minioadmin`) |
 
-Log in with `admin@forge.local` and the password you set in Step 2 (seeded installs). On a **cohost** box, point your reverse proxy / tunnel at `http://127.0.0.1:4200`.
-
-### Step 4 — Install the `forge-deploy` CLI
-
-`setup.sh` got you running. The **`forge-deploy` CLI** manages everything afterward — version upgrades, rollbacks, and multi-machine topology. It runs on Linux, macOS, and Windows/WSL (not native Windows):
-
-```bash
-sudo bash scripts/install-forge-deploy.sh
-```
-
-**What this does:** copies `forge-deploy` to `/usr/local/bin` (so you can run it from anywhere), creates `/etc/forge/deploy-state.json` (records what's deployed), and a log at `/var/log/forge-deploy.log`. Re-running it is safe and preserves your state. Verify with `forge-deploy --version`.
+On a **seeded** install, log in with `admin@forge.local` and the password you set during setup. On a **clean** install, the first visit opens the in-app setup wizard to create your admin account. On a **cohost** box, point your reverse proxy / tunnel at `http://127.0.0.1:4200`.
 
 ### Step 5 — Manage Forge with `forge-deploy`
 
-Run it with **no arguments** — it adapts to the box:
+From here on, `forge-deploy` with **no arguments** adapts to the box:
 
-```bash
-forge-deploy
-```
-
-- **First run** (box not yet configured) → a **topology wizard**: it asks what this box should run, prompts for only the addresses that choice needs, picks an image version per component, wires everything, and brings the stack up.
 - **A configured box** → a **version picker**: for each component it lists the published versions (newest releases), highlights the one you're running with `»  0.0.121  « current`, and defaults to it — press **Enter** to keep it and move to the next component, or pick a number to upgrade/downgrade. Press **`r`** at any prompt to re-run setup from scratch, **`q`** to quit.
+- **An unconfigured or broken box** → the recovery doctor / setup flow from Step 3.
 
-Other commands: `forge-deploy --status` (what's deployed + container health), `forge-deploy --list` (available versions), `forge-deploy --rollback` (revert to the previous version), `forge-deploy --logs` (deploy history), `forge-deploy --self-update` (update the CLI itself). Run `forge-deploy --help` for everything.
+Other commands: `forge-deploy --status` (what's deployed + container health), `forge-deploy --list` (available versions), `forge-deploy --rollback` (revert to the previous version), `forge-deploy --recover` (fix a broken box in place), `forge-deploy --fresh-start` (wipe and reinstall), `forge-deploy --logs` (deploy history), `forge-deploy --self-update` (update the CLI itself). Run `forge-deploy --help` for everything.
 
-> **Always run `forge-preflight` if a deploy misbehaves** — it's a read-only doctor that checks the things that actually break deployments (floating image tags, file ownership, line endings, overlay drift) and prints the exact fix for each.
+> **If a deploy misbehaves:** `forge-deploy --recover` fixes what it can automatically; `forge-preflight` is the read-only doctor that checks the things that break deployments (floating image tags, file ownership, line endings, overlay drift) and prints the exact fix for each without changing anything.
 
 ### Deployment topologies (separate hardware)
 
