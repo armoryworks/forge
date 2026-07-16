@@ -68,8 +68,10 @@ sudo usermod -aG docker "$USER"                  # run docker without sudo
 On Ubuntu 24.04+ you can use the distro packages instead of the convenience script — note the compose plugin is named `docker-compose-v2` there, not `docker-compose-plugin`:
 
 ```bash
-sudo apt install -y docker.io docker-compose-v2
+sudo apt install -y docker.io docker-compose-v2 docker-buildx
 ```
+
+(`docker-buildx` is optional — without it the one locally-built sidecar falls back to the classic builder and compose prints a harmless "Bake, but buildx isn't installed" warning.)
 
 **Fedora / RHEL / CentOS Stream (dnf)**
 
