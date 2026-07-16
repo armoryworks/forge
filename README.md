@@ -189,7 +189,7 @@ That's the whole install. On a box with no configuration yet, the built-in **rec
 6. **Images** — pulls prebuilt multi-arch images from `ghcr.io/armoryworks/*`, pinned to the newest release.
 7. **Topology wizard** — asks what this box should run (all-in-one, or a role in a split deployment — see below), wires everything, and brings the stack up.
 
-**If anything goes wrong — or a previous attempt died halfway** — run `forge-deploy --recover`. It detects the common failure modes (Docker not running, broken snap packaging, half-written config, unpulled images, stopped or crash-looping containers, port conflicts) and offers two paths: **resume** (fix in place, keep your data) or **fresh start** (`forge-deploy --fresh-start`: wipe containers, database, files, and config after typed confirmation, then set up from scratch). If it hits something it can't fix or identify, it explains the situation in plain language and gives you a direct link to file a GitHub issue — offering to file it for you (with sanitized diagnostics) if you're logged into `gh`.
+**If anything goes wrong — or a previous attempt died halfway** — run `forge-deploy --recover`. It detects the common failure modes (Docker not running, broken snap packaging, half-written config, unpulled images, stopped or crash-looping containers, port conflicts) and offers two paths: **resume** (fix in place, keep your data) or **fresh start** (`forge-deploy --fresh-start`: wipe containers, database, files, and config after typed confirmation, then set up from scratch). If it hits something it can't fix or identify, it explains the situation in plain language and gives you a direct link to file a GitHub issue — offering to file it for you if you're logged into `gh`. Auto-filed issues lead with the steps to reproduce (what you ran plus what the doctor found and fixed along the way), followed by the technical diagnostics maintainers need — with credentials redacted and your `.env` secrets never included.
 
 ### Step 4 — Open Forge
 
@@ -285,7 +285,7 @@ Edit `.env`, then re-apply with `forge-deploy --up` (which brings up only this b
 
 ## Troubleshooting
 
-Run **`forge-preflight`** first — it diagnoses most of these automatically. If you're still stuck, work through the relevant section.
+Run **`forge-deploy --recover`** first — it detects and fixes most of these automatically (and files an issue with diagnostics when it can't). **`forge-preflight`** is the read-only alternative: it diagnoses without changing anything. If you're still stuck, work through the relevant section.
 
 ### 1. `docker compose up` fails: "port is already allocated"
 
