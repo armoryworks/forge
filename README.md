@@ -45,6 +45,19 @@ Forge runs as a **self-hosted Docker Compose stack**. Single-node by default, wi
 
 Everything below runs on the machine that will host Forge. The deploy toolchain lives in the **[forge-deploy](https://github.com/armoryworks/forge-deploy)** repo: `setup.sh` bootstraps a new install, and the `forge-deploy` CLI manages topology, versions, and updates afterward.
 
+> **Quickest path (npm).** For a single-node install you can skip the manual clone below entirely — the deploy toolchain is published as a self-contained npm package that bundles the whole deploy tree:
+>
+> ```bash
+> # Ubuntu: Node.js 22 + the deploy CLI
+> curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - && sudo apt-get install -y nodejs
+> sudo npm install -g @armoryworks/forge-deploy
+>
+> # install or update (point at your install directory); pulls images from GHCR
+> forge-deploy /opt/forge
+> ```
+>
+> To update later: `sudo npm update -g @armoryworks/forge-deploy && forge-deploy /opt/forge`. The detailed steps below cover source builds, split UI/API/DB topologies, and version pinning/rollback.
+
 ### Step 0 — OS prerequisites (start here on a bare machine)
 
 Every host needs the same four things: **Docker Engine + the Compose v2 plugin**, **git**, **curl**, and **jq** (the `forge-deploy` CLI installer hard-requires docker/curl/jq). Also: **~4 GB RAM** minimum (8 GB+ recommended; setup applies tighter container limits automatically on low-RAM hosts) and outbound access to **ghcr.io** to pull prebuilt images (unless you build from source). ARM (Raspberry Pi 4/5, Apple Silicon) is fully supported — all images are multi-arch. The commands below assume **nothing** is pre-installed.
