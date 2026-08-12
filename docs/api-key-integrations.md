@@ -204,7 +204,9 @@ Content-Type: application/json
   "followUpDate": null,
   "engagementShape": null,
   "accountId": null,
-  "customFieldValues": null
+  "customFieldValues": null,
+  "externalId": "tuyere:9f2c7a31",
+  "leadSourceCode": "armoryworks.com"
 }
 ```
 
@@ -217,11 +219,27 @@ Mapping notes for typical contact-form payloads:
 | `company`          | `companyName`           |
 | `topic`            | `source` (prefix it with `contact-form:` so it sorts cleanly in reports) OR `customFieldValues["topic"]` |
 | `message`          | `notes`                 |
+| submission id      | `externalId` (≤ 100 chars — the idempotency key, see below) |
+| originating site   | `leadSourceCode` (a `lead_sources.code`, e.g. `armoryworks.com` / `nommeal.com` — resolved server-side to `leadSourceId`; an unknown code degrades to `leadSourceId: null` rather than failing) |
 
 `companyName` is required (`FluentValidation`). Everything else is
 optional; the email pattern is validated when present.
 
-**Success (201 Created):**
+**Idempotency (`externalId`):** stamp your stable submission id into
+`externalId` on every relay POST. When a live (non-deleted) lead already
+carries the same `externalId`, Forge does NOT create a duplicate — it
+returns the existing lead with **200 OK** instead of 201, so blind
+retries are safe. `externalId` is unique among live leads and echoes
+back in every lead response. To check before retrying, use the
+exact-match filter:
+
+```http
+GET /api/v1/leads?externalId=tuyere:9f2c7a31
+```
+
+An empty array means the original POST never landed — retry it.
+
+**Success (201 Created; 200 OK on an `externalId` replay):**
 
 ```json
 {
@@ -232,6 +250,8 @@ optional; the email pattern is validated when present.
   "phone": "+1 555 0123",
   "source": "contact-form:Sales Inquiry",
   "status": "New",
+  "externalId": "tuyere:9f2c7a31",
+  "leadSourceId": 3,
   "createdAt": "2026-05-17T22:13:04Z",
   ...
 }
@@ -245,7 +265,7 @@ optional; the email pattern is validated when present.
 | 401    | Missing / bad / revoked / expired API key                   | No — rotate or investigate. |
 | 403    | Authenticated but not authorized (e.g. role lacks permission, or capability `CAP-O2C-LEAD` disabled on this install) | No — operator action required. |
 | 409    | Business-rule conflict (e.g. duplicate suppression hit)     | No — surface to upstream. |
-| 5xx    | Server-side failure                                         | **Yes** — retry with exponential backoff. Forge has no idempotency-key header today, so use `GET /api/v1/leads?search=...` to check before retrying on POST after a network-timeout / 5xx where you don't know if the write landed. |
+| 5xx    | Server-side failure                                         | **Yes** — retry with exponential backoff. Stamp `externalId` on every POST and retries are idempotent: a replay of a write that already landed returns the existing lead as 200 instead of creating a duplicate. To check explicitly first, `GET /api/v1/leads?externalId=...` (exact match; empty array = the write never landed). |
 
 ### 1.7 Rate limits
 
