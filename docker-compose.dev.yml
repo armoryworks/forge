@@ -17,12 +17,12 @@
 services:
   forge-ui:
     build:
-      context: ./forge-ui
+      context: ../forge-ui
       dockerfile: Dockerfile.dev
     ports: !override
       - "${UI_PORT:-4200}:80"
     volumes:
-      - ./forge-ui:/app
+      - ../forge-ui:/app
       - ui_node_modules:/app/node_modules
     deploy:
       resources:
@@ -31,14 +31,14 @@ services:
 
   forge-api:
     build:
-      context: ./forge-api
+      context: ../forge-api
       dockerfile: forge.api/Dockerfile.dev
     ports: !override
       - "${API_PORT:-5000}:8080"
     volumes:
-      - ./forge-api:/app
-      - ./.git:/app/.git:ro
-      - ./tools:/app/tools:ro
+      - ../forge-api:/app
+      - ../forge-api/.git:/app/.git:ro
+      - ../forge-api/tools:/app/tools:ro
     environment:
       - DOTNET_USE_POLLING_FILE_WATCHER=true
       - DOTNET_WATCH_RESTART_ON_RUDE_EDIT=true
