@@ -22,6 +22,11 @@ Last updated: 2026-08-18.
 | F-6 | App shell | High | Prod build opens `ws://localhost:9876` (dev socket leak) — connection refused | Open |
 | F-7 | Frontend bug | Low | `TypeError: this.tasks is not a function` (computed-signal bug) on 1 page | Open |
 | F-8 | Routing | — | forge SplitUi tenants 404 publicly (edge-routing gap) | Open |
+| F-9 | Accounting | **High** | Ledger unreachable UI-only: **$45,750 collected across 3 paid invoices produced 0 journal entries / 0 GL accounts** — GL posting gated on CAP-ACCT-FULLGL (off, no UI to enable); `/accounting/*` redirects to `/dashboard` | Open |
+| F-10 | O2C | Low (UX) | New-invoice save is silently disabled until `invoiceDate` **and** `dueDate` are set — neither is defaulted and there's no validation hint | Open |
+| F-11 | O2C | Low | Confirming an SO auto-creates the production job; the job dialog's SO-line picker hides already-assigned lines, so a manual job for the same line silently duplicates | Open |
+| F-12 | Quotes | Low | `GET /api/v1/quotes/{id}/payment-schedule` 404s on every quote-detail open (benign noise) | Open |
+| F-13 | O2C | — (by design) | Shipping requires a **stockable-part** SO line; R&D **service** lines are correctly non-shippable, so R&D and production must be modeled as separate orders | Noted |
 
 _Backend/functional findings from the earlier deep audit (GL rounding, job-costing actuals, FULLGL enablement, mock bank, PRESET-08, etc.) are tracked in `AUDIT.md` / the analysis set; see "Backend" below for the load-bearing ones._
 
@@ -64,6 +69,31 @@ Captured across all 55 routes with the admin token seeded:
 ## F-8 — Reachability (forge SplitUi edge gap)
 
 `forgetest2.armoryworks.com` 404s because the `*.armoryworks.com` cloudflared wildcard routes to the api box, but a SplitUi tenant's forge-ui is on the web box. Forge normally runs SingleBox (e.g. `lancemachining`, whole stack on the api box), so this only bites deliberate splits. Fix options: per-tenant cloudflared routes (like the existing `dan-testing`/`jesco` entries) → web box, or a Traefik-forwards-unknown-hosts design. (NOM took the wildcard→web-box fix on its own tunnel because NOM is SplitUi-only.)
+
+## F-9 … F-13 — Full lead-to-cash chronology, driven UI-only (2026-08-18)
+
+Drove a complete order-to-cash chronology on `forgetest2` **entirely through the UI** (Playwright over an SSH tunnel to the forge-ui container, since the tenant 404s publicly — F-8). SQL/API used **only to read/verify**, never to write. Result: **2 customers, 3 sales orders, 4 jobs, 1 delivered shipment, 3 invoices — all 3 Paid ($45,750 collected).**
+
+**The chain that works UI-only (faithful chronology):**
+1. **Lead** (`new-lead-btn` → engagement-shape fork; picked *Prototype* for R&D) → **convert** to Customer (`lead-convert-btn`, one click).
+2. **R&D Estimate** on the customer's Estimates tab (`estimatedAmount` header) → **Convert to Quote** (0-line estimate skips the lump-sum resolve dialog; the quote is created **linked** via `source_estimate_id`, with a line carrying the estimate amount).
+3. **Quote** lifecycle: Send → Accept → **Convert to Order** (`quote-convert-btn`; gated — convert only enabled at status *Accepted*).
+4. **Sales Order** confirm is **gated on a customer-acceptance record** (F: good control). Recording a **Verbal** acceptance (method select, no file needed) unblocks `so-confirm-btn`.
+5. Confirming the SO **auto-creates a production job** linked to the SO line (F-11); job stages advance via `job-stage-chip` → `stage-option` (some jumps gated by adjacency, e.g. *In Production* needs materials).
+6. **Shipment** (production/goods order only) — `shipment-so` picker is keyed to the **job** (search by customer), `shipment-line-so-line` needs a typed query; mark **Shipped → Delivered**.
+7. **Invoice** (`new-invoice-btn`) → **Send** finalizes it (Draft → Sent).
+8. **Payment** applied to the invoice at save (application row) → invoice goes **Paid**. Used Check / Bank Transfer / Wire (Cash reserved for in-person retail).
+
+Acme Aerospace ran two orders — **SO-00001** (R&D *services*, $12,000, invoiced + paid by Check) and **SO-00002** (production, 250× Turbine Bracket @ $85 = $21,250, shipped + invoiced + paid by Bank Transfer). Beta Robotics ran a full R&D order (SO-3, $18,500, paid by Wire) in a single pass — the chain is **repeatable**.
+
+### F-9 — the ledger stays empty (the load-bearing finding)
+
+Despite the three paid invoices, the accounting subsystem recorded **nothing**: `acct_journal_entries = 0`, `acct_journal_lines = 0`, `acct_gl_accounts = 0`, `acct_account_determination_rules = 0`. Two compounding reasons, both confirmed in code:
+
+- **GL posting is gated on `CAP-ACCT-FULLGL`, which is OFF by default and cannot be turned on through the UI.** `SendInvoice.cs` is explicit: *"While the capability is OFF (the default) the posting call is a no-op."* Same for payments (cash-disbursement posting fires only when FULLGL is on). So finalizing invoices and recording payments post **zero** journal lines.
+- **The entire `/accounting/*` UI is behind `capabilityGuard('CAP-ACCT-FULLGL')`** — navigating to `/accounting/ledger` **redirects to `/dashboard`**. There is no UI to enable FULLGL (no opening-balance flow), no UI to create GL accounts, and a fresh tenant seeds **no chart of accounts and no account-determination rules**.
+
+**Net: "entries in the ledger" is not achievable UI-only on a fresh tenant.** The full commercial chain (lead → … → cash) works and the AR/cash records are correct, but the general ledger is unreachable and unpopulated. Remediating needs a reachable FULLGL-enablement + chart-of-accounts/opening-balance flow (ties to the earlier "FULLGL complete but unreachable" backend finding).
 
 ## Backend / functional (load-bearing — see `AUDIT.md` for detail)
 
