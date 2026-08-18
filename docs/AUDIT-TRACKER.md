@@ -22,7 +22,7 @@ Last updated: 2026-08-18.
 | F-6 | App shell | High | Prod build opens `ws://localhost:9876` (dev socket leak) — connection refused | Open |
 | F-7 | Frontend bug | Low | `TypeError: this.tasks is not a function` (computed-signal bug) on 1 page | Open |
 | F-8 | Routing | — | forge SplitUi tenants 404 publicly (edge-routing gap) | Open |
-| F-9 | Accounting | **High** | Ledger unreachable UI-only: **$45,750 collected across 3 paid invoices produced 0 journal entries / 0 GL accounts** — GL posting gated on CAP-ACCT-FULLGL (off, no UI to enable); `/accounting/*` redirects to `/dashboard` | Open |
+| F-9 | Accounting | **High** | Ledger unreachable UI-only: **$45,750 collected across 3 paid invoices produced 0 journal entries / 0 GL accounts** — GL posting gated on CAP-ACCT-FULLGL (off, no UI to enable); `/accounting/*` redirects to `/dashboard` | In progress — design `fullgl-deactivation`; disable-guard landed (forge-api `construction/phase0-blockers`) |
 | F-10 | O2C | Low (UX) | New-invoice save is silently disabled until `invoiceDate` **and** `dueDate` are set — neither is defaulted and there's no validation hint | Open |
 | F-11 | O2C | Low | Confirming an SO auto-creates the production job; the job dialog's SO-line picker hides already-assigned lines, so a manual job for the same line silently duplicates | Open |
 | F-12 | Quotes | Low | `GET /api/v1/quotes/{id}/payment-schedule` 404s on every quote-detail open (benign noise) | Open |
