@@ -23,6 +23,20 @@ Legend: Done | Partial | Not Started | N/A (deferred or out of scope)
 | 11 — AI Assistant | Self-Hosted AI Module | Done |
 | 12 — Domain AI Assistants | Configurable AI Assistants (HR, Procurement, Sales) | Done |
 
+## Autonomous session (2026-08-18) — Gated Sequence Engine (GSE) backend
+
+> Committed locally on `forge-api` / `forge-db` / `forge`, **not pushed** (same unattended stance as the 2026-07-05 session recorded in `delivery/in-progress/blocking-questions.md`). Design + record: `docs/delivery/in-progress/gated-sequence-engine/`.
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Pure engine (net, validator, evaluator, IGateSource) | Done | `forge.core/Sequences/`; 14 unit tests |
+| Entities + EF + forge-db schema (9 tables, 14 indexes) | Done | `sequence_*`; embedded schema regenerated |
+| API: definitions (versioned), instances, steps, gates, rework, clocks | Done | `api/v1/sequences`, `CAP-CROSS-SEQUENCES` (off by default) |
+| Built-in gate sources: ManualClearance, TimeWindow, ResourceClock, Approval, Custom (fail-closed) | Done | + `SequenceClockJob` (minutely) + `OnApprovalCompleted_ReevaluateSequences` |
+| Domain events (StepReady, InstanceCompleted, ClockExpired) | Done | published; no default reactions |
+| forge-ui screens | Not Started | follow-up slice |
+| First consumers (routing gates, permits/inspections) | Not Started | design notes only |
+
 ---
 
 ## Architecture (architecture.md)

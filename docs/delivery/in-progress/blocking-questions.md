@@ -97,3 +97,16 @@ sandbox lacks.
 **Assumptions (reasonable defaults — flag if wrong):**
 - Ledger register uses a NEW richer result model (`LedgerRegisterEntry/Line`) rather than reusing `ManualJournalEntryResult`, because the register/drill-back UI needs `source` + reversal refs + per-line account labels the manual result lacks.
 - The explain endpoint is gated on `CAP-ACCT-FULLGL` only (query-record attribute); AI availability is a runtime graceful-degrade, not a second `CAP-EXT-AI-ASSISTANT` attribute (multiple-`[RequiresCapability]` semantics were unverified). Confirm whether explain should also hard-require `CAP-EXT-AI-ASSISTANT`.
+
+## Gated Sequence Engine (2026-08-18, autonomous)
+
+Context: `docs/delivery/in-progress/gated-sequence-engine/`. Built + tested, committed locally, not pushed.
+
+- **[needs owner judgment] Role gating on override / skip / rework / publish.** Currently one capability
+  (`CAP-CROSS-SEQUENCES`) + `[Authorize]`. Recommend requiring an elevated role for override and publish.
+- **[design] Dwell-expiry `Block` semantics.** Today: event + escalation only, marking unchanged. Should Block hold
+  the step's successors until acknowledged?
+- **[design] Default notification reaction** for `SequenceStepReadyEvent` / `SequenceClockExpiredEvent(Escalate)`.
+  Left to consumers; a generic "notify EscalateRole" handler is a 30-line follow-up if wanted.
+- **[decision to ratify] Placement = open core (forge-api), not Tuyere** — derived from the construction-vertical
+  boundary rule ("private holds operations, never workflow"). Assumed correct; flag if not.
