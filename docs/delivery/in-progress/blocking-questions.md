@@ -110,3 +110,19 @@ Context: `docs/delivery/in-progress/gated-sequence-engine/`. Built + tested, com
   Left to consumers; a generic "notify EscalateRole" handler is a 30-line follow-up if wanted.
 - **[decision to ratify] Placement = open core (forge-api), not Tuyere** — derived from the construction-vertical
   boundary rule ("private holds operations, never workflow"). Assumed correct; flag if not.
+
+## Costing / overhead / pricing (Tier-3 ABC) — 2026-08-21
+
+- **[blocker: environment] Schema + EF + API + UI need a Postgres-capable box.** The Tier-3 domain
+  layer (entities + `CostRollEvaluator` + tests) landed and compiles, but forge-db schema authoring
+  + `forge-db assemble` regen + `AppDbContext` DbSets can't be validated here (this dev box has no
+  local Postgres). EF model errors + schema drift surface at model-build / the `PostgresFixture`
+  collection, not at `dotnet build` — so they were NOT wired blind. Continue in a Postgres env (or
+  rely on CI's integration stage). Full plan + reconciliation: `costing-overhead-pricing/INTEGRATION.md`.
+- **[decision to ratify] `ItemStandardCost` (new, Tier-3 period-frozen) vs existing `CostCalculation`
+  (Tier-1/2 live).** Assumed distinct records; confirm before wiring the roll to persistence.
+- **[decision to ratify] Reuse existing `WorkCenter`; new costing cost-center (`CostingCostCenter`)
+  is decoupled from the GL `Book`/`Accounting.CostCenter`** so costing runs with an external GL (QBO)
+  and doesn't require `CAP-ACCT-FULLGL`. Gated on the existing `CAP-COSTING-TIER3-ABC` (no new cap).
+- **[decision to ratify] Bundled release.** Costing ships together with the held integration-readiness
+  + demo-guard work (per owner, 2026-08-21) — not as a separate beta.
