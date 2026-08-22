@@ -130,3 +130,22 @@ Context: `docs/delivery/in-progress/gated-sequence-engine/`. Built + tested, com
   and doesn't require `CAP-ACCT-FULLGL`. Gated on the existing `CAP-COSTING-TIER3-ABC` (no new cap).
 - **[decision to ratify] Bundled release.** Costing ships together with the held integration-readiness
   + demo-guard work (per owner, 2026-08-21) — not as a separate beta.
+
+## Prod (forge.armoryworks.com) beta.9 API/schema — BLOCKED on pgvector version pin (2026-08-22)
+
+- **[blocker: infra] Prod schema reconcile fails on `CREATE EXTENSION "vector" VERSION "0.8.5"`.**
+  `pg-schema-diff` validates the migration plan in a temp DB; the desired schema (forge-db) pins
+  vector 0.8.5, but prod's `pgvector/pgvector:pg17` image has "no installation script nor update
+  path for version 0.8.5" → "could not compute plan", forge-db exit 1. The deploy **aborted before
+  the app swap** — prod is UNCHANGED and healthy on beta.7 (API + DB), no data touched, backup taken
+  (`/backups/2026-08-22T200331Z`). This is the pre-existing pgvector mismatch flagged at session
+  start, not the costing/nav code (AP reconciled fine — different image/extension state).
+  **Resolution needs a decision (do NOT force):** either (a) bump prod's postgres container to a
+  pgvector image that ships the 0.8.5 install script (recreates the DB container — fragile-prod, wants
+  supervision), or (b) unpin the vector version in forge-db's assembled schema (`CREATE EXTENSION
+  vector` without VERSION, or pin to the image's actual version) and re-release. Until then prod's
+  API+DB stay beta.7; the **beta.9 UI (nav redesign) was deployed to web-box** (UI box runs no schema
+  reconcile) so the menu change is live, backward-compatible with the beta.7 API (additive-only API
+  changes; costing gated off; readiness panel degrades via defaults).
+- **[done] AP (design-partner Pi) is fully on beta.9** (api+ui+test), the full stack incl. costing
+  (dark) + nav redesign — the complete deliverable is proven on a real box.
