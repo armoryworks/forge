@@ -113,7 +113,11 @@ Context: `docs/delivery/in-progress/gated-sequence-engine/`. Built + tested, com
 
 ## Costing / overhead / pricing (Tier-3 ABC) — 2026-08-21
 
-- **[blocker: environment] Schema + EF + API + UI need a Postgres-capable box.** The Tier-3 domain
+- **[RESOLVED 2026-08-21] Schema + EF verified on real Postgres.** Docker WAS available (uid in the
+  docker group, just not active in the shell session — use `sg docker -c`). Ran the costing tables +
+  EF model + freeze against pgvector via PostgresFixture (`FORGE_TEST_PG` external-pg mode): 2/2 pass.
+  Original note kept below for history.
+- **[was blocker, now resolved] Schema + EF + API + UI need a Postgres-capable box.** The Tier-3 domain
   layer (entities + `CostRollEvaluator` + tests) landed and compiles, but forge-db schema authoring
   + `forge-db assemble` regen + `AppDbContext` DbSets can't be validated here (this dev box has no
   local Postgres). EF model errors + schema drift surface at model-build / the `PostgresFixture`

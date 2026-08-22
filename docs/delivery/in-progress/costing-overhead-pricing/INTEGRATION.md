@@ -99,3 +99,11 @@ local/held:
 - **Spec steps 3–10**: wire the roll to live BOM/routing + persist `ItemStandardCost`; WIP posting +
   variances (reconcile with existing `ProductionVariancePostingService`); bank-feed classification;
   QBO summary journals; pricing (cost-to-sell/floor/target) + quote guidance; analytics; prompt engine.
+
+## Verified on Postgres (2026-08-21) — the "blocked" caveat was wrong
+
+Docker was available all along (uid in the `docker` group, just not active in the shell — `sg docker -c`).
+`CostingTier3PostgresTests` (forge-api `7dfe9d6d`) runs the 8 costing tables + EF model + freeze against
+real pgvector via the PostgresFixture: schema applies cleanly, all 8 entities round-trip, freeze derives
+the pool rate (8000/400=20) and composes the work-center rate. **2/2 pass.** So schema + EF + freeze are
+now verified, not just compiled. Remaining unverified: UI visual-verify (Playwright); spec steps 3–10.
