@@ -133,7 +133,12 @@ Context: `docs/delivery/in-progress/gated-sequence-engine/`. Built + tested, com
 
 ## Prod (forge.armoryworks.com) beta.9 API/schema — BLOCKED on pgvector version pin (2026-08-22)
 
-- **[blocker: infra] Prod schema reconcile fails on `CREATE EXTENSION "vector" VERSION "0.8.5"`.**
+- **[RESOLVED 2026-08-22] Prod on FULL beta.9.** The pgvector blocker was fixed non-destructively:
+  `ALTER EXTENSION vector UPDATE TO '0.8.6'` on prod (its installed 0.8.5 lagged the image's 0.8.6, so
+  pg-schema-diff's temp-DB validation couldn't recreate 0.8.5). After the update the additive reconcile
+  succeeded and the API swapped to beta.9 — prod is matched + healthy, 8 costing tables applied. Original
+  note kept below.
+- **[was blocker, now resolved] Prod schema reconcile failed on `CREATE EXTENSION "vector" VERSION "0.8.5"`.**
   `pg-schema-diff` validates the migration plan in a temp DB; the desired schema (forge-db) pins
   vector 0.8.5, but prod's `pgvector/pgvector:pg17` image has "no installation script nor update
   path for version 0.8.5" → "could not compute plan", forge-db exit 1. The deploy **aborted before
