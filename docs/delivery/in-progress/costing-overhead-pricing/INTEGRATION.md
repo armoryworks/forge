@@ -79,3 +79,23 @@ FULLGL machinery:
 
 A stateless "what-if roll" endpoint over the evaluator (no DB) is the one API slice that could be
 built + tested here; deferred so the first API surface matches the real persisted feature.
+
+## Build status update — full vertical slice landed (2026-08-21)
+
+Steps 1–2 of the build order are now end-to-end (domain → schema → API → UI), all committed
+local/held:
+- **Schema** (forge-db `212ea89`): 8 tables + FKs, embedded `forge-schema.sql` regenerated.
+- **API** (forge-api `12808979`): 8 DbSets; MediatR CRUD for periods/cost-centers/pools/budgets;
+  `FreezeCostingPeriod` (derive pool rates → compose `WorkCenterCostRate`); `Tier3CostingController`
+  at `/api/v1/costing/tier3` gated by `CAP-COSTING-TIER3-ABC`. Compiles + Architecture ratchet +
+  cost-roll tests green.
+- **UI** (forge-ui `6671f53c`): `/costing` (Admin,Manager) — URL-tabbed periods/freeze/rates,
+  cost centers, pools/budgets. build + lint + lint:standards + lint:i18n green.
+
+**Still to do (own increments):**
+- **Visual verification** of the UI — needs the docker stack or the static-serve+Playwright
+  substitute; not run on this box. Do before the bundled release.
+- **EF model ↔ schema** end-to-end validation on Postgres (CI integration stage / PostgresFixture).
+- **Spec steps 3–10**: wire the roll to live BOM/routing + persist `ItemStandardCost`; WIP posting +
+  variances (reconcile with existing `ProductionVariancePostingService`); bank-feed classification;
+  QBO summary journals; pricing (cost-to-sell/floor/target) + quote guidance; analytics; prompt engine.
