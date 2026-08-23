@@ -154,3 +154,25 @@ Context: `docs/delivery/in-progress/gated-sequence-engine/`. Built + tested, com
   changes; costing gated off; readiness panel degrades via defaults).
 - **[done] AP (design-partner Pi) is fully on beta.9** (api+ui+test), the full stack incl. costing
   (dark) + nav redesign — the complete deliverable is proven on a real box.
+
+## Accounting Phase 2 — status + remaining items (2026-08-22)
+
+- **[RESOLVED — the immediate "purely read-only" complaint]** The GL's data-entry surfaces already
+  existed on main as functional routes but were **absent from the nav**, so only read-only reports were
+  reachable. beta.10 surfaces them in Financials>Accounting: **Journal Entries** (posts balanced
+  double-entry via the GL engine), **Ledger**, **Bank Statements** (import/match), **QBO Export**.
+  Payables (AP bills/payments entry) was already reachable. So accounting is no longer read-only.
+- **[assessment] Phase 2 (AP sub-ledger, COGS-at-sale, PO-receipt inventory, 3-way match, GRNI) is
+  substantially ON MAIN**, not just the stale branch — payables, AP aging, GRNI reconciliation, COGS
+  posting, journal entries all present + gated behind CAP-ACCT-FULLGL (ON on prod). The
+  `feat/accounting-gl-phase1` branch (186 commits behind main, last touched 2026-06-12) appears
+  **superseded** by forward-ported work on main; do NOT naive-merge it (huge conflicts, financial
+  boundary). Confirm with the owner whether the branch can be abandoned.
+- **[blocker: needs design + owner ratification — do NOT blind-build] Remaining Phase-2 items:**
+  1. **Chart of Accounts management UI** — currently read-only (`GetChartOfAccounts` only; the JE editor
+     reads it for its picker). No create/edit-account API or UI. Adding it touches GL-account immutability
+     + posting constraints — a financial-boundary feature needing design + real-Postgres verification.
+  2. **Stage E — inventory valuation store** (standard / weighted-avg / FIFO), the last unbuilt stage per
+     `forge-api/PHASE2_STATUS.md` §Stage-E. Schema + services + per-tenant ratification (§8.1).
+  3. Several **"ratify" defaults** in PHASE2_STATUS.md (COGS fallback, FG-negative handling, valuation
+     method default) await the owner/accountant sign-off before un-darking beyond current use.
