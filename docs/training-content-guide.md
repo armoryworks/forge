@@ -331,3 +331,29 @@ Walkthrough-type rows in the Content tab show an `auto_awesome` "Regenerate Step
 5. If adding a new path, add a title-guard and associate modules via `bySlug`
 6. Run `docker compose up -d --build forge-api` to apply seed changes to dev DB
 7. Verify the module appears in `/training/all-modules` and the path appears in `/training/paths`
+
+## Coverage ratchet (added 2026-08-26)
+
+Training used to drift silently: the catalog changed 16 times between July and August with no
+new modules. Two mechanical checks now hold the line:
+
+1. **`TrainingCoverageRatchetTests`** (forge-api, `forge.tests/Architecture/`). Every seeder
+   declares the capability codes it teaches:
+
+   ```csharp
+   public override IReadOnlyList<string> Capabilities => ["CAP-MD-VENDORS"];
+   ```
+
+   Every code in `CapabilityCatalog` must be claimed by at least one seeder. The untaught set
+   lives in `training-coverage-baseline.json` and may only shrink. Shipping a new capability
+   without a module is a red build; adding a module for a baselined code fails with
+   `RATCHET DOWN` until you rerun `FORGE_STANDARDS_UPDATE_BASELINE=1 dotnet test --filter
+   TrainingCoverage` and commit the smaller baseline.
+
+2. **`training-routes.spec.ts`** (forge-ui nightly E2E). Reads every published module from the
+   API, opens each of its `AppRoutes`, and asserts the route really exists (no redirect home)
+   and that every walkthrough step's `element` selector is on the page. Content that describes
+   a UI that no longer exists fails the nightly instead of misleading someone on the floor.
+
+`npm run training:verify` (vision-model review of screenshots) still exists for a deeper pass;
+it needs a local Ollama and is run by hand.
