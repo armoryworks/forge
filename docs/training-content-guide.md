@@ -332,6 +332,16 @@ Walkthrough-type rows in the Content tab show an `auto_awesome` "Regenerate Step
 6. Run `docker compose up -d --build forge-api` to apply seed changes to dev DB
 7. Verify the module appears in `/training/all-modules` and the path appears in `/training/paths`
 
+## Shapes the renderers actually read (corrected 2026-08-26)
+
+The examples above predate the current renderers. What ships today, and what
+`TrainingContentShapeTests` enforces on every seed:
+
+- **Article**: `{"body": "<markdown>", "sections": []}`
+- **Walkthrough**: `{"appRoute": "/route", "startButtonLabel": "…", "steps": [{"element": "<selector>", "popover": {"title", "description", "side"}}]}`
+- **QuickRef**: `{"title": "…", "groups": [{"heading": "…", "items": [{"label": "…", "value": "…"}]}]}`
+- **Quiz**: `{"passingScore": 80, "shuffleQuestions": false, "shuffleOptions": true, "showExplanationsAfterSubmit": true, "questions": [{"id": "q1", "text": "…", "options": [{"id": "q1a", "text": "…", "isCorrect": true}], "explanation": "…"}]}` — the scorer reads `options[].isCorrect`; a quiz written with `correctIndex` scores every attempt as zero with no error. That shape has been removed everywhere.
+
 ## Coverage ratchet (added 2026-08-26)
 
 Training used to drift silently: the catalog changed 16 times between July and August with no
