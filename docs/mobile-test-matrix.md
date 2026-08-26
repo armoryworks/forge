@@ -18,7 +18,7 @@ Screen: 360×640 up to 430×932 logical px; one-hand reach for every primary act
 | Layer | Command | Covers |
 |---|---|---|
 | forge-ui unit | `npm run test -- --watch=false` | scan-code hints, DSN parsing, screen guard, idempotency headers, offline queue (headers replay, per-instance, 4xx → rejected) |
-| forge-ui e2e (stub-driven) | `npx playwright test mobile-shell` | shell tabs, clock punch + undo, lookup → action sheet → move prefill, job advance + undo |
+| forge-ui e2e (stub-driven) | `npx playwright test mobile-shell` | shell tabs, clock punch + undo, lookup → action sheet → move prefill, job advance + undo, full Move Stock via typed labels (wrong kind, same bin, on-hand default, undo reverse move), typed label on Scan |
 | forge-ui a11y | `npm run test:a11y` | axe critical/serious on all six shell routes + enrollment at 390×844 |
 | forge-api | `dotnet test` | IdempotencyMiddleware (Postgres), ScanCollapseService, DbSessionStore, PasskeyService, mobile capability edges, problem-report validator, controller gate audit |
 
@@ -43,6 +43,7 @@ Screen: 360×640 up to 430×932 logical px; one-hand reach for every primary act
 
 ### Five screens
 - [ ] Scan: torch, tick on decode, double-buzz on unknown, enrollment QR refused here with a hint.
+- [ ] "Type it in" on Scan and Move Stock: a typed label id behaves exactly like a decode (same kind checks, same sheet); the link is easy to miss on purpose.
 - [ ] Scan → job → advance → undo (moves back); duplicate scan inside 3 s collapses.
 - [ ] Job Status: note preset picker, dictated note, photo attach; each with undo.
 - [ ] Clock: OUT → IN → break → IN → OUT; undo inside 45 s; older undo refused with the desktop hint.
