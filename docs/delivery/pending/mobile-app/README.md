@@ -185,3 +185,5 @@ functional, `dotnet build -warnaserror && dotnet test` — plus the new unit tes
 - **D7 — Store accounts.** Reserve `com.armoryworks.forge` on App Store Connect + Play
   Console and enroll Play App Signing — account actions only Dan can do; blocking for
   step 9, not for steps 2–8.
+
+Test matrix: `docs/mobile-test-matrix.md`.
