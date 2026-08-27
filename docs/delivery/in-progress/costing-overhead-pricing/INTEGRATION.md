@@ -108,7 +108,16 @@ real pgvector via the PostgresFixture: schema applies cleanly, all 8 entities ro
 the pool rate (8000/400=20) and composes the work-center rate. **2/2 pass.** So schema + EF + freeze are
 now verified, not just compiled. Remaining unverified: UI visual-verify (Playwright); spec steps 3–10.
 
-## Build status update — step 3 landed (2026-08-26)
+## A note on numbering
+
+Two numbering schemes were in play and they collide. [SPEC.md](./SPEC.md) §10 is the
+**build order** (1 = foundation, 2 = cost roll, 3 = WIP posting and variances, …). The
+"Build status" sections below originally numbered their own increments 1/2/3, where "3" meant
+"wire the roll to live BOM/routing". **Use the SPEC §10 numbering from here on.** In those
+terms: build-order step 1 landed 2026-08-21, and build-order **step 2 (the cost roll, spec §3)
+is complete as of 2026-08-27**. The next unbuilt increment is build-order step 3 (spec §4).
+
+## Build status update — the cost roll, spec §3 (2026-08-26/27)
 
 The cost roll is no longer an unwired evaluator: it reads live BOM + routing and persists
 `ItemStandardCost`.
@@ -135,3 +144,54 @@ The cost roll is no longer an unwired evaluator: it reads live BOM + routing and
 `Operation` yet), and operation-level `ScrapFactor` is not applied — the evaluator takes scrap on BOM
 lines only. Spec steps 4–10 (WIP posting + variances, bank feed, QBO summary journals, pricing,
 analytics, prompt engine) remain.
+
+## Spec §3 closed out (2026-08-27)
+
+The three residuals the roll shipped with are done, so build-order step 2 is complete:
+
+- **§1.2 BOM fields are reachable.** `component_type` and `scrap_pct` landed with the roll but
+  nothing could write them — phantom, expensed and scrap were dead columns. Both are now on the
+  create/update commands (scrap validated 0–1), count as structural changes so they capture a BOM
+  revision, are recorded in the revision snapshot (`bom_revision_lines` gained the same two
+  columns), and are settable from both BOM authoring surfaces as a Component Type select and a
+  Scrap % input. The Postgres roll test seeds 5% scrap and asserts material rolls at 10.50, not
+  10.00 — the column is proven to reach the standard.
+- **§3.2 purchased item standards.** The roll was taking every purchased component from
+  `ManualCostOverride`, which shops do not maintain. Purchased material now comes from the
+  quantity-weighted **landed** cost of the last N receipts (PO unit price + the freight allocated
+  to that receipt); an explicit override still wins, and a part with no receipt history falls back
+  to its persisted cost calculation. `GET /costing/tier3/purchased-standards` is the pre-freeze
+  review — carried vs proposed, the drift, the receipts behind it, flagged past the threshold —
+  surfaced as the Purchased tab with a flagged-only filter. N and the threshold are the system
+  settings `costing.purchasedStandardReceipts` (3) and `costing.purchasedStandardDriftPct` (5),
+  seeded with the same values the code falls back to.
+- **§3.3 "where does the cost come from".** The stacked bar per part by element ships behind the
+  Classic/Visual toggle on the Standards tab. Its palette was validated (lightness, chroma, CVD
+  and normal-vision separation on every adjacent pair) rather than chosen by eye, and reuses the
+  rate chart's conversion hues so the two charts read as one system.
+
+**Still open in §3, deliberately:** the *indented* roll report — each operation's individual
+contribution, this level beside lower level, per item. The persisted standard carries this-level
+and rolled-up totals, so the table and chart cover the "what"; a per-operation breakdown needs
+either a detail endpoint that re-runs the evaluator for one item or per-op rows persisted at roll
+time. Worth doing when someone needs to argue with a number, not before.
+
+**Also not built, and still true:** `CostToSell` stays null (spec §6), labor crew is fixed at 1.0
+(no crew field on `Operation`), and operation-level `ScrapFactor` is not applied — the evaluator
+takes scrap on BOM lines only.
+
+## What build-order step 3 is, and whether it is documented
+
+**Yes, and it is the best-specified step in the document.** SPEC §4 gives the WIP posting formulas
+per element, the material-issue rule, PPV at receipt rather than issue, the overhead-applied
+posting, the `POST /costing-periods/{id}/close` endpoint, and the four variance formulas (spending,
+volume, efficiency, plus the labor rate/efficiency and material usage splits) with a worked
+example of the generated explanation text. §11 carries its test fixtures (800 budgeted press-hours
+against 620 actual, electricity 9% over, expected volume variance ≈ fixed_rate × 180) and reserves
+the case-ID areas ABSB and VARI.
+
+The one thing §4 does *not* settle is the reconciliation this repo has to make: Forge already has
+`OverheadPoolService` and `ProductionVariancePostingService` posting variances into the FULLGL,
+and §4 describes the same concepts for a shop whose GL is QBO. Which of those two owns the posting
+— and whether Tier-3 variances feed the existing services or a parallel path — is an open
+reconciliation, the same shape as the ones listed above. Decide it before writing the code.
