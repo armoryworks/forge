@@ -47,6 +47,8 @@ FULLGL machinery:
 
 ## Open reconciliations (decide as those steps land)
 
+> **Two of these are now settled by the code — see "Reconciliations settled" below.**
+
 - **`ItemStandardCost` vs `CostCalculation`** — the new per-period frozen item cost vs the existing
   persisted calc. Likely `ItemStandardCost` is the Tier-3 period-frozen record; `CostCalculation`
   stays the Tier-1/2 live calc. Confirm before wiring the roll to persistence.
@@ -195,3 +197,26 @@ The one thing §4 does *not* settle is the reconciliation this repo has to make:
 and §4 describes the same concepts for a shop whose GL is QBO. Which of those two owns the posting
 — and whether Tier-3 variances feed the existing services or a parallel path — is an open
 reconciliation, the same shape as the ones listed above. Decide it before writing the code.
+
+## Reconciliations settled (2026-08-27)
+
+Two of the three open reconciliations were answered by building the roll; recording them so they
+are not re-litigated:
+
+- **`ItemStandardCost` vs `CostCalculation`** — settled as proposed. `ItemStandardCost` is the
+  Tier-3 **period-frozen** record, written only by the period roll and versioned per re-roll.
+  `CostCalculation` stays the Tier-1/2 **live** calc and is untouched by Tier-3; the roll reads it
+  only as the last fallback for a purchased part with no override and no receipt history. Nothing
+  writes both, so the two cannot drift into disagreement about the same number.
+- **`WorkCenter.BurdenRatePerHour` vs pool-derived rates** — settled as proposed, with one detail
+  worth knowing: `FreezeCostingPeriod` uses the work center's flat `LaborCostPerHour` and
+  `BurdenRatePerHour` as the *base* labour and machine rates and layers the pool-derived overhead
+  on top as the LOH/MOHV/MOHF components. Tier-1 keeps the flat fields as its whole answer. So the
+  flat rates are not dead under Tier-3 — they are its labour and machine base.
+
+Still open: **pool → work-center mapping breadth.** A pool carries an optional `WorkCenterId` and
+the freeze only composes rates from pools that name one. The "else applies to every work center in
+its cost center, by driver" half was never built, so a pool with no `WorkCenterId` currently
+absorbs nowhere. Decide and build this with build-order step 3 — under-absorption is exactly what
+that step measures, and a silently unallocated pool would show up there as a variance nobody can
+explain.
