@@ -107,3 +107,31 @@ Docker was available all along (uid in the `docker` group, just not active in th
 real pgvector via the PostgresFixture: schema applies cleanly, all 8 entities round-trip, freeze derives
 the pool rate (8000/400=20) and composes the work-center rate. **2/2 pass.** So schema + EF + freeze are
 now verified, not just compiled. Remaining unverified: UI visual-verify (Playwright); spec steps 3–10.
+
+## Build status update — step 3 landed (2026-08-26)
+
+The cost roll is no longer an unwired evaluator: it reads live BOM + routing and persists
+`ItemStandardCost`.
+
+- **forge-db**: `bomlines` += `component_type` + `scrap_pct` (additive, defaulted) — the two fields
+  spec §1.2 requires and `CostRollEvaluator` already branched on. Embedded schema regenerated.
+- **forge.core**: `CostRollGraph` adapts live facts into the evaluator's shape — minutes/ms → hours,
+  `SetupMinutes` + `RunMinutesLot` fold into the per-lot charge the evaluator amortizes, standard lot
+  size = FixedOrderQuantity ?? MinimumOrderQuantity ?? 1, phantom detected from the *part* as well as
+  the line, subcontract ops charge SUB only. Kahn sort rolls components before assemblies and drops
+  BOM cycles instead of recursing into them. `CostElementJson` persists the spec's uppercase element map.
+- **forge-api**: `POST /costing/tier3/periods/{id}/roll` (409 until the period is frozen, 409 on a
+  closed period; re-roll updates in place and bumps `RollVersion`) + `GET .../item-costs`.
+- **forge-ui**: `/costing/standards` — period picker loads what is already rolled, Roll button
+  re-rolls, table shows all eight elements + total + lot + version, and the roll's diagnostics
+  (cyclic parts, unrated work centers) surface as a warning band rather than being swallowed.
+- **Verified**: 2404 forge-api tests green including a new Postgres roll test (schema + EF + roll +
+  re-roll versioning, 19.90 standard from a seeded BOM/routing); 8 new pure `CostRollGraph` tests;
+  forge-ui lint/lint:i18n/lint:standards/1498 tests/build green; Playwright static-serve screenshot
+  of `/costing/standards` (no overflow, no raw i18n keys) — that pass caught and fixed a real gap
+  (selecting a period showed nothing until you rolled).
+
+**Not in this step:** `CostToSell` stays null (spec §6), labor crew is fixed at 1.0 (no crew field on
+`Operation` yet), and operation-level `ScrapFactor` is not applied — the evaluator takes scrap on BOM
+lines only. Spec steps 4–10 (WIP posting + variances, bank feed, QBO summary journals, pricing,
+analytics, prompt engine) remain.
