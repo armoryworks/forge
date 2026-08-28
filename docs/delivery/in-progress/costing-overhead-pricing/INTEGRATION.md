@@ -220,3 +220,46 @@ its cost center, by driver" half was never built, so a pool with no `WorkCenterI
 absorbs nowhere. Decide and build this with build-order step 3 — under-absorption is exactly what
 that step measures, and a silently unallocated pool would show up there as a variance nobody can
 explain.
+
+## Build-order step 3 — period close and variances (2026-08-27)
+
+Built to decision [D1](./DECISIONS.md): Tier-3 **measures**, and does not decide where the numbers post.
+
+- **Schema.** `costing_wip_transactions` (absorption trail), `costing_variances` (named variance with the
+  quantities and rates behind it plus a generated explanation), `overhead_actuals` (what a pool really
+  cost, and from which source). `work_centers` gains `costing_cost_center_id` — this closes the gap
+  flagged above, where a pool naming a cost center rather than a work center had no way to resolve
+  which work centers it measures.
+- **`VarianceCalculator`** (pure, `Forge.Core.Costing`) — the §4.2 formulas plus the sentence each number
+  gets. Positive is unfavorable throughout. The wording follows the spec's worked example: it calls a
+  miss a "volume problem, not a cost problem" only when spending is genuinely on budget, and never when
+  the rate is the real story. Explanations are generated English formatted en-US and stored as a record
+  of what the close concluded — they are not re-rendered per viewer and do not go through i18n.
+- **`DriverActualsResolver`** — measures each pool's driver from data production already captures: time
+  entries for hour and labor-dollar drivers, production runs for units, receiving records for receipt
+  count, and routing for the standard hours the period's output should have taken. Continuous posting
+  during the period (§4.1's "as it happens") is **not** built; deriving at close produces the same
+  period totals without touching every production handler, and the derived WIP rows are the trail.
+- **`CloseCostingPeriod`** — refuses an unfrozen period (nothing to measure against) and a closed one,
+  records spending/volume/efficiency per pool, writes the per-work-order absorption trail, auto-opens
+  the next period with budgets carried forward, and replaces its own rows on a re-close rather than
+  stacking a second set.
+- **UI** — a Variances tab: close the period, read the variances with their explanations, see the
+  overhead actuals they were measured against.
+
+**Two things this deliberately does NOT do.**
+
+1. **It posts nothing.** No journal entry, to either ledger. That is D1's invariant — exactly one path
+   posts a given dollar, and on a FULLGL install the existing job close is already that path. Emitting
+   Tier-3 variances outward arrives with the QBO adapter (build-order step 5), at which point the
+   FULLGL reconciliation gets decided with real numbers in front of it.
+2. **Machine hours and labor hours are the same number.** Time entries are the only hour source and crew
+   size is not modelled on `Operation` — the same reason the cost roll fixes crew at 1.0. A pool on a
+   machine-hour driver and one on a labor-hour driver will measure identically until a crew field or
+   machine telemetry lands. `DriverActualsResolver` is where they diverge when it does.
+
+**Also not sourced:** the material-dollar driver. A pool using it is **reported as skipped** by the
+close rather than measured as zero — a zero would read as "absorbed nothing" and manufacture a large
+volume variance out of nothing. PPV, material usage, labor rate/efficiency and subcontract price are
+enumerated in `VarianceType` but only the three overhead variances are computed; the rest need the
+per-job standard-vs-actual comparison that build-order step 3's job side would add.
