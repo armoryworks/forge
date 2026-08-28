@@ -64,3 +64,39 @@ the posting services. That is not the current direction ([[forge-platform]]: `CA
 **Still open, and not an architecture question.** Which variances a given shop's accountant wants
 named — labor rate split from labor efficiency, or one lumped conversion variance. That is a
 conversation with the design partners. This decision does not foreclose either.
+
+---
+
+## D2 — Where the spec and standard cost accounting disagree, the standard wins (2026-08-27)
+
+**Context.** The owner is not an accountant and asked that these calls follow industry standard practice
+rather than being escalated. This records the standing rule and the calls made under it.
+
+**Decision.** Where SPEC.md and standard cost accounting conflict, implement the standard and record the
+divergence here. Accounting-policy questions are not escalated; genuine business questions (pricing
+strategy, which shops to serve, what to charge) still are.
+
+**Calls made under this rule.**
+
+1. **Overhead spending is measured against the flexible budget, not `rate × actual_qty`.** §4.2's formula
+   block writes `spending = actual − (rate × actual_qty)`, but its own worked example — "under-absorbed
+   $11,240 … Spending was on budget ($2 over)" — only reconciles when a fixed pool is measured against its
+   **static** budget. Fixed cost does not fall when hours do. Implemented per the example.
+2. **Spending and volume must articulate.** They now sum exactly to the pool's total under- or
+   over-absorption, for fixed, variable and semi-variable behavior alike. Under the spec's formulas they
+   did not, so an owner adding the two numbers landed on a figure that did not exist. There are tests on
+   this property specifically.
+3. **A purely variable pool has no volume variance.** Its budget flexes with activity, so running fewer
+   hours cannot strand cost — it should simply have cost less. The close records no row rather than a
+   zero, because a zero implies the variance exists and came out even.
+4. **Price and quantity are named separately for every input.** Purchase price, material usage, labor rate
+   and labor efficiency are distinct variances rather than one lumped conversion figure. Each holds one
+   factor at standard so the pair is exhaustive and each lands on the person who can act on it. This was
+   previously flagged as "a conversation with the design partners"; it is not — it is the standard, and a
+   shop that wants them summed can sum them.
+5. **Purchase price is recognized at receipt, not at issue** (this one the spec already had right), so it
+   lands on the period that made the buying commitment.
+
+**What would make this wrong.** A design partner's own accountant asking for a different treatment for
+their books. That is a real reason to revisit — but it is a request to deviate from the standard, and
+should be recorded as such rather than absorbed silently.

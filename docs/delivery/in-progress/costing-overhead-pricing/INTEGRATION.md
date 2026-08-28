@@ -263,3 +263,19 @@ close rather than measured as zero — a zero would read as "absorbed nothing" a
 volume variance out of nothing. PPV, material usage, labor rate/efficiency and subcontract price are
 enumerated in `VarianceType` but only the three overhead variances are computed; the rest need the
 per-job standard-vs-actual comparison that build-order step 3's job side would add.
+
+## Step 3, second pass — corrected to standard practice (2026-08-27)
+
+Two things changed after checking the implementation against standard cost accounting rather than against
+the spec's formula block. Both are recorded as [D2](./DECISIONS.md).
+
+- **The overhead model was wrong and is fixed.** Spending is now measured against the flexible budget
+  (static budget for the fixed share, `rate × actual_qty` for the variable share), so spending + volume
+  articulate to total under/over-absorption. A purely variable pool records no volume variance at all.
+  Efficiency is reported alongside and its explanation says explicitly not to add it to the other two.
+- **The job side is built.** Purchase price at receipt, material usage, and the labor rate/efficiency
+  split — named separately rather than lumped, each holding one factor at standard.
+
+**Now genuinely complete for build-order step 3** except subcontract price, which stays uncomputed on
+purpose: one outside-processing PO line can cover several routing operations across jobs, so attribution
+would be a guess rather than a measurement.
