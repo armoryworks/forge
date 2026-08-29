@@ -463,20 +463,23 @@ Admin → Updates in Forge itself.
 
 ## 10. Build order
 
-1. **Agent.** `panel/server.mjs` → `agent/server.mjs`: strip HTML, add the job
+1. ~~**Agent.**~~ DONE. `panel/server.mjs` → `agent/server.mjs`: strip HTML, add the job
    model, disk-backed job records, detached child, restart reconciliation, the
    full action registry, destructive-statement parsing.
    `install-forge-panel.sh` → `install-forge-agent.sh`, `/etc/forge/agent.token`.
-2. **Peer mode.** `FORGE_PEER_AGENTS`, LAN bind, coordinator sequencing.
-3. **API.** `IDeployAgentClient`, `AdminUpdatesController` (bootstrap-exempt),
+2. ~~**Peer mode.**~~ DONE. `FORGE_PEER_AGENTS`, coordinator sequencing. A job
+   became a sequence of steps (local box, then each peer) whose outcomes are
+   recovered from disk, so an agent restart mid-upgrade resumes rather than
+   guesses. Partial cross-box upgrades are reported as a named state.
+3. ~~**API.**~~ DONE. `IDeployAgentClient`, `AdminUpdatesController` (bootstrap-exempt),
    `StartDeployJob` with audit + broadcast, `UpgradeCompletionBroadcaster`.
-4. **Blue/green UI cutover.** `forge-ui-next` on a second internal port, edge
+4. ~~**Blue/green UI cutover.**~~ DONE. `forge-ui-next` on a second internal port, edge
    upstream flip, retire-old — in `scripts/forge-deploy` first, exposed second.
-5. **Upgrade lock transport.** `upgradeStateChanged` on `NotificationHub`
+5. ~~**Upgrade lock transport.**~~ DONE. `upgradeStateChanged` on `NotificationHub`
    (generic envelope), startup re-broadcast hosted service, agent marker
    written to `upgrade.json`, `forge-ui` mounting and serving it at
    `/upgrade-status.json`.
-6. **UI.** `features/admin/updates`, the global upgrade lock (§4.2) with its two
+6. ~~**UI.**~~ DONE. `features/admin/updates`, the global upgrade lock (§4.2) with its two
    payload levels, destructive-disposition dialog, per-tier advanced actions.
 7. **Rehearsal on a clone.** Restore-to-scratch, `forge-db apply`, boot target
    API, health check, tear down — resource-gated with a visible skip.
@@ -484,8 +487,14 @@ Admin → Updates in Forge itself.
 9. **Docs.** `DEPLOY.md` section, `TROUBLESHOOTING.md` entry for "the Updates
    screen says the agent is unreachable."
 
-Steps 1 and 2 ship value on their own: the agent alone makes the existing panel
-safe to keep, and step 3 is blocked on nothing else.
+**Status 2026-08-29: steps 1-6 are built and committed** across `forge-deploy`,
+`forge-api` and `forge-ui` (branch `self-service-upgrade` in each, unpushed).
+Remaining: step 7 (rehearsal on a clone), step 8 (the test matrix), step 9
+(docs). Nothing in 1-6 has been exercised against real containers yet — that is
+what step 8 is for, and it is the gate before any of this reaches a client box.
+
+One deliberate omission: `panel/` is still on disk. It stays as the break-glass
+until the matrix passes.
 
 ---
 
