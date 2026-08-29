@@ -397,9 +397,18 @@ container without new network surface.
 and accept the same shared secret. A peer agent runs exactly the same fixed-argv
 registry — there is no separate "peer protocol" to get wrong.
 
-**Order.** Schema (DB box, or in-line on the API box) → API → UI. The
-coordinator runs its own tiers to completion and only then dispatches the UI
-box's job. A failure at any step stops the sequence and reports which tiers
+**Order.** Schema (DB box, or in-line on the API box) → API → UI. The DB box is
+named separately as `FORGE_SCHEMA_AGENT`, not as an ordinary peer, because its
+step runs *before* the coordinator's own. `FORGE_PEER_AGENTS` entries run after.
+The coordinator resolves the target release before planning the job and refuses
+to start if it cannot, rather than skipping the schema step.
+
+A box that runs no versioned component declares `FORGE_DEPLOY_SERVICES=none`.
+Unset means "all", which is the opposite of what a DB box wants — left unset it
+believes it deploys api, ui, test and demo.
+
+`forge-deploy --reconcile [tag]` is how the DB box applies the schema, through
+the same gated path. It refuses where `DB_HOST` points elsewhere. A failure at any step stops the sequence and reports which tiers
 moved; the CLI's per-service auto-rollback has already restored the failed tier,
 but a *partial* upgrade across boxes is a state the screen must name explicitly
 rather than round off to "failed."
@@ -553,8 +562,20 @@ Per role (`all`, `ui+api`, `api+db`, `ui`, `api`, `db`):
 16. Rehearsal: passes on an additive release; fails loudly and changes nothing
     on a broken one; skipped-with-notice on a box too small to run it.
 
-Cross-box only (`ui` + `api+db`): coordinator sequencing, and a UI-box failure
-after a successful API deploy reported as a named partial state.
+Cross-box (`ui` + `api+db`): coordinator sequencing, and a UI-box failure after
+a successful API deploy reported as a named partial state.
+
+Fully split (`ui` + `api` + `db`): schema lands on the DB box before the API
+swaps; a missing `FORGE_SCHEMA_AGENT` refuses the job rather than skipping the
+schema; the DB box declines `--update` and points at `--reconcile`.
+
+**Run 2026-08-29 on a real three-project rig.** Both split topologies pass. It
+found three defects that single-box testing structurally could not: the upgrade
+lock missed the entire API-replacement window (the marker is written by the
+coordinator, served by the web box); a fully split install migrated nothing and
+reported success; and a DB box could not express that it deploys nothing. It
+also surfaced a pg_dump/server major mismatch that had broken backups — and
+therefore every schema-bearing upgrade — outright.
 
 The `forge-deploy` repo's CI is shellcheck-only and was red for 37 runs before
 94b1cf1 — the agent is Node, so add it to the same workflow with `node --check`
