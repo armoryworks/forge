@@ -487,7 +487,26 @@ Admin → Updates in Forge itself.
 9. **Docs.** `DEPLOY.md` section, `TROUBLESHOOTING.md` entry for "the Updates
    screen says the agent is unreachable."
 
-**Status 2026-08-29: steps 1-6 are built and committed** across `forge-deploy`,
+**First real-container run, 2026-08-29.** The single-box (`all`) cases were run
+against real GHCR images (beta.24 -> beta.25), real Postgres, MinIO, the backup
+sidecar and an nginx edge. Result: a full two-tier upgrade with a real
+pre-reconcile backup and `forge-db` apply, and **163/163 SPA probes returned 200
+through the whole thing, including the API container swap**. Passing: clean
+upgrade, check-for-updates, blue/green cutover both directions, unpublished tag,
+standby-cannot-start, marker lifecycle, container inventory.
+
+It also found three defects, two pre-existing and both able to mis-deploy a
+client box silently (see `fix(deploy): three bugs the first real-container run
+found`): `--service` rejected on every scoped box via a `pipefail` interaction;
+a failed parse reporting "All targeted services deployed successfully" and
+exiting 0; and a failed API tier **not** stopping the UI tier behind it, which
+produced exactly the new-UI-on-old-API skew §4.1 exists to prevent. That last
+one is the argument for this matrix in one line.
+
+Still unrun: the split-box roles against real containers, health-gate rollback,
+destructive-schema halt, and agent-killed-mid-job on a real deploy.
+
+**Status: steps 1-6 are built and committed** across `forge-deploy`,
 `forge-api` and `forge-ui` (branch `self-service-upgrade` in each, unpushed).
 Remaining: step 7 (rehearsal on a clone), step 8 (the test matrix), step 9
 (docs). Nothing in 1-6 has been exercised against real containers yet — that is
