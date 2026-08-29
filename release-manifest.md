@@ -22,7 +22,7 @@ deploy tag automatically pulls the right images.
    `forge-test`) auto-bump patch on every main push and publish
    `<X.Y.Z>` tags to GHCR. See
    [docs/cicd-design.md §Phase 8 addendum](./docs/cicd-design.md) and
-   [forge-deploy/CONTRIBUTING.md](https://github.com/danielhokanson/forge-deploy/blob/main/CONTRIBUTING.md)
+   [forge-deploy/CONTRIBUTING.md](https://github.com/armoryworks/forge-deploy/blob/main/CONTRIBUTING.md)
    for the auto-bump model.
 2. Update `forge-deploy/docker-compose.yml` to reference the
    chosen image tags. Tag and release `forge-deploy` (manual,

@@ -24,7 +24,7 @@ forge-ui      ─┼─▶ test → buildx → push to GHCR
 forge-deploy  ─┘
                             │
                             ▼
-              ghcr.io/danielhokanson/forge-{server,ui}
+              ghcr.io/armoryworks/forge-{server,ui}
                             │
                             ▼
          ┌──────────────────────────────────────┐
@@ -43,7 +43,7 @@ Two clean halves:
 
 ## Image registry: GHCR
 
-`ghcr.io/danielhokanson/forge-api` and `ghcr.io/danielhokanson/forge-ui`. Image name matches repo name -- the convention `${{ github.repository }}` already encodes in the existing `release.yml` workflows.
+`ghcr.io/armoryworks/forge-api` and `ghcr.io/armoryworks/forge-ui`. Image name matches repo name -- the convention `${{ github.repository }}` already encodes in the existing `release.yml` workflows.
 
 Why GHCR:
 - Free, unlimited bandwidth for public images
@@ -171,10 +171,10 @@ Local dev keeps the existing `build:` directives. Prod adds an overlay that swap
 ```yaml
 services:
   forge-api:
-    image: ghcr.io/danielhokanson/forge-api:${SERVER_IMAGE_TAG:-latest}
+    image: ghcr.io/armoryworks/forge-api:${SERVER_IMAGE_TAG:-latest}
     build: !reset null
   forge-ui:
-    image: ghcr.io/danielhokanson/forge-ui:${UI_IMAGE_TAG:-latest}
+    image: ghcr.io/armoryworks/forge-ui:${UI_IMAGE_TAG:-latest}
     build: !reset null
 ```
 

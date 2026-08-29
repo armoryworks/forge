@@ -65,7 +65,7 @@ forge-wrapper/
 │           ├── shared/       # Reusable components, services, directives, pipes, utils
 │           ├── features/     # Feature modules (kanban, backlog, admin, etc.)
 │           └── core/         # Singleton services (layout, nav, toolbar, sidebar)
-├── forge-api/       # .NET 9 solution
+├── forge-api/       # .NET 10 solution
 │   ├── forge.api/      # Controllers, Features/ (MediatR handlers), Middleware
 │   ├── forge.core/     # Entities, Interfaces, Models, Enums
 │   ├── forge.data/     # DbContext, Repositories, Migrations, Configuration
