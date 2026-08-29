@@ -154,12 +154,33 @@ GET  /jobs/current                         -> the running job, or null
 
 ```csharp
 [Authorize(Roles = "Admin")]
-[Capability("SYSTEM-UPGRADE")]     // new, default-OFF, owner-grantable
-public class AdminUpdatesController(IMediator mediator) : ControllerBase
+[CapabilityBootstrap]
+public class AdminUpdatesController(IMediator mediator, IDeployAgentClient agent) : ControllerBase
 ```
 
-`SYSTEM-UPGRADE` is a real capability, not `[CapabilityBootstrap]`. Upgrading is
-not a bootstrap concern and must be grantable to exactly one person in a shop.
+**Bootstrap-exempt, not a new capability** — reversed during implementation. The
+first draft called for a `SYSTEM-UPGRADE` capability, default-off and
+owner-grantable. Three things argued it down:
+
+- Upgrading is a *recovery* surface, and the closest precedent in the codebase
+  says so: `AdminDatabaseController` is bootstrap-exempt because it is "the
+  recovery tool an admin reaches for when an install is in a bad state, so it
+  must never itself be gated off." A capability misconfiguration is one of the
+  states an upgrade fixes; gating the fix behind the broken subsystem is
+  backwards.
+- The control it was supposed to buy already exists, and is stronger. A shop
+  that wants upgrades to remain its integrator's job does not install the agent
+  — which removes the mechanism, rather than hiding a button in front of a
+  mechanism that still works. `Deploy:AgentUrl` unset is a supported, first-class
+  state, not a degraded one.
+- A new catalog entry is not free: `CapabilityCatalog` is ratcheted against
+  CLAUDE.md's stated count, and `TrainingCoverageRatchetTests` fails the build
+  for any capability shipped without a training module. That cost is worth
+  paying for a feature; it is not worth paying to express "Admin, but not
+  upgrades," which the role already expresses.
+
+Access is therefore the `Admin` role plus the agent having been deliberately
+installed and wired.
 
 | endpoint | maps to |
 |---|---|
@@ -181,10 +202,13 @@ accepted. The CLI's `/var/log/forge-deploy.log` records *what the box did*;
 Forge's audit log must record *who told it to*.
 
 `IDeployAgentClient` is a thin typed `HttpClient` over the agent, registered
-only when `Deploy__AgentUrl` is configured. Absent configuration, the endpoints
-return `503` with "upgrade agent not installed on this box" — that is the
-correct state for a cohosted or Tuyere-managed instance where upgrades are not
-the tenant's to run.
+unconditionally; `IsConfigured` is false when `Deploy__AgentUrl` is unset. Every
+method then degrades to a value rather than an exception, because "no agent on
+this box" is a supported deployment (cohosted, or Tuyere-managed) and not a
+fault. `GET state` returns `200` with `agentAvailable: false` so the screen can
+render the real situation; the action endpoints return `503` naming the terminal
+path. Returning a value rather than throwing also keeps the controller free of
+the try/catch the standards ratchet forbids.
 
 ---
 
@@ -267,7 +291,7 @@ regardless, because the SPA bundle they are running has just been replaced.
 | audience | sees |
 |---|---|
 | every console | "Forge is being updated. This screen will come back on its own." No versions, no tiers, no logs. |
-| holders of `SYSTEM-UPGRADE` | per-tier progress, the live deploy log, destructive statements, from -> to tags |
+| the `Admin` role | per-tier progress, the live deploy log, destructive statements, from -> to tags |
 
 This split is a **security boundary, not a copywriting choice.** The broadcast
 goes to `Clients.All`, so its payload carries the generic envelope only —
@@ -444,8 +468,8 @@ Admin → Updates in Forge itself.
    full action registry, destructive-statement parsing.
    `install-forge-panel.sh` → `install-forge-agent.sh`, `/etc/forge/agent.token`.
 2. **Peer mode.** `FORGE_PEER_AGENTS`, LAN bind, coordinator sequencing.
-3. **API.** `SYSTEM-UPGRADE` capability, `IDeployAgentClient`,
-   `AdminUpdatesController`, audit entries, `503` when unconfigured.
+3. **API.** `IDeployAgentClient`, `AdminUpdatesController` (bootstrap-exempt),
+   `StartDeployJob` with audit + broadcast, `UpgradeCompletionBroadcaster`.
 4. **Blue/green UI cutover.** `forge-ui-next` on a second internal port, edge
    upstream flip, retire-old — in `scripts/forge-deploy` first, exposed second.
 5. **Upgrade lock transport.** `upgradeStateChanged` on `NotificationHub`
@@ -482,15 +506,14 @@ Per role (`all`, `ui+api`, `api+db`, `ui`, `api`, `db`):
 7. API container recreated mid-job — the hub drops and reconnects, the console
    holds the lock throughout, the log resumes, no false error is shown.
 8. Second job while one runs — `409`, no double deploy.
-9. Non-Admin / missing `SYSTEM-UPGRADE` — `403`, no dispatch, audit records the
-   attempt.
+9. Non-Admin — `403`, no dispatch.
 10. Agent not installed — `503`, screen offers the terminal path.
 11. Upgrade lock, pub-sub path: a second console already open receives the
     broadcast and locks without polling; a console opened fresh mid-upgrade
     locks from the marker; both release together; completion forces exactly one
     hard reload.
-12. Upgrade lock, payload split: a non-`SYSTEM-UPGRADE` session sees only the
-    generic message — assert the broadcast frame itself carries no tag, tier,
+12. Upgrade lock, payload split: a non-Admin session sees only the generic
+    message — assert the broadcast frame itself carries no tag, tier,
     or DDL, and that `/upgrade-status.json` carries no job id or action name.
 13. Stale marker: agent killed with the marker present — every console releases
     at `expiresAt` rather than locking the shop out.
@@ -527,5 +550,7 @@ plus a job-model unit test that does not need docker.
   not optional.
 - Do not put a version tag, a tier name, or schema DDL in the `Clients.All`
   broadcast or in `/upgrade-status.json`. Both reach every tablet in the shop.
+- Do not gate the upgrade surface behind a capability. It is a recovery tool,
+  and a broken capability snapshot is one of the things it recovers from.
 - Do not offer per-tier upgrades as the primary action.
 - Do not remove the CLI path, or let it fall behind the website's capabilities.
