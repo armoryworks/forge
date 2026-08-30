@@ -204,7 +204,7 @@ Forge's audit log must record *who told it to*.
 `IDeployAgentClient` is a thin typed `HttpClient` over the agent, registered
 unconditionally; `IsConfigured` is false when `Deploy__AgentUrl` is unset. Every
 method then degrades to a value rather than an exception, because "no agent on
-this box" is a supported deployment (cohosted, or Tuyere-managed) and not a
+this box" is a supported deployment (cohosted, or externally managed) and not a
 fault. `GET state` returns `200` with `agentAvailable: false` so the screen can
 render the real situation; the action endpoints return `503` naming the terminal
 path. Returning a value rather than throwing also keeps the controller free of
