@@ -23,13 +23,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout wrapper
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: .ps1 BOM check
         run: bash scripts/check-ps1-bom.sh
 
       - name: Checkout forge-deploy (sibling) for parity comparison
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: armoryworks/forge-deploy
           path: forge-deploy

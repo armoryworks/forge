@@ -35,7 +35,7 @@ Forge runs as a **self-hosted Docker Compose stack**. Single-node by default, wi
 |-------|-----------|-----------|
 | Frontend | Angular 21 + Material, served by nginx | `forge-ui` |
 | Backend | .NET 10 API (MediatR/CQRS, EF Core) | `forge-api` |
-| Database | PostgreSQL 17 + pgvector; schema owned by [forge-db](https://github.com/armoryworks/forge-db) | `forge` |
+| Database | PostgreSQL 18 + pgvector; schema owned by [forge-db](https://github.com/armoryworks/forge-db) | `forge` |
 | Object storage | MinIO (S3-compatible) | `forge-storage` |
 | Backups | Scheduled `pg_dump` sidecar (daily at 02:00 UTC by default) | `forge-backup` |
 | Optional | Ollama (AI), Coqui (TTS), DocuSeal (signing), Seq (logs), GlitchTip (crash reports) | profile-gated |
