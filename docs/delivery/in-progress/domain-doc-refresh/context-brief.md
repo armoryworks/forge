@@ -6,13 +6,22 @@ id: domain-doc-refresh-context-brief
 updated: 2026-09-14
 ---
 
-# Context brief — where this product does not match a standard ERP/MRP/MES stack
+# Context brief — vocabulary audit and domain-document refresh
 
-> Written for a reviewer who knows the industry but not this product. It exists so that a
-> refresh of the May 2026 domain documents does not silently assume vocabulary and structure
-> this platform deliberately does not use. It describes concepts, not implementation. Nothing
-> here is derived from reading application source, and a reviewer using it must not read
-> application source either — the whole point of the refresh is an opinion the code did not shape.
+> Written for a reviewer who knows the industry but not this product.
+>
+> **Read this first, because the framing changed.** An earlier draft of this brief presented the
+> product's non-standard vocabulary as context to work around. That was wrong. The owner's
+> position is that this product should follow **industry-standard verbiage and practice**, and
+> every departure is a finding to be judged, not a constraint to be accommodated.
+>
+> So the first deliverable of this run is a **complete vocabulary audit**: every term this
+> product uses where the industry has a settled term, with a ruling on each. The list further
+> down is a starting point, not the answer — it was assembled quickly and is known to be both
+> incomplete and partly wrong. Find the ones it missed. Overturn the ones it got wrong.
+>
+> Nothing here is derived from reading application source, and you must not read application
+> source either — the value of this refresh is an opinion the code did not shape.
 
 ## What the platform is
 
@@ -20,6 +29,58 @@ A shop-management platform for small and mid-size discrete manufacturers — job
 similar. It covers the commercial and operational spine (lead, estimate, quote, order,
 production, shipment, invoice, cash) plus master data, quality, inventory, purchasing and
 people. It is **one application**, not an ERP with a bolted-on MES.
+
+## Deliverable 1 — the vocabulary audit
+
+Produce `docs/delivery/in-progress/domain-doc-refresh/vocabulary-audit.md`. One row per term.
+For each: the term this product uses, the industry-standard term, the standard's source
+(a named standard body, a dominant vendor's usage, or settled trade practice), and a **ruling**
+of one of:
+
+- **Rename** — the industry term exists, is well understood, and this product's word is simply
+  non-standard. Say what it should be called.
+- **Keep** — the product's term names something the industry has no settled word for, or the
+  industry term would be actively misleading here. Justify it; "we're used to it" is not a
+  justification.
+- **Collision** — the product uses a standard word to mean something other than what the
+  industry means by it. These are the most damaging, because a customer reads them and is
+  confidently wrong. Flag them even where the fix is hard.
+
+Two rulings are already made and are not yours to revisit:
+
+- **Job → Work Order is decided.** In discrete manufacturing the shop-floor document is a work
+  order; "job" in job-shop costing means the customer engagement you cost against, so the
+  product's usage is a collision. Treat it as settled and use *work order* throughout your
+  revision of the domain documents.
+- **The domain documents themselves must be written in standard vocabulary**, with the product's
+  current word noted parenthetically only where a reader would otherwise be lost.
+
+Go well beyond the starting list below. Sweep the documents under `docs/` for product coinages:
+entity names, status names, document names, role names, process names, and any phrase that reads
+like engineering vocabulary that escaped into the business domain. Judge master data, planning,
+purchasing, inventory, quality, costing and people vocabulary, not only the order-to-cash spine.
+
+## Starting list — incomplete, and partly wrong
+
+These are candidate findings from a quick pass. Verify each; some are misjudged. Grounded
+checks against the product's own surfaces showed that routings, operations and work centres do
+exist as first-class concepts, and that the manual test library already says *work order*.
+
+| Product term | Likely standard term | Note |
+|---|---|---|
+| Job | Work order | **Decided — collision.** See above. |
+| Track type, stage | Routing, operation, order status | Sits alongside real routings, so the product carries two parallel lifecycle vocabularies |
+| Attestation, proof of intent | Customer purchase order, order acknowledgment | Invented names for artefacts every ERP already names |
+| Gated sequence | Quality gate, hold point, inspection plan, approval workflow | Implementation vocabulary surfacing in the domain |
+| Capability | Module, licensed feature | Judge whether this one is worth changing |
+| Retail buyer | Ship-to party | The sold-to / bill-to / ship-to triad already covers this role |
+| Editable document numbers | Number ranges, immutable | A **practice** departure, not a naming one. Audit exposure. |
+
+Judged and found **standard already**, so do not "fix" them: the estimate-versus-quote split;
+integrating an external general ledger as book of record; expressing part identity as separate
+procurement, inventory-class and taxonomy axes; per-install label remapping as a feature.
+
+## Deliverable 2 — the refreshed domain documents
 
 ## The deviations that matter to a correctness document
 
