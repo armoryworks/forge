@@ -1,9 +1,19 @@
+---
+title: Definition of Correct — regulated-manufacturing addendum
+type: domain
+status: stable
+id: definition-of-correct-regulated-addendum
+updated: 2026-09-14
+---
+
 # Addendum — The "If Regulated" Delta (CONDITIONAL — dormant until evidence warrants)
 
 **Author:** Domain / Industry Specialist
-**Status:** Pre-staged. **Do not activate** unless the BA's schema/code evidence confirms the shop runs **regulated contract manufacturing**. This layers on top of the v1 spine; it does not replace it.
+**Status:** Pre-staged. **Do not activate** unless evidence confirms the shop runs **regulated contract manufacturing**. This layers on top of the v3 spine; it does not replace it. Revised 2026-09-14 for standard vocabulary (*work order*, *hold point*) and the v3 rule format.
 **Companion to:** `definition-of-correct.md`
 
+> **Presumes (every rule below):** capabilities *quality*, *lot/serial traceability* and *hold points / approvals* on, plus *operator competence records* for special-process rules · accounting mode X/N (none of these rules is financial). With any presumed capability off, the rule is *not exercised*, not passed.
+>
 > The base "Definition of Correct" assumes a general job shop. The app carries **AS9100 / PPAP / FMEA-class depth**, so regulated operation is plausible. This addendum specifies *exactly* which previously nice-to-have items become **table-stakes** and which spine invariants gain **gating preconditions** if that proves true.
 
 ---
@@ -12,14 +22,14 @@
 
 Activate **granularly, by vertical**, not all-or-nothing:
 
-| Trigger evidence in schema/code | Activates |
+| Trigger evidence (customers, contracts, certifications, records the shop keeps) | Activates |
 |---|---|
 | AS9100 / aerospace customers; **AS9102 FAIR**, ballooned-characteristic, NADCAP/AVL, DFARS melt-source fields | §R-AERO (FAI, special-process source control, melt/COO) |
 | **PPAP/PSW**, control-plan, MSA, IATF references | §R-AUTO (PPAP gating, control plan) |
 | ISO 13485 / medical / UDI, **21 CFR Part 11** e-sig & audit fields | §R-MED (e-sig, retention, UDI/DHR) |
 | Lot/serial **genealogy**, mill-cert/CofC capture, NCR/MRB/CAPA, **revision effectivity**, calibration/gauge, operator qualification | §R-CORE (applies to *all* regulated verticals) |
 
-**Critical real-world nuance — activate per-part, not shop-wide.** An AS9100-certified shop typically runs **both regulated and commercial jobs**. The controls below should be driven by a **part/customer/contract "quality-controlled" flag**, not applied blanket to every order. If the schema has such a flag (e.g., part-level quality class, contract flowdown), the gates fire only on flagged work. If there is *no* such flag and the app forces full control on everything, that itself is a finding (over-rigid for commercial work, a competitiveness problem).
+**Critical real-world nuance — activate per-part, not shop-wide.** An AS9100-certified shop typically runs **both regulated and commercial work orders**. The controls below should be driven by a **part/customer/contract "quality-controlled" flag**, not applied blanket to every order. If the platform has such a flag (e.g., a part-level quality designation, contract flowdown), the gates fire only on flagged work. If there is *no* such flag and the app forces full control on everything, that itself is a finding (over-rigid for commercial work, a competitiveness problem).
 
 ---
 
@@ -31,14 +41,16 @@ Activate **granularly, by vertical**, not all-or-nothing:
 - **NCR + MRB disposition + CAPA** as mandatory, controlled flows (not optional logs).
 - **Revision / configuration control with effectivity** (which serial/lot range a rev applies to), ECO/ECN approval workflow.
 - **Calibration / gauge control**: acceptance measurements use in-cal equipment.
-- **Operator qualification** for special processes recorded against the op.
+- **Operator qualification** (competence records, ISO 9001 §7.2 / AS9100 §7.2) for special processes recorded against the operation, with expiry.
 - **Records retention + immutable, attributable audit trail** on quality/traceability records (append-only; controlled deletion).
 
 ### Spine invariants that gain **gating preconditions** (the base invariant still holds; these *block progression*)
 
+Each gate is a **hold point**: a precondition on advancing work, stated as what must be true, whatever the shop has named its statuses and however the approval mechanism is configured (base §A3). A gate that is recorded but does not block advance fails the rule.
+
 | Spine stage (base ref) | Added gating precondition when flagged regulated |
 |---|---|
-| **A5 Receiving/issue** | Material **cannot be issued** to a flagged job without its required **cert on file** and **incoming inspection** passed. |
+| **A5 Receiving/issue** | Material **cannot be issued** to a flagged work order without its required **cert on file** and **incoming inspection** passed. |
 | **A5 Inventory** | **Nonconforming stock must be physically segregated (quarantine)** and **cannot be issued/shipped without an MRB disposition**. A part dispositioned *scrap* can never re-enter good inventory. |
 | **A6 Shipment** | **Cannot ship** without: complete unbroken **genealogy**, required **certs/CofC package**, and acceptance recorded on **in-cal gauges**. No orphan units ("unknown lot") may ship. |
 | **A2/A3 Revision** | A **rev or process change re-triggers FAI/PPAP** (per vertical) and **quarantines superseded-rev inventory**; mixing revs within a lot is blocked. |
@@ -46,7 +58,7 @@ Activate **granularly, by vertical**, not all-or-nothing:
 
 ### New conservation-law-style invariants (QA oracles)
 - **No-orphan-genealogy:** every shipped unit has a complete, unbroken chain to raw material; a shipment with an incomplete chain cannot post.
-- **Cert-before-use:** `issued_to_flagged_job ⇒ required_cert_on_file ∧ incoming_inspection_passed`.
+- **Cert-before-use:** `issued_to_flagged_work_order ⇒ required_cert_on_file ∧ incoming_inspection_passed`.
 - **Disposition-gate:** `nonconforming ⇒ ¬issuable ∧ ¬shippable` until MRB disposition recorded; `disposition=scrap ⇒ permanently removed from good inventory`.
 - **Cal-gate:** every acceptance inspection references a gauge **in-calibration at the time of measurement**; an out-of-cal gauge triggers review/recall of product accepted on it.
 - **Quality records are append-only, timestamped, attributable**; edits are versioned, not overwritten.
@@ -55,7 +67,7 @@ Activate **granularly, by vertical**, not all-or-nothing:
 
 ## §R-AERO — aerospace (AS9100) additions
 - **FAI / AS9102 FAIR** mandatory: ballooned drawing → characteristic accountability → measured results (Forms 1/2/3). **No production shipment of a flagged part until an approved FAI exists for the current rev/process.** FAI **re-triggers** on: new part, **rev change**, process/source change, or production lapse (typically >2 yrs).
-- **Special-process source control (NADCAP + customer AVL):** an outside-process PO (heat-treat, plating, NDT, weld) can be placed **only to an approved source for that process**; returned process cert is **mandatory** before the lot proceeds (gates A6/A9 procurement).
+- **Special-process source control (NADCAP + customer AVL):** an outside-process PO (heat-treat, plating, NDT, weld) can be placed **only to an approved source for that process**; returned process cert is **mandatory** before the lot proceeds (gates §A6 shipment and Part D procurement).
 - **DFARS / specialty-metals + melt-source / country-of-origin** capture on material for defense-aero; flows into cert package and genealogy. (May intersect **ITAR/EAR export control** — flag if export-control fields appear; that adds access-control obligations to Identity.)
 - Invariant: `flagged_aero_production_ship ⇒ approved_FAI(current_rev) ∧ all_special_processes_from_approved_source_with_cert`.
 
@@ -83,8 +95,8 @@ Base calibration said: *quality features (FMEA/PPAP/SPC/CAPA) are differentiator
 ---
 
 ## What I need from the BA to activate (precise asks)
-1. Is there a **part/customer/contract quality-class flag** that scopes these controls, or are they shop-wide? (Determines granular vs blanket activation.)
+1. Is there a **part/customer/contract quality designation** that scopes these controls, or are they shop-wide? (Determines granular vs blanket activation.)
 2. Which **verticals** are evidenced — AS9102/NADCAP/DFARS (aero), PPAP/PSW (auto), Part-11/UDI (med)? (Determines which §R-* sections activate.)
 3. Are the **gates actually enforced** (ship/issue blocked) or merely **recorded** (data captured, no enforcement)? — This is the single biggest correctness question if regulated: *captured-but-not-enforced traceability is a false sense of compliance*, and would be a high-severity finding.
 
-Until the BA returns this, the addendum stays dormant and the base v1 Definition of Correct governs.
+Until the BA returns this, the addendum stays dormant and the base Definition of Correct governs.
