@@ -4,12 +4,17 @@
 /forge-ui/
 /forge-test/
 /forge-voice/
+/forge-db/
+/forge-factory/
+/forge-analysis/
+/forge-ux/
+/arsenal/
 
 # --- Wrapper-local copy (relative paths differ from forge-deploy's) ---
 /docker-compose.yml
 
 # --- Junctioned to forge-deploy/tools (Windows directory link) ---
-/tools/
+/tools
 
 # Note: the four overlay compose files (docker-compose.{dev,demo,cohost,
 # export}.yml) USED to be gitignored here under a "hard-linked, owned by
