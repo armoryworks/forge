@@ -12,7 +12,7 @@ updated: 2026-09-14
 **Status:** Pre-staged. **Do not activate** unless evidence confirms the shop runs **regulated contract manufacturing**. This layers on top of the v3 spine; it does not replace it. Revised 2026-09-14 for standard vocabulary (*work order*, *hold point*) and the v3 rule format.
 **Companion to:** `definition-of-correct.md`
 
-> **Presumes (every rule below):** capabilities *quality*, *lot/serial traceability* and *hold points / approvals* on, plus *operator competence records* for special-process rules · accounting mode X/N (none of these rules is financial). With any presumed capability off, the rule is *not exercised*, not passed.
+> **Presumes (every rule below):** features *quality*, *lot/serial traceability* and *approval workflow* on, plus *operator competence records* for special-process rules · accounting mode X/N (none of these rules is financial). With any presumed capability off, the rule is *not exercised*, not passed.
 >
 > The base "Definition of Correct" assumes a general job shop. The app carries **AS9100 / PPAP / FMEA-class depth**, so regulated operation is plausible. This addendum specifies *exactly* which previously nice-to-have items become **table-stakes** and which spine invariants gain **gating preconditions** if that proves true.
 
@@ -46,9 +46,9 @@ Activate **granularly, by vertical**, not all-or-nothing:
 
 ### Spine invariants that gain **gating preconditions** (the base invariant still holds; these *block progression*)
 
-Each gate is a **hold point**: a precondition on advancing work, stated as what must be true, whatever the shop has named its statuses and however the approval mechanism is configured (base §A3). A gate that is recorded but does not block advance fails the rule.
+Each gate is an inspection **hold point** or an approval-workflow step: a precondition on advancing work, stated as what must be true, whatever the shop has named its statuses and however the approval workflow is configured (base §A3). A gate that is recorded but does not block advance fails the rule.
 
-| Spine stage (base ref) | Added gating precondition when flagged regulated |
+| Spine rule (base ref) | Added gating precondition when flagged regulated |
 |---|---|
 | **A5 Receiving/issue** | Material **cannot be issued** to a flagged work order without its required **cert on file** and **incoming inspection** passed. |
 | **A5 Inventory** | **Nonconforming stock must be physically segregated (quarantine)** and **cannot be issued/shipped without an MRB disposition**. A part dispositioned *scrap* can never re-enter good inventory. |
