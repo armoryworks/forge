@@ -72,3 +72,6 @@ analysis/**/*.ps1
 # Playwright e2e run artifacts (test output, never source)
 test-results/
 .last-run.json
+
+# md-agent run workspaces (each seat is its own git worktree)
+/runs/
