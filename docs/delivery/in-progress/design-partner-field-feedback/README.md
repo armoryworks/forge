@@ -44,7 +44,7 @@ blocker.
 
 - [x] Draft/cancelled/shipped SO lines no longer offered for job assignment (`58b4757a`)
 - [x] Auto-created jobs record a `JobPart` row with part + quantity (`58b4757a`)
-- [ ] Manual job creation must accept part + quantity (the auto path is wired, the manual one is not)
+- [x] Manual job creation accepts part + quantity (`199335e1`)
 - [ ] Job card should show part number and quantity, not only the generated title
 - [ ] Default auto-generated job title is not useful — derive from part number
 - [ ] Over-allocation across jobs on the same SO line: **warn, do not block** (decided)
@@ -55,8 +55,9 @@ Two status fields render on a job (header and the J-### area) with no defined in
 neither offers a way to retire a mistaken entry.
 
 - [ ] Define the two status fields' relationship; a change in one must drive the other
-- [ ] Add an unambiguous "entered in error" disposition, plus "other"
-- [ ] Archive currently leaves the card on the production column — it must leave the board
+- [x] `EnteredInError` and `Other` dispositions; the first archives (`199335e1`)
+- [x] Archive left the card on the board: the client never subscribed to `boardUpdated`, so all
+      four bulk operations were silently dropped (`c927d584`)
 - [ ] Kanban filter for active-only jobs, defaulted on
 - [ ] Operation-level status: allow marking an operation complete or partially complete from the
       job view, not only via shop-floor scanning
