@@ -4,7 +4,7 @@ type: delivery
 status: in-progress
 id: design-partner-field-feedback
 owner:
-updated: 2026-10-08
+updated: 2026-10-14
 ---
 
 # Design-partner field feedback — triage and build order
@@ -135,6 +135,23 @@ Two build waves landed on main: 37 packages in wave 1 and 74 in wave 2, each gat
 tests, lint, i18n parity, standards ratchets) and reviewed before push. Operation-level status
 ships behind the `shop-floor.operation-tracking` setting, default off.
 
+## Released
+
+- **1.0.0-beta.27** (2026-10-09): both sweep waves above. First build the partner can upgrade to
+  with the frozen-clock fix; the install preflight moves `ASPNETCORE_ENVIRONMENT` to Production.
+- **1.0.0-beta.28** (2026-10-10): release plumbing only — API images carry their own version and
+  commit so `/api/v1/version` and the Updates screen report the running build.
+- **1.0.0-beta.29** (2026-10-14): follow-ups from the same field feedback.
+  - [x] Efficiency on the job card renders as a dash until there is data, instead of a red 0%.
+  - [x] Scrap/rework entry takes a rework count and a reason code on the desktop dialog and the
+        phone sheet; reason codes are a managed `operation_reason` reference-data group served
+        with the job-operations config.
+  - [x] The Time Tracking header's elapsed time ticks while a timer runs.
+  - [x] Job status dates on the phone pages are date-only, so due dates no longer shift by a day.
+
+After upgrading, turn on `shop-floor.operation-tracking` and the safety-stock capability (with a
+replenishment assignee) on the partner install; both default off.
+
 Still open:
 
 - [ ] `minio/minio` is gone from Docker Hub and quay.io no longer serves it, so a fresh install
@@ -142,7 +159,9 @@ Still open:
       Needs a replacement S3-compatible backend and a migration path for existing volumes.
 - [ ] Over-allocation warning when several jobs cover the same sales-order line (decided: warn).
 - [ ] Breaking a job's operations out into their own sub-jobs.
-- [ ] Partner re-test on beta.27: timers, terminal setup, first-paint scaling, MRP.
+- [ ] Partner re-test on beta.29: timers, terminal setup, first-paint scaling, MRP, rework entry.
+- [ ] Nightly E2E has been failing since 2026-10-09 (before beta.28); not a release gate, needs
+      triage.
 
 Owner decisions raised by the sweep: internal production orders; retiring the legacy phone pages;
 kiosk re-authentication per tap; approved-source enforcement on POs; PO revisions after submit;
