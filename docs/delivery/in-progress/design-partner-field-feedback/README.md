@@ -148,9 +148,18 @@ ships behind the `shop-floor.operation-tracking` setting, default off.
         with the job-operations config.
   - [x] The Time Tracking header's elapsed time ticks while a timer runs.
   - [x] Job status dates on the phone pages are date-only, so due dates no longer shift by a day.
+- **1.0.0-beta.30** (2026-10-15): the partner reported being unable to change the status of a
+  job's individual steps. The switch existed only in the API's settings catalog; the Settings tab
+  never rendered its group.
+  - [x] Settings tab gains a Shop Floor section. Numbering and Shop Floor are both catalog-driven
+        toggle sections, and every toggle carries an info icon with the setting's description.
+  - [x] `shop-floor.operation-tracking` is on by default and labelled "Operation tracking
+        (per-step status and timers)". Installs with no stored override pick this up on upgrade;
+        the old job-timer-only behaviour is one toggle away.
+  - [x] Settings tab search filters every section and row by label and description.
 
-After upgrading, turn on `shop-floor.operation-tracking` and the safety-stock capability (with a
-replenishment assignee) on the partner install; both default off.
+After upgrading, turn on the safety-stock capability (with a replenishment assignee) on the
+partner install; it defaults off.
 
 Still open:
 
@@ -159,7 +168,8 @@ Still open:
       Needs a replacement S3-compatible backend and a migration path for existing volumes.
 - [ ] Over-allocation warning when several jobs cover the same sales-order line (decided: warn).
 - [ ] Breaking a job's operations out into their own sub-jobs.
-- [ ] Partner re-test on beta.29: timers, terminal setup, first-paint scaling, MRP, rework entry.
+- [ ] Partner re-test on beta.30: per-step status, timers, terminal setup, first-paint scaling, MRP,
+      rework entry.
 - [ ] Nightly E2E has been failing since 2026-10-09 (before beta.28); not a release gate, needs
       triage.
 
