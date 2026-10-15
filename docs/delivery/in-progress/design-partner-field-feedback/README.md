@@ -135,6 +135,31 @@ Two build waves landed on main: 37 packages in wave 1 and 74 in wave 2, each gat
 tests, lint, i18n parity, standards ratchets) and reviewed before push. Operation-level status
 ships behind the `shop-floor.operation-tracking` setting, default off.
 
+## Round 2 — reported 2026-10-15
+
+Reported from a laptop after the beta.29 upgrade. The partner is away until 2026-10-20.
+
+- [x] Clicking a job opens a fixed-size window with content outside the field of view and no
+      scrolling. The detail panel never took its height from the dialog surface, so its columns
+      grew to their content and the surface clipped the rest. Measured at 1100x650: surface 602px,
+      panel 735px, no scroll. Fixed: the panel fills the dialog and each column scrolls.
+- [x] Jobs marked completed and hidden by the board filter still sit in the In Production column,
+      still count on the dashboard, and still show as past deadline. Three causes:
+      the "Completed" workflow status is retired on main but was still selectable on this install
+      (owner to confirm the install's reference data); a scrapped job kept its overdue flag; and the
+      dashboard counted completed and disposed jobs in tasks, deadlines, stage totals and the
+      overdue KPI. The board flag and the dashboard now treat completed and disposed jobs as closed.
+      A job's column is its stage; completing is moving it to the last stage, not a status pick.
+- [x] Estimated time remaining on the card shows one part's time, not the balance of the order.
+      The card's quantity fell back to the sales-order line when a job had no job-part row; the
+      remaining-time math fell back to 1. Both now share the fallback.
+- [x] The "connection lost" message is too sensitive on a LAN. Cause not reproduced; SignalR
+      keep-alive and timeout are now explicit on both ends (15 s / 120 s) and the banner waits
+      15 s instead of 5 s before reporting. If it persists, capture the browser console.
+- [ ] The public demo's board shows "Failed to load board data" (seen while reproducing the
+      dialog bug on beta.30; not a partner report). Needs the demo build run locally to find which
+      intercepted request fails.
+
 ## Released
 
 - **1.0.0-beta.27** (2026-10-09): both sweep waves above. First build the partner can upgrade to
